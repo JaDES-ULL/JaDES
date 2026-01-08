@@ -46,7 +46,7 @@ To use JaDES in your project:
 <dependency>
     <groupId>es.ull.simulation</groupId>
     <artifactId>jades-core</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>version</version>
 </dependency>
 ```
 
@@ -71,3 +71,4 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for gu
 ## Authors
 
 JaDES Development Team - Universidad de La Laguna
+
