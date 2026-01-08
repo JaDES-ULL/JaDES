@@ -1,0 +1,45 @@
+# EditorConfig helps maintain consistent coding styles across editors and IDEs
+# See https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{java,xml}]
+indent_style = space
+indent_size = 4
+max_line_length = 120
+
+[*.{md,markdown}]
+indent_style = space
+indent_size = 2
+max_line_length = 80
+trim_trailing_whitespace = false
+
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+[*.{json,jsonc}]
+indent_style = space
+indent_size = 2
+
+[*.properties]
+indent_style = space
+indent_size = 4
+
+[Makefile]
+indent_style = tab
+
+[pom.xml]
+indent_style = space
+indent_size = 4
+
+# GitHub Actions workflows
+[.github/**/*.{yml,yaml}]
+indent_style = space
+indent_size = 2
