@@ -32,7 +32,7 @@ class ActivityManagerTest {
     @Test
     void shouldAutoRegisterInSimulation_whenCreated() {
         ActivityManager am = new ActivityManager(simulation);
-        
+
         assertTrue(simulation.getActivityManagerList().contains(am));
     }
 
@@ -50,7 +50,7 @@ class ActivityManagerTest {
     @Test
     void shouldHaveDescriptionWithIdentifier_whenCreated() {
         String description = activityManager.getDescription();
-        
+
         assertNotNull(description);
         assertTrue(description.contains("Activity Manager"));
         assertTrue(description.contains(String.valueOf(activityManager.getIdentifier())));
@@ -59,9 +59,9 @@ class ActivityManagerTest {
     @Test
     void shouldAddResourceType_whenRequested() {
         ResourceType rt = new ResourceType(simulation, "Test Resource Type");
-        
+
         activityManager.add(rt);
-        
+
         String description = activityManager.getDescription();
         assertTrue(description.contains(rt.toString()));
     }
@@ -70,10 +70,10 @@ class ActivityManagerTest {
     void shouldAddMultipleResourceTypes_whenRequested() {
         ResourceType rt1 = new ResourceType(simulation, "RT1");
         ResourceType rt2 = new ResourceType(simulation, "RT2");
-        
+
         activityManager.add(rt1);
         activityManager.add(rt2);
-        
+
         String description = activityManager.getDescription();
         assertTrue(description.contains(rt1.toString()));
         assertTrue(description.contains(rt2.toString()));
@@ -85,9 +85,9 @@ class ActivityManagerTest {
         WorkGroup wg = new WorkGroup(simulation, rt, 1);
         RequestResourcesFlow flow = new RequestResourcesFlow(simulation, "TestFlow");
         flow.newWorkGroupAdder(wg).add();
-        
+
         activityManager.add(flow);
-        
+
         String description = activityManager.getDescription();
         assertTrue(description.contains(flow.toString()));
     }
@@ -98,9 +98,9 @@ class ActivityManagerTest {
         WorkGroup wg = new WorkGroup(simulation, rt, 1);
         RequestResourcesFlow flow = new RequestResourcesFlow(simulation, "TestFlow", 5);
         flow.newWorkGroupAdder(wg).add();
-        
+
         activityManager.add(flow);
-        
+
         String description = activityManager.getDescription();
         assertTrue(description.contains("[5]"));
     }
@@ -113,10 +113,10 @@ class ActivityManagerTest {
         flow1.newWorkGroupAdder(wg).add();
         RequestResourcesFlow flow2 = new RequestResourcesFlow(simulation, "Flow2", 2);
         flow2.newWorkGroupAdder(wg).add();
-        
+
         activityManager.add(flow1);
         activityManager.add(flow2);
-        
+
         String description = activityManager.getDescription();
         assertTrue(description.contains(flow1.toString()));
         assertTrue(description.contains(flow2.toString()));

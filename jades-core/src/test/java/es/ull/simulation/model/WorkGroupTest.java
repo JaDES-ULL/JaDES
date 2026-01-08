@@ -20,7 +20,7 @@ class WorkGroupTest {
     @Test
     void shouldCreateEmptyWorkGroup_whenNoParametersProvided() {
         WorkGroup wg = new WorkGroup(simulation);
-        
+
         assertNotNull(wg);
     }
 
@@ -28,7 +28,7 @@ class WorkGroupTest {
     void shouldCreateWorkGroupWithSingleResourceType_whenProvided() {
         ResourceType rt = new ResourceType(simulation, "Test RT");
         WorkGroup wg = new WorkGroup(simulation, rt, 2);
-        
+
         assertNotNull(wg);
     }
 
@@ -38,9 +38,9 @@ class WorkGroupTest {
         ResourceType rt2 = new ResourceType(simulation, "RT2");
         ResourceType[] rts = {rt1, rt2};
         int[] needed = {1, 2};
-        
+
         WorkGroup wg = new WorkGroup(simulation, rts, needed);
-        
+
         assertNotNull(wg);
     }
 
@@ -48,7 +48,7 @@ class WorkGroupTest {
     void shouldAutoRegisterInSimulation_whenCreated() {
         WorkGroup wg1 = new WorkGroup(simulation);
         WorkGroup wg2 = new WorkGroup(simulation);
-        
+
         assertEquals(2, simulation.getWorkGroupList().size());
         assertTrue(simulation.getWorkGroupList().contains(wg1));
         assertTrue(simulation.getWorkGroupList().contains(wg2));
@@ -59,7 +59,7 @@ class WorkGroupTest {
         WorkGroup wg1 = new WorkGroup(simulation);
         WorkGroup wg2 = new WorkGroup(simulation);
         WorkGroup wg3 = new WorkGroup(simulation);
-        
+
         assertEquals(0, wg1.getIdentifier());
         assertEquals(1, wg2.getIdentifier());
         assertEquals(2, wg3.getIdentifier());
@@ -68,14 +68,14 @@ class WorkGroupTest {
     @Test
     void shouldHaveObjectTypeIdentifier_whenCreated() {
         WorkGroup wg = new WorkGroup(simulation);
-        
+
         assertEquals("WG", wg.getObjectTypeIdentifier());
     }
 
     @Test
     void shouldBelongToSimulation_whenCreated() {
         WorkGroup wg = new WorkGroup(simulation);
-        
+
         assertNotNull(wg.getSimulation());
         assertEquals(simulation, wg.getSimulation());
     }
@@ -87,9 +87,9 @@ class WorkGroupTest {
         ResourceType rt3 = new ResourceType(simulation, "RT3");
         ResourceType[] rts = {rt1, rt2, rt3};
         int[] needed = {1, 5, 3};
-        
+
         WorkGroup wg = new WorkGroup(simulation, rts, needed);
-        
+
         assertNotNull(wg);
         assertEquals(simulation, wg.getSimulation());
     }

@@ -21,7 +21,7 @@ class ElementTypeTest {
     @Test
     void shouldCreateElementType_whenInstantiated() {
         ElementType et = new ElementType(simulation, ET_DESC);
-        
+
         assertNotNull(et);
         assertEquals(ET_DESC, et.getDescription());
     }
@@ -30,7 +30,7 @@ class ElementTypeTest {
     void shouldAutoRegisterInSimulation_whenCreated() {
         ElementType et1 = new ElementType(simulation, "ET1");
         ElementType et2 = new ElementType(simulation, "ET2");
-        
+
         assertEquals(2, simulation.getElementTypeList().size());
         assertTrue(simulation.getElementTypeList().contains(et1));
         assertTrue(simulation.getElementTypeList().contains(et2));
@@ -41,7 +41,7 @@ class ElementTypeTest {
         ElementType et1 = new ElementType(simulation, "ET1");
         ElementType et2 = new ElementType(simulation, "ET2");
         ElementType et3 = new ElementType(simulation, "ET3");
-        
+
         assertEquals(0, et1.getIdentifier());
         assertEquals(1, et2.getIdentifier());
         assertEquals(2, et3.getIdentifier());
@@ -50,14 +50,14 @@ class ElementTypeTest {
     @Test
     void shouldHaveObjectTypeIdentifier_whenCreated() {
         ElementType et = new ElementType(simulation, ET_DESC);
-        
+
         assertEquals("ET", et.getObjectTypeIdentifier());
     }
 
     @Test
     void shouldBelongToSimulation_whenCreated() {
         ElementType et = new ElementType(simulation, ET_DESC);
-        
+
         assertNotNull(et.getSimulation());
         assertEquals(simulation, et.getSimulation());
     }
@@ -66,7 +66,7 @@ class ElementTypeTest {
     void shouldReturnDescription_whenQueried() {
         String customDesc = "Custom Element Type Description";
         ElementType et = new ElementType(simulation, customDesc);
-        
+
         assertEquals(customDesc, et.getDescription());
     }
 }
