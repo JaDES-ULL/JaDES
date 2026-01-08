@@ -1,106 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>es.ull.simulation</groupId>
-  <artifactId>JaDES</artifactId>
+  <artifactId>jades-parent</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
+
+  <name>JaDES - Java Discrete Event Simulation</name>
+  <description>A comprehensive Java framework for discrete event simulation</description>
+  <url>https://github.com/JaDES-ULL/JaDES</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>jades-team</id>
+      <name>JaDES Development Team</name>
+      <organization>Universidad de La Laguna</organization>
+      <organizationUrl>https://www.ull.es</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/JaDES-ULL/JaDES.git</connection>
+    <developerConnection>scm:git:ssh://github.com:JaDES-ULL/JaDES.git</developerConnection>
+    <url>https://github.com/JaDES-ULL/JaDES/tree/main</url>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+
+    <!-- Dependency versions -->
+    <log4j2.version>2.23.1</log4j2.version>
+    <junit.jupiter.version>5.10.2</junit.jupiter.version>
+    <jacoco.version>0.8.11</jacoco.version>
+    <poi.version>5.4.1</poi.version>
+    <owlapi.version>5.5.0</owlapi.version>
+    <hermit.version>1.4.5.519</hermit.version>
+    <simkit.version>1.4.1</simkit.version>
+    <jcommander.version>1.82</jcommander.version>
+    
+    <!-- Plugin versions -->
+    <maven.surefire.version>3.5.2</maven.surefire.version>
+    <maven.compiler.version>3.13.0</maven.compiler.version>
+    
+    <!-- SonarCloud -->
     <sonar.organization>jades</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-
-    <!-- Java -->
-    <maven.compiler.release>25</maven.compiler.release>
-
-    <!-- Versions (alineadas con el resto del workspace) -->
-    <junit.jupiter.version>5.10.1</junit.jupiter.version>
-    <surefire.version>3.5.2</surefire.version>
-    <slf4j.version>2.0.16</slf4j.version>
-    <log4j2.version>2.23.1</log4j2.version>
   </properties>
 
-  <dependencies>
-    <!-- Local -->
-    <dependency>
-      <groupId>es.ull.simulation</groupId>
-      <artifactId>utils</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
+  <modules>
+    <module>jades-core</module>
+    <module>jades-utils</module>
+  </modules>
 
-    <dependency>
-      <groupId>de.jflex</groupId>
-      <artifactId>jflex</artifactId>
-      <version>1.4.2</version>
-    </dependency>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Internal modules -->
+      <dependency>
+        <groupId>es.ull.simulation</groupId>
+        <artifactId>jades-utils</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-    <dependency>
-      <groupId>com.zenuevo.simkit</groupId>
-      <artifactId>simkit</artifactId>
-      <version>1.4.1</version>
-    </dependency>
+      <!-- Logging -->
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${log4j2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j2-impl</artifactId>
+        <version>${log4j2.version}</version>
+      </dependency>
 
-    <dependency>
-      <groupId>com.beust</groupId>
-      <artifactId>jcommander</artifactId>
-      <version>1.82</version>
-    </dependency>
+      <!-- Apache POI -->
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi</artifactId>
+        <version>${poi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml</artifactId>
+        <version>${poi.version}</version>
+      </dependency>
 
-    <!-- Logging: SLF4J -> Log4j2 (igual que en el resto) -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>${log4j2.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${log4j2.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j2-impl</artifactId>
-      <version>${log4j2.version}</version>
-    </dependency>
+      <!-- Simkit -->
+      <dependency>
+        <groupId>com.zenuevo.simkit</groupId>
+        <artifactId>simkit</artifactId>
+        <version>${simkit.version}</version>
+      </dependency>
 
-    <!-- Tests: JUnit 5 only -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>${junit.jupiter.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+      <!-- OWLAPI / HermiT -->
+      <dependency>
+        <groupId>net.sourceforge.owlapi</groupId>
+        <artifactId>owlapi-distribution</artifactId>
+        <version>${owlapi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.sourceforge.owlapi</groupId>
+        <artifactId>org.semanticweb.hermit</artifactId>
+        <version>${hermit.version}</version>
+      </dependency>
+
+      <!-- JCommander -->
+      <dependency>
+        <groupId>com.beust</groupId>
+        <artifactId>jcommander</artifactId>
+        <version>${jcommander.version}</version>
+      </dependency>
+
+      <!-- Tests: JUnit 5 -->
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${junit.jupiter.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
-    <plugins>
-      <!-- Java 25 -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
-        <configuration>
-          <release>${maven.compiler.release}</release>
-        </configuration>
-      </plugin>
-
-      <!-- JUnit 5 runner -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>${surefire.version}</version>
-        <configuration>
-          <useModulePath>false</useModulePath>
-        </configuration>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven.compiler.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven.surefire.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>
