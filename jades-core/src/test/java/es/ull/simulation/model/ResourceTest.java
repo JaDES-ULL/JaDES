@@ -1,7 +1,10 @@
 package es.ull.simulation.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -85,5 +88,114 @@ class ResourceTest {
 
         assertNotNull(resource.getTimeTableEntries());
         assertTrue(resource.getTimeTableEntries().isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmptyCancellationPeriodEntries_whenCreated() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+
+        assertNotNull(resource.getCancellationPeriodEntries());
+        assertTrue(resource.getCancellationPeriodEntries().isEmpty());
+    }
+
+    @Test
+    void shouldReturnNullCurrentResourceType_whenNotSet() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+
+        assertNull(resource.getCurrentResourceType());
+    }
+
+    @Test
+    void shouldSetCurrentResourceType_whenProvided() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        ResourceType resourceType = new ResourceType(simulation, "Type1");
+
+        resource.setCurrentResourceType(resourceType);
+
+        assertNotNull(resource.getCurrentResourceType());
+        assertEquals(resourceType, resource.getCurrentResourceType());
+    }
+
+    @Test
+    void shouldUpdateCurrentResourceType_whenChanged() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        ResourceType initialType = new ResourceType(simulation, "Type1");
+        ResourceType newType = new ResourceType(simulation, "Type2");
+        resource.setCurrentResourceType(initialType);
+
+        resource.setCurrentResourceType(newType);
+
+        assertNotNull(resource.getCurrentResourceType());
+        assertEquals(newType, resource.getCurrentResourceType());
+    }
+
+    @Test
+    void shouldReturnFalseForIsTimeOut_whenCreated() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+
+        assertFalse(resource.isTimeOut());
+    }
+
+    @Test
+    void shouldSetTimeOutToTrue_whenTimeOutSet() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+
+        resource.setTimeOut(true);
+
+        assertTrue(resource.isTimeOut());
+    }
+
+    @Test
+    void shouldSetTimeOutToFalse_whenTimeOutReset() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        resource.setTimeOut(true);
+
+        resource.setTimeOut(false);
+
+        assertFalse(resource.isTimeOut());
+    }
+
+    @Test
+    void shouldToggleTimeOut_whenCalledMultipleTimes() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+
+        resource.setTimeOut(true);
+        assertTrue(resource.isTimeOut());
+        
+        resource.setTimeOut(false);
+        assertFalse(resource.isTimeOut());
+        
+        resource.setTimeOut(true);
+        assertTrue(resource.isTimeOut());
+    }
+
+    @Test
+    void shouldHandleLargeCapacity_whenCreated() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC, 10000, null);
+
+        assertEquals(10000, resource.getCapacity());
+    }
+
+    @Test
+    void shouldMaintainCapacityAndDescription_whenCreated() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC, 5, null);
+
+        assertEquals(5, resource.getCapacity());
+        assertEquals(RESOURCE_DESC, resource.getDescription());
+    }
+
+    @Test
+    void shouldCreateMultipleResourcesWithDifferentTypes() {
+        Resource resource1 = new Resource(simulation, "Resource1");
+        Resource resource2 = new Resource(simulation, "Resource2");
+        ResourceType type1 = new ResourceType(simulation, "Type1");
+        ResourceType type2 = new ResourceType(simulation, "Type2");
+        
+        resource1.setCurrentResourceType(type1);
+        resource2.setCurrentResourceType(type2);
+
+        assertEquals(type1, resource1.getCurrentResourceType());
+        assertEquals(type2, resource2.getCurrentResourceType());
+        assertNotEquals(resource1.getCurrentResourceType(), resource2.getCurrentResourceType());
     }
 }
