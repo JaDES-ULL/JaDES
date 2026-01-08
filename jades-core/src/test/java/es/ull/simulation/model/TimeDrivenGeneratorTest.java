@@ -1,0 +1,211 @@
+package es.ull.simulation.model;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import es.ull.simulation.functions.ConstantFunction;
+import es.ull.simulation.model.flow.ActivityFlow;
+
+/**
+ * Test class for {@link TimeDrivenGenerator}.
+ * Tests time-driven element generation functionality.
+ */
+public class TimeDrivenGeneratorTest {
+
+    private Simulation simulation;
+    private ISimulationCycle cycle;
+    private ElementType elementType;
+    private ActivityFlow flow;
+
+    @BeforeEach
+    public void setUp() {
+        simulation = new Simulation(0, "Test Simulation", TimeUnit.MINUTE);
+        elementType = new ElementType(simulation, "Test Element Type");
+        flow = new ActivityFlow(simulation, "Test Activity");
+        
+        // Create a simple periodic cycle
+        TimeStamp startTs = new TimeStamp(TimeUnit.MINUTE, 0);
+        ConstantFunction period = new ConstantFunction(10);
+        TimeStamp endTs = new TimeStamp(TimeUnit.MINUTE, 100);
+        cycle = new SimulationPeriodicCycle(TimeUnit.MINUTE, startTs, period, endTs);
+    }
+
+    @Test
+    public void shouldCreateGeneratorWithFixedElements() {
+        // Given: number of elements to generate
+        int nElem = 5;
+
+        // When: creating a time-driven generator with fixed number
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // Then: it should be created successfully
+        assertNotNull(generator);
+        assertEquals(cycle, generator.getCycle());
+    }
+
+    @Test
+    public void shouldCreateGeneratorWithFunctionElements() {
+        // Given: function for number of elements
+        ConstantFunction nElemFunction = new ConstantFunction(10);
+
+        // When: creating a time-driven generator with function
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElemFunction, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // Then: it should be created successfully
+        assertNotNull(generator);
+        assertEquals(cycle, generator.getCycle());
+    }
+
+    @Test
+    public void shouldBelongToSimulation() {
+        // Given: a generator
+        int nElem = 3;
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // Then: it should be registered in simulation
+        assertTrue(simulation.getTimeDrivenGeneratorList().contains(generator));
+    }
+
+    @Test
+    public void shouldHaveObjectTypeIdentifier() {
+        // Given: a generator
+        int nElem = 2;
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // When: getting its identifier
+        String id = generator.toString();
+
+        // Then: it should have "GEN" identifier
+        assertTrue(id.startsWith("[GEN"));
+        assertTrue(id.endsWith("]"));
+    }
+
+    @Test
+    public void shouldHaveSequentialIds() {
+        // Given: multiple generators
+        int nElem = 1;
+        TimeDrivenGenerator<StandardElementGenerationInfo> gen1 = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+        TimeDrivenGenerator<StandardElementGenerationInfo> gen2 = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // Then: they should have sequential IDs
+        int id1 = Integer.parseInt(gen1.toString().replaceAll("[^0-9]", ""));
+        int id2 = Integer.parseInt(gen2.toString().replaceAll("[^0-9]", ""));
+        assertTrue(id2 > id1);
+    }
+
+    @Test
+    public void shouldStoreCycle() {
+        // Given: a specific cycle
+        TimeStamp startTs = new TimeStamp(TimeUnit.MINUTE, 10);
+        ConstantFunction period = new ConstantFunction(5);
+        TimeStamp endTs = new TimeStamp(TimeUnit.MINUTE, 60);
+        ISimulationCycle specificCycle = new SimulationPeriodicCycle(TimeUnit.MINUTE, startTs, period, endTs);
+
+        // When: creating a generator with this cycle
+        int nElem = 2;
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, specificCycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // Then: the cycle should be stored
+        assertSame(specificCycle, generator.getCycle());
+    }
+
+    @Test
+    public void shouldHandleZeroElements() {
+        // Given: generator with zero elements
+        int nElem = 0;
+
+        // When: creating the generator
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // Then: it should be created successfully
+        assertNotNull(generator);
+    }
+
+    @Test
+    public void shouldHandleLargeNumberOfElements() {
+        // Given: generator with large number of elements
+        int nElem = 1000;
+
+        // When: creating the generator
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // Then: it should be created successfully
+        assertNotNull(generator);
+    }
+
+    @Test
+    public void shouldAllowAddingGenerationInfo() {
+        // Given: a generator
+        int nElem = 3;
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // When: adding generation info
+        StandardElementGenerationInfo info = new StandardElementGenerationInfo(elementType, flow, 1, null, 1.0);
+        generator.add(info);
+
+        // Then: generator should accept the info
+        assertNotNull(generator);
+    }
+}
