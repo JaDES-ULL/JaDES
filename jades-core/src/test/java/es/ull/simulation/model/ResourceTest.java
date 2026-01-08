@@ -24,7 +24,7 @@ class ResourceTest {
     @Test
     void shouldCreateResourceWithDefaultSize_whenNoSizeProvided() {
         Resource resource = new Resource(simulation, RESOURCE_DESC);
-        
+
         assertEquals(RESOURCE_DESC, resource.getDescription());
         assertEquals(0, resource.getCapacity());
     }
@@ -33,7 +33,7 @@ class ResourceTest {
     void shouldCreateResourceWithCustomSize_whenSizeProvided() {
         int customSize = 10;
         Resource resource = new Resource(simulation, RESOURCE_DESC, customSize, null);
-        
+
         assertEquals(RESOURCE_DESC, resource.getDescription());
         assertEquals(customSize, resource.getCapacity());
     }
@@ -42,7 +42,7 @@ class ResourceTest {
     void shouldAutoRegisterInSimulation_whenCreated() {
         Resource resource1 = new Resource(simulation, "Resource 1");
         Resource resource2 = new Resource(simulation, "Resource 2");
-        
+
         assertEquals(2, simulation.getResourceList().size());
         assertTrue(simulation.getResourceList().contains(resource1));
         assertTrue(simulation.getResourceList().contains(resource2));
@@ -53,7 +53,7 @@ class ResourceTest {
         Resource resource1 = new Resource(simulation, "Resource 1");
         Resource resource2 = new Resource(simulation, "Resource 2");
         Resource resource3 = new Resource(simulation, "Resource 3");
-        
+
         assertEquals(0, resource1.getIdentifier());
         assertEquals(1, resource2.getIdentifier());
         assertEquals(2, resource3.getIdentifier());
@@ -62,7 +62,7 @@ class ResourceTest {
     @Test
     void shouldHaveNullLocation_whenNoLocationProvided() {
         Resource resource = new Resource(simulation, RESOURCE_DESC, 5, null);
-        
+
         assertEquals(null, resource.getLocation());
     }
 
@@ -161,10 +161,10 @@ class ResourceTest {
 
         resource.setTimeOut(true);
         assertTrue(resource.isTimeOut());
-        
+
         resource.setTimeOut(false);
         assertFalse(resource.isTimeOut());
-        
+
         resource.setTimeOut(true);
         assertTrue(resource.isTimeOut());
     }
@@ -190,7 +190,7 @@ class ResourceTest {
         Resource resource2 = new Resource(simulation, "Resource2");
         ResourceType type1 = new ResourceType(simulation, "Type1");
         ResourceType type2 = new ResourceType(simulation, "Type2");
-        
+
         resource1.setCurrentResourceType(type1);
         resource2.setCurrentResourceType(type2);
 

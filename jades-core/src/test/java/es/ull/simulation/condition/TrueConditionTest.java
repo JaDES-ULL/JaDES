@@ -13,31 +13,31 @@ class TrueConditionTest {
     void shouldAlwaysReturnTrue() {
         // Given: a TrueCondition
         TrueCondition<Object> condition = new TrueCondition<>();
-        
+
         // When: checking with any object
         boolean result = condition.check(new Object());
-        
+
         // Then: it should return true
         assertTrue(result);
     }
-    
+
     @Test
     void shouldReturnTrue_whenCheckingWithNull() {
         // Given: a TrueCondition
         TrueCondition<Object> condition = new TrueCondition<>();
-        
+
         // When: checking with null
         boolean result = condition.check(null);
-        
+
         // Then: it should return true
         assertTrue(result);
     }
-    
+
     @Test
     void shouldReturnTrue_whenCheckingMultipleTimes() {
         // Given: a TrueCondition
         TrueCondition<String> condition = new TrueCondition<>();
-        
+
         // When: checking multiple times
         // Then: all checks should return true
         assertTrue(condition.check("test1"));

@@ -146,7 +146,7 @@ class TimeTableEntryTest {
     @Test
     void shouldCreateMultipleEntriesWithDifferentRoles() {
         ResourceType resourceType2 = new ResourceType(simulation, "Second Type");
-        
+
         TimeTableEntry entry1 = new TimeTableEntry(cycle, duration, resourceType);
         TimeTableEntry entry2 = new TimeTableEntry(cycle, duration, resourceType2);
 
@@ -165,12 +165,12 @@ class TimeTableEntryTest {
         assertEquals(duration, entry.getDuration());
         assertEquals(resourceType, entry.getRole());
         assertFalse(entry.isPermanent());
-        
+
         // Llamar múltiples veces no debe cambiar el estado
         entry.getCycle();
         entry.getDuration();
         entry.getRole();
-        
+
         assertEquals(cycle, entry.getCycle());
         assertEquals(duration, entry.getDuration());
         assertEquals(resourceType, entry.getRole());

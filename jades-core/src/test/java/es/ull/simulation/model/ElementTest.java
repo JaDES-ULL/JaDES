@@ -59,7 +59,7 @@ class ElementTest {
     void shouldHaveCustomSize_whenCreatedWithSize() {
         int customSize = 5;
         Element element = new Element(simulation, "E", elementType, initialFlow, customSize, null);
-        
+
         assertEquals(customSize, element.getCapacity());
     }
 

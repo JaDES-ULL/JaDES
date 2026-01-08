@@ -128,7 +128,7 @@ public class DoWhileFlowTest {
         // Given: a specific condition
         AbstractCondition<ElementInstance> condition = new AbstractCondition<ElementInstance>() {
             private boolean checkValue = true;
-            
+
             @Override
             public boolean check(ElementInstance fe) {
                 return checkValue;

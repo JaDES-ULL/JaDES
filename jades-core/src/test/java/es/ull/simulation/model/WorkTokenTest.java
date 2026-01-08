@@ -157,7 +157,7 @@ class WorkTokenTest {
     @Test
     void shouldMaintainFlowOrderInTreeSet() {
         WorkToken token = new WorkToken(true);
-        
+
         token.addFlow(flow3);
         token.addFlow(flow1);
         token.addFlow(flow2);

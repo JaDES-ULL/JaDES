@@ -85,10 +85,10 @@ public class DelayFlowTest {
 
         // When: getting duration without element
         long duration1 = flow.getDurationSample(null);
-        
+
         // Then: durations should reflect the logic
         assertEquals(10, duration1);
-        // Note: Creating actual Element requires complex setup, 
+        // Note: Creating actual Element requires complex setup,
         // so we test the method signature and null case
     }
 

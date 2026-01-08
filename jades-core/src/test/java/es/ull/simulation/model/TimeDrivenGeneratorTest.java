@@ -24,7 +24,7 @@ public class TimeDrivenGeneratorTest {
         simulation = new Simulation(0, "Test Simulation", TimeUnit.MINUTE);
         elementType = new ElementType(simulation, "Test Element Type");
         flow = new ActivityFlow(simulation, "Test Activity");
-        
+
         // Create a simple periodic cycle
         TimeStamp startTs = new TimeStamp(TimeUnit.MINUTE, 0);
         ConstantFunction period = new ConstantFunction(10);
@@ -38,7 +38,7 @@ public class TimeDrivenGeneratorTest {
         int nElem = 5;
 
         // When: creating a time-driven generator with fixed number
-        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -57,7 +57,7 @@ public class TimeDrivenGeneratorTest {
         ConstantFunction nElemFunction = new ConstantFunction(10);
 
         // When: creating a time-driven generator with function
-        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElemFunction, cycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -74,7 +74,7 @@ public class TimeDrivenGeneratorTest {
     public void shouldBelongToSimulation() {
         // Given: a generator
         int nElem = 3;
-        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -90,7 +90,7 @@ public class TimeDrivenGeneratorTest {
     public void shouldHaveObjectTypeIdentifier() {
         // Given: a generator
         int nElem = 2;
-        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -110,14 +110,14 @@ public class TimeDrivenGeneratorTest {
     public void shouldHaveSequentialIds() {
         // Given: multiple generators
         int nElem = 1;
-        TimeDrivenGenerator<StandardElementGenerationInfo> gen1 = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> gen1 =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
                     return new Element(simulation, info);
                 }
             };
-        TimeDrivenGenerator<StandardElementGenerationInfo> gen2 = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> gen2 =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -141,7 +141,7 @@ public class TimeDrivenGeneratorTest {
 
         // When: creating a generator with this cycle
         int nElem = 2;
-        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, specificCycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -159,7 +159,7 @@ public class TimeDrivenGeneratorTest {
         int nElem = 0;
 
         // When: creating the generator
-        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -177,7 +177,7 @@ public class TimeDrivenGeneratorTest {
         int nElem = 1000;
 
         // When: creating the generator
-        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -193,7 +193,7 @@ public class TimeDrivenGeneratorTest {
     public void shouldAllowAddingGenerationInfo() {
         // Given: a generator
         int nElem = 3;
-        TimeDrivenGenerator<StandardElementGenerationInfo> generator = 
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
             new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, cycle) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {

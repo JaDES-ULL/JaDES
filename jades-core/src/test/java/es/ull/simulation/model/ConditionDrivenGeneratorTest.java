@@ -35,7 +35,7 @@ public class ConditionDrivenGeneratorTest {
         int nElem = 5;
 
         // When: creating a condition-driven generator with fixed number
-        ConditionDrivenGenerator<StandardElementGenerationInfo> generator = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> generator =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, condition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -54,7 +54,7 @@ public class ConditionDrivenGeneratorTest {
         ConstantFunction nElemFunction = new ConstantFunction(10);
 
         // When: creating a condition-driven generator with function
-        ConditionDrivenGenerator<StandardElementGenerationInfo> generator = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> generator =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElemFunction, condition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -71,7 +71,7 @@ public class ConditionDrivenGeneratorTest {
     public void shouldBelongToSimulation() {
         // Given: a generator
         int nElem = 3;
-        ConditionDrivenGenerator<StandardElementGenerationInfo> generator = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> generator =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, condition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -87,7 +87,7 @@ public class ConditionDrivenGeneratorTest {
     public void shouldHaveObjectTypeIdentifier() {
         // Given: a generator
         int nElem = 2;
-        ConditionDrivenGenerator<StandardElementGenerationInfo> generator = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> generator =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, condition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -107,14 +107,14 @@ public class ConditionDrivenGeneratorTest {
     public void shouldHaveSequentialIds() {
         // Given: multiple generators
         int nElem = 1;
-        ConditionDrivenGenerator<StandardElementGenerationInfo> gen1 = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> gen1 =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, condition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
                     return new Element(simulation, info);
                 }
             };
-        ConditionDrivenGenerator<StandardElementGenerationInfo> gen2 = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> gen2 =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, condition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -135,7 +135,7 @@ public class ConditionDrivenGeneratorTest {
 
         // When: creating a generator with this condition
         int nElem = 2;
-        ConditionDrivenGenerator<StandardElementGenerationInfo> generator = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> generator =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, specificCondition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -153,7 +153,7 @@ public class ConditionDrivenGeneratorTest {
         int nElem = 0;
 
         // When: creating the generator
-        ConditionDrivenGenerator<StandardElementGenerationInfo> generator = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> generator =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, condition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -171,7 +171,7 @@ public class ConditionDrivenGeneratorTest {
         int nElem = 1000;
 
         // When: creating the generator
-        ConditionDrivenGenerator<StandardElementGenerationInfo> generator = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> generator =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, condition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
@@ -187,7 +187,7 @@ public class ConditionDrivenGeneratorTest {
     public void shouldAllowAddingGenerationInfo() {
         // Given: a generator
         int nElem = 3;
-        ConditionDrivenGenerator<StandardElementGenerationInfo> generator = 
+        ConditionDrivenGenerator<StandardElementGenerationInfo> generator =
             new ConditionDrivenGenerator<StandardElementGenerationInfo>(simulation, nElem, condition) {
                 @Override
                 public Element createEventSource(int ind, StandardElementGenerationInfo info) {
