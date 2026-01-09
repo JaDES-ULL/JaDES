@@ -47,7 +47,7 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	private final int size;
 	/** Main element instance */
 	protected ElementInstance mainInstance = null;
-    /** List of seized resources indexed as groups by an identifier */
+    /** Collection manager for seized resources */
     final protected SeizedResourcesCollection seizedResources;
 	/** The engine that executes specific behavior of the element */
 	private ElementEngine engine;
@@ -75,7 +75,7 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 		super(simul, simul.getNewElementId(), objectTypeId);
 		this.elementType = elementType;
 		this.initialFlow = initialFlow;
-        this.seizedResources = new SeizedResourcesCollection();
+        this.seizedResources = new SeizedResourcesCollection(this);
         this.size = size;
         this.initLocation = initLocation;
 		initializeElementVars(this.elementType.getElementValues());
@@ -90,7 +90,7 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 		super(simul, simul.getNewElementId(), objectTypeId);
 		this.elementType = info.getElementType();
 		this.initialFlow = info.getFlow();
-        this.seizedResources = new SeizedResourcesCollection();
+        this.seizedResources = new SeizedResourcesCollection(this);
         this.initLocation = info.getInitLocation();
         this.size = info.getSize(this);
 		initializeElementVars(this.elementType.getElementValues());
@@ -457,158 +457,5 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 		public void event() {
 			IFlow.move(ei);
 		}
-	}
-
-	/**
-	 * A collection of resources that have been seized by this element. They are arranged in two levels: the
-	 * first level represents resource groups, as logically defined by the modeler; the second level represents
-	 * resource types.
-	 * @author Iván Castilla Rodríguez
-	 *
-	 */
-	protected final class SeizedResourcesCollection {
-	    /** List of seized resources indexed as groups by an identifier */
-	    final protected TreeMap<Integer, TreeMap<ResourceType, ArrayDeque<Resource>>> resources;
-		
-	    /**
-	     * Creates an empty collection of seized resources.
-	     */
-	    public SeizedResourcesCollection() {
-	    	resources = new TreeMap<Integer, TreeMap<ResourceType,ArrayDeque<Resource>>>();
-	    	resources.put(0, new TreeMap<ResourceType, ArrayDeque<Resource>>());
-		}
-	    
-	    /**
-	     * Returns true if the collection contains any resource of the specified resource type; false otherwise
-	     * @param rt Searched resource type 
-	     * @return true if the collection contains any resource of the specified resource type; false otherwise
-	     */
-	    public boolean containsResourceType(final ResourceType rt) {
-	    	for (TreeMap<ResourceType, ArrayDeque<Resource>> item1 : resources.values()) {
-	    		if (item1.containsKey(rt))
-	    			return true;
-	    	}
-	    	return false;
-	    }
-	    
-	    /**
-	     * Returns the whole list of resources seized by the element
-	     * @return the whole list of resources seized by the element
-	     */
-	    public ArrayDeque<Resource> getAll() {
-	    	final ArrayDeque<Resource> list = new ArrayDeque<Resource>();
-	    	
-	    	for (TreeMap<ResourceType, ArrayDeque<Resource>> item1 : resources.values()) {
-	    		for (ArrayDeque<Resource> item2 : item1.values()) {
-	    			list.addAll(item2);
-	    		}
-	    	}
-	    	return list;
-	    }
-	    
-	    /**
-	     * Returns the list of resources caught by the specified element instance when performing the specified IFlow
-	     * @param resourcesId Identifier of the group of resources
-	     * @return the list of resources caught by the specified element instance when performing the specified IFlow
-	     */
-	    public ArrayDeque<Resource> get(final int resourcesId) {
-	    	final ArrayDeque<Resource> list = new ArrayDeque<Resource>();
-	    	final TreeMap<ResourceType, ArrayDeque<Resource>> item1 = resources.get(resourcesId);
-    		for (ArrayDeque<Resource> item2 : item1.values()) {
-    			list.addAll(item2);
-    		}
-	    	return list;
-	    }
-	    
-	    /**
-	     * Returns the list of resources identifier by the resourcesId and belonging to the specified workgroup
-	     * @param resourcesId Identifier of the group of resources
-	     * @param wg Resource types 
-	     * @return the list of resources caught by the specified element instance when performing the specified IFlow
-	     */
-	    public ArrayDeque<Resource> get(final int resourcesId, final WorkGroup wg) {
-	    	final ArrayDeque<Resource> list = new ArrayDeque<Resource>();
-	    	final TreeMap<ResourceType, ArrayDeque<Resource>> item1 = resources.get(resourcesId);
-    		final ResourceType[] rts = wg.getResourceTypes();
-    		for (int i = 0; i < rts.length; i++) {
-    			list.addAll(item1.get(rts[i]));
-    		}
-	    	return list;
-	    }
-	    
-		/**
-		 * Adds the specified resources to the list of seized resources
-		 * @param resourcesId Identifier of the group of resources
-		 * @param newResources New resources seized by the element
-		 */
-	    public void addResources(final int resourcesId, final ArrayDeque<Resource> newResources) {
-	    	// If it's a request IFlow inside an activity, use minus the element instance identifier
-	    	TreeMap<ResourceType, ArrayDeque<Resource>> collection = resources.get(resourcesId);
-	    	// Not already created
-	    	if (collection == null) {
-	    		collection = new TreeMap<ResourceType, ArrayDeque<Resource>>();
-				resources.put(resourcesId, collection);
-	    	}
-	    	for (final Resource res : newResources) {
-	    		final ResourceType currentRT = res.getCurrentResourceType();
-	    		if (!collection.containsKey(currentRT))
-	    			collection.put(currentRT, new ArrayDeque<Resource>());
-	    		collection.get(currentRT).push(res);
-	    	}
-	    }
-	    
-	    /**
-	     * Removes the resources specified in the workgroup from the list of seized resources
-		 * @param resourcesId Identifier of the group of resources
-		 * @param wg Workgroup
-	     * @return The released resources
-	     */
-	    public ArrayDeque<Resource> removeResources(final int resourcesId, final WorkGroup wg) {
-	    	final TreeMap<ResourceType, ArrayDeque<Resource>> collection = resources.get(resourcesId);
-	    	// Not already created
-	    	if (collection == null) {
-				error("Trying to release group of resources not already created. ID:" + resourcesId);
-				return null;	    		
-	    	}
-	    	final ArrayDeque<Resource> toRemove = new ArrayDeque<Resource>();
-	    	// Remove all resources from group
-	    	if (wg == null) {
-	    		for (ArrayDeque<Resource> list : collection.values()) {
-	    			toRemove.addAll(list);
-	    		}
-	    		collection.clear();
-	    	}
-	    	else {
-	    		final ResourceType[] rts = wg.getResourceTypes();
-	    		for (int i = 0; i < rts.length; i++) {
-	    			final ArrayDeque<Resource> list = collection.get(rts[i]);
-	    			if (list == null) {
-	    				error("Trying to release non-seized resource of type "
-								+ rts[i] + " from group with ID " + resourcesId);
-	    			}
-	    			else {
-	    				int max = wg.getNeeded(i);
-	    				// More resources to remove than available
-	    				if (wg.getNeeded(i) > list.size()) {
-	    					max = collection.get(rts[i]).size();
-		    				error("Trying to release " + wg.getNeeded(i)
-									+ " resources of type " + rts[i] + " from group with ID "
-									+ resourcesId + ". Available: " + list.size());
-	    					toRemove.addAll(collection.remove(rts[i]));
-	    				}
-	    				// Remove all resources from that type
-	    				else if (wg.getNeeded(i) == collection.get(rts[i]).size()) {
-	    					toRemove.addAll(collection.remove(rts[i]));
-	    				}
-	    				else {
-			    			for (int j = 0; j < max; j++) {
-			    				toRemove.add(list.pop());
-			    			}
-		    			}
-	    			}
-	    		}
-	    	}
-	    	return toRemove;
-	    }
 	}
 }
