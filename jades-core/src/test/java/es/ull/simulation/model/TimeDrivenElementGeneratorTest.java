@@ -133,4 +133,50 @@ class TimeDrivenElementGeneratorTest {
         // Then: debe ser creado sin errores
         assertNotNull(generator);
     }
+
+    @Test
+    void shouldCreateGenerator_withMovableElementsUsingTimeFunction() {
+        // Given: generador con elementos movibles y función de tiempo
+        AbstractTimeFunction nElemFunction = new ConstantFunction(2.0);
+        AbstractTimeFunction sizeFunction = new ConstantFunction(1.0);
+        // Location puede ser null para este test básico de constructor
+
+        // When: creando generador con location y size como función
+        TimeDrivenElementGenerator generator = new TimeDrivenElementGenerator(
+                simulation, nElemFunction, elementType, initFlow, sizeFunction, null, cycle);
+
+        // Then: debe ser creado correctamente
+        assertNotNull(generator);
+        assertEquals(simulation, generator.getSimulation());
+    }
+
+    @Test
+    void shouldCreateGenerator_withMovableElementsUsingIntAndSizeFunction() {
+        // Given: generador con elementos movibles usando int para nElem y función para size
+        int nElem = 3;
+        AbstractTimeFunction sizeFunction = new ConstantFunction(2.0);
+
+        // When: creando generador con int nElem y función de size
+        TimeDrivenElementGenerator generator = new TimeDrivenElementGenerator(
+                simulation, nElem, elementType, initFlow, sizeFunction, null, cycle);
+
+        // Then: debe ser creado correctamente
+        assertNotNull(generator);
+        assertEquals(simulation, generator.getSimulation());
+    }
+
+    @Test
+    void shouldCreateGenerator_withMovableElementsUsingIntSize() {
+        // Given: generador con elementos movibles usando int para size
+        int nElem = 4;
+        int size = 5;
+
+        // When: creando generador con int para nElem y size
+        TimeDrivenElementGenerator generator = new TimeDrivenElementGenerator(
+                simulation, nElem, elementType, initFlow, size, null, cycle);
+
+        // Then: debe ser creado correctamente
+        assertNotNull(generator);
+        assertEquals(simulation, generator.getSimulation());
+    }
 }
