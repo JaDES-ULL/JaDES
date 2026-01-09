@@ -29,13 +29,19 @@ import es.ull.simulation.utils.cycle.DiscreteCycleIterator;
 public class Resource extends VariableStoreSimulationObject implements IDescribable, IEventSource, IMovable {
     /** A brief description of the resource */
     protected final String description;
-	/** The current location of the resource*/
+	/** Manages location and movement for this resource */
+	private final ResourceLocation resourceLocation;
+	/** The current location of the resource - DEPRECATED: use resourceLocation */
+	@Deprecated
 	private Location currentLocation;
-	/** The initial location of the resource*/
+	/** The initial location of the resource - DEPRECATED: use resourceLocation */
+	@Deprecated
 	private Location initLocation;
-	/** The size of the resource */
+	/** The size of the resource - DEPRECATED: use resourceLocation */
+	@Deprecated
 	private final int size;
-	/** The current element instance that drives the movement of the resource */
+	/** The current element instance that drives the movement of the resource - DEPRECATED: use resourceLocation */
+	@Deprecated
 	private ElementInstance movingInstance = null;	
 	/** Timetable which defines the availability estructure of the resource. Define RollOn and RollOff events. */
     protected final ArrayList<TimeTableEntry> timeTable = new ArrayList<TimeTableEntry>();
@@ -67,6 +73,9 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	public Resource(final Simulation model, final String description, final int size, final Location initLocation) {
 		super(model, model.getResourceList().size(), "RES");
 		this.description = description;
+		// Initialize new ResourceLocation
+		this.resourceLocation = new ResourceLocation(this, initLocation, size);
+		// Keep deprecated fields for backward compatibility
 		this.size = size;
 		this.initLocation = initLocation;
 		model.add(this);
@@ -92,28 +101,22 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 
 	@Override
 	public int getCapacity() {
-		return size;
+		return resourceLocation.getCapacity();
 	}
 
 	@Override
 	public Location getLocation() {
+		// Delegate to ResourceLocation and sync deprecated field
+		currentLocation = resourceLocation.getLocation();
 		return currentLocation;
 	}
 
 	@Override
 	public void setLocation(final Location location) {
-		if (currentLocation == null) {
-			simul.notifyInfo(new EntityLocationInfo(simul, this, location,
-					EntityLocationInfo.Type.START, getTs()));
-			currentLocation = location;
-		}
-		else {
-			simul.notifyInfo(new EntityLocationInfo(simul, this, currentLocation,
-					EntityLocationInfo.Type.LEAVE, getTs()));
-			currentLocation = location;
-			simul.notifyInfo(new EntityLocationInfo(simul, this, currentLocation,
-					EntityLocationInfo.Type.ARRIVE, getTs()));
-		}
+		// Delegate to ResourceLocation
+		resourceLocation.setLocation(location);
+		// Sync deprecated field for backward compatibility
+		currentLocation = location;
 	}
 
 	/**
@@ -134,17 +137,12 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	
 	@Override
 	public DiscreteEvent onCreate(final long ts) {
-		if (initLocation != null) {
-			if (initLocation.fitsIn(this)) {
-				initLocation.enter(this);
-			}
-			else {
-				error("Unable to initialize resource. Not enough space in location " +
-						initLocation + " (available: " + initLocation.getAvailableCapacity() +
-						" - required: " + size + ")");
-				return onDestroy(ts);
-			}
+		// Delegate initialization to ResourceLocation
+		if (!resourceLocation.initialize()) {
+			return onDestroy(ts);
 		}
+		// Sync deprecated field for backward compatibility
+		currentLocation = resourceLocation.getLocation();
 		return new CreateResourceEvent(ts);
 	}
 
@@ -292,9 +290,11 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
     	final Location destination = flow.getDestination();
     	final IRouter router = flow.getRouter();
 		trace("Start route\t" + this + "\t" + destination);
-    	movingInstance = ei;
+    	// Delegate to ResourceLocation
+    	resourceLocation.setMovingInstance(ei);
+    	movingInstance = ei; // Sync deprecated field
     	// No need to move
-    	if (currentLocation.equals(destination)) {
+    	if (resourceLocation.getLocation().equals(destination)) {
     		endMove(flow, true);
     	}
     	else {
@@ -303,7 +303,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	    		endMove(flow, false);
 			}
 			else {
-		    	simul.addEvent(new MoveEvent(getTs() + currentLocation.getDelayAtExit(this), nextLoc, destination, router));
+		    	simul.addEvent(new MoveEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this), nextLoc, destination, router));
 			}
     	}
     }
@@ -321,9 +321,11 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
     	final Location destination = flow.getDestination();
     	final IRouter router = flow.getRouter();
 		trace("Start transport\t" + this + "\t" + destination);
-    	movingInstance = ei;
+    	// Delegate to ResourceLocation
+    	resourceLocation.setMovingInstance(ei);
+    	movingInstance = ei; // Sync deprecated field
     	// No need to move
-    	if (currentLocation.equals(destination)) {
+    	if (resourceLocation.getLocation().equals(destination)) {
     		endTransport(flow, true);
     	}
     	else {
@@ -332,7 +334,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	    		endTransport(flow, false);
 			}
 			else {
-		    	simul.addEvent(new TransportEvent(getTs() + currentLocation.getDelayAtExit(this),
+		    	simul.addEvent(new TransportEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
 						nextLoc, destination, router));
 			}
     	}
@@ -348,12 +350,14 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	 *                 destination was unreachable (false).
 	 */
     private void endMove(final MoveResourcesFlow flow, final boolean success) {
-		flow.notifyArrival(movingInstance, success);
-    	movingInstance = null;
+		flow.notifyArrival(resourceLocation.getMovingInstance(), success);
+    	// Clear moving instance in both locations
+    	resourceLocation.setMovingInstance(null);
+    	movingInstance = null; // Sync deprecated field
     	if (success)
 			trace("Finishes route\t" + this + "\t" + flow.getDestination());
     	else
-			error("Destination unreachable. Current: " + currentLocation + "; destination: " +
+			error("Destination unreachable. Current: " + resourceLocation.getLocation() + "; destination: " +
 					flow.getDestination());
     }
 
@@ -367,29 +371,45 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	 */
     private void endTransport(final TransportFlow flow, final boolean success) {
     	if (success) {
-			flow.finish(movingInstance);
-    		movingInstance = null;
+			flow.finish(resourceLocation.getMovingInstance());
+    		resourceLocation.setMovingInstance(null);
+    		movingInstance = null; // Sync deprecated field
     		trace("Finishes transport\t" + this + "\t" + flow.getDestination());
     	}
     	else {
-			movingInstance.cancel(flow);
-			flow.next(movingInstance);
-	    	movingInstance = null;
-    		error("Destination unreachable. Current: " + currentLocation + "; destination: " +
+    		final ElementInstance ei = resourceLocation.getMovingInstance();
+			ei.cancel(flow);
+			flow.next(ei);
+	    	resourceLocation.setMovingInstance(null);
+	    	movingInstance = null; // Sync deprecated field
+    		error("Destination unreachable. Current: " + resourceLocation.getLocation() + "; destination: " +
 					flow.getDestination());
     	}
     }
 
 	@Override
 	public void notifyLocationAvailable(final Location location) {
-		location.enter(this);
-
+		// Delegate to ResourceLocation
+		resourceLocation.notifyLocationAvailable(location);
+		// Sync deprecated field
+		currentLocation = resourceLocation.getLocation();
+	}
+	
+	/**
+	 * Handles the logic when a location becomes available.
+	 * This method is called from ResourceLocation.notifyLocationAvailable().
+	 * Package-private to allow ResourceLocation to call it.
+	 * 
+	 * @param location The location that became available
+	 * @param movingInstance The element instance that is moving
+	 */
+	void handleLocationAvailable(final Location location, final ElementInstance movingInstance) {
 		if (movingInstance.getCurrentFlow() instanceof MoveResourcesFlow) {
 	    	final MoveResourcesFlow flow = (MoveResourcesFlow)movingInstance.getCurrentFlow();
 	    	final Location destination = flow.getDestination();
 	    	final IRouter router = flow.getRouter();
 			
-			if (currentLocation.equals(destination)) {
+			if (resourceLocation.getLocation().equals(destination)) {
 				endMove(flow, true);
 			}
 			else {
@@ -398,7 +418,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					endMove(flow, false);
 				}
 				else {
-			    	simul.addEvent(new MoveEvent(getTs() + currentLocation.getDelayAtExit(this),
+			    	simul.addEvent(new MoveEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
 							nextLoc, destination, router));
 				}
 			}			
@@ -410,7 +430,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	    	final Location destination = flow.getDestination();
 	    	final IRouter router = flow.getRouter();
 			
-			if (currentLocation.equals(destination)) {
+			if (resourceLocation.getLocation().equals(destination)) {
 				endTransport(flow, true);
 			}
 			else {
@@ -419,7 +439,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					endTransport(flow, false);
 				}
 				else {
-			    	simul.addEvent(new TransportEvent(getTs() + currentLocation.getDelayAtExit(this),
+			    	simul.addEvent(new TransportEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
 							nextLoc, destination, router));
 				}
 			}			
@@ -780,7 +800,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		 * @param IRouter Instance that returns the path for the resource
 		 */
 		public MoveEvent(final long ts, final Location destination, final IRouter IRouter) {
-			this(ts, currentLocation, destination, IRouter);
+			this(ts, resourceLocation.getLocation(), destination, IRouter);
 		}
 
 		/**
@@ -805,7 +825,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		@Override
 		public void event() {
 			if (nextLocation.fitsIn(Resource.this)) {
-				final MoveResourcesFlow flow = ((MoveResourcesFlow)movingInstance.getCurrentFlow());
+				final MoveResourcesFlow flow = ((MoveResourcesFlow)resourceLocation.getMovingInstance().getCurrentFlow());
 				nextLocation.enter(Resource.this);
 				if (nextLocation.equals(destination)) {
 					endMove(flow, true);
@@ -817,7 +837,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					}
 					else {
 						final MoveEvent mEvent = new MoveEvent(getTs() +
-								currentLocation.getDelayAtExit(Resource.this), nextLoc, destination, router);
+								resourceLocation.getLocation().getDelayAtExit(Resource.this), nextLoc, destination, router);
 				    	simul.addEvent(mEvent);						
 					}
 				}
@@ -850,7 +870,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		 * @param IRouter Instance that returns the path for the resource
 		 */
 		public TransportEvent(final long ts, final Location destination, final IRouter IRouter) {
-			this(ts, currentLocation, destination, IRouter);
+			this(ts, resourceLocation.getLocation(), destination, IRouter);
 		}
 
 		/**
@@ -877,10 +897,10 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		@Override
 		public void event() {
 			if (nextLocation.fitsIn(Resource.this)) {
-				final TransportFlow flow = ((TransportFlow)movingInstance.getCurrentFlow());
+				final TransportFlow flow = ((TransportFlow)resourceLocation.getMovingInstance().getCurrentFlow());
 				nextLocation.enter(Resource.this);
 				// Move the element without checking anything else
-				movingInstance.getElement().setLocation(nextLocation);
+				resourceLocation.getMovingInstance().getElement().setLocation(nextLocation);
 				if (nextLocation.equals(destination)) {
 					endTransport(flow, true);
 				}
@@ -891,7 +911,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					}
 					else {
 						final TransportEvent mEvent = new TransportEvent(getTs() +
-								currentLocation.getDelayAtExit(Resource.this), nextLoc, destination, router);
+								resourceLocation.getLocation().getDelayAtExit(Resource.this), nextLoc, destination, router);
 				    	simul.addEvent(mEvent);						
 					}
 				}
