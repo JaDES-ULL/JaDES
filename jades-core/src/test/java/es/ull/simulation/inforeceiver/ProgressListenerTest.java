@@ -37,7 +37,7 @@ class ProgressListenerTest {
     @Test
     void shouldCreateProgressListener_withEndTimestamp() {
         progressListener = new ProgressListener(1000L);
-        
+
         assertNotNull(progressListener);
         assertEquals("Progress", progressListener.toString());
     }
@@ -45,7 +45,7 @@ class ProgressListenerTest {
     @Test
     void shouldCreateProgressListener_withSmallEndTimestamp() {
         progressListener = new ProgressListener(100L);
-        
+
         assertNotNull(progressListener);
         assertEquals("Progress", progressListener.toString());
     }
@@ -53,7 +53,7 @@ class ProgressListenerTest {
     @Test
     void shouldCreateProgressListener_withLargeEndTimestamp() {
         progressListener = new ProgressListener(10000L);
-        
+
         assertNotNull(progressListener);
         assertEquals("Progress", progressListener.toString());
     }
@@ -61,7 +61,7 @@ class ProgressListenerTest {
     @Test
     void shouldAddTargetInformationClasses() {
         progressListener = new ProgressListener(1000L);
-        
+
         assertTrue(progressListener.getTargetInformation().contains(TimeChangeInfo.class));
         assertTrue(progressListener.getTargetInformation().contains(SimulationStartStopInfo.class));
         assertEquals(2, progressListener.getTargetInformation().size());
@@ -71,9 +71,9 @@ class ProgressListenerTest {
     void shouldPrintStartingMessage_whenSimulationStarts() {
         progressListener = new ProgressListener(1000L);
         SimulationStartStopInfo startInfo = new SimulationStartStopInfo(simulation, SimulationStartStopInfo.Type.START, 0L);
-        
+
         progressListener.infoEmited(startInfo);
-        
+
         String output = outputStream.toString();
         assertTrue(output.contains("Starting!!"));
     }
@@ -82,9 +82,9 @@ class ProgressListenerTest {
     void shouldNotPrintStartingMessage_whenSimulationEnds() {
         progressListener = new ProgressListener(1000L);
         SimulationStartStopInfo endInfo = new SimulationStartStopInfo(simulation, SimulationStartStopInfo.Type.END, 1000L);
-        
+
         progressListener.infoEmited(endInfo);
-        
+
         String output = outputStream.toString();
         assertFalse(output.contains("Starting!!"));
     }
@@ -93,9 +93,9 @@ class ProgressListenerTest {
     void shouldPrintPercentage_whenTimeChangeReachesGap() {
         progressListener = new ProgressListener(100L); // gap = 1
         TimeChangeInfo timeInfo = new TimeChangeInfo(simulation, 1L);
-        
+
         progressListener.infoEmited(timeInfo);
-        
+
         String output = outputStream.toString();
         assertTrue(output.contains("1%"));
     }
@@ -104,9 +104,9 @@ class ProgressListenerTest {
     void shouldNotPrintPercentage_whenTimeBelowGap() {
         progressListener = new ProgressListener(1000L); // gap = 10
         TimeChangeInfo timeInfo = new TimeChangeInfo(simulation, 5L);
-        
+
         progressListener.infoEmited(timeInfo);
-        
+
         String output = outputStream.toString();
         assertFalse(output.contains("%"));
     }
@@ -114,11 +114,11 @@ class ProgressListenerTest {
     @Test
     void shouldPrintMultiplePercentages_forIncrementalTimeChanges() {
         progressListener = new ProgressListener(100L); // gap = 1
-        
+
         progressListener.infoEmited(new TimeChangeInfo(simulation, 1L));
         progressListener.infoEmited(new TimeChangeInfo(simulation, 2L));
         progressListener.infoEmited(new TimeChangeInfo(simulation, 3L));
-        
+
         String output = outputStream.toString();
         assertTrue(output.contains("1%"));
         assertTrue(output.contains("2%"));
@@ -128,21 +128,21 @@ class ProgressListenerTest {
     @Test
     void shouldExtendBasicListener() {
         progressListener = new ProgressListener(1000L);
-        
+
         assertTrue(progressListener instanceof BasicListener);
     }
 
     @Test
     void shouldHaveCorrectDescription() {
         progressListener = new ProgressListener(1000L);
-        
+
         assertEquals("Progress", progressListener.toString());
     }
 
     @Test
     void shouldImplementIListener() {
         progressListener = new ProgressListener(1000L);
-        
+
         assertTrue(progressListener instanceof IListener);
     }
 
@@ -151,7 +151,7 @@ class ProgressListenerTest {
         ProgressListener listener1 = new ProgressListener(100L);
         ProgressListener listener2 = new ProgressListener(1000L);
         ProgressListener listener3 = new ProgressListener(10000L);
-        
+
         assertNotNull(listener1);
         assertNotNull(listener2);
         assertNotNull(listener3);

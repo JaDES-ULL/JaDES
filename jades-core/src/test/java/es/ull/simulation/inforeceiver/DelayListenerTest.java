@@ -22,7 +22,7 @@ class DelayListenerTest {
     @Test
     void shouldCreateDelayListener_withTimeout() {
         delayListener = new DelayListener(1);
-        
+
         assertNotNull(delayListener);
         assertEquals("Delay listener", delayListener.toString());
     }
@@ -30,7 +30,7 @@ class DelayListenerTest {
     @Test
     void shouldCreateDelayListener_withZeroTimeout() {
         delayListener = new DelayListener(0);
-        
+
         assertNotNull(delayListener);
         assertEquals("Delay listener", delayListener.toString());
     }
@@ -38,7 +38,7 @@ class DelayListenerTest {
     @Test
     void shouldCreateDelayListener_withLargeTimeout() {
         delayListener = new DelayListener(100);
-        
+
         assertNotNull(delayListener);
         assertEquals("Delay listener", delayListener.toString());
     }
@@ -46,7 +46,7 @@ class DelayListenerTest {
     @Test
     void shouldAddTimeChangeInfoAsTargetInformation() {
         delayListener = new DelayListener(1);
-        
+
         assertTrue(delayListener.getTargetInformation().contains(TimeChangeInfo.class));
         assertEquals(1, delayListener.getTargetInformation().size());
     }
@@ -54,7 +54,7 @@ class DelayListenerTest {
     @Test
     void shouldHaveCorrectDescription() {
         delayListener = new DelayListener(5);
-        
+
         assertEquals("Delay listener", delayListener.toString());
     }
 
@@ -62,11 +62,11 @@ class DelayListenerTest {
     void shouldCallInfoEmited_withTimeChangeInfo() {
         delayListener = new DelayListener(0); // Use 0 timeout for fast test
         TimeChangeInfo info = new TimeChangeInfo(simulation, 100L);
-        
+
         long startTime = System.currentTimeMillis();
         delayListener.infoEmited(info);
         long endTime = System.currentTimeMillis();
-        
+
         // Should complete quickly with 0 timeout
         assertTrue(endTime - startTime < 1000);
     }
@@ -74,7 +74,7 @@ class DelayListenerTest {
     @Test
     void shouldExtendBasicListener() {
         delayListener = new DelayListener(1);
-        
+
         assertTrue(delayListener instanceof BasicListener);
     }
 
@@ -83,7 +83,7 @@ class DelayListenerTest {
         DelayListener listener1 = new DelayListener(1);
         DelayListener listener2 = new DelayListener(2);
         DelayListener listener3 = new DelayListener(3);
-        
+
         assertNotNull(listener1);
         assertNotNull(listener2);
         assertNotNull(listener3);
@@ -95,7 +95,7 @@ class DelayListenerTest {
     @Test
     void shouldImplementIListener() {
         delayListener = new DelayListener(1);
-        
+
         assertTrue(delayListener instanceof IListener);
     }
 }

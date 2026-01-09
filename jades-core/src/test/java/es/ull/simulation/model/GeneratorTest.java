@@ -13,7 +13,7 @@ class GeneratorTest {
     private Simulation simulation;
     private ElementType elementType;
     private ActivityFlow flow;
-    
+
     @BeforeEach
     public void setUp() {
         simulation = new Simulation(0, "Test Simulation", TimeUnit.MINUTE);

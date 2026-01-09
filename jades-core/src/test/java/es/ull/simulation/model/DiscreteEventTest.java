@@ -35,9 +35,9 @@ class DiscreteEventTest {
     void shouldCreateDefaultStartEvent_withValidParameters() {
         IEventSource source = new MockEventSource();
         long timestamp = 100;
-        
+
         DiscreteEvent.DefaultStartEvent event = new DiscreteEvent.DefaultStartEvent(source, timestamp);
-        
+
         assertNotNull(event);
         assertEquals(timestamp, event.getTs());
     }
@@ -46,9 +46,9 @@ class DiscreteEventTest {
     void shouldCreateDefaultStartEvent_withZeroTimestamp() {
         IEventSource source = new MockEventSource();
         long timestamp = 0;
-        
+
         DiscreteEvent.DefaultStartEvent event = new DiscreteEvent.DefaultStartEvent(source, timestamp);
-        
+
         assertEquals(timestamp, event.getTs());
     }
 
@@ -56,9 +56,9 @@ class DiscreteEventTest {
     void shouldCreateDefaultStartEvent_withLargeTimestamp() {
         IEventSource source = new MockEventSource();
         long timestamp = Long.MAX_VALUE;
-        
+
         DiscreteEvent.DefaultStartEvent event = new DiscreteEvent.DefaultStartEvent(source, timestamp);
-        
+
         assertEquals(timestamp, event.getTs());
     }
 
@@ -66,7 +66,7 @@ class DiscreteEventTest {
     void shouldExecuteEvent_withoutException() {
         IEventSource source = new MockEventSource();
         DiscreteEvent.DefaultStartEvent event = new DiscreteEvent.DefaultStartEvent(source, 100);
-        
+
         // Should not throw exception
         assertDoesNotThrow(() -> event.event());
     }
@@ -75,7 +75,7 @@ class DiscreteEventTest {
     void shouldRunEvent_whenNotCancelled() {
         IEventSource source = new MockEventSource();
         DiscreteEvent.DefaultStartEvent event = new DiscreteEvent.DefaultStartEvent(source, 100);
-        
+
         assertFalse(event.isCancelled());
         assertDoesNotThrow(() -> event.run());
     }
@@ -84,7 +84,7 @@ class DiscreteEventTest {
     void shouldNotRunEvent_whenCancelled() {
         IEventSource source = new MockEventSource();
         DiscreteEvent.DefaultStartEvent event = new DiscreteEvent.DefaultStartEvent(source, 100);
-        
+
         event.cancel();
         assertTrue(event.isCancelled());
         assertDoesNotThrow(() -> event.run());
@@ -95,9 +95,9 @@ class DiscreteEventTest {
         IEventSource source = new MockEventSource();
         long timestamp = 500;
         DiscreteEvent.DefaultStartEvent event = new DiscreteEvent.DefaultStartEvent(source, timestamp);
-        
+
         String result = event.toString();
-        
+
         assertTrue(result.contains("Ev("));
         assertTrue(result.contains("DefaultStartEvent"));
         assertTrue(result.contains("[" + timestamp + "]"));
@@ -108,7 +108,7 @@ class DiscreteEventTest {
         IEventSource source = new MockEventSource();
         DiscreteEvent.DefaultStartEvent event1 = new DiscreteEvent.DefaultStartEvent(source, 100);
         DiscreteEvent.DefaultStartEvent event2 = new DiscreteEvent.DefaultStartEvent(source, 100);
-        
+
         assertEquals(0, event1.compareTo(event2));
     }
 
@@ -117,7 +117,7 @@ class DiscreteEventTest {
         IEventSource source = new MockEventSource();
         DiscreteEvent.DefaultStartEvent event1 = new DiscreteEvent.DefaultStartEvent(source, 200);
         DiscreteEvent.DefaultStartEvent event2 = new DiscreteEvent.DefaultStartEvent(source, 100);
-        
+
         assertTrue(event1.compareTo(event2) > 0);
     }
 
@@ -126,7 +126,7 @@ class DiscreteEventTest {
         IEventSource source = new MockEventSource();
         DiscreteEvent.DefaultStartEvent event1 = new DiscreteEvent.DefaultStartEvent(source, 50);
         DiscreteEvent.DefaultStartEvent event2 = new DiscreteEvent.DefaultStartEvent(source, 100);
-        
+
         assertTrue(event1.compareTo(event2) < 0);
     }
 
@@ -134,9 +134,9 @@ class DiscreteEventTest {
     void shouldCancel_andReturnTrue() {
         IEventSource source = new MockEventSource();
         DiscreteEvent.DefaultStartEvent event = new DiscreteEvent.DefaultStartEvent(source, 100);
-        
+
         boolean result = event.cancel();
-        
+
         assertTrue(result);
         assertTrue(event.isCancelled());
     }

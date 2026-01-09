@@ -25,7 +25,7 @@ class SimulationTableCycleTest {
     @Test
     void shouldCreateSimulationTableCycle_withTimestamps() {
         SimulationTableCycle cycle = new SimulationTableCycle(timeUnit, timestamps);
-        
+
         assertNotNull(cycle);
         assertNotNull(cycle.getCycle());
     }
@@ -34,7 +34,7 @@ class SimulationTableCycleTest {
     void shouldCreateSimulationTableCycle_withEmptyTimestamps() {
         TimeStamp[] emptyTimestamps = new TimeStamp[0];
         SimulationTableCycle cycle = new SimulationTableCycle(timeUnit, emptyTimestamps);
-        
+
         assertNotNull(cycle);
         assertNotNull(cycle.getCycle());
     }
@@ -43,7 +43,7 @@ class SimulationTableCycleTest {
     void shouldCreateSimulationTableCycle_withSingleTimestamp() {
         TimeStamp[] singleTimestamp = new TimeStamp[] { new TimeStamp(timeUnit, 5) };
         SimulationTableCycle cycle = new SimulationTableCycle(timeUnit, singleTimestamp);
-        
+
         assertNotNull(cycle);
         assertNotNull(cycle.getCycle());
     }
@@ -55,7 +55,7 @@ class SimulationTableCycleTest {
             manyTimestamps[i] = new TimeStamp(timeUnit, i * 5);
         }
         SimulationTableCycle cycle = new SimulationTableCycle(timeUnit, manyTimestamps);
-        
+
         assertNotNull(cycle);
         assertNotNull(cycle.getCycle());
     }
@@ -64,7 +64,7 @@ class SimulationTableCycleTest {
     void shouldCreateSimulationTableCycle_withSubCycle() {
         SimulationTableCycle subCycle = new SimulationTableCycle(timeUnit, timestamps);
         SimulationTableCycle cycle = new SimulationTableCycle(timeUnit, timestamps, subCycle);
-        
+
         assertNotNull(cycle);
         assertNotNull(cycle.getCycle());
     }
@@ -78,7 +78,7 @@ class SimulationTableCycleTest {
             new TimeStamp(hourUnit, 2)
         };
         SimulationTableCycle cycle = new SimulationTableCycle(hourUnit, hourTimestamps);
-        
+
         assertNotNull(cycle);
         assertNotNull(cycle.getCycle());
     }
@@ -86,14 +86,14 @@ class SimulationTableCycleTest {
     @Test
     void shouldImplementISimulationCycle() {
         SimulationTableCycle cycle = new SimulationTableCycle(timeUnit, timestamps);
-        
+
         assertTrue(cycle instanceof ISimulationCycle);
     }
 
     @Test
     void shouldReturnNonNullCycle() {
         SimulationTableCycle cycle = new SimulationTableCycle(timeUnit, timestamps);
-        
+
         assertNotNull(cycle.getCycle());
     }
 
@@ -101,7 +101,7 @@ class SimulationTableCycleTest {
     void shouldCreateSimulationTableCycle_withZeroTimestamps() {
         TimeStamp[] zeroTimestamps = new TimeStamp[] { new TimeStamp(timeUnit, 0) };
         SimulationTableCycle cycle = new SimulationTableCycle(timeUnit, zeroTimestamps);
-        
+
         assertNotNull(cycle);
         assertNotNull(cycle.getCycle());
     }
@@ -114,7 +114,7 @@ class SimulationTableCycleTest {
             new TimeStamp(timeUnit, 3000)
         };
         SimulationTableCycle cycle = new SimulationTableCycle(timeUnit, largeTimestamps);
-        
+
         assertNotNull(cycle);
         assertNotNull(cycle.getCycle());
     }
@@ -124,7 +124,7 @@ class SimulationTableCycleTest {
         SimulationTableCycle cycle1 = new SimulationTableCycle(timeUnit, timestamps);
         SimulationTableCycle cycle2 = new SimulationTableCycle(TimeUnit.HOUR, timestamps);
         SimulationTableCycle cycle3 = new SimulationTableCycle(TimeUnit.DAY, timestamps);
-        
+
         assertNotNull(cycle1);
         assertNotNull(cycle2);
         assertNotNull(cycle3);

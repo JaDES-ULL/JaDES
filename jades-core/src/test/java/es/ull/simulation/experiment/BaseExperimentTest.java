@@ -34,7 +34,7 @@ class BaseExperimentTest {
     @Test
     void shouldGetDescription() {
         String description = experiment.getDescription();
-        
+
         assertEquals("Test Experiment", description);
         assertNotNull(description);
     }
@@ -42,7 +42,7 @@ class BaseExperimentTest {
     @Test
     void shouldGetNExperiments() {
         int nExperiments = experiment.getNExperiments();
-        
+
         assertEquals(5, nExperiments);
         assertTrue(nExperiments > 0);
     }
@@ -50,7 +50,7 @@ class BaseExperimentTest {
     @Test
     void shouldGetArguments() {
         CommonArguments args = experiment.getArguments();
-        
+
         assertNotNull(args);
         assertEquals(5, args.nRuns);
         assertEquals(42L, args.seed);
@@ -64,7 +64,7 @@ class BaseExperimentTest {
         CommonArguments zeroArgs = new CommonArguments();
         zeroArgs.nRuns = 0;
         TestExperiment zeroExperiment = new TestExperiment("Zero Experiment", zeroArgs);
-        
+
         assertEquals(0, zeroExperiment.getNExperiments());
     }
 
@@ -75,7 +75,7 @@ class BaseExperimentTest {
         parallelArgs.parallel = true;
         parallelArgs.nThreads = 4;
         TestExperiment parallelExperiment = new TestExperiment("Parallel Experiment", parallelArgs);
-        
+
         assertTrue(parallelExperiment.getArguments().parallel);
         assertEquals(4, parallelExperiment.getArguments().nThreads);
     }
@@ -86,7 +86,7 @@ class BaseExperimentTest {
         quietArgs.nRuns = 3;
         quietArgs.quiet = true;
         TestExperiment quietExperiment = new TestExperiment("Quiet Experiment", quietArgs);
-        
+
         assertTrue(quietExperiment.getArguments().quiet);
     }
 
@@ -98,10 +98,10 @@ class BaseExperimentTest {
         CommonArguments args2 = new CommonArguments();
         args2.nRuns = 2;
         args2.seed = 200L;
-        
+
         TestExperiment exp1 = new TestExperiment("Exp1", args1);
         TestExperiment exp2 = new TestExperiment("Exp2", args2);
-        
+
         assertEquals(100L, exp1.getArguments().seed);
         assertEquals(200L, exp2.getArguments().seed);
     }
@@ -113,7 +113,7 @@ class BaseExperimentTest {
         multiThreadArgs.parallel = true;
         multiThreadArgs.nThreads = 8;
         TestExperiment multiThreadExperiment = new TestExperiment("Multi-thread Experiment", multiThreadArgs);
-        
+
         assertEquals(8, multiThreadExperiment.getArguments().nThreads);
         assertTrue(multiThreadExperiment.getArguments().parallel);
     }
@@ -126,11 +126,11 @@ class BaseExperimentTest {
         args2.nRuns = 2;
         CommonArguments args3 = new CommonArguments();
         args3.nRuns = 3;
-        
+
         TestExperiment exp1 = new TestExperiment("Experiment 1", args1);
         TestExperiment exp2 = new TestExperiment("Experiment 2", args2);
         TestExperiment exp3 = new TestExperiment("Experiment 3", args3);
-        
+
         assertEquals(1, exp1.getNExperiments());
         assertEquals(2, exp2.getNExperiments());
         assertEquals(3, exp3.getNExperiments());

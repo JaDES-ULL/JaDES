@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -29,22 +29,22 @@ import es.ull.simulation.variable.IVariable;
 
 /**
  * The main simulation class. Defines all the components of the model and the logical structures required to simulate them.
- * 
+ *
  * @author Ivan Castilla Rodriguez
  *
  */
-public class Simulation implements IIdentifiable, IDescribable, IVariableStore, ILoggable, IHandlesInformation {
+public class Simulation implements IIdentifiable, IDescribable, IVariableStore, ILoggable, IHandlesInformation, ISimulationContext {
 	/** The default time unit used by the simulation */
-	public final static TimeUnit DEF_TIME_UNIT = TimeUnit.MINUTE; 	
+	public final static TimeUnit DEF_TIME_UNIT = TimeUnit.MINUTE;
 	/** A short text describing this simulation. */
 	protected final String description;
 	/** Time unit of the simulation */
 	protected final TimeUnit unit;
 	/** A unique simulation identifier */
 	protected final int id;
-	/** The identifier to be assigned to the next element */ 
+	/** The identifier to be assigned to the next element */
 	private int elemCounter = 0;
-	
+
 	/** List of element types present in the simulation. */
 	private final ArrayList<ElementType> elementTypeList = new ArrayList<ElementType>();
 	/** List of resources present in the simulation. */
@@ -66,22 +66,22 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 
 	/** Variable store */
 	protected final Map<String, IVariable> varCollection = new TreeMap<String, IVariable>();
-	
+
 	/** A handler for the information produced by the execution of this simulation */
 	protected final InfoHandler infoHandler = new InfoHandler();
-	
+
 	/** The simulation engine that executes this model */
 	protected SimulationEngine simulationEngine = null;
-	
+
 	/** The way the activity managers are created */
 	protected ActivityManagerCreator amCreator = null;
-	
+
 	/** A value representing the simulation's start timestamp without unit */
 	protected long startTs;
 
 	/** A value representing the simulation's end timestamp without unit */
 	protected long endTs;
-	
+
 	/**
 	 * Creates a new instance of a simulation
 	 *
@@ -93,7 +93,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		this.description = description;
 		unit = DEF_TIME_UNIT;
 	}
-	
+
 	/**
 	 * Creates a new instance of a simulation
 	 *
@@ -105,7 +105,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		this.description = description;
 		this.unit = unit;
 	}
-	
+
 	@Override
 	public int getIdentifier() {
 		return id;
@@ -118,7 +118,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	public TimeUnit getTimeUnit() {
 		return unit;
 	}
-	
+
 	@Override
 	public String getDescription() {
 		return description;
@@ -144,10 +144,21 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
      * Returns the current simulation time
      * @return The current simulation time
      */
-	public long getTs() {
+	@Override
+	public long getCurrentTimestamp() {
 		return simulationEngine.getTs();
 	}
-	
+
+	/**
+	 * Returns the current simulation time
+	 * @return The current simulation time
+	 * @deprecated Use {@link #getCurrentTimestamp()} instead
+	 */
+	@Deprecated
+	public long getTs() {
+		return getCurrentTimestamp();
+	}
+
 	/**
 	 * Returns the simulation engine that executes this model
 	 * @return The simulation engine that executes this model
@@ -168,7 +179,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 			rt.assignSimulation(simulationEngine);
 		for (Resource res : AbstractResourceList)
 			res.assignSimulation(simulationEngine);
-		for (WorkGroup wg : workGroupList)	
+		for (WorkGroup wg : workGroupList)
 			wg.assignSimulation(simulationEngine);
 		for (BasicFlow f : flowList)
 			f.assignSimulation(simulationEngine);
@@ -191,24 +202,46 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	}
 
 	/**
-	 * Returns a unique identifier for a newly created element. 
+	 * Returns a unique identifier for a newly created element.
 	 * @return a unique identifier for a newly created element.
 	 */
-	public int getNewElementId() {
+	@Override
+	public int generateId() {
 		return elemCounter++;
 	}
-	
+
+	/**
+	 * Returns a unique identifier for a newly created element.
+	 * @return a unique identifier for a newly created element.
+	 * @deprecated Use {@link #generateId()} instead
+	 */
+	@Deprecated
+	public int getNewElementId() {
+		return generateId();
+	}
+
 	/**
 	 * Adds a new event to the simulation
 	 * @param ev New event
 	 */
-	public void addEvent(final DiscreteEvent ev) {
+	@Override
+	public void scheduleEvent(final DiscreteEvent ev) {
 		simulationEngine.addEvent(ev);
 	}
 
 	/**
+	 * Adds a new event to the simulation
+	 * @param ev New event
+	 * @deprecated Use {@link #scheduleEvent(DiscreteEvent)} instead
+	 */
+	@Deprecated
+	public void addEvent(final DiscreteEvent ev) {
+		scheduleEvent(ev);
+	}
+
+	/**
 	 * Starts the execution of the simulation at timestamp 0 using the default time unit.
-	 * 
+	 *
 	 * @param endTs Simulation end timestamp
 	 */
 	public void run(final TimeStamp endTs) {
@@ -226,7 +259,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 
 	/**
 	 * Starts the execution of the simulation using the default time unit.
-	 * 
+	 *
 	 * @param startTs Simulation start timestamp
 	 * @param endTs Simulation end timestamp
 	 */
@@ -235,10 +268,10 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	}
 
 	/**
-	 * Starts the execution of the simulation. It creates and initializes all the necessary 
+	 * Starts the execution of the simulation. It creates and initializes all the necessary
 	 * structures.<p> The following checks and initializations are performed within this method:
 	 * <ol>
-	 * <li>If no customized {@link ActivityManagerCreator AM creator} has been defined, the 
+	 * <li>If no customized {@link ActivityManagerCreator AM creator} has been defined, the
 	 * {@link StandardActivityManagerCreator default one} is used.</li>
 	 * <li>If no customized {@link SimulationEngine simulation engine} has been defined, a
 	 * {@link SequentialSimulationEngine sequential engine} is used.</li>
@@ -249,7 +282,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * </ol>
 	 * @param startTs Simulation start expressed in simulation default time units
 	 * @param endTs Simulation end expressed in simulation default  time units
-     */ 
+     */
 	public void run(long startTs, long endTs) {
 		this.startTs = startTs;
 		this.endTs = endTs;
@@ -261,13 +294,13 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		if (amCreator == null)
 			amCreator = new StandardActivityManagerCreator(this);
 		amCreator.createActivityManagers();
-		debugPrintActManager();					
+		debugPrintActManager();
 		simulationEngine.initializeEngine();
 		trace("SIMULATION MODEL CREATED\t" + getTs());
 		init();
 
 		infoHandler.notifyInfo(new SimulationStartStopInfo(this, SimulationStartStopInfo.Type.START, startTs));
-		
+
 		// Starts all the time driven generators
 		for (TimeDrivenGenerator<?> evSource : tGenList)
 			simulationEngine.addWait(evSource.onCreate(startTs));
@@ -277,13 +310,13 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 
 		// Adds the event to control end of simulation
 		simulationEngine.addWait(new SimulationEndEvent());
-		
+
 		simulationEngine.simulationLoop();
 
 		trace("SIMULATION FINISHES\t" + getTs() + "\t[EXPECTED " + endTs + "]");
     	simulationEngine.printState();
-		
-		infoHandler.notifyInfo(new SimulationStartStopInfo(this, SimulationStartStopInfo.Type.END, endTs));    	
+
+		infoHandler.notifyInfo(new SimulationStartStopInfo(this, SimulationStartStopInfo.Type.END, endTs));
         // The user defined method for finalization is invoked
 		end();
 	}
@@ -298,36 +331,36 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 				gen.create();
 		}
 	}
-	
+
 	/**
 	 * Resets variables or contents of the model. It should be invoked by the user when the same model
 	 * is used for multiple replicas
 	 * and contains variables that must be initialized among replicas.
 	 */
-	public void reset() {		
+	public void reset() {
 	}
-	
+
 	/**
 	 * Adds an {@link ElementType} to the model. This method is invoked from the object's constructor.
 	 * @param et Element Type that's added to the model.
 	 */
-	public void add(final ElementType et) { 
+	public void add(final ElementType et) {
 		elementTypeList.add(et);
 	}
-	
+
 	/**
 	 * Adds a {@link Resource} to the simulation. This method is invoked from the object's constructor.
 	 * @param res Resource that's added to the model.
 	 */
-	public void add(final Resource res) { 
+	public void add(final Resource res) {
 		AbstractResourceList.add(res);
 	}
-	
+
 	/**
 	 * Adds an {@link ResourceType} to the model. This method is invoked from the object's constructor.
 	 * @param rt Resource Type that's added to the model.
 	 */
-	public void add(final ResourceType rt) { 
+	public void add(final ResourceType rt) {
 		resourceTypeList.add(rt);
 	}
 
@@ -335,19 +368,19 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * Adds an {@link WorkGroup} to the model. This method is invoked from the object's constructor.
 	 * @param wg Workgroup that's added to the model.
 	 */
-	public void add(final WorkGroup wg) { 
+	public void add(final WorkGroup wg) {
 		workGroupList.add(wg);
 	}
 	/**
 	 * Adds an {@link BasicFlow} to the model. This method is invoked from the object's constructor.
 	 * @param f IFlow that's added to the model.
 	 */
-	public void add(final BasicFlow f) { 
+	public void add(final BasicFlow f) {
 		flowList.add(f);
 		if (f instanceof RequestResourcesFlow)
 			reqFlowList.add((RequestResourcesFlow)f);
 	}
-	
+
 	/**
 	 * Adds an {@link TimeDrivenGenerator} to the model. This method is invoked from the object's constructor.
 	 * @param gen Time-driven generator that's added to the model.
@@ -355,7 +388,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	public void add(final TimeDrivenGenerator<?> gen) {
 		tGenList.add(gen);
 	}
-	
+
 	/**
 	 * Adds an {@link ConditionDrivenGenerator} to the model. This method is invoked from the object's constructor.
 	 * @param gen Condition-driven generator that's added to the model.
@@ -363,7 +396,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	public void add(final ConditionDrivenGenerator<?> gen) {
 		cGenList.add(gen);
 	}
-	
+
 	/**
 	 * Adds an {@link ActivityManager} to the simulation. The activity managers are  automatically added from
 	 * their constructor.
@@ -377,47 +410,47 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * Returns the list of {@link ElementType element types} defined within this simulation
 	 * @return the list of {@link ElementType element types} defined within this simulation
 	 */
-	public List<ElementType> getElementTypeList() { 
+	public List<ElementType> getElementTypeList() {
 		return elementTypeList;
 	}
-	
+
 	/**
 	 * Returns the list of {@link Resource resources} defined within this simulation
 	 * @return the list of {@link Resource resources} defined within this simulation
 	 */
-	public List<Resource> getResourceList() { 
+	public List<Resource> getResourceList() {
 		return AbstractResourceList;
 	}
-	
+
 	/**
 	 * Returns the list of {@link ResourceType resource types} defined within this simulation
 	 * @return the list of {@link ResourceType resource types} defined within this simulation
 	 */
-	public List<ResourceType> getResourceTypeList() { 
+	public List<ResourceType> getResourceTypeList() {
 		return resourceTypeList;
 	}
-	
+
 	/**
 	 * Returns the list of {@link WorkGroup workgroups} defined within this simulation
 	 * @return the list of {@link WorkGroup workgroups} defined within this simulation
 	 */
-	public List<WorkGroup> getWorkGroupList() { 
+	public List<WorkGroup> getWorkGroupList() {
 		return workGroupList;
 	}
-	
+
 	/**
 	 * Returns the list of {@link BasicFlow flows} defined within this simulation
 	 * @return the list of {@link BasicFlow flows} defined within this simulation
 	 */
-	public List<BasicFlow> getFlowList() { 
+	public List<BasicFlow> getFlowList() {
 		return flowList;
 	}
-	
+
 	/**
 	 * Returns the list of {@link RequestResourcesFlow flows requesting resources} defined within this simulation
 	 * @return the list of {@link RequestResourcesFlow flows requesting resources} defined within this simulation
 	 */
-	public List<RequestResourcesFlow> getRequestFlowList() { 
+	public List<RequestResourcesFlow> getRequestFlowList() {
 		return reqFlowList;
 	}
 
@@ -444,22 +477,22 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	public List<ActivityManager> getActivityManagerList() {
 		return amList;
 	}
-	
+
 	/**
 	 * A convenience method for converting a timestamp to a long value expressed in the
 	 * simulation's time unit.
 	 * @param source A timestamp
-	 * @return A long value representing the received timestamp in the simulation's time unit 
+	 * @return A long value representing the received timestamp in the simulation's time unit
 	 */
 	public long simulationTime2Long(final TimeStamp source) {
 		return unit.convert(source);
 	}
-	
+
 	/**
 	 * A convenience method for converting a long value expressed in the simulation's time unit
 	 * to a timestamp.
 	 * @param sourceValue A long value expressed in the simulation's time unit
-	 * @return A timestamp representing the received long value in the simulation's time unit 
+	 * @return A timestamp representing the received long value in the simulation's time unit
 	 */
 	public TimeStamp long2SimulationTime(final long sourceValue) {
 		return new TimeStamp(unit, sourceValue);
@@ -474,12 +507,12 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	public IVariable getVar(final String varName) {
 		return varCollection.get(varName);
 	}
-	
+
 	@Override
 	public void putVar(final String varName, final IVariable value) {
 		varCollection.put(varName, value);
 	}
-	
+
 	@Override
 	public void putVar(final String varName, final double value) {
 		IUserVariable v = (IUserVariable) varCollection.get(varName);
@@ -489,7 +522,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		} else
 			varCollection.put(varName, new DoubleVariable(value));
 	}
-	
+
 	@Override
 	public void putVar(final String varName, final int value) {
 		IUserVariable v = (IUserVariable) varCollection.get(varName);
@@ -519,7 +552,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		} else
 			varCollection.put(varName, new CharacterVariable(value));
 	}
-	
+
 	@Override
 	public void putVar(final String varName, final byte value) {
 		IUserVariable v = (IUserVariable) varCollection.get(varName);
@@ -539,7 +572,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		} else
 			varCollection.put(varName, new FloatVariable(value));
 	}
-	
+
 	@Override
 	public void putVar(final String varName, final long value) {
 		IUserVariable v = (IUserVariable) varCollection.get(varName);
@@ -549,7 +582,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		} else
 			varCollection.put(varName, new LongVariable(value));
 	}
-	
+
 	@Override
 	public void putVar(final String varName, final short value) {
 		IUserVariable v = (IUserVariable) varCollection.get(varName);
@@ -559,7 +592,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		} else
 			varCollection.put(varName, new ShortVariable(value));
 	}
-	
+
 	public double getVarViewValue(final Object...params) {
 		String varName = (String) params[0];
 		params[0] = this;
@@ -569,7 +602,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		else
 			return -1;
 	}
-	
+
 	/**
 	 * Prints the contents of the activity managers created.
 	 */
@@ -589,7 +622,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	public void notifyInfo(final IPieceOfInformation info) {
 		infoHandler.notifyInfo(info);
 	}
-	
+
 	/**
 	 * Returns the listeners attached to this simulation that are interested in receiving information of a certain type.
 	 * @param infoTypeClass The type of information.
@@ -608,25 +641,25 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	}
 
 	// User methods
-	
+
 	/**
 	 * Allows a user for adding customized code before the simulation starts.
 	 */
 	public void init() {
 	};
-	
+
 	/**
 	 * Allows a user for adding customized code after the simulation finishes.
 	 */
 	public void end() {
 	};
-	
+
 	/**
 	 * Allows a user for adding customized code before the simulation clock advances.
 	 */
 	public void beforeClockTick() {
 	};
-	
+
 	/**
 	 * Allows a user for adding customized code just after the simulation clock advances.
 	 */
@@ -641,12 +674,12 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
     public boolean isSimulationEnd(final long currentTs) {
     	return (currentTs >= endTs);
     }
-    
+
 	// End of user methods
-	
+
 	/**
 	 * A basic event which facilitates the control of the end of the simulation. Scheduling this event
-	 * ensures that there's always at least one event in the simulation. 
+	 * ensures that there's always at least one event in the simulation.
 	 * @author Iván Castilla Rodríguez
 	 */
     class SimulationEndEvent extends DiscreteEvent {
