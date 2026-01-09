@@ -121,4 +121,39 @@ class GeneratorTest {
         assertEquals(info1, infos.get(0));
         assertEquals(info2, infos.get(1));
     }
+    
+    /**
+     * PREVIOUSLY IMPOSSIBLE TEST - now enabled by ISimulationContext refactoring.
+     * 
+     * Before: getTime() called getTs() which required SimulationEngine (NullPointerException).
+     * After: getTime() uses context.getCurrentTimestamp() which can be mocked.
+     * 
+     * This test was blocked in the original coverage session - we had to skip it because
+     * even simple getters required full initialization. Now it works perfectly.
+     */
+    @Test
+    public void shouldCallGetTime_returnsCurrentTimestamp() {
+        // Given: a simulation with controlled timestamp
+        MockSimulationContext mockContext = new MockSimulationContext(42);
+        Simulation testSimulation = new Simulation(0, "Test") {
+            @Override
+            public long getCurrentTimestamp() {
+                return mockContext.getCurrentTimestamp();
+            }
+        };
+        
+        Generator<StandardElementGenerationInfo> generator = new Generator<StandardElementGenerationInfo>(testSimulation, 1, 5) {
+            @Override
+            public IEventSource createEventSource(int ind, StandardElementGenerationInfo info) {
+                return new Element(testSimulation, info);
+            }
+        };
+        
+        // When: calling getTime (previously threw NullPointerException)
+        double time = generator.getTime();
+        
+        // Then: should return the current timestamp as double
+        assertEquals(42.0, time, 0.001);
+    }
 }
+

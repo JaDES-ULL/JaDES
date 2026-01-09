@@ -266,4 +266,52 @@ public class TimeDrivenGeneratorTest {
         assertNotNull(event);
         assertEquals(Long.MAX_VALUE, event.getTs());
     }
+    
+    /**
+     * PREVIOUSLY IMPOSSIBLE TEST - now enabled by ISimulationContext refactoring.
+     * 
+     * Before: notifyEnd() required full SimulationEngine initialization (NullPointerException).
+     * After: Using MockSimulationContext through Simulation allows testing without SimulationEngine.
+     * 
+     * This demonstrates the power of the refactoring - methods that were untestable
+     * due to tight coupling are now easily testable with proper context isolation.
+     * 
+     * The test uses a Simulation that delegates time queries to MockSimulationContext,
+     * proving that the time abstraction works correctly through the inheritance chain.
+     */
+    @Test
+    public void shouldCallNotifyEnd_withoutSimulationEngine() {
+        // Given: a simulation that provides controlled timestamps without SimulationEngine
+        MockSimulationContext mockContext = new MockSimulationContext(100);
+        Simulation testSimulation = new Simulation(0, "Test") {
+            @Override
+            public long getCurrentTimestamp() {
+                return mockContext.getCurrentTimestamp();
+            }
+            
+            @Override
+            public void scheduleEvent(DiscreteEvent ev) {
+                mockContext.scheduleEvent(ev);
+            }
+        };
+        
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(testSimulation, 1, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return null; // Not testing Element creation, just notifyEnd behavior
+                }
+            };
+        
+        // When: calling notifyEnd (previously threw NullPointerException)
+        assertDoesNotThrow(() -> generator.notifyEnd());
+        
+        // Then: should schedule a finalize event at current timestamp
+        assertEquals(1, mockContext.getScheduledEvents().size());
+        DiscreteEvent scheduledEvent = mockContext.getScheduledEvents().get(0);
+        assertNotNull(scheduledEvent);
+        assertEquals(100, scheduledEvent.getTs(), "Event should be scheduled at current timestamp");
+    }
 }
+
+
