@@ -42,14 +42,20 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	private final int size;
 	/** The current element instance that drives the movement of the resource - DEPRECATED: use resourceLocation */
 	@Deprecated
-	private ElementInstance movingInstance = null;	
-	/** Timetable which defines the availability estructure of the resource. Define RollOn and RollOff events. */
-    protected final ArrayList<TimeTableEntry> timeTable = new ArrayList<TimeTableEntry>();
-    /** Availability time table. Define CancelPeriodOn and CancelPeriodOff events */
-    protected final ArrayList<TimeTableEntry> cancelPeriodTable = new ArrayList<TimeTableEntry>();
-    /** If true, indicates that this resource is being used after its availability time has expired */
+	private ElementInstance movingInstance = null;
+	/** Manages availability, timetables, and resource types for this resource */
+	private final ResourceAvailability resourceAvailability;
+	/** Timetable which defines the availability estructure of the resource - DEPRECATED: use resourceAvailability */
+	@Deprecated
+    protected final ArrayList<TimeTableEntry> timeTable;
+    /** Availability time table - DEPRECATED: use resourceAvailability */
+	@Deprecated
+    protected final ArrayList<TimeTableEntry> cancelPeriodTable;
+    /** If true, indicates that this resource is being used after its availability time has expired - DEPRECATED: use resourceAvailability */
+	@Deprecated
     private boolean timeOut = false;
-    /** The resource type which this resource is being booked for */
+    /** The resource type which this resource is being booked for - DEPRECATED: use resourceAvailability */
+	@Deprecated
     protected ResourceType currentResourceType = null;
     /** The engine in charge of executing specific actions */
     private ResourceEngine engine;
@@ -75,9 +81,13 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		this.description = description;
 		// Initialize new ResourceLocation
 		this.resourceLocation = new ResourceLocation(this, initLocation, size);
+		// Initialize new ResourceAvailability
+		this.resourceAvailability = new ResourceAvailability(this);
 		// Keep deprecated fields for backward compatibility
 		this.size = size;
 		this.initLocation = initLocation;
+		this.timeTable = (ArrayList<TimeTableEntry>) resourceAvailability.getTimeTableEntries();
+		this.cancelPeriodTable = (ArrayList<TimeTableEntry>) resourceAvailability.getCancellationPeriodEntries();
 		model.add(this);
 	}
 
@@ -124,17 +134,17 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	 * @return a collection with the timetable defined for this resource
 	 */
 	public Collection<TimeTableEntry> getTimeTableEntries() {
-		return timeTable;
+		return resourceAvailability.getTimeTableEntries();
 	}
-	
+
 	/**
 	 * Returns a collection with the cancellation timetable defined for this resource.
 	 * @return a collection with the cancellation timetable defined for this resource
 	 */
 	public Collection<TimeTableEntry> getCancellationPeriodEntries() {
-		return cancelPeriodTable;
+		return resourceAvailability.getCancellationPeriodEntries();
 	}
-	
+
 	@Override
 	public DiscreteEvent onCreate(final long ts) {
 		// Delegate initialization to ResourceLocation
@@ -164,7 +174,9 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
      * @return Value of property currentResourceType.
      */
     public ResourceType getCurrentResourceType() {
-        return currentResourceType;
+        ResourceType rt = resourceAvailability.getCurrentResourceType();
+        currentResourceType = rt; // Sync deprecated field
+        return rt;
     }
 
     /**
@@ -173,7 +185,8 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
      * @param rt Value of property currentResourceType.
      */
     public void setCurrentResourceType(final ResourceType rt) {
-    	currentResourceType = rt;
+    	resourceAvailability.setCurrentResourceType(rt);
+    	currentResourceType = rt; // Sync deprecated field
     }
     
     /**
@@ -190,7 +203,9 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
      * <code>false</code> otherwise.
      */
     public boolean isTimeOut() {
-        return timeOut;
+        boolean result = resourceAvailability.isTimeOut();
+        this.timeOut = result; // Sync deprecated field
+        return result;
     }
     
     /**
@@ -199,7 +214,8 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
      * <code>false</code> otherwise.
      */
     public void setTimeOut(final boolean timeOut) {
-        this.timeOut = timeOut;
+        resourceAvailability.setTimeOut(timeOut);
+        this.timeOut = timeOut; // Sync deprecated field
     }
     
 	/**
@@ -451,8 +467,8 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	 * @param roleList The types of this resource during every activation /to be cancelled
 	 * @return a builder class for adding time table or cancellation entries
 	 */
-	public TimeTableOrCancelEntriesAdder newTimeTableOrCancelEntriesAdder(final ArrayList<ResourceType> roleList) {
-		return new TimeTableOrCancelEntriesAdder(roleList);
+	public ResourceAvailability.TimeTableOrCancelEntriesAdder newTimeTableOrCancelEntriesAdder(final ArrayList<ResourceType> roleList) {
+		return resourceAvailability.newTimeTableOrCancelEntriesAdder(roleList);
 	}
 	
 	/**
@@ -460,87 +476,8 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	 * @param role The type of this resource during every activation/to be cancelled 
 	 * @return a builder class for adding time table or cancellation entries
 	 */
-	public TimeTableOrCancelEntriesAdder newTimeTableOrCancelEntriesAdder(final ResourceType role) {
-		return new TimeTableOrCancelEntriesAdder(role);
-	}
-	
-	/**
-	 * A builder class to build time table or cancellation entries. With one builder you can create several entries
-	 * with the same cycle and duration forone or more resource types. If you don't use the
-	 * {@link #withDuration(ISimulationCycle, TimeStamp)} method, the entries are assumed to last for the whole
-	 * duration of the simulation. You can also use the same builder for time table or cancellation entries,
-	 * by invoking, respectively, {@link #addTimeTableEntry()} or {@link #addCancelEntry()}
-	 * @author Iván Castilla Rodríguez
-	 *
-	 */
-	public final class TimeTableOrCancelEntriesAdder {
-		private final ArrayList<ResourceType> roleList = new ArrayList<ResourceType>();
-		private ISimulationCycle cycle = null;
-		private TimeStamp dur = null;
-		
-		/**
-		 * Creates an entry adder with a single role
-		 * @param role The type of this resource during every activation/to be cancelled
-		 */
-		public TimeTableOrCancelEntriesAdder(final ResourceType role) {
-			roleList.add(role);
-		}
-
-		/**
-		 * Creates an entry adder with multiple concurrent roles
-		 * @param roleList The types of this resource during every activation /to be cancelled
-		 */
-		public TimeTableOrCancelEntriesAdder(final ArrayList<ResourceType> roleList) {
-			this.roleList.addAll(roleList);
-		}
-		
-		/**
-		 * Adds a duration and activation/cancellation cycle
-		 * @param cycle Simulation cycle to define activation/deactivation time
-		 * @param dur How long the resource is active/will remain inactive
-		 */
-		public TimeTableOrCancelEntriesAdder withDuration(final ISimulationCycle cycle, final TimeStamp dur) {
-			this.cycle = cycle;
-			this.dur = dur;
-			return this;
-		}
-		
-		/**
-		 * Adds a duration and activation/cancellation cycle
-		 * @param cycle Simulation cycle to define activation/deactivation time
-		 * @param dur How long the resource is active/will remain inactive
-		 */
-		public TimeTableOrCancelEntriesAdder withDuration(final ISimulationCycle cycle, final long dur) {
-			return this.withDuration(cycle, new TimeStamp(simul.getTimeUnit(), dur));
-		}
-		
-		/**
-		 * Creates the time table entry/ies with the specified characteristics
-		 */
-		public void addTimeTableEntry() {
-			if (cycle == null) {
-		    	for (final ResourceType role : roleList)
-		    		timeTable.add(new TimeTableEntry(role));
-			}
-			else {
-		    	for (final ResourceType role : roleList)
-		    		timeTable.add(new TimeTableEntry(cycle, dur, role));
-			}
-		}
-		
-		/**
-		 * Creates the cancellation entry/ies with the specified characteristics
-		 */
-		public void addCancelEntry() {
-			if (cycle == null) {
-		    	for (final ResourceType role : roleList)
-		    		cancelPeriodTable.add(new TimeTableEntry(role));
-			}
-			else {
-		    	for (final ResourceType role : roleList)
-		    		cancelPeriodTable.add(new TimeTableEntry(cycle, dur, role));
-			}
-		}
+	public ResourceAvailability.TimeTableOrCancelEntriesAdder newTimeTableOrCancelEntriesAdder(final ResourceType role) {
+		return resourceAvailability.newTimeTableOrCancelEntriesAdder(role);
 	}
 	    
     /**
