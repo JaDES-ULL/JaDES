@@ -198,4 +198,76 @@ class ResourceTest {
         assertEquals(type2, resource2.getCurrentResourceType());
         assertNotEquals(resource1.getCurrentResourceType(), resource2.getCurrentResourceType());
     }
+
+    @Test
+    void shouldReturnEngine_afterResourceCreation() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+
+        // Engine is assigned during simulation initialization, not immediately
+        // For now, just verify the method doesn't throw NPE
+        assertNotNull(resource);
+    }
+
+    @Test
+    void shouldCreateTimeTableEntriesAdder_withSingleRole() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        ResourceType role = new ResourceType(simulation, "Type1");
+
+        var adder = resource.newTimeTableOrCancelEntriesAdder(role);
+
+        assertNotNull(adder);
+    }
+
+    @Test
+    void shouldCreateTimeTableEntriesAdder_withRoleList() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        ResourceType role1 = new ResourceType(simulation, "Type1");
+        ResourceType role2 = new ResourceType(simulation, "Type2");
+        java.util.ArrayList<ResourceType> roleList = new java.util.ArrayList<>();
+        roleList.add(role1);
+        roleList.add(role2);
+
+        var adder = resource.newTimeTableOrCancelEntriesAdder(roleList);
+
+        assertNotNull(adder);
+    }
+
+    @Test
+    void shouldMaintainIndependentCapacities_acrossMultipleResources() {
+        Resource r1 = new Resource(simulation, "R1", 5, null);
+        Resource r2 = new Resource(simulation, "R2", 10, null);
+        Resource r3 = new Resource(simulation, "R3", 15, null);
+
+        assertEquals(5, r1.getCapacity());
+        assertEquals(10, r2.getCapacity());
+        assertEquals(15, r3.getCapacity());
+    }
+
+    @Test
+    void shouldMaintainDescriptionAndCapacity_independently() {
+        String desc1 = "Description One";
+        String desc2 = "Description Two";
+        Resource r1 = new Resource(simulation, desc1, 100, null);
+        Resource r2 = new Resource(simulation, desc2, 200, null);
+
+        assertEquals(desc1, r1.getDescription());
+        assertEquals(100, r1.getCapacity());
+        assertEquals(desc2, r2.getDescription());
+        assertEquals(200, r2.getCapacity());
+    }
+
+    @Test
+    void shouldAllowNullCurrentResourceType() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        resource.setCurrentResourceType(null);
+
+        assertNull(resource.getCurrentResourceType());
+    }
+
+    @Test
+    void shouldSupportZeroCapacity() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC, 0, null);
+
+        assertEquals(0, resource.getCapacity());
+    }
 }

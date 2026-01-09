@@ -81,4 +81,72 @@ class ResourceLocationTest {
         assertEquals(10, r2.getCapacity());
         assertEquals(100, r3.getCapacity());
     }
+
+    @Test
+    void shouldReturnNullLocation_initiallyWithoutInitLocation() {
+        // Given: resource created without init location
+        resource = new Resource(simulation, "Test Resource", 5, null);
+
+        // When: checking location
+        Location loc = resource.getLocation();
+
+        // Then: location should be null
+        assertNull(loc);
+    }
+
+    @Test
+    void shouldMaintainCapacityConsistency() {
+        // Given: resource with specific capacity
+        final int capacity = 42;
+        resource = new Resource(simulation, "Test Resource", capacity, null);
+
+        // When: querying capacity multiple times
+        int cap1 = resource.getCapacity();
+        int cap2 = resource.getCapacity();
+        int cap3 = resource.getCapacity();
+
+        // Then: all should return same value
+        assertEquals(capacity, cap1);
+        assertEquals(capacity, cap2);
+        assertEquals(capacity, cap3);
+    }
+
+    @Test
+    void shouldSupportLargeCapacity() {
+        // Given: resource with large capacity
+        resource = new Resource(simulation, "Large Resource", 10000, null);
+
+        // When: getting capacity
+        int capacity = resource.getCapacity();
+
+        // Then: should support large values
+        assertEquals(10000, capacity);
+    }
+
+    @Test
+    void shouldAllowZeroCapacity() {
+        // Given: resource with zero capacity
+        resource = new Resource(simulation, "Zero Resource", 0, null);
+
+        // When: getting capacity
+        int capacity = resource.getCapacity();
+
+        // Then: should be zero
+        assertEquals(0, capacity);
+    }
+
+    @Test
+    void shouldMaintainIndependentLocations_acrossResources() {
+        // Given: multiple resources
+        Resource r1 = new Resource(simulation, "R1", 1, null);
+        Resource r2 = new Resource(simulation, "R2", 2, null);
+
+        // When: checking locations
+        Location loc1 = r1.getLocation();
+        Location loc2 = r2.getLocation();
+
+        // Then: both should be independent (both null in this case)
+        assertNull(loc1);
+        assertNull(loc2);
+    }
 }
