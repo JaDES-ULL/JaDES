@@ -37,13 +37,19 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	protected final IInitializerFlow initialFlow;
 	/** If true, the element is in exclusive mode, and cannot perform other exclusive tasks concurrently */ 
 	protected boolean exclusive = false;
-	/** The current location of the element */
+	/** Movement manager for location and transport */
+	private final ElementMovement movementManager;
+	/** @deprecated Use movementManager.getLocation() instead */
+	@Deprecated
 	private Location currentLocation;
-	/** The initial location of the element */
+	/** @deprecated Use movementManager.getInitLocation() instead */
+	@Deprecated
 	private final Location initLocation;
-	/** The current element instance that drives the movement of the element */
+	/** @deprecated Use movementManager.getMovingInstance() instead */
+	@Deprecated
 	private ElementInstance movingInstance = null;
-	/** The size of the element */
+	/** @deprecated Use movementManager.getCapacity() instead */
+	@Deprecated
 	private final int size;
 	/** Main element instance */
 	protected ElementInstance mainInstance = null;
@@ -76,8 +82,11 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 		this.elementType = elementType;
 		this.initialFlow = initialFlow;
         this.seizedResources = new SeizedResourcesCollection(this);
+        this.movementManager = new ElementMovement(this, size, initLocation);
+        // Sync deprecated fields
         this.size = size;
         this.initLocation = initLocation;
+        this.currentLocation = null;
 		initializeElementVars(this.elementType.getElementValues());
 	}
 	
@@ -91,8 +100,13 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 		this.elementType = info.getElementType();
 		this.initialFlow = info.getFlow();
         this.seizedResources = new SeizedResourcesCollection(this);
-        this.initLocation = info.getInitLocation();
-        this.size = info.getSize(this);
+        final int elemSize = info.getSize(this);
+        final Location elemInitLocation = info.getInitLocation();
+        this.movementManager = new ElementMovement(this, elemSize, elemInitLocation);
+        // Sync deprecated fields
+        this.initLocation = elemInitLocation;
+        this.size = elemSize;
+        this.currentLocation = null;
 		initializeElementVars(this.elementType.getElementValues());
 	}
 	
@@ -264,16 +278,8 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	@Override
 	public DiscreteEvent onCreate(final long ts) {
 		simul.notifyInfo(new ElementInfo(simul, this, elementType, ElementInfo.Type.START, getTs()));
-		if (initLocation != null) {
-			if (initLocation.fitsIn(this)) {
-				initLocation.enter(this);
-			}
-			else {
-				error("Unable to initialize element. Not enough space in location "
-						+ initLocation + " (available: " + initLocation.getAvailableCapacity() +
-						" - required: " + size + ")");
-				return onDestroy(ts);
-			}
+		if (!movementManager.initializeLocation()) {
+			return onDestroy(ts);
 		}
 		if (initialFlow != null) {
 			mainInstance = ElementInstance.getMainElementInstance(this);
@@ -332,42 +338,28 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 
 	@Override
 	public int getCapacity() {
-		return size;
+		return movementManager.getCapacity();
 	}
 
 	@Override
 	public Location getLocation() {
-		return currentLocation;
+		Location loc = movementManager.getLocation();
+		this.currentLocation = loc; // Sync deprecated
+		return loc;
 	}
 
 	@Override
 	public void setLocation(final Location location) {
-		if (currentLocation == null) {
-			simul.notifyInfo(new EntityLocationInfo(simul, this, location,
-					EntityLocationInfo.Type.START, getTs()));
-			currentLocation = location;
-		}
-		else {
-			simul.notifyInfo(new EntityLocationInfo(simul, this, currentLocation,
-					EntityLocationInfo.Type.LEAVE, getTs()));
-			currentLocation = location;
-			simul.notifyInfo(new EntityLocationInfo(simul, this, currentLocation,
-					EntityLocationInfo.Type.ARRIVE, getTs()));
-		}
+		movementManager.setLocation(location);
+		this.currentLocation = movementManager.getLocation(); // Sync deprecated
 	}
 
 	@Override
 	public void notifyLocationAvailable(final Location location) {
-		location.enter(this);
-
-    	final MoveFlow IFlow = (MoveFlow)movingInstance.getCurrentFlow();
-		
-		if (currentLocation.equals(IFlow.getDestination())) {
-			IFlow.finish(movingInstance);
-		}
-		else {
-			keepMoving(IFlow, movingInstance);
-		}
+		movementManager.notifyLocationAvailable(location);
+		// Sync deprecated fields
+		this.currentLocation = movementManager.getLocation();
+		this.movingInstance = movementManager.getMovingInstance();
 	}
 	
 	/**
@@ -376,9 +368,8 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	 * @param ei Element instance moving
 	 */
 	public void keepMoving(final MoveFlow IFlow, final ElementInstance ei) {
-    	movingInstance = ei;
-		final MoveEvent mEvent = new MoveEvent(getTs() + currentLocation.getDelayAtExit(this), IFlow, ei);
-    	simul.addEvent(mEvent);		
+		movementManager.keepMoving(IFlow, ei);
+		this.movingInstance = movementManager.getMovingInstance(); // Sync deprecated
 	}
 	
 	/**
