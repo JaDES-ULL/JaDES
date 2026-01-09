@@ -33,7 +33,10 @@ import es.ull.simulation.utils.Prioritizable;
 public class Element extends VariableStoreSimulationObject implements Prioritizable, IEventSource, IMovable {
 	/** Element type */
 	protected ElementType elementType;
-	/** First step of the IFlow of the element */
+	/** Workflow manager for initial flow and main instance */
+	private final ElementFlow flowManager;
+	/** @deprecated Use flowManager.getInitialFlow() instead */
+	@Deprecated
 	protected final IInitializerFlow initialFlow;
 	/** If true, the element is in exclusive mode, and cannot perform other exclusive tasks concurrently */ 
 	protected boolean exclusive = false;
@@ -51,7 +54,8 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	/** @deprecated Use movementManager.getCapacity() instead */
 	@Deprecated
 	private final int size;
-	/** Main element instance */
+	/** @deprecated Use flowManager.getMainInstance() instead */
+	@Deprecated
 	protected ElementInstance mainInstance = null;
     /** Collection manager for seized resources */
     final protected SeizedResourcesCollection seizedResources;
@@ -80,7 +84,10 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 				   final IInitializerFlow initialFlow, final int size, final Location initLocation) {
 		super(simul, simul.getNewElementId(), objectTypeId);
 		this.elementType = elementType;
+		this.flowManager = new ElementFlow(this, initialFlow);
+		// Sync deprecated fields
 		this.initialFlow = initialFlow;
+		this.mainInstance = null;
         this.seizedResources = new SeizedResourcesCollection(this);
         this.movementManager = new ElementMovement(this, size, initLocation);
         // Sync deprecated fields
@@ -98,7 +105,10 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	public Element(final Simulation simul, String objectTypeId, final StandardElementGenerationInfo info) {
 		super(simul, simul.getNewElementId(), objectTypeId);
 		this.elementType = info.getElementType();
+		this.flowManager = new ElementFlow(this, info.getFlow());
+		// Sync deprecated fields
 		this.initialFlow = info.getFlow();
+		this.mainInstance = null;
         this.seizedResources = new SeizedResourcesCollection(this);
         final int elemSize = info.getSize(this);
         final Location elemInitLocation = info.getInitLocation();
@@ -132,7 +142,7 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	 * @return the associated {@link es.ull.simulation.model.flow.IInitializerFlow IFlow}
 	 */
 	public IInitializerFlow getFlow() {
-		return initialFlow;
+		return flowManager.getInitialFlow();
 	}
 
 	/**
@@ -281,9 +291,11 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 		if (!movementManager.initializeLocation()) {
 			return onDestroy(ts);
 		}
-		if (initialFlow != null) {
-			mainInstance = ElementInstance.getMainElementInstance(this);
-			return (new RequestFlowEvent(ts, initialFlow, mainInstance.getDescendantElementInstance(initialFlow)));
+		if (flowManager.hasInitialFlow()) {
+			ElementInstance instance = flowManager.initializeMainInstance();
+			// Sync deprecated field
+			this.mainInstance = flowManager.getMainInstance();
+			return (new RequestFlowEvent(ts, flowManager.getInitialFlow(), instance.getDescendantElementInstance(flowManager.getInitialFlow())));
 		}
 		else
 			return onDestroy(ts);
