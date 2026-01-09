@@ -71,3 +71,4 @@ class ElementTypeConditionTest {
         assertSame(result1, result2);
     }
 }
+

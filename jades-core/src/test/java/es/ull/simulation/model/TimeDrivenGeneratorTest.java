@@ -208,4 +208,62 @@ public class TimeDrivenGeneratorTest {
         // Then: generator should accept the info
         assertNotNull(generator);
     }
+
+    @Test
+    public void shouldCallOnDestroy() {
+        // Given: a generator
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, 1, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // When: calling onDestroy
+        DiscreteEvent event = generator.onDestroy(100);
+
+        // Then: should return a finalize event
+        assertNotNull(event);
+        assertInstanceOf(DiscreteEvent.DefaultFinalizeEvent.class, event);
+        assertEquals(100, event.getTs());
+    }
+
+    @Test
+    public void shouldCallOnDestroyWithZeroTimestamp() {
+        // Given: a generator
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, 1, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // When: calling onDestroy with zero timestamp
+        DiscreteEvent event = generator.onDestroy(0);
+
+        // Then: should return a finalize event at time 0
+        assertNotNull(event);
+        assertEquals(0, event.getTs());
+    }
+
+    @Test
+    public void shouldCallOnDestroyWithMaxTimestamp() {
+        // Given: a generator
+        TimeDrivenGenerator<StandardElementGenerationInfo> generator =
+            new TimeDrivenGenerator<StandardElementGenerationInfo>(simulation, 1, cycle) {
+                @Override
+                public Element createEventSource(int ind, StandardElementGenerationInfo info) {
+                    return new Element(simulation, info);
+                }
+            };
+
+        // When: calling onDestroy with max timestamp
+        DiscreteEvent event = generator.onDestroy(Long.MAX_VALUE);
+
+        // Then: should return a finalize event at max time
+        assertNotNull(event);
+        assertEquals(Long.MAX_VALUE, event.getTs());
+    }
 }
