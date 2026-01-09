@@ -40,10 +40,14 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	/** A string that identifies the instance */
 	private final String description; 
     /** Element which carries out this IFlow. */    
-    private final Element elem; 
+    private final Element elem;
+    /** Manages the hierarchical structure (Composite pattern) */
+    private final ElementInstanceHierarchy hierarchy;
     /** The parent element thread */
+    @Deprecated
     protected final ElementInstance parent;
     /** The descendant element instances */
+    @Deprecated
 	protected final ArrayList<ElementInstance> descendants;
     /** Thread's initial IFlow */
     protected final IFlow initialFlow;
@@ -78,10 +82,11 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 							final IFlow initialFlow, final ElementInstance parent) {
     	this.token = token;
         this.elem = elem;
-        this.parent = parent;
-        descendants = new ArrayList<ElementInstance>();
-        if (parent != null)
-        	parent.addDescendant(this);
+        // Initialize hierarchy management
+        this.hierarchy = new ElementInstanceHierarchy(this, parent);
+        // Assign deprecated fields for backward compatibility
+        this.parent = hierarchy.getParent();
+        this.descendants = hierarchy.getDescendants();
         this.initialFlow = initialFlow;
         this.engine = elem.getEngine().getElementInstance(this);
         this.description = elem.toString() + "-" + engine.getIdentifier();
@@ -92,6 +97,15 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 */
 	public ElementInstanceEngine getEngine() {
 		return engine;
+	}
+
+	/**
+	 * Gets the hierarchy manager for this element instance.
+	 * 
+	 * @return the hierarchy manager
+	 */
+	public ElementInstanceHierarchy getHierarchy() {
+		return hierarchy;
 	}
 
 	@Override
@@ -157,19 +171,15 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
      * Notifies the parent this thread has finished.
      */
     public void notifyEnd() {
-    	if (parent != null) {
-    		parent.removeDescendant(this);
-    		if ((parent.descendants.size() == 0) && (parent.currentFlow != null))
-    			((ITaskFlow)parent.currentFlow).finish(parent);
-    	}
+    	hierarchy.notifyEndToParent();
     }
     
     /**
      * Adds a thread to the list of descendants.
      * @param wThread Descendant thread
      */
-	private void addDescendant(final ElementInstance wThread) {
-		descendants.add(wThread);
+	void addDescendant(final ElementInstance wThread) {
+		hierarchy.addDescendant(wThread);
 	}
 
 	/**
@@ -177,10 +187,8 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * the element has to be notified and finished.
 	 * @param wThread Descendant thread
 	 */
-	private void removeDescendant(final ElementInstance wThread) {
-		descendants.remove(wThread);
-		if (parent == null && descendants.size() == 0)
-			elem.notifyEnd();
+	void removeDescendant(final ElementInstance wThread) {
+		hierarchy.removeDescendant(wThread);
 	}
 
 	/**
@@ -229,7 +237,7 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
      * @return The parent element thread.
      */
 	public ElementInstance getParent() {
-		return parent;
+		return hierarchy.getParent();
 	}
 
 	/**
