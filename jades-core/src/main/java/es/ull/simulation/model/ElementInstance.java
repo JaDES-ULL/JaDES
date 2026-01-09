@@ -49,13 +49,18 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
     /** The descendant element instances */
     @Deprecated
 	protected final ArrayList<ElementInstance> descendants;
+    /** Manages the flow execution state */
+    private final ElementInstanceFlow flowManager;
     /** Thread's initial IFlow */
+    @Deprecated
     protected final IFlow initialFlow;
 	/** A flag to indicate if the thread executes the IFlow or not */
 	protected WorkToken token;
 	/** The current IFlow the thread is in */
+	@Deprecated
 	protected IFlow currentFlow = null;
 	/** The last IFlow the thread was in */
+	@Deprecated
 	protected IFlow lastFlow = null;
     /** The workgroup which is used to carry out this IFlow. If <code>null</code>, 
      * the IFlow has not been carried out. */
@@ -87,7 +92,11 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
         // Assign deprecated fields for backward compatibility
         this.parent = hierarchy.getParent();
         this.descendants = hierarchy.getDescendants();
-        this.initialFlow = initialFlow;
+        // Initialize flow management
+        this.flowManager = new ElementInstanceFlow(this, initialFlow);
+        this.initialFlow = flowManager.getInitialFlow();
+        this.currentFlow = null;
+        this.lastFlow = null;
         this.engine = elem.getEngine().getElementInstance(this);
         this.description = elem.toString() + "-" + engine.getIdentifier();
     }
@@ -106,6 +115,15 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 */
 	public ElementInstanceHierarchy getHierarchy() {
 		return hierarchy;
+	}
+
+	/**
+	 * Gets the flow manager for this element instance.
+	 * 
+	 * @return the flow manager
+	 */
+	public ElementInstanceFlow getFlowManager() {
+		return flowManager;
 	}
 
 	@Override
@@ -127,7 +145,11 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * @param f The IFlow to be performed
 	 */
 	public void setCurrentFlow(final IFlow f) {
-    	currentFlow = f;
+		flowManager.setCurrentFlow(f);
+		// Sync deprecated fields
+		this.currentFlow = flowManager.getCurrentFlow();
+		this.lastFlow = flowManager.getLastFlow();
+		// Resource-related logic remains in ElementInstance
 		executionWG = null;
 		arrivalTs = -1;
 		if (f instanceof RequestResourcesFlow) {
@@ -147,7 +169,9 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * @return The IFlow being performed.
 	 */
 	public IFlow getCurrentFlow() {
-		return currentFlow;
+		IFlow flow = flowManager.getCurrentFlow();
+		this.currentFlow = flow; // Sync deprecated field
+		return flow;
 	}
 
 	/**
@@ -213,7 +237,9 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * @return the last IFlow visited by this FlowExecutor
 	 */
 	public IFlow getLastFlow() {
-		return lastFlow;
+		IFlow flow = flowManager.getLastFlow();
+		this.lastFlow = flow; // Sync deprecated field
+		return flow;
 	}
 
 	/**
@@ -221,7 +247,8 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * @param lastFlow The lastFlow visited by this thread
 	 */
 	public void setLastFlow(final IFlow lastFlow) {
-		this.lastFlow = lastFlow;
+		flowManager.setLastFlow(lastFlow);
+		this.lastFlow = flowManager.getLastFlow(); // Sync deprecated field
 	}
 
 	/**
