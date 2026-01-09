@@ -122,6 +122,19 @@ class WorkGroupTest {
     }
 
     @Test
+    void shouldReturnNeededValue_whenCalledWithIndex() {
+        // Given: WorkGroup with single resource type needing 5 units
+        ResourceType rt = new ResourceType(simulation, "TestRT");
+        WorkGroup wg = new WorkGroup(simulation, rt, 5);
+
+        // When: calling getNeeded with index 0
+        int needed = wg.getNeeded(0);
+
+        // Then: should return 5
+        assertEquals(5, needed);
+    }
+
+    @Test
     void shouldReturnResourceTypeAtIndex_whenQueried() {
         // Given: WorkGroup with multiple resource types
         ResourceType rt1 = new ResourceType(simulation, "RT1");
