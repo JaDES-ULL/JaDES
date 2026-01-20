@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import es.ull.simulation.model.location.Node;
+
 class ResourceTest {
     private Simulation simulation;
     private static final int SIMULATION_ID = 1;
@@ -269,5 +271,36 @@ class ResourceTest {
         Resource resource = new Resource(simulation, RESOURCE_DESC, 0, null);
 
         assertEquals(0, resource.getCapacity());
+    }
+
+    @Test
+    void shouldSetLocation_whenProvided() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        Node location = new Node("Location1");
+
+        resource.setLocation(location);
+
+        assertNotNull(resource.getLocation());
+        assertEquals(location, resource.getLocation());
+    }
+
+    @Test
+    void shouldCreateOnCreateEvent_withTimestamp() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        long timestamp = 100L;
+
+        var event = resource.onCreate(timestamp);
+
+        assertNotNull(event);
+    }
+
+    @Test
+    void shouldCreateOnDestroyEvent_withTimestamp() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        long timestamp = 500L;
+
+        var event = resource.onDestroy(timestamp);
+
+        assertNotNull(event);
     }
 }
