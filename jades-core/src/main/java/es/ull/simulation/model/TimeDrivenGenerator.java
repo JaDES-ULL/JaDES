@@ -53,7 +53,7 @@ public abstract class TimeDrivenGenerator<INF extends Generator.GenerationInfo>
 	
 	@Override
     public void notifyEnd() {
-        simul.addEvent(onDestroy(getTs()));
+        simul.scheduleEvent(onDestroy(getTs()));
     }
     
 	@Override
@@ -94,7 +94,7 @@ public abstract class TimeDrivenGenerator<INF extends Generator.GenerationInfo>
             }
 			else {
 				final GenerateEvent e = new GenerateEvent(newTs);
-				simul.addEvent(e);
+				simul.scheduleEvent(e);
 			}
         }
     }

@@ -43,41 +43,12 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
     private final Element elem;
     /** Manages the hierarchical structure (Composite pattern) */
     private final ElementInstanceHierarchy hierarchy;
-    /** The parent element thread */
-    @Deprecated
-    protected final ElementInstance parent;
-    /** The descendant element instances */
-    @Deprecated
-	protected final ArrayList<ElementInstance> descendants;
     /** Manages the flow execution state */
     private final ElementInstanceFlow flowManager;
-    /** Thread's initial IFlow */
-    @Deprecated
-    protected final IFlow initialFlow;
 	/** A flag to indicate if the thread executes the IFlow or not */
 	protected WorkToken token;
-	/** The current IFlow the thread is in */
-	@Deprecated
-	protected IFlow currentFlow = null;
-	/** The last IFlow the thread was in */
-	@Deprecated
-	protected IFlow lastFlow = null;
 	/** Manages resource tracking and activity execution state */
 	private final ElementInstanceResources resourceManager;
-    /** The workgroup which is used to carry out this IFlow. If <code>null</code>, 
-     * the IFlow has not been carried out. */
-    @Deprecated
-    protected ActivityWorkGroup executionWG = null;
-	/** The arrival order of this element instance relatively to the rest of element instances 
-	 * in the same activity manager. */
-	@Deprecated
-	protected int arrivalOrder;
-	/** The simulation timestamp when this element instance was requested. */
-	@Deprecated
-	protected long arrivalTs = -1;
-	/** The proportion of time left to finish the activity. Used in interruptible activities. */
-	@Deprecated
-	protected double remainingTask = 0.0;
 	/** The engine with the specific functioning of the element instance */
 	final private ElementInstanceEngine engine;
 	
@@ -95,20 +66,10 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
         this.elem = elem;
         // Initialize hierarchy management
         this.hierarchy = new ElementInstanceHierarchy(this, parent);
-        // Assign deprecated fields for backward compatibility
-        this.parent = hierarchy.getParent();
-        this.descendants = hierarchy.getDescendants();
         // Initialize flow management
         this.flowManager = new ElementInstanceFlow(this, initialFlow);
-        this.initialFlow = flowManager.getInitialFlow();
-        this.currentFlow = null;
-        this.lastFlow = null;
         // Initialize resource management
         this.resourceManager = new ElementInstanceResources(this);
-        this.executionWG = null;
-        this.arrivalOrder = 0;
-        this.arrivalTs = -1;
-        this.remainingTask = 0.0;
         this.engine = elem.getEngine().getElementInstance(this);
         this.description = elem.toString() + "-" + engine.getIdentifier();
     }
@@ -167,26 +128,20 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 */
 	public void setCurrentFlow(final IFlow f) {
 		flowManager.setCurrentFlow(f);
-		// Sync deprecated fields
-		this.currentFlow = flowManager.getCurrentFlow();
-		this.lastFlow = flowManager.getLastFlow();
 		// Resource-related logic - delegate to resourceManager
 		resourceManager.resetForNewActivity();
-		this.executionWG = null;
-		this.arrivalTs = -1;
 		if (f instanceof RequestResourcesFlow) {
 			resourceManager.setRemainingTask(1.0);
-			this.remainingTask = 1.0;
-			if (parent.currentFlow instanceof ActivityFlow) {
-				if (parent.remainingTask > 0.0) {
-					resourceManager.setRemainingTask(parent.remainingTask);
-					this.remainingTask = parent.remainingTask;
+			ElementInstance parent = hierarchy.getParent();
+			if (parent != null && parent.getCurrentFlow() instanceof ActivityFlow) {
+				double parentRemaining = parent.resourceManager.getRemainingTask();
+				if (parentRemaining > 0.0) {
+					resourceManager.setRemainingTask(parentRemaining);
 				}
 			}
 		}
 		else {
 			resourceManager.setRemainingTask(0.0);
-			this.remainingTask = 0.0;
 		}
 	}
 
@@ -195,9 +150,7 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * @return The IFlow being performed.
 	 */
 	public IFlow getCurrentFlow() {
-		IFlow flow = flowManager.getCurrentFlow();
-		this.currentFlow = flow; // Sync deprecated field
-		return flow;
+		return flowManager.getCurrentFlow();
 	}
 
 	/**
@@ -205,9 +158,7 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * @return the workgroup that the element instance is using to execute a resource handler IFlow
 	 */
 	public ActivityWorkGroup getExecutionWG() {
-		ActivityWorkGroup wg = resourceManager.getExecutionWG();
-		this.executionWG = wg; // Sync deprecated field
-		return wg;
+		return resourceManager.getExecutionWG();
 	}
 
 	/**
@@ -217,7 +168,6 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 */
 	public void setExecutionWG(final ActivityWorkGroup executionWG) {
 		resourceManager.setExecutionWG(executionWG);
-		this.executionWG = resourceManager.getExecutionWG(); // Sync deprecated field
 	}
 
     /**
@@ -266,9 +216,7 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * @return the last IFlow visited by this FlowExecutor
 	 */
 	public IFlow getLastFlow() {
-		IFlow flow = flowManager.getLastFlow();
-		this.lastFlow = flow; // Sync deprecated field
-		return flow;
+		return flowManager.getLastFlow();
 	}
 
 	/**
@@ -277,7 +225,6 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 */
 	public void setLastFlow(final IFlow lastFlow) {
 		flowManager.setLastFlow(lastFlow);
-		this.lastFlow = flowManager.getLastFlow(); // Sync deprecated field
 	}
 
 	/**
@@ -332,7 +279,7 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 				newToken = new WorkToken(false, newFlow);
 		else
 			newToken = new WorkToken(true);
-		return new ElementInstance(newToken, elem, newFlow, parent);
+		return new ElementInstance(newToken, elem, newFlow, hierarchy.getParent());
 	}
 
 	/**
@@ -365,9 +312,7 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * @return the order of arrival of this element instance to request the activity
 	 */
 	public int getArrivalOrder() {
-		int order = resourceManager.getArrivalOrder();
-		this.arrivalOrder = order; // Sync deprecated field
-		return order;
+		return resourceManager.getArrivalOrder();
 	}
 
 	/**
@@ -376,7 +321,6 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 */
 	public void setArrivalOrder(final int arrivalOrder) {
 		resourceManager.setArrivalOrder(arrivalOrder);
-		this.arrivalOrder = resourceManager.getArrivalOrder(); // Sync deprecated field
 	}
 
 	/**
@@ -384,9 +328,7 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 * @return the timestamp when this element instance arrives to request the current single IFlow
 	 */
 	public long getArrivalTs() {
-		long ts = resourceManager.getArrivalTs();
-		this.arrivalTs = ts; // Sync deprecated field
-		return ts;
+		return resourceManager.getArrivalTs();
 	}
 
 	/**
@@ -395,7 +337,6 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 */
 	public void setArrivalTs(final long arrivalTs) {
 		resourceManager.setArrivalTs(arrivalTs);
-		this.arrivalTs = resourceManager.getArrivalTs(); // Sync deprecated field
 	}
 
     /**
@@ -404,7 +345,7 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
      * @return The minimum availability timestamp of the taken resources 
      */
 	public long catchResources(final ArrayDeque<Resource> solution) {
-		final RequestResourcesFlow reqFlow = (RequestResourcesFlow)currentFlow;
+		final RequestResourcesFlow reqFlow = (RequestResourcesFlow)getCurrentFlow();
 		// Add booked resources to the element
 		elem.seizeResources(reqFlow, this, solution);
     	long auxTs = Long.MAX_VALUE;
@@ -415,44 +356,41 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
     	engine.notifyResourcesAcquired();
     	final long ts = elem.getTs();
 		elem.getSimulation().notifyInfo(new ElementActionInfo(elem.getSimulation(), this, elem, reqFlow,
-				executionWG, solution, ElementActionInfo.Type.ACQ, ts));
+				getExecutionWG(), solution, ElementActionInfo.Type.ACQ, ts));
 		elem.trace("Resources acquired\t" + this + "\t" + reqFlow.getDescription());			
 		reqFlow.afterAcquire(this);
 		double remaining = resourceManager.getRemainingTask();
-		long delay = Math.round(executionWG.getDurationSample(elem) * remaining);
+		long delay = Math.round(getExecutionWG().getDurationSample(elem) * remaining);
 		auxTs -= ts;
 		if (delay > 0) {
 			if (remaining == 1.0) {
 				elem.getSimulation().notifyInfo(new ElementActionInfo(elem.getSimulation(), this, elem, reqFlow,
-						executionWG, null, ElementActionInfo.Type.START, ts));
+						getExecutionWG(), null, ElementActionInfo.Type.START, ts));
 				elem.trace("Start delay\t" + this + "\t" + reqFlow.getDescription());
 			}
 			else {
 				elem.getSimulation().notifyInfo(new ElementActionInfo(elem.getSimulation(), this, elem, reqFlow,
-						executionWG, null, ElementActionInfo.Type.RESACT, ts));
+						getExecutionWG(), null, ElementActionInfo.Type.RESACT, ts));
 				elem.trace("Continues\t" + this + "\t" + reqFlow.getDescription());			
 			}
 			// The required time for finishing the activity is reduced (useful only for interruptible activities)
 			if (reqFlow.partOfInterruptible() && (delay - auxTs > 0.0)) {
 				remaining = (delay - auxTs) * remaining / (double)delay;
 				resourceManager.setRemainingTask(remaining);
-				this.remainingTask = remaining;
 				delay = auxTs;
 			}
 			else {
 				resourceManager.setRemainingTask(0.0);
-				this.remainingTask = 0.0;
 			}
 		}
 		else {
 			resourceManager.setRemainingTask(0.0);
-			this.remainingTask = 0.0;
 		}
 		return delay;
 	}
 	
 	public void startDelay(final long delay) {
-		elem.addFinishEvent(delay + elem.getTs(), (ITaskFlow)currentFlow, this);
+		elem.addFinishEvent(delay + elem.getTs(), (ITaskFlow)getCurrentFlow(), this);
 	}
 	
 	/**
@@ -461,7 +399,7 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
 	 */
 	public ArrayDeque<Resource> releaseCaughtResources() {
         final TreeSet<ActivityManager> amList = new TreeSet<ActivityManager>();
-		final ReleaseResourcesFlow relFlow = (ReleaseResourcesFlow)currentFlow;
+		final ReleaseResourcesFlow relFlow = (ReleaseResourcesFlow)getCurrentFlow();
 		
 		final ArrayDeque<Resource> resources = elem.releaseResources(relFlow, this);
         // Generate unavailability periods.
@@ -496,28 +434,28 @@ public class ElementInstance implements Prioritizable, Comparable<ElementInstanc
     public void endDelay(final RequestResourcesFlow f) {
 		double remaining = resourceManager.getRemainingTask();
 		// Checks time and not percentage of time to avoid rounding errors
-		if (Math.round(executionWG.getDurationSample(elem) * remaining) == 0) {
+		if (Math.round(getExecutionWG().getDurationSample(elem) * remaining) == 0) {
 			resourceManager.setRemainingTask(0.0);
-			this.remainingTask = 0.0;
 			elem.getSimulation().notifyInfo(new ElementActionInfo(elem.getSimulation(), this, elem, f,
-					executionWG, null, ElementActionInfo.Type.END, elem.getTs()));
+					getExecutionWG(), null, ElementActionInfo.Type.END, elem.getTs()));
 			elem.trace("Finishes\t" + this + "\t" + f.getDescription());
 			f.afterFinalize(this);
 		}
 		else {
 			elem.getSimulation().notifyInfo(new ElementActionInfo(elem.getSimulation(), this, elem, f,
-					executionWG, null, ElementActionInfo.Type.INTACT, elem.getTs()));
+					getExecutionWG(), null, ElementActionInfo.Type.INTACT, elem.getTs()));
 			elem.trace("Finishes part of \t" + this + "\t" + f.getDescription() + "\t" +
 						remaining * 100 + "% Left");
 			// Notifies the parent workthread that the activity was interrupted
 		}
-		parent.getResourceManager().setRemainingTask(remaining);
-		parent.remainingTask = remaining;
+		ElementInstance parent = hierarchy.getParent();
+		if (parent != null) {
+			parent.getResourceManager().setRemainingTask(remaining);
+		}
     }
 
     public boolean wasInterrupted(final ActivityFlow f) {
 		double remaining = resourceManager.getRemainingTask();
-		this.remainingTask = remaining;
 		// It was an interruptible activity and it was interrupted
 		return (remaining > 0.0);    	
     }

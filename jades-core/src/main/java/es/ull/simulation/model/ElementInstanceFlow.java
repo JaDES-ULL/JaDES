@@ -61,11 +61,12 @@ public class ElementInstanceFlow {
 	 * @param flow The flow to be performed
 	 */
 	public void setCurrentFlow(IFlow flow) {
-		this.currentFlow = flow;
-		// Save previous flow as last flow
-		if (currentFlow != null) {
-			this.lastFlow = currentFlow;
+		// Save previous current flow as last flow before updating
+		// Only update lastFlow if there was actually a currentFlow
+		if (this.currentFlow != null && flow != null) {
+			this.lastFlow = this.currentFlow;
 		}
+		this.currentFlow = flow;
 	}
 	
 	/**

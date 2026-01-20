@@ -269,7 +269,7 @@ public class RequestResourcesFlow extends AbstractSingleSuccessorFlow implements
 			if (ei.isExecutable()) {
 				if (beforeRequest(ei)) {
 					simul.notifyInfo(new ElementActionInfo(simul, ei, ei.getElement(),
-							this, ei.getExecutionWG(), null, ElementActionInfo.Type.REQ, simul.getTs()));
+							this, ei.getExecutionWG(), null, ElementActionInfo.Type.REQ, simul.getCurrentTimestamp()));
 					ei.getElement().trace("Requests\t" + this + "\t" + getDescription());
 					engine.queueAdd(ei); // The element is introduced in the queue
 					manager.notifyAvailableElement(ei);

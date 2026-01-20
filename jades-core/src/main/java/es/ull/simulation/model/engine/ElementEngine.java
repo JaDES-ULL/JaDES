@@ -64,7 +64,7 @@ public class ElementEngine extends AbstractEngineObject {
 	}
 
     public void notifyEnd() {
-        simul.addEvent(modelElem.onDestroy(simul.getTs()));
+        model.scheduleEvent(modelElem.onDestroy(model.getCurrentTimestamp()));
     }
 
 	/**

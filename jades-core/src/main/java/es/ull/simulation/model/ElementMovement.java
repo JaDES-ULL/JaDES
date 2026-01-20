@@ -151,6 +151,6 @@ public class ElementMovement {
     	movingInstance = ei;
 		final Element.MoveEvent mEvent = element.new MoveEvent(
 			element.getTs() + currentLocation.getDelayAtExit(element), flow, ei);
-    	element.getSimulation().addEvent(mEvent);		
+    	element.getSimulation().scheduleEvent(mEvent);		
 	}
 }

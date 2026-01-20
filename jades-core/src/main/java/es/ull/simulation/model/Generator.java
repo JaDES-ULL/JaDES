@@ -101,7 +101,7 @@ public abstract class Generator<INF extends Generator.GenerationInfo> extends Si
             		// Some generators may not create the element for some reason
             		if (elems[i] != null) {
 	    	            final DiscreteEvent e = elems[i].onCreate(getTs());
-	    	            simul.addEvent(e);
+	    	            simul.scheduleEvent(e);
             		}
     	            break;
             	}

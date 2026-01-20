@@ -53,7 +53,7 @@ public abstract class DelayFlow extends AbstractSingleSuccessorFlow implements I
 			if (ei.isExecutable()) {
 				if (beforeRequest(ei)) {
 					final Element elem = ei.getElement();
-					simul.notifyInfo(new ElementActionInfo(simul, ei, elem, this, ei.getExecutionWG(), null, ElementActionInfo.Type.START, simul.getTs()));
+					simul.notifyInfo(new ElementActionInfo(simul, ei, elem, this, ei.getExecutionWG(), null, ElementActionInfo.Type.START, simul.getCurrentTimestamp()));
 					elem.trace("Start delay\t" + this + "\t" + getDescription());	
 					ei.startDelay(getDurationSample(elem));
 				}
@@ -72,7 +72,7 @@ public abstract class DelayFlow extends AbstractSingleSuccessorFlow implements I
 
 	@Override
 	public void finish(final ElementInstance ei) {
-		simul.notifyInfo(new ElementActionInfo(simul, ei, ei.getElement(), this, ei.getExecutionWG(), null, ElementActionInfo.Type.END, simul.getTs()));
+		simul.notifyInfo(new ElementActionInfo(simul, ei, ei.getElement(), this, ei.getExecutionWG(), null, ElementActionInfo.Type.END, simul.getCurrentTimestamp()));
 		ei.getElement().trace("Finishes\t" + this + "\t" + getDescription());
 		afterFinalize(ei);
 		next(ei);
