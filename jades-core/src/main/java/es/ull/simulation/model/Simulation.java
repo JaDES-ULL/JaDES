@@ -42,27 +42,12 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	protected final TimeUnit unit;
 	/** A unique simulation identifier */
 	protected final int id;
-	/** The identifier to be assigned to the next element */
-	private int elemCounter = 0;
-
-	/** List of element types present in the simulation. */
-	private final ArrayList<ElementType> elementTypeList = new ArrayList<ElementType>();
-	/** List of resources present in the simulation. */
-	private final ArrayList<Resource> AbstractResourceList = new ArrayList<Resource>();
-	/** List of resource types present in the simulation. */
-	private final ArrayList<ResourceType> resourceTypeList = new ArrayList<ResourceType>();
-	/** List of workgroups present in the simulation */
-	private final ArrayList<WorkGroup> workGroupList = new ArrayList<WorkGroup>();
-	/** List of flows present in the simulation */
-	private final ArrayList<BasicFlow> flowList = new ArrayList<BasicFlow>();
-	/** List of request flows present in the simulation. */
-	private final ArrayList<RequestResourcesFlow> reqFlowList = new ArrayList<RequestResourcesFlow>();
-	/** List of time-driven element generators of the simulation. */
-	private final ArrayList<TimeDrivenGenerator<?>> tGenList = new ArrayList<TimeDrivenGenerator<?>>();
-	/** List of condition-driven element generators of the simulation. */
-	private final ArrayList<ConditionDrivenGenerator<?>> cGenList = new ArrayList<ConditionDrivenGenerator<?>>();
-	/** List of activity managers that partition the simulation. */
-	private final ArrayList<ActivityManager> amList = new ArrayList<ActivityManager>();
+	
+	/** Component registry - DIP: depends on abstraction */
+	private final ISimulationRegistry registry;
+	
+	/** ID generator - DIP: depends on abstraction */
+	private final IIdGenerator idGenerator;
 
 	/** Variable store */
 	protected final Map<String, IVariable> varCollection = new TreeMap<String, IVariable>();
@@ -89,9 +74,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param description A short text describing this simulation.
 	 */
 	public Simulation(final int id, final String description) {
-		this.id = id;
-		this.description = description;
-		unit = DEF_TIME_UNIT;
+		this(id, description, DEF_TIME_UNIT, new SimulationRegistry(), new SequentialIdGenerator());
 	}
 
 	/**
@@ -101,9 +84,25 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param description A short text describing this simulation.
 	 */
 	public Simulation(final int id, final String description, final TimeUnit unit) {
+		this(id, description, unit, new SimulationRegistry(), new SequentialIdGenerator());
+	}
+	
+	/**
+	 * Creates a new instance of a simulation with custom registry and ID generator (DIP constructor)
+	 *
+	 * @param id Simulation identifier
+	 * @param description A short text describing this simulation.
+	 * @param unit Time unit
+	 * @param registry Component registry implementation
+	 * @param idGenerator ID generator implementation
+	 */
+	public Simulation(final int id, final String description, final TimeUnit unit, 
+			final ISimulationRegistry registry, final IIdGenerator idGenerator) {
 		this.id = id;
 		this.description = description;
 		this.unit = unit;
+		this.registry = registry;
+		this.idGenerator = idGenerator;
 	}
 
 	@Override
@@ -150,16 +149,6 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	}
 
 	/**
-	 * Returns the current simulation time
-	 * @return The current simulation time
-	 * @deprecated Use {@link #getCurrentTimestamp()} instead
-	 */
-	@Deprecated
-	public long getTs() {
-		return getCurrentTimestamp();
-	}
-
-	/**
 	 * Returns the simulation engine that executes this model
 	 * @return The simulation engine that executes this model
 	 */
@@ -173,32 +162,32 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 */
 	public void setSimulationEngine(final SimulationEngine simulationEngine) {
 		this.simulationEngine = simulationEngine;
-		for (ElementType et : elementTypeList)
+		for (ElementType et : registry.getElementTypes())
 			et.assignSimulation(simulationEngine);
-		for (ResourceType rt : resourceTypeList)
+		for (ResourceType rt : registry.getResourceTypes())
 			rt.assignSimulation(simulationEngine);
-		for (Resource res : AbstractResourceList)
+		for (Resource res : registry.getResources())
 			res.assignSimulation(simulationEngine);
-		for (WorkGroup wg : workGroupList)
+		for (WorkGroup wg : registry.getWorkGroups())
 			wg.assignSimulation(simulationEngine);
-		for (BasicFlow f : flowList)
+		for (BasicFlow f : registry.getFlows())
 			f.assignSimulation(simulationEngine);
-		for (Generator<?> gen : tGenList)
+		for (Generator<?> gen : registry.getTimeDrivenGenerators())
 			gen.assignSimulation(simulationEngine);
-		for (ActivityManager am : amList)
+		for (ActivityManager am : registry.getActivityManagers())
 			am.assignSimulation(simulationEngine);
 	}
 
 	public void debug(final String description) {
-		logger.debug(this.toString() + "\t" + getTs() + "\t" + description);
+		logger.debug(this.toString() + "\t" + getCurrentTimestamp() + "\t" + description);
 	}
 
 	public void trace(final String description) {
-		logger.trace(this.toString() + "\t" + getTs() + "\t" + description);
+		logger.trace(this.toString() + "\t" + getCurrentTimestamp() + "\t" + description);
 	}
 
 	public void error(final String description) {
-		logger.error(this.toString() + "\t" + getTs() + "\t" + description);
+		logger.error(this.toString() + "\t" + getCurrentTimestamp() + "\t" + description);
 	}
 
 	/**
@@ -207,17 +196,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 */
 	@Override
 	public int generateId() {
-		return elemCounter++;
-	}
-
-	/**
-	 * Returns a unique identifier for a newly created element.
-	 * @return a unique identifier for a newly created element.
-	 * @deprecated Use {@link #generateId()} instead
-	 */
-	@Deprecated
-	public int getNewElementId() {
-		return generateId();
+		return idGenerator.generateId();
 	}
 
 	/**
@@ -227,16 +206,6 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	@Override
 	public void scheduleEvent(final DiscreteEvent ev) {
 		simulationEngine.addEvent(ev);
-	}
-
-	/**
-	 * Adds a new event to the simulation
-	 * @param ev New event
-	 * @deprecated Use {@link #scheduleEvent(DiscreteEvent)} instead
-	 */
-	@Deprecated
-	public void addEvent(final DiscreteEvent ev) {
-		scheduleEvent(ev);
 	}
 
 	/**
@@ -296,16 +265,16 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 		amCreator.createActivityManagers();
 		debugPrintActManager();
 		simulationEngine.initializeEngine();
-		trace("SIMULATION MODEL CREATED\t" + getTs());
+		trace("SIMULATION MODEL CREATED\t" + getCurrentTimestamp());
 		init();
 
 		infoHandler.notifyInfo(new SimulationStartStopInfo(this, SimulationStartStopInfo.Type.START, startTs));
 
 		// Starts all the time driven generators
-		for (TimeDrivenGenerator<?> evSource : tGenList)
+		for (TimeDrivenGenerator<?> evSource : registry.getTimeDrivenGenerators())
 			simulationEngine.addWait(evSource.onCreate(startTs));
 		// Starts all the resources
-		for (Resource res : AbstractResourceList)
+		for (Resource res : registry.getResources())
 			simulationEngine.addWait(res.onCreate(startTs));
 
 		// Adds the event to control end of simulation
@@ -313,7 +282,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 
 		simulationEngine.simulationLoop();
 
-		trace("SIMULATION FINISHES\t" + getTs() + "\t[EXPECTED " + endTs + "]");
+		trace("SIMULATION FINISHES\t" + getCurrentTimestamp() + "\t[EXPECTED " + endTs + "]");
     	simulationEngine.printState();
 
 		infoHandler.notifyInfo(new SimulationStartStopInfo(this, SimulationStartStopInfo.Type.END, endTs));
@@ -326,7 +295,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * creates the corresponding event sources.
 	 */
 	public void checkConditions() {
-		for (ConditionDrivenGenerator<?> gen : cGenList) {
+		for (ConditionDrivenGenerator<?> gen : registry.getConditionDrivenGenerators()) {
 			if (gen.getCondition().check(null))
 				gen.create();
 		}
@@ -338,6 +307,8 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * and contains variables that must be initialized among replicas.
 	 */
 	public void reset() {
+		registry.reset();
+		idGenerator.reset();
 	}
 
 	/**
@@ -345,7 +316,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param et Element Type that's added to the model.
 	 */
 	public void add(final ElementType et) {
-		elementTypeList.add(et);
+		registry.registerElementType(et);
 	}
 
 	/**
@@ -353,7 +324,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param res Resource that's added to the model.
 	 */
 	public void add(final Resource res) {
-		AbstractResourceList.add(res);
+		registry.registerResource(res);
 	}
 
 	/**
@@ -361,7 +332,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param rt Resource Type that's added to the model.
 	 */
 	public void add(final ResourceType rt) {
-		resourceTypeList.add(rt);
+		registry.registerResourceType(rt);
 	}
 
 	/**
@@ -369,16 +340,14 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param wg Workgroup that's added to the model.
 	 */
 	public void add(final WorkGroup wg) {
-		workGroupList.add(wg);
+		registry.registerWorkGroup(wg);
 	}
 	/**
 	 * Adds an {@link BasicFlow} to the model. This method is invoked from the object's constructor.
 	 * @param f IFlow that's added to the model.
 	 */
 	public void add(final BasicFlow f) {
-		flowList.add(f);
-		if (f instanceof RequestResourcesFlow)
-			reqFlowList.add((RequestResourcesFlow)f);
+		registry.registerFlow(f);
 	}
 
 	/**
@@ -386,7 +355,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param gen Time-driven generator that's added to the model.
 	 */
 	public void add(final TimeDrivenGenerator<?> gen) {
-		tGenList.add(gen);
+		registry.registerTimeDrivenGenerator(gen);
 	}
 
 	/**
@@ -394,7 +363,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param gen Condition-driven generator that's added to the model.
 	 */
 	public void add(final ConditionDrivenGenerator<?> gen) {
-		cGenList.add(gen);
+		registry.registerConditionDrivenGenerator(gen);
 	}
 
 	/**
@@ -403,7 +372,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param am Activity manager.
 	 */
 	public void add(final ActivityManager am) {
-		amList.add(am);
+		registry.registerActivityManager(am);
 	}
 
 	/**
@@ -411,7 +380,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @return the list of {@link ElementType element types} defined within this simulation
 	 */
 	public List<ElementType> getElementTypeList() {
-		return elementTypeList;
+		return registry.getElementTypes();
 	}
 
 	/**
@@ -419,7 +388,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @return the list of {@link Resource resources} defined within this simulation
 	 */
 	public List<Resource> getResourceList() {
-		return AbstractResourceList;
+		return registry.getResources();
 	}
 
 	/**
@@ -427,7 +396,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @return the list of {@link ResourceType resource types} defined within this simulation
 	 */
 	public List<ResourceType> getResourceTypeList() {
-		return resourceTypeList;
+		return registry.getResourceTypes();
 	}
 
 	/**
@@ -435,7 +404,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @return the list of {@link WorkGroup workgroups} defined within this simulation
 	 */
 	public List<WorkGroup> getWorkGroupList() {
-		return workGroupList;
+		return registry.getWorkGroups();
 	}
 
 	/**
@@ -443,7 +412,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @return the list of {@link BasicFlow flows} defined within this simulation
 	 */
 	public List<BasicFlow> getFlowList() {
-		return flowList;
+		return registry.getFlows();
 	}
 
 	/**
@@ -451,7 +420,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @return the list of {@link RequestResourcesFlow flows requesting resources} defined within this simulation
 	 */
 	public List<RequestResourcesFlow> getRequestFlowList() {
-		return reqFlowList;
+		return registry.getRequestFlows();
 	}
 
 	/**
@@ -459,7 +428,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @return the list of {@link TimeDrivenGenerator time-driven generators} defined within this simulation
 	 */
 	public List<TimeDrivenGenerator<?>> getTimeDrivenGeneratorList() {
-		return tGenList;
+		return registry.getTimeDrivenGenerators();
 	}
 
 	/**
@@ -467,7 +436,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @return the list of {@link ConditionDrivenGenerator condition-driven generators} defined within this simulation
 	 */
 	public List<ConditionDrivenGenerator<?>> getConditionDrivenGeneratorList() {
-		return cGenList;
+		return registry.getConditionDrivenGenerators();
 	}
 
 	/**
@@ -475,7 +444,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @return the list of {@link ActivityManager activity managers} defined within this simulation
 	 */
 	public List<ActivityManager> getActivityManagerList() {
-		return amList;
+		return registry.getActivityManagers();
 	}
 
 	/**
@@ -608,7 +577,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 */
 	protected void debugPrintActManager() {
 		StringBuffer str1 = new StringBuffer("Activity Managers:\r\n");
-		for (ActivityManager am : amList)
+		for (ActivityManager am : registry.getActivityManagers())
 			str1.append(am.getDescription() + "\r\n");
 		debug(str1.toString());
 	}
