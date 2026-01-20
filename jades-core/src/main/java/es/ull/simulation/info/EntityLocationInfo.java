@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.info;
 
@@ -19,9 +19,9 @@ public class EntityLocationInfo extends SimulationInfo {
 			START	("START AT LOCATION"),
 			WAIT_FOR	("WAIT FOR LOCATION"),
 			COND_WAIT	("CONDITIONAL WAIT");
-			
+
 			private final String description;
-			
+
 			Type (String description) {
 				this.description = description;
 			}
@@ -29,13 +29,13 @@ public class EntityLocationInfo extends SimulationInfo {
 			public String getDescription() {
 				return description;
 			}
-			
+
 		};
-	
+
 	final private IMovable entity;
 	final private Type type;
 	final private ILocation location;
-	
+
 
 	/**
 	 * @param model

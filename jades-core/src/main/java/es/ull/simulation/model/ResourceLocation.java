@@ -9,7 +9,7 @@ import es.ull.simulation.model.location.IMovable;
  * Manages the location and movement logic for a Resource.
  * This class encapsulates all location-related responsibilities that were previously
  * in the Resource class, following the Single Responsibility Principle.
- * 
+ *
  * @author Refactoring - 2026
  */
 public class ResourceLocation implements IMovable {
@@ -23,7 +23,7 @@ public class ResourceLocation implements IMovable {
     private final int size;
     /** The current element instance that drives the movement of the resource */
     private ElementInstance movingInstance = null;
-    
+
     /**
      * Creates a location manager for a resource
      * @param resource The resource this manager belongs to
@@ -36,23 +36,23 @@ public class ResourceLocation implements IMovable {
         this.size = size;
         this.currentLocation = null;
     }
-    
+
     @Override
     public int getCapacity() {
         return size;
     }
-    
+
     @Override
     public ILocation getLocation() {
         return currentLocation;
     }
-    
+
     @Override
     public void setLocation(final ILocation location) {
         final Location resolvedLocation = (Location) location;
         final Simulation simul = resource.getSimulation();
         final long ts = resource.getTs();
-        
+
         if (currentLocation == null) {
             simul.notifyInfo(new EntityLocationInfo(simul, resource, resolvedLocation,
                     EntityLocationInfo.Type.START, ts));
@@ -65,7 +65,7 @@ public class ResourceLocation implements IMovable {
                     EntityLocationInfo.Type.ARRIVE, ts));
         }
     }
-    
+
     /**
      * Returns the initial location of the resource
      * @return the initial location
@@ -73,7 +73,7 @@ public class ResourceLocation implements IMovable {
     public Location getInitLocation() {
         return initLocation;
     }
-    
+
     /**
      * Returns the current element instance driving the movement
      * @return the moving instance or null
@@ -81,7 +81,7 @@ public class ResourceLocation implements IMovable {
     public ElementInstance getMovingInstance() {
         return movingInstance;
     }
-    
+
     /**
      * Sets the element instance that is moving this resource
      * @param movingInstance the element instance
@@ -89,7 +89,7 @@ public class ResourceLocation implements IMovable {
     public void setMovingInstance(final ElementInstance movingInstance) {
         this.movingInstance = movingInstance;
     }
-    
+
     /**
      * Initializes the location by entering the init location if available
      * @return true if initialization succeeded, false otherwise
@@ -108,12 +108,12 @@ public class ResourceLocation implements IMovable {
         }
         return true;
     }
-    
+
     @Override
     public void notifyLocationAvailable(final ILocation location) {
         final Location resolvedLocation = (Location) location;
         resolvedLocation.enter(resource);
-        
+
         if (movingInstance != null) {
             // Delegate to Resource for flow-specific logic
             resource.handleLocationAvailable(resolvedLocation, movingInstance);

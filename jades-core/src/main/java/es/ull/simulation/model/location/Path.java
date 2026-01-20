@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model.location;
 
@@ -7,7 +7,7 @@ import es.ull.simulation.functions.AbstractTimeFunction;
 
 /**
  * A location representing a path between two or more places ({@link Node}). Useful for roads.
- * The capacity of the path is the product of the number of lanes and the capacity per lane 
+ * The capacity of the path is the product of the number of lanes and the capacity per lane
  * @author Iván Castilla Rodríguez
  *
  */
@@ -16,7 +16,7 @@ public class Path extends Location {
 	private final int nLanes;
 
 	/**
-	 * Creates a path with capacity constrains 
+	 * Creates a path with capacity constrains
 	 * @param description A brief description of the location
 	 * @param delayAtExit The time that it takes to exit (or go through) the location
 	 * @param capacityPerLane Total capacity of each lane
@@ -24,7 +24,7 @@ public class Path extends Location {
 	 */
 	public Path(String description, AbstractTimeFunction delayAtExit, int capacityPerLane, int nLanes) {
 		super(description, delayAtExit, capacityPerLane * nLanes);
-		this.nLanes = nLanes; 
+		this.nLanes = nLanes;
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class Path extends Location {
 	 */
 	public Path(String description, AbstractTimeFunction delayAtExit) {
 		super(description, delayAtExit);
-		this.nLanes = Integer.MAX_VALUE; 
+		this.nLanes = Integer.MAX_VALUE;
 	}
 
 	/**
@@ -45,16 +45,16 @@ public class Path extends Location {
 	 */
 	public Path(String description, int capacityPerLane, int nLanes) {
 		super(description, capacityPerLane * nLanes);
-		this.nLanes = nLanes; 
+		this.nLanes = nLanes;
 	}
-	
+
 	/**
 	 * Creates a path with no capacity constrains and no time to exit
 	 * @param description A brief description of the location
 	 */
 	public Path(String description) {
 		super(description);
-		this.nLanes = Integer.MAX_VALUE; 
+		this.nLanes = Integer.MAX_VALUE;
 	}
 
 	/**

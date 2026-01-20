@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -39,7 +39,7 @@ public abstract class TimeDrivenGenerator<INF extends Generator.GenerationInfo>
 	}
 
     /**
-     * Returns the next timestamp when elements have to be generated. 
+     * Returns the next timestamp when elements have to be generated.
      * @return The next timestamp to generate elements. -1 if this generator
      * don't have to create more elements.
      */
@@ -51,12 +51,12 @@ public abstract class TimeDrivenGenerator<INF extends Generator.GenerationInfo>
 	public DiscreteEvent onDestroy(final long ts) {
 		return new DiscreteEvent.DefaultFinalizeEvent(this, ts);
 	}
-	
+
 	@Override
     public void notifyEnd() {
         simul.scheduleEvent(onDestroy(getTs()));
     }
-    
+
 	@Override
 	public DiscreteEvent onCreate(final long ts) {
 		cycleIter = ((Cycle) cycle.getCycle()).iterator(simul.getStartTs(), Long.MAX_VALUE);
@@ -81,9 +81,9 @@ public abstract class TimeDrivenGenerator<INF extends Generator.GenerationInfo>
         public GenerateEvent(final long ts) {
             super(ts);
         }
-        
+
         /**
-         * Generates the elements corresponding to this timestamp. After this, 
+         * Generates the elements corresponding to this timestamp. After this,
          * it checks the following event.
          */
         @Override
@@ -99,5 +99,5 @@ public abstract class TimeDrivenGenerator<INF extends Generator.GenerationInfo>
 			}
         }
     }
-    
+
 }

@@ -8,10 +8,10 @@ import es.ull.simulation.model.flow.RequestResourcesFlow;
 
 /**
  * Partition of activities. It serves as a mutual exclusion mechanism to access a set of activities
- * and a set of resource types. This mutual exclusion mechanism is never used implicitly by this object, 
- * so it must be controlled by the user by means of a semaphore. When the user wants to modify an object 
- * belonging to this AM, it's required to invoke the <code>waitSemaphore</code> method. When the modification 
- * finishes, the <code>signalSemaphore()</code> method must be invoked.  
+ * and a set of resource types. This mutual exclusion mechanism is never used implicitly by this object,
+ * so it must be controlled by the user by means of a semaphore. When the user wants to modify an object
+ * belonging to this AM, it's required to invoke the <code>waitSemaphore</code> method. When the modification
+ * finishes, the <code>signalSemaphore()</code> method must be invoked.
  * @author Iván Castilla Rodríguez
  */
 public class ActivityManager extends SimulationObject implements IActivityManager {
@@ -23,7 +23,7 @@ public class ActivityManager extends SimulationObject implements IActivityManage
     protected final ArrayList<ResourceType> resourceTypeList;
     /** The specific implementation of the behavior of the activity manager */
     private ActivityManagerEngine engine;
-    
+
    /**
 	* Creates a new instance of ActivityManager.
 	* @param model ParallelSimulationEngine this activity manager belongs to
@@ -42,7 +42,7 @@ public class ActivityManager extends SimulationObject implements IActivityManage
     public void add(final RequestResourcesFlow IFlow) {
         activityList.add(IFlow);
     }
-    
+
     /**
      * Adds a resource type to this activity manager.
      * @param rt Resource type added
@@ -58,7 +58,7 @@ public class ActivityManager extends SimulationObject implements IActivityManage
     public void queueAdd(final ElementInstance ei) {
     	engine.queueAdd(ei);
     }
-    
+
     /**
      * Removes an element instance from the waiting queue.
      * @param ei Element instance which is removed from the waiting queue.
@@ -66,9 +66,9 @@ public class ActivityManager extends SimulationObject implements IActivityManage
     public void queueRemove(final ElementInstance ei) {
     	engine.queueRemove(ei);
     }
-    
+
     /**
-     * Informs this activity manager that a resource has become available. 
+     * Informs this activity manager that a resource has become available.
      */
     public void notifyResource() {
     	engine.notifyAvailableResource();
@@ -81,9 +81,9 @@ public class ActivityManager extends SimulationObject implements IActivityManage
     public void notifyAvailableElement(final ElementInstance ei) {
     	engine.notifyAvailableElement(ei);
     }
-    
+
 	/**
-	 * Builds a detailed description of this activity manager, including activities and 
+	 * Builds a detailed description of this activity manager, including activities and
 	 * resource types.
 	 * @return A large description of this activity manager.
 	 */
@@ -113,7 +113,7 @@ public class ActivityManager extends SimulationObject implements IActivityManage
 			engine.processAvailableElements();
 		}
 	}
-	
+
 	@Override
 	protected void assignSimulation(SimulationEngine simul) {
         engine = simul.getActivityManagerEngineInstance(this);

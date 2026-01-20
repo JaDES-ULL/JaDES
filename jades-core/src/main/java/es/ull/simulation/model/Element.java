@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -27,7 +27,7 @@ import es.ull.simulation.utils.Prioritizable;
  * An entity capable of following a {@link IFlow workflow}. Elements have a {@link ElementType type} and
  * interact with {@link Resource resources}by means of
  * {@link es.ull.simulation.model.flow.IResourceHandlerFlow resource handler flows}
- * Elements can also move from a {@link Location} to another.   
+ * Elements can also move from a {@link Location} to another.
  * @author Iván Castilla Rodríguez
  *
  */
@@ -36,7 +36,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	protected ElementType elementType;
 	/** Workflow manager for initial flow and main instance */
 	private final ElementFlow flowManager;
-	/** If true, the element is in exclusive mode, and cannot perform other exclusive tasks concurrently */ 
+	/** If true, the element is in exclusive mode, and cannot perform other exclusive tasks concurrently */
 	protected boolean exclusive = false;
 	/** Movement manager for location and transport */
 	private final ElementMovement movementManager;
@@ -44,7 +44,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
     final protected IResourceManager resourceManager;
 	/** The engine that executes specific behavior of the element */
 	private ElementEngine engine;
-	
+
 	/**
 	 * Creates an element with a type and initial IFlow; and 0 size.
 	 * @param simul Simulation model this element belongs to
@@ -54,7 +54,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public Element(final Simulation simul, final ElementType elementType, final IInitializerFlow initialFlow) {
 		this(simul, "E", elementType, initialFlow, 0, null, new SeizedResourcesCollection(null));
 	}
-	
+
 	/**
 	 * Creates an element with a type and initial IFlow
 	 * @param simul Simulation model this element belongs to
@@ -67,7 +67,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 				   final IInitializerFlow initialFlow, final int size, final Location initLocation) {
 		this(simul, objectTypeId, elementType, initialFlow, size, initLocation, new SeizedResourcesCollection(null));
 	}
-	
+
 	/**
 	 * Creates an element with dependency injection (DIP constructor)
 	 * @param simul Simulation model this element belongs to
@@ -92,11 +92,11 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
         this.movementManager = new ElementMovement(this, size, initLocation);
 		initializeElementVars(this.elementType.getElementValues());
 	}
-	
+
 	/**
 	 * Creates an element from the information of a Generator
 	 * @param simul Simulation model this element belongs to
-	 * @param info Information required to create the element  
+	 * @param info Information required to create the element
 	 */
 	public Element(final Simulation simul, String objectTypeId, final StandardElementGenerationInfo info) {
 		super(simul, simul.generateId(), objectTypeId);
@@ -108,16 +108,16 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
         this.movementManager = new ElementMovement(this, elemSize, elemInitLocation);
 		initializeElementVars(this.elementType.getElementValues());
 	}
-	
+
 	/**
 	 * Creates an element from the information of a Generator
 	 * @param simul Simulation model this element belongs to
-	 * @param info Information required to create the element  
+	 * @param info Information required to create the element
 	 */
 	public Element(final Simulation simul, final StandardElementGenerationInfo info) {
 		this(simul, "E", info);
 	}
-	
+
 	/**
 	 * Returns the corresponding type of the element.
 	 * @return the corresponding type of the element
@@ -125,7 +125,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public ElementType getType() {
 		return elementType;
 	}
-	
+
 	/**
 	 * Returns the associated {@link es.ull.simulation.model.flow.IInitializerFlow IFlow}.
 	 * @return the associated {@link es.ull.simulation.model.flow.IInitializerFlow IFlow}
@@ -149,7 +149,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public void incInQueue(final ElementInstance ei) {
 		engine.incInQueue(ei);
 	}
-	
+
 	/**
 	 * Notifies an instance of the element has finished waiting in an activity queue.
 	 * @param ei Element instance that was waiting in a queue.
@@ -157,9 +157,9 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public void decInQueue(final ElementInstance ei) {
 		engine.decInQueue(ei);
 	}
-	
+
 	/**
-	 * Returns true if the element is currently performing an exclusive activity; returns false otherwise 
+	 * Returns true if the element is currently performing an exclusive activity; returns false otherwise
 	 * @return true if the element is currently performing an exclusive activity; returns false otherwise
 	 */
 	public boolean isExclusive() {
@@ -191,7 +191,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
     	final int resId = (reqFlow.getResourcesId() < 0) ? -ei.getIdentifier() : reqFlow.getResourcesId();
     	resourceManager.addResources(resId, newResources);
     }
-    
+
 	/**
      * Removes the resources specified in the workgroup from the list of seized resources
      * @param relFlow The IFlow that released the resources
@@ -203,7 +203,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
     	final WorkGroup wg = relFlow.getWorkGroup();
     	return resourceManager.removeResources(resId, wg);
     }
-    
+
     /**
      * Returns the list of resources currently seized by the element
      * @return the list of resources currently seized by the element
@@ -211,7 +211,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public ArrayDeque<Resource> getCaughtResources() {
 		return resourceManager.getAllResources();
 	}
-	
+
 	/**
 	 * Returns the list of resources caught by the specified element instance when performing the specified IFlow
 	 * @param reqFlow The IFlow that seized the resources
@@ -221,7 +221,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public ArrayDeque<Resource> getCaughtResources(final RequestResourcesFlow reqFlow, final ElementInstance ei) {
     	return resourceManager.getResourcesByFlow(reqFlow, ei);
     }
-    
+
 	/**
 	 * Returns the list of resources caught by the specified element instance when performing the specified IFlow
 	 * @param resourcesId Identifier of the group of resources
@@ -241,7 +241,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public boolean isAcquiredResourceType(final ResourceType rt) {
 		return resourceManager.hasResourceType(rt);
 	}
-	
+
 	/**
 	 * Initializes the variables of the element as indicated by a generator
 	 * @param varList List of variables and values
@@ -299,7 +299,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
     public void notifyEnd() {
     	engine.notifyEnd();
     }
-    
+
     /**
      * Creates and adds an event to request a IFlow at the current simulation time
      * @param f IFlow to be requested
@@ -308,7 +308,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public void addRequestEvent(final IFlow f, final ElementInstance ei) {
 		simul.scheduleEvent(new RequestFlowEvent(getTs(), f, ei));
 	}
-	
+
 	/**
      * Creates and adds an event to finish a IFlow at the specified simulation time
 	 * @param ts Timestamp when the finalization of the IFlow is scheduled to happen
@@ -331,7 +331,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public ElementEngine getEngine() {
 		return engine;
 	}
-	
+
 
 	@Override
 	public int getCapacity() {
@@ -352,7 +352,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public void notifyLocationAvailable(final ILocation location) {
 		movementManager.notifyLocationAvailable((Location) location);
 	}
-	
+
 	/**
 	 * Makes the element issue a {@link MoveEvent move event} to continue the movement to its destination
 	 * @param IFlow The IFlow indicating the destination
@@ -361,7 +361,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 	public void keepMoving(final MoveFlow IFlow, final ElementInstance ei) {
 		movementManager.keepMoving(IFlow, ei);
 	}
-	
+
 	/**
 	 * An event to request a IFlow.
 	 * @author Iván Castilla Rodríguez
@@ -376,7 +376,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 			super(ts);
 			this.ei = ei;
 			this.f = f;
-		}		
+		}
 
 		@Override
 		public void event() {
@@ -384,9 +384,9 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 			f.request(ei);
 		}
 	}
-	
+
 	/**
-	 * An event to finish a IFlow. 
+	 * An event to finish a IFlow.
 	 * @author Iván Castilla Rodríguez
 	 */
 	protected class FinishFlowEvent extends DiscreteEvent {
@@ -399,7 +399,7 @@ public class Element extends VariableStoreSimulationObject implements IElement, 
 			super(ts);
 			this.ei = ei;
 			this.f = f;
-		}		
+		}
 
 		@Override
 		public void event() {

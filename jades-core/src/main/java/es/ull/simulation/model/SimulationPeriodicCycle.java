@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -16,7 +16,7 @@ import es.ull.simulation.utils.cycle.PeriodicCycle;
 public class SimulationPeriodicCycle implements ISimulationCycle {
 	/** Inner {@link es.ull.simulation.utils.cycle.PeriodicCycle PeriodicCycle} */
 	private final PeriodicCycle cycle;
-	
+
 	/**
 	 * Creates a new cycle which runs until the specified timestamp is reached.
 	 * @param unit Time unit used in the simulation
@@ -123,17 +123,17 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 
 	/**
 	 * Creates a cycle that starts at 0 and advances hour to hour
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @return An hourly cycle
 	 */
 	public static SimulationPeriodicCycle newHourlyCycle(TimeUnit unit) {
 		return new SimulationPeriodicCycle(unit, 0, new SimulationTimeFunction(unit,
 				"ConstantVariate", new TimeStamp(TimeUnit.HOUR, 1)), 0);
 	}
-	
+
 	/**
 	 * Creates a cycle that starts at 0 and advances day to day
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @return A daily cycle
 	 */
 	public static SimulationPeriodicCycle newDailyCycle(TimeUnit unit) {
@@ -143,7 +143,7 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 
 	/**
 	 * Creates a cycle that starts at 0 and advances week to week
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @return A weekly cycle
 	 */
 	public static SimulationPeriodicCycle newWeeklyCycle(TimeUnit unit) {
@@ -153,7 +153,7 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 
 	/**
 	 * Creates a cycle that starts at 0 and advances month to month
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @return A monthly cycle
 	 */
 	public static SimulationPeriodicCycle newMonthlyCycle(TimeUnit unit) {
@@ -163,7 +163,7 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 
 	/**
 	 * Creates a cycle that starts at 0 and advances hour to hour
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @param startTs Timestamp (using specified time unit) when this cycle starts
 	 * @return An hourly cycle
 	 */
@@ -171,10 +171,10 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 		return new SimulationPeriodicCycle(unit, startTs, new SimulationTimeFunction(unit,
 				"ConstantVariate", new TimeStamp(TimeUnit.HOUR, 1)), 0);
 	}
-	
+
 	/**
 	 * Creates a cycle that starts at 0 and advances day to day
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @param startTs Timestamp (using specified time unit) when this cycle starts
 	 * @return A daily cycle
 	 */
@@ -185,7 +185,7 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 
 	/**
 	 * Creates a cycle that starts at 0 and advances week to week
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @param startTs Timestamp (using specified time unit) when this cycle starts
 	 * @return A weekly cycle
 	 */
@@ -196,7 +196,7 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 
 	/**
 	 * Creates a cycle that starts at 0 and advances month to month
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @param startTs Timestamp (using specified time unit) when this cycle starts
 	 * @return A monthly cycle
 	 */
@@ -204,10 +204,10 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 		return new SimulationPeriodicCycle(unit, startTs, new SimulationTimeFunction(unit,
 				"ConstantVariate", new TimeStamp(TimeUnit.MONTH, 1)), 0);
 	}
-	
+
 	/**
 	 * Creates a cycle that starts at 0 and advances hour to hour
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @param startTs Timestamp when this cycle starts
 	 * @return An hourly cycle
 	 */
@@ -215,10 +215,10 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 		return new SimulationPeriodicCycle(unit, startTs, new SimulationTimeFunction(unit,
 				"ConstantVariate", new TimeStamp(TimeUnit.HOUR, 1)), 0);
 	}
-	
+
 	/**
 	 * Creates a cycle that starts at 0 and advances day to day
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @param startTs Timestamp when this cycle starts
 	 * @return A daily cycle
 	 */
@@ -229,7 +229,7 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 
 	/**
 	 * Creates a cycle that starts at 0 and advances week to week
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @param startTs Timestamp when this cycle starts
 	 * @return A weekly cycle
 	 */
@@ -240,13 +240,13 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 
 	/**
 	 * Creates a cycle that starts at 0 and advances month to month
-	 * @param unit TimeUnit this cycle is attached to. 
+	 * @param unit TimeUnit this cycle is attached to.
 	 * @param startTs Timestamp when this cycle starts
 	 * @return A monthly cycle
 	 */
 	public static SimulationPeriodicCycle newMonthlyCycle(TimeUnit unit, TimeStamp startTs) {
 		return new SimulationPeriodicCycle(unit, startTs, new SimulationTimeFunction(unit,
 				"ConstantVariate", new TimeStamp(TimeUnit.MONTH, 1)), 0);
-	}	
-	
+	}
+
 }

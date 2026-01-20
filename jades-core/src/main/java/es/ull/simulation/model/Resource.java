@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -23,11 +23,11 @@ import es.ull.simulation.utils.cycle.DiscreteCycleIterator;
  * Timetable entries can overlap in time, thus allowing the resource for being potentially available for
  * different resource types simultaneously.
  * A resource finishes its execution when it has no longer valid timetable entries.
- * 
+ *
  * <p>Following the Dependency Inversion Principle, Resource depends on the {@link IResourceEngine} interface
  * rather than the concrete {@link es.ull.simulation.model.engine.ResourceEngine} implementation.
  * This improves testability and reduces coupling.</p>
- * 
+ *
  * @author Iván Castilla Rodríguez
  */
 public class Resource extends VariableStoreSimulationObject implements IResource, IEventSource, IMovable {
@@ -42,7 +42,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 
     /**
      * Creates a resource with size 0
-     * @param model The simulation model this resource belongs to 
+     * @param model The simulation model this resource belongs to
      * @param description A brief description of the resource
      */
 	public Resource(final Simulation model, final String description) {
@@ -51,7 +51,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 
     /**
      * Creates a resource
-     * @param model The simulation model this resource belongs to 
+     * @param model The simulation model this resource belongs to
      * @param description A brief description of the resource
      * @param size The size of the resource
      * @param initLocation The initial location of the resource
@@ -69,12 +69,12 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 	@Override
 	protected void assignSimulation(SimulationEngine simul) {
 		engine = simul.getResourceEngineInstance(this);
-	}      
-	
+	}
+
 	/**
 	 * Returns the associated {@link IResourceEngine}.
 	 * Following DIP, returns the interface rather than concrete implementation.
-	 * 
+	 *
 	 * @return the associated {@link IResourceEngine}
 	 */
 	public IResourceEngine getEngine() {
@@ -130,14 +130,14 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 	public DiscreteEvent onDestroy(final long ts) {
 		return new DiscreteEvent.DefaultFinalizeEvent(this, ts);
 	}
-    
+
     /**
-     * Informs the resource that it must finish its execution. 
+     * Informs the resource that it must finish its execution.
      */
     public void notifyEnd() {
         engine.notifyEnd();
     }
-    
+
     /**
      * Returns the {@link ResourceType resource type} currently assigned to this resource, in case it is in use.
 	 * Returns null otherwise.
@@ -155,15 +155,15 @@ public class Resource extends VariableStoreSimulationObject implements IResource
     public void setCurrentResourceType(final ResourceType rt) {
     	resourceAvailability.setCurrentResourceType(rt);
     }
-    
+
     /**
-     * Returns true if the resource is currently seized by an {@link Element element}; false otherwise 
+     * Returns true if the resource is currently seized by an {@link Element element}; false otherwise
      * @return true if the resource is currently seized by an {@link Element element}; false otherwise
      */
     public boolean isSeized() {
     	return (engine.getCurrentElement() != null);
     }
-    
+
     /**
      * Returns <code>true</code> if this resource is being used in spite of having finished its availability.
      * @return <code>True</code> if this resource is being used in spite of having finished its availability;
@@ -172,20 +172,20 @@ public class Resource extends VariableStoreSimulationObject implements IResource
     public boolean isTimeOut() {
         return resourceAvailability.isTimeOut();
     }
-    
+
     /**
-     * Sets the state of this resource as being used in spite of having finished its availability. 
-     * @param timeOut <code>True</code> if this resource is being used beyond its availability; 
+     * Sets the state of this resource as being used in spite of having finished its availability.
+     * @param timeOut <code>True</code> if this resource is being used beyond its availability;
      * <code>false</code> otherwise.
      */
     public void setTimeOut(final boolean timeOut) {
         resourceAvailability.setTimeOut(timeOut);
     }
-    
+
 	/**
 	 * Checks if a resource is available for a specific {@link ResourceType resource type}.
 	 * The resource type is used to prevent
-	 * using a resource when it's becoming unavailable right at this timestamp. 
+	 * using a resource when it's becoming unavailable right at this timestamp.
 	 * @param rt Resource type
 	 * @return True if the resource is available.
 	 */
@@ -200,9 +200,9 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 	protected void setNotCanceled(final boolean available) {
 		engine.setNotCanceled(available);
 	}
-	
+
 	/**
-	 * Adds a resource to the set of resources requested by an {@link Element}. 
+	 * Adds a resource to the set of resources requested by an {@link Element}.
 	 * @param solution Tentative solution with booked resources
 	 * @param rt Resource type
 	 * @param ei Element instance corresponding to an Element
@@ -224,12 +224,12 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 	/**
 	 * Marks this resource as taken by an {@link Element}
 	 * @param ei The element instance in charge of executing the current IFlow
-	 * @return The availability timestamp of this resource for this resource type 
+	 * @return The availability timestamp of this resource for this resource type
 	 */
 	protected long catchResource(final ElementInstance ei) {
 		return engine.catchResource(ei);
 	}
-	
+
     /**
      * Releases this resource
 	 * @param ei The element instance in charge of executing the current IFlow
@@ -239,15 +239,15 @@ public class Resource extends VariableStoreSimulationObject implements IResource
     protected boolean releaseResource(final ElementInstance ei) {
     	return engine.releaseResource(ei);
     }
-    
+
 	/**
-	 * Builds a list of activity managers referenced by the roles of the resource. 
+	 * Builds a list of activity managers referenced by the roles of the resource.
 	 * @return Returns the list of activity managers referenced by the roles of the resource.
 	 */
     public ArrayList<ActivityManager> getCurrentManagers() {
     	return engine.getCurrentManagers();
     }
-    
+
     /**
      * Generates an event which finalizes a period of unavailability.
      * @param ts Current simulation time.
@@ -368,12 +368,12 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 	public void notifyLocationAvailable(final ILocation location) {
 		resourceLocation.notifyLocationAvailable((Location) location);
 	}
-	
+
 	/**
 	 * Handles the logic when a location becomes available.
 	 * This method is called from ResourceLocation.notifyLocationAvailable().
 	 * Package-private to allow ResourceLocation to call it.
-	 * 
+	 *
 	 * @param location The location that became available
 	 * @param movingInstance The element instance that is moving
 	 */
@@ -382,7 +382,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 	    	final MoveResourcesFlow flow = (MoveResourcesFlow)movingInstance.getCurrentFlow();
 	    	final Location destination = flow.getDestination();
 	    	final IRouter router = flow.getRouter();
-			
+
 			if (resourceLocation.getLocation().equals(destination)) {
 				endMove(flow, true);
 			}
@@ -396,7 +396,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 			    		simul.scheduleEvent(new MoveEvent(getTs() + ((Location) resourceLocation.getLocation()).getDelayAtExit(this),
 							resolvedNext, destination, router));
 				}
-			}			
+			}
 		}
 		else if (movingInstance.getCurrentFlow() instanceof TransportFlow) {
 	    	final TransportFlow flow = (TransportFlow)movingInstance.getCurrentFlow();
@@ -404,7 +404,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 			movingInstance.getElement().setLocation(location);
 	    	final Location destination = flow.getDestination();
 	    	final IRouter router = flow.getRouter();
-			
+
 			if (resourceLocation.getLocation().equals(destination)) {
 				endTransport(flow, true);
 			}
@@ -418,10 +418,10 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 			    		simul.scheduleEvent(new TransportEvent(getTs() + ((Location) resourceLocation.getLocation()).getDelayAtExit(this),
 							resolvedNext, destination, router));
 				}
-			}			
+			}
 		}
 	}
-	
+
 	/**
 	 * Returns a builder class for adding time table or cancellation entries
 	 * @param roleList The types of this resource during every activation /to be cancelled
@@ -430,16 +430,16 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 	public ResourceAvailability.TimeTableOrCancelEntriesAdder newTimeTableOrCancelEntriesAdder(final ArrayList<ResourceType> roleList) {
 		return resourceAvailability.newTimeTableOrCancelEntriesAdder(roleList);
 	}
-	
+
 	/**
 	 * Returns a builder class for adding time table or cancellation entries
-	 * @param role The type of this resource during every activation/to be cancelled 
+	 * @param role The type of this resource during every activation/to be cancelled
 	 * @return a builder class for adding time table or cancellation entries
 	 */
 	public ResourceAvailability.TimeTableOrCancelEntriesAdder newTimeTableOrCancelEntriesAdder(final ResourceType role) {
 		return resourceAvailability.newTimeTableOrCancelEntriesAdder(role);
 	}
-	    
+
     /**
      * The event in charge of initializing the resource
      * @author Iván Castilla Rodríguez
@@ -450,7 +450,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
     	public CreateResourceEvent(long ts) {
     		super(ts);
 		}
-    	
+
 		@Override
 		public void event() {
 			simul.notifyInfo(new ResourceInfo(simul, Resource.this, null, ResourceInfo.Type.START, getTs()));
@@ -493,11 +493,11 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 			if (engine.getValidTimeTableEntries() == 0)// at least one tte should be valid
 				notifyEnd();
 		}
-    	
+
     }
 
     /**
-     * Makes available a resource with a specific role. 
+     * Makes available a resource with a specific role.
      */
     protected class RoleOnEvent extends DiscreteEvent {
         /** Available role */
@@ -506,14 +506,14 @@ public class Resource extends VariableStoreSimulationObject implements IResource
         private final DiscreteCycleIterator iter;
         /** Availability duration */
         private final long duration;
-        
+
         /**
          * Creates a new event
          * @param ts Timestamp when the resource will  be available.
          * @param role Role played by the resource.
          * @param iter The cycle iterator that handles the availability of this resource
          * @param duration The duration of the availability.
-         */        
+         */
         public RoleOnEvent(final long ts, final ResourceType role, final DiscreteCycleIterator iter,
 						   final long duration) {
             super(ts);
@@ -521,7 +521,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
             this.role = role;
             this.duration = duration;
         }
-        
+
         @Override
         public void event() {
         	final long waitTime = role.beforeRoleOn();
@@ -547,9 +547,9 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 			return role;
 		}
     }
-    
+
     /**
-     * Makes unavailable a resource with a specific role. 
+     * Makes unavailable a resource with a specific role.
      */
     protected class RoleOffEvent extends DiscreteEvent {
         /** Unavailable role */
@@ -558,14 +558,14 @@ public class Resource extends VariableStoreSimulationObject implements IResource
         private final DiscreteCycleIterator iter;
         /** Availability duration */
         private final long duration;
-        
+
         /**
          * Creates a new event
          * @param ts Timestamp when the resource will be unavailable.
          * @param role Role played by the resource.
          * @param iter The cycle iterator that handles the availability of this resource
          * @param duration The duration of the availability.
-         */        
+         */
         public RoleOffEvent(final long ts, final ResourceType role, final DiscreteCycleIterator iter,
 							final long duration) {
             super(ts);
@@ -573,7 +573,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
             this.iter = iter;
             this.duration = duration;
         }
-        
+
         @Override
         public void event() {
         	final long waitTime = role.beforeRoleOff();
@@ -585,7 +585,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
         		final long nextTs = (iter == null) ? -1 : iter.next();
         		if (nextTs != -1) {
         			RoleOnEvent rEvent = new RoleOnEvent(nextTs, role, iter, duration);
-        		simul.scheduleEvent(rEvent);            	
+        		simul.scheduleEvent(rEvent);
         		}
         		else if (engine.decValidTimeTableEntries() == 0) {
         			role.afterRoleOff();
@@ -603,9 +603,9 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 		 */
 		public ResourceType getRole() {
 			return role;
-		}        
+		}
     }
-    
+
 	/**
 	 * Event which starts a cancellation period for this resource
 	 * @author ycallero
@@ -656,7 +656,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 		 * @param ts Actual simulation time.
 		 * @param iter Cycle iterator.
 		 * @param duration The event duration.
-		 */   
+		 */
 		public CancelPeriodOffEvent(final long ts, final DiscreteCycleIterator iter, final long duration) {
 			super(ts);
 			this.iter = iter;
@@ -674,7 +674,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 				nextTs = iter.next();
 			if (nextTs != -1) {
 				CancelPeriodOnEvent aEvent = new CancelPeriodOnEvent(nextTs, iter, duration);
-				simul.scheduleEvent(aEvent);            	
+				simul.scheduleEvent(aEvent);
 			}
 		}
 	}
@@ -691,7 +691,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 		final private Location nextLocation;
 		/** The instance that computes the path to the final destination */
 		final private IRouter router;
-		
+
 		/**
 		 * Creates a move event that starts a move from the resource's current location
 		 * @param ts Current timestamp
@@ -738,7 +738,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 						final Location resolvedNext = (Location) nextLoc;
 						final MoveEvent mEvent = new MoveEvent(getTs() +
 								((Location) resourceLocation.getLocation()).getDelayAtExit(Resource.this), resolvedNext, destination, router);
-				    	simul.scheduleEvent(mEvent);						
+				    	simul.scheduleEvent(mEvent);
 					}
 				}
 			}
@@ -762,7 +762,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 		final private Location nextLocation;
 		/** The instance that computes the path to the final destination */
 		final private IRouter router;
-		
+
 		/**
 		 * Creates a transport event that starts a move from the resource's current location
 		 * @param ts Current timestamp
@@ -813,7 +813,7 @@ public class Resource extends VariableStoreSimulationObject implements IResource
 						final Location resolvedNext = (Location) nextLoc;
 						final TransportEvent mEvent = new TransportEvent(getTs() +
 								((Location) resourceLocation.getLocation()).getDelayAtExit(Resource.this), resolvedNext, destination, router);
-				    	simul.scheduleEvent(mEvent);						
+				    	simul.scheduleEvent(mEvent);
 					}
 				}
 			}

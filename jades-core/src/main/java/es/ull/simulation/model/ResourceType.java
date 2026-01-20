@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -42,7 +42,7 @@ public class ResourceType extends SimulationObject implements IResourceType {
 	protected void assignSimulation(SimulationEngine simul) {
 		availableResourceList = simul.getResourceListInstance();
 	}
-	
+
 	@Override
 	public String getDescription() {
 		return description;
@@ -50,16 +50,16 @@ public class ResourceType extends SimulationObject implements IResourceType {
 
     /**
      * Returns the resource corresponding to the "ind" position.
-     * @param ind Resource position in the availability list. 
+     * @param ind Resource position in the availability list.
      * @return Resource corresponding to the "ind" position".
      */
     protected Resource getResource(int ind) {
         return availableResourceList.get(ind);
     }
-      
+
     /**
-     * Searches the first available resource (a resource which is not being used yet) with 
-     * this role. The search starts at position <code>ind</code>.   
+     * Searches the first available resource (a resource which is not being used yet) with
+     * this role. The search starts at position <code>ind</code>.
 	 * @param solution Tentative solution with booked resources
      * @param ind Position to start the search.
      * @param ei Element instance requesting the resources
@@ -76,7 +76,7 @@ public class ResourceType extends SimulationObject implements IResourceType {
     }
 
     /**
-     * Checks if there are enough available resources starting from the ind-th one. 
+     * Checks if there are enough available resources starting from the ind-th one.
      * @param ind Index of the first resource to check
      * @param need Total amount of available resources required.
      * @return True if there are more available resources than needed; false in other case.
@@ -89,13 +89,13 @@ public class ResourceType extends SimulationObject implements IResourceType {
     	for (int i = ind; (i < total) && (disp < need); i++) {
     		final Resource res = availableResourceList.get(i);
             if ((!res.isSeized()) && (res.getCurrentResourceType() == null))
-                disp++;    		
+                disp++;
     	}
     	if (disp < need)
     		return false;
     	return true;
     }
-    
+
     /**
      * Adds a resource as available
      * @param res New available resource.
@@ -108,9 +108,9 @@ public class ResourceType extends SimulationObject implements IResourceType {
         if ((res.getCurrentResourceType() == this) && res.isTimeOut())
         	res.setTimeOut(false);
     }
-    
+
     /**
-     * Removes a resource from the available list. 
+     * Removes a resource from the available list.
      * @param res New unavailable resource.
      */
     protected void decAvailable(Resource res) {
@@ -124,9 +124,9 @@ public class ResourceType extends SimulationObject implements IResourceType {
      * Notifies the activity managers that a resource is available for this resource type
      */
     public void notifyResource() {
-    	manager.notifyResource();    	
+    	manager.notifyResource();
     }
-    
+
     /**
      * Returns the activity manager this resource type belongs to.
      * @return Value of property manager.
@@ -134,7 +134,7 @@ public class ResourceType extends SimulationObject implements IResourceType {
     public ActivityManager getManager() {
         return manager;
     }
-    
+
     /**
      * Sets the activity manager this resource type belongs to. It also
      * adds this resource type to the manager.
@@ -151,47 +151,47 @@ public class ResourceType extends SimulationObject implements IResourceType {
 	 */
 	public int getAvailableResources() {
 		int counter = 0;
-		
+
 		for(Resource res: availableResourceList.getResources())
 			if (res.isAvailable(this))
 				counter++;
 		return counter;
 	}
-    
+
 	// User methods
-	
+
 	/**
 	 * Allows a user for adding customized code before a resource is activated for this type. If this
 	 * method returns a value higher than 0, the activation of the resource is delayed such returned value.
-	 * @return The delay in activating the resource. No delay is applied if 0 
+	 * @return The delay in activating the resource. No delay is applied if 0
 	 */
 	public long beforeRoleOn() {
 		return 0;
 	}
-	
+
 	/**
-	 * Allows a user for adding customized code after a resource is activated for this type. 
+	 * Allows a user for adding customized code after a resource is activated for this type.
 	 */
-	public void afterRoleOn() {	
+	public void afterRoleOn() {
 	}
-	
+
 	/**
 	 * Allows a user for adding customized code before a resource is deactivated for this type. If this
 	 * method returns a value higher than 0, the deactivation of the resource is delayed such returned value.
-	 * @return The delay in deactivating the resource. No delay is applied if 0 
+	 * @return The delay in deactivating the resource. No delay is applied if 0
 	 */
 	public long beforeRoleOff() {
 		return 0;
 	}
-	
+
 	/**
-	 * Allows a user for adding customized code after a resource is deactivated for this type. 
+	 * Allows a user for adding customized code after a resource is deactivated for this type.
 	 */
 	public void afterRoleOff() {
 	}
 
 	// End of user methods
-	
+
 	/**
 	 * Adds n resources of type {@link ResourceType}. This method is useful when you simply want to create a
 	 * set of resources that are available all the time as {@link ResourceType}.
@@ -209,7 +209,7 @@ public class ResourceType extends SimulationObject implements IResourceType {
 
 	/**
 	 * Adds n resources of type {@link ResourceType}. This method is useful when you simply want to create a
-	 * set of resources that are available all the time as {@link ResourceType}. It also initializes the location of the 
+	 * set of resources that are available all the time as {@link ResourceType}. It also initializes the location of the
 	 * resources
 	 * @param n Number of generic resources to create.
 	 * @param size Size of the created resources
@@ -233,5 +233,5 @@ public class ResourceType extends SimulationObject implements IResourceType {
 		return availableResourceList;
 	}
 
-	
+
 }

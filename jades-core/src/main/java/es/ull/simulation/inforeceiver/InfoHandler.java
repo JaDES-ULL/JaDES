@@ -14,19 +14,19 @@ public class InfoHandler implements IHandlesInformation {
 	 * A map between the type of information and the listeners that are interested in receiving it.
 	 */
 	private final HashMap<Class<? extends IPieceOfInformation>, ArrayList<IListener> > registeredListeners;
-	
+
 	/**
 	 * Creates a handler for the simulation information.
 	 */
 	public InfoHandler() {
 		registeredListeners = new HashMap<Class<? extends IPieceOfInformation>, ArrayList<IListener>>();
 	}
-	
+
 	/**
 	 * Registers a listener to receive information of a certain type.
 	 * @param listener The listener that wants to receive the information.
 	 */
-	public void registerListener(IListener listener) {	
+	public void registerListener(IListener listener) {
 		for (Class<? extends IPieceOfInformation> cl: listener.getTargetInformation()) {
 			ArrayList<IListener> list;
 			if (!registeredListeners.containsKey(cl)) {
@@ -72,5 +72,5 @@ public class InfoHandler implements IHandlesInformation {
 				listener.infoEmited(info);
 		}
 	}
-	
+
 }

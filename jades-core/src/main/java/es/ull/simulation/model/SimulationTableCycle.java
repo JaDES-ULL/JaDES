@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -15,10 +15,10 @@ import es.ull.simulation.utils.cycle.TableCycle;
 public class SimulationTableCycle implements ISimulationCycle {
 	/** Inner {@link es.ull.simulation.utils.cycle.TableCycle TableCycle} */
 	private final TableCycle cycle;
-	
+
 	/**
 	 * Creates a new cycle which activates according to the timestamps indicated.
-	 * @param unit ParallelSimulationEngine time unit 
+	 * @param unit ParallelSimulationEngine time unit
 	 * @param timestamps Set of timestamps to indicate the activations of this cycle
 	 */
 	public SimulationTableCycle(TimeUnit unit, TimeStamp[] timestamps) {
@@ -27,7 +27,7 @@ public class SimulationTableCycle implements ISimulationCycle {
 
 	/**
 	 * Creates a new cycle containing a subcycle which activates according to the timestamps indicated.
-	 * @param unit ParallelSimulationEngine time unit 
+	 * @param unit ParallelSimulationEngine time unit
 	 * @param timestamps Set of timestamps to indicate the activations of this cycle
 	 * @param subCycle Subcycle contained in this cycle
 	 */

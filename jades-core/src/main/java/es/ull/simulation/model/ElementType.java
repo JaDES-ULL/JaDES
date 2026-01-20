@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -20,10 +20,10 @@ public class ElementType extends VariableStoreSimulationObject implements IEleme
     private final String description;
     /** The initial values for the variables of the elements */
     protected final TreeMap<String, Object> elementValues = new TreeMap<String, Object>();
-    
+
 	/**
 	 * Creates a new element type with the highest priority.
-	 * @param model The simulation model this element type belongs to 
+	 * @param model The simulation model this element type belongs to
 	 * @param description A short text describing this element type.
 	 */
 	public ElementType(final Simulation model, final String description) {
@@ -32,7 +32,7 @@ public class ElementType extends VariableStoreSimulationObject implements IEleme
 
 	/**
 	 * Creates a new element type.
-	 * @param model The simulation model this element type belongs to 
+	 * @param model The simulation model this element type belongs to
 	 * @param description A short text describing this element type.
 	 * @param priority The priority to set.
 	 */
@@ -60,7 +60,7 @@ public class ElementType extends VariableStoreSimulationObject implements IEleme
 	public void setPriority(final int priority) {
 		this.priority = priority;
 	}
-	
+
 	/**
 	 * Adds a variable which will be associated to every element of this type. Once instantiated,
 	 * each element has its own variable.
@@ -70,7 +70,7 @@ public class ElementType extends VariableStoreSimulationObject implements IEleme
 	public void addElementVar(final String name, final Object value) {
 		elementValues.put(name, value);
 	}
-	
+
 	public TreeMap<String,  Object> getElementValues() {
 		return elementValues;
 	}

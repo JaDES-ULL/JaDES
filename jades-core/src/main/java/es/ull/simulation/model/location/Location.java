@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model.location;
 
@@ -24,9 +24,9 @@ import es.ull.simulation.model.location.IMovable;
  */
 public abstract class Location implements ILocation, IIdentifiable, Comparable<Location> {
 	/** An array of the locations that this location is linked to */
-	private final ArrayList<Location> linkedTo; 
+	private final ArrayList<Location> linkedTo;
 	/** An array of the locations that this location is linked from */
-	private final ArrayList<Location> linkedFrom; 
+	private final ArrayList<Location> linkedFrom;
 	/** Total capacity of the location */
 	private final int capacity;
 	/** How much of the capacity is currently occupied */
@@ -36,7 +36,7 @@ public abstract class Location implements ILocation, IIdentifiable, Comparable<L
 	// TODO: Change by a customizable queue
 	/** A simple FIFO queue for entities waiting to enter into the location */
 	private final List<IMovable> entitiesWaiting;
-	/** The time that it takes to exit (or go through) the location */ 
+	/** The time that it takes to exit (or go through) the location */
 	private final AbstractTimeFunction delayAtExit;
 	/** An internal unique identifier */
 	private final int id;
@@ -134,11 +134,11 @@ public abstract class Location implements ILocation, IIdentifiable, Comparable<L
 	public boolean fitsIn(IMovable entity) {
 		return getAvailableCapacity() >= entity.getCapacity();
 	}
-	
+
 	/**
 	 * Connects this location to another
 	 * @param location Another location
-	 * @return The other location (useful for concatenate calls to this method) 
+	 * @return The other location (useful for concatenate calls to this method)
 	 */
 	public Location linkTo(Location location) {
 		linkedTo.add(location);
@@ -186,7 +186,7 @@ public abstract class Location implements ILocation, IIdentifiable, Comparable<L
 	public List<IMovable> getEntitiesIn() {
 		return entitiesIn;
 	}
-	
+
 	/**
 	 * Puts the entity into a waiting queue until the location has enough available capacity
 	 * @param entity Entity currently trying to arrive at the location
@@ -194,7 +194,7 @@ public abstract class Location implements ILocation, IIdentifiable, Comparable<L
 	public void waitFor(IMovable entity) {
 		entitiesWaiting.add(entity);
 	}
-	
+
 	/**
 	 * Moves an entity into the location and updates the available capacity
 	 * @param entity Entity moving into the location
@@ -208,7 +208,7 @@ public abstract class Location implements ILocation, IIdentifiable, Comparable<L
 			((Location) currentLocation).leave(entity);
 		}
 	}
-	
+
 	/**
 	 * Moves an entity out of the location and checks whether there are waiting entities. If there is any that fits into the available capacity,
 	 * the entity moves into the location.
@@ -248,7 +248,7 @@ public abstract class Location implements ILocation, IIdentifiable, Comparable<L
 			return false;
 		return ((Location)obj).id == id;
 	}
-	
+
 	@Override
 	public String toString() {
 		return description;

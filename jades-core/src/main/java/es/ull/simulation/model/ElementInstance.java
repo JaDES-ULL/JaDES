@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -32,14 +32,14 @@ import es.ull.simulation.utils.Prioritizable;
  * To invoke, use: {@link #getSubsequentElementInstance(boolean, IFlow, WorkToken)}</li>
  * </ol><p>
  *  An instance has an associated token, which can be true or false. A false token is used
- *  only for synchronization purposes and doesn't execute task flows. 
+ *  only for synchronization purposes and doesn't execute task flows.
  * @author Ivan Castilla Rodriguez
  *
  */
 public class ElementInstance implements IElementInstance, Comparable<ElementInstance>, Prioritizable {
 	/** A string that identifies the instance */
-	private final String description; 
-    /** Element which carries out this IFlow. */    
+	private final String description;
+    /** Element which carries out this IFlow. */
     private final Element elem;
     /** Manages the hierarchical structure (Composite pattern) */
     private final ElementInstanceHierarchy hierarchy;
@@ -51,16 +51,16 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 	private final ElementInstanceResources resourceManager;
 	/** The engine with the specific functioning of the element instance */
 	final private ElementInstanceEngine engine;
-	
-    /** 
-     * Creates a new element instance. The constructor is private since it must be invoked from the 
+
+    /**
+     * Creates a new element instance. The constructor is private since it must be invoked from the
      * <code>getInstance...</code> methods.
-     * @param token An object containing the state of the thread  
+     * @param token An object containing the state of the thread
      * @param elem Element owner of this thread
      * @param initialFlow The first IFlow to be executed by this thread
      * @param parent The parent thread, if this thread is included within a structured IFlow
      */
-    private ElementInstance(final WorkToken token, final Element elem, 
+    private ElementInstance(final WorkToken token, final Element elem,
 							final IFlow initialFlow, final ElementInstance parent) {
     	this.token = token;
         this.elem = elem;
@@ -83,7 +83,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 
 	/**
 	 * Gets the hierarchy manager for this element instance.
-	 * 
+	 *
 	 * @return the hierarchy manager
 	 */
 	public ElementInstanceHierarchy getHierarchy() {
@@ -92,7 +92,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 
 	/**
 	 * Gets the flow manager for this element instance.
-	 * 
+	 *
 	 * @return the flow manager
 	 */
 	public ElementInstanceFlow getFlowManager() {
@@ -101,7 +101,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 
 	/**
 	 * Gets the resource manager for this element instance.
-	 * 
+	 *
 	 * @return the resource manager
 	 */
 	public ElementInstanceResources getResourceManager() {
@@ -112,7 +112,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 	public int getIdentifier() {
 		return engine.getIdentifier();
 	}
-	
+
 	/**
      * Returns the priority of the element owner of this IFlow
      * @return The priority of the associated element.
@@ -123,7 +123,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
     }
 
 	/**
-	 * Sets the IFlow currently executed by this FlowExecutor 
+	 * Sets the IFlow currently executed by this FlowExecutor
 	 * @param f The IFlow to be performed
 	 */
 	public void setCurrentFlow(final IFlow f) {
@@ -176,7 +176,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
     public void notifyEnd() {
     	hierarchy.notifyEndToParent();
     }
-    
+
     /**
      * Adds a thread to the list of descendants.
      * @param wThread Descendant thread
@@ -204,7 +204,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 
 	/**
 	 * Changes the state of this thread to not valid and restarts the path of visited flows.
-	 * @param startPoint The initial IFlow to control infinite loops with not valid threads. 
+	 * @param startPoint The initial IFlow to control infinite loops with not valid threads.
 	 */
 	public void cancel(final IFlow startPoint) {
 		token.reset();
@@ -234,7 +234,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
     public Element getElement() {
         return elem;
     }
-    
+
     /**
      * Gets the parent element thread.
      * @return The parent element thread.
@@ -253,20 +253,20 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 	}
 
 	/**
-	 * Returns a new instance of an element which carries out the inner subflow of a structured IFlow. 
-	 * The current instance is the parent of the newly created child instance. 
+	 * Returns a new instance of an element which carries out the inner subflow of a structured IFlow.
+	 * The current instance is the parent of the newly created child instance.
 	 * @return A new instance of an element created to carry out the inner subflow of a structured IFlow
 	 */
 	public ElementInstance getDescendantElementInstance(final IInitializerFlow newFlow) {
-		assert isExecutable() : "Invalid parent to create descendant element instance"; 
+		assert isExecutable() : "Invalid parent to create descendant element instance";
 		return new ElementInstance(new WorkToken(true), elem, newFlow, this);
 	}
 
 	/**
 	 * Returns a new instance of an element which carries out a new IFlow after a split IFlow
 	 * @param executable Indicates if the instance to be created has to be valid or not
-	 * @param newFlow The IFlow associated to the new instance 
-	 * @param token The token to be cloned in case the current instance is not valid and the token is also not valid. 
+	 * @param newFlow The IFlow associated to the new instance
+	 * @param token The token to be cloned in case the current instance is not valid and the token is also not valid.
 	 * @return A new instance of an element created to carry out a new IFlow after a split IFlow
 	 */
 	public ElementInstance getSubsequentElementInstance(final boolean executable, final IFlow newFlow,
@@ -297,7 +297,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 	public WorkToken getToken() {
 		return token;
 	}
-	
+
 	/**
 	 * Returns true if the specified IFlow was already visited from this thread.
 	 * @param IFlow IFlow to be checked.
@@ -342,7 +342,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
     /**
      * Catch the resources needed for each resource type to carry out an activity.
 	 * @param solution Tentative solution with booked resources
-     * @return The minimum availability timestamp of the taken resources 
+     * @return The minimum availability timestamp of the taken resources
      */
 	public long catchResources(final ArrayDeque<Resource> solution) {
 		final RequestResourcesFlow reqFlow = (RequestResourcesFlow)getCurrentFlow();
@@ -357,7 +357,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
     	final long ts = elem.getTs();
 		elem.getSimulation().notifyInfo(new ElementActionInfo(elem.getSimulation(), this, elem, reqFlow,
 				getExecutionWG(), solution, ElementActionInfo.Type.ACQ, ts));
-		elem.trace("Resources acquired\t" + this + "\t" + reqFlow.getDescription());			
+		elem.trace("Resources acquired\t" + this + "\t" + reqFlow.getDescription());
 		reqFlow.afterAcquire(this);
 		double remaining = resourceManager.getRemainingTask();
 		long delay = Math.round(getExecutionWG().getDurationSample(elem) * remaining);
@@ -371,7 +371,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 			else {
 				elem.getSimulation().notifyInfo(new ElementActionInfo(elem.getSimulation(), this, elem, reqFlow,
 						getExecutionWG(), null, ElementActionInfo.Type.RESACT, ts));
-				elem.trace("Continues\t" + this + "\t" + reqFlow.getDescription());			
+				elem.trace("Continues\t" + this + "\t" + reqFlow.getDescription());
 			}
 			// The required time for finishing the activity is reduced (useful only for interruptible activities)
 			if (reqFlow.partOfInterruptible() && (delay - auxTs > 0.0)) {
@@ -388,11 +388,11 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 		}
 		return delay;
 	}
-	
+
 	public void startDelay(final long delay) {
 		elem.addFinishEvent(delay + elem.getTs(), (ITaskFlow)getCurrentFlow(), this);
 	}
-	
+
 	/**
 	 * Releases the previously seized resources
 	 * @return The released resources
@@ -400,7 +400,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 	public ArrayDeque<Resource> releaseCaughtResources() {
         final TreeSet<ActivityManager> amList = new TreeSet<ActivityManager>();
 		final ReleaseResourcesFlow relFlow = (ReleaseResourcesFlow)getCurrentFlow();
-		
+
 		final ArrayDeque<Resource> resources = elem.releaseResources(relFlow, this);
         // Generate unavailability periods.
         for (Resource res : resources) {
@@ -426,7 +426,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 		}
         return resources;
 	}
-   
+
 	/**
 	 * Sends the information and executes the tasks required when the delay of a request flow finishes.
 	 * @param f The request flow that has been delayed
@@ -457,7 +457,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
     public boolean wasInterrupted(final ActivityFlow f) {
 		double remaining = resourceManager.getRemainingTask();
 		// It was an interruptible activity and it was interrupted
-		return (remaining > 0.0);    	
+		return (remaining > 0.0);
     }
 
 	@Override
@@ -470,7 +470,7 @@ public class ElementInstance implements IElementInstance, Comparable<ElementInst
 			return 1;
 		return 0;
 	}
-    
+
 	@Override
 	public String toString() {
 		return description;

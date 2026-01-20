@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -9,7 +9,7 @@ import es.ull.simulation.model.engine.SimulationEngine;
 import es.ull.simulation.model.flow.ActivityFlow;
 
 /**
- * A set of pairs &lt{@link ResourceType}, {@link Integer}&gt which defines how many resources 
+ * A set of pairs &lt{@link ResourceType}, {@link Integer}&gt which defines how many resources
  * from each type are required to do something (typically an {@link ActivityFlow}).
  * Contains several methods to help the simulation find a suitable solution with the currently available
  * resources.
@@ -20,7 +20,7 @@ public class WorkGroup extends SimulationObject implements IWorkGroup {
 	protected final ResourceType[] resourceTypes;
 	/** Amount of resource types required to do something */
 	protected final int[] needed;
-		
+
 	/**
 	 * Creates an empty work group
 	 * @param simul The simulation this work group belongs to
@@ -64,11 +64,11 @@ public class WorkGroup extends SimulationObject implements IWorkGroup {
     public int size() {
         return resourceTypes.length;
     }
-    
+
     /**
      * Returns the {@link ResourceType resource type} from the position ind of the table.
      * @param ind Index of the entry
-     * @return The resource type from the position ind. 
+     * @return The resource type from the position ind.
      */
     public ResourceType getResourceType(final int ind) {
         return resourceTypes[ind];
@@ -77,7 +77,7 @@ public class WorkGroup extends SimulationObject implements IWorkGroup {
     /**
      * Returns the needed amount of resources from the position ind of the table.
      * @param ind Index of the entry
-     * @return The needed amount of resources from the position ind. 
+     * @return The needed amount of resources from the position ind.
      */
     protected int getNeeded(final int ind) {
         return needed[ind];
@@ -88,9 +88,9 @@ public class WorkGroup extends SimulationObject implements IWorkGroup {
      * @return an array with the needs of resources for each {@link ResourceType resource type}
      */
     public int[] getNeeded() {
-    	return needed;    	
+    	return needed;
     }
-    
+
     /**
      * Returns an array with the {@link ResourceType resource types} required by this work group
      * @return an array with the {@link ResourceType resource types} required by this work group
@@ -98,9 +98,9 @@ public class WorkGroup extends SimulationObject implements IWorkGroup {
     public ResourceType[] getResourceTypes() {
     	return resourceTypes;
     }
-    
+
     /**
-     * Checks if a valid solution can be reached from the current situation. This method 
+     * Checks if a valid solution can be reached from the current situation. This method
      * is used to bound the search tree.
      * @param pos Initial position.
      * @param nec Resources needed.
@@ -117,16 +117,16 @@ public class WorkGroup extends SimulationObject implements IWorkGroup {
         }
         return true;
     }
-    
+
     /**
-     * Returns the position [{@link ResourceType}, {@link Resource}] of the next valid 
+     * Returns the position [{@link ResourceType}, {@link Resource}] of the next valid
      * solution. The initial position <code>pos</code> is supposed to be correct.
 	 * @param solution Tentative solution with booked resources
      * @param pos Initial position [ResourceType, Resource].
      * @param nec Resources needed.
      * @param ei The element instance trying to seize the resources
      * @return [ResourceType, Resource] where the next valid solution can be found; or
-     * <code>null</code> if no solution was found. 
+     * <code>null</code> if no solution was found.
      */
     private int []searchNext(final ArrayDeque<Resource> solution, final int[] pos, final int []nec,
                              final ElementInstance ei) {
@@ -155,7 +155,7 @@ public class WorkGroup extends SimulationObject implements IWorkGroup {
     /**
      * Makes a depth first search looking for a solution.
 	 * @param solution Tentative solution with booked resources
-     * @param pos Position to look for a solution [ResourceType, Resource] 
+     * @param pos Position to look for a solution [ResourceType, Resource]
      * @param ned Resources needed
      * @param ei The element instance trying to seize the resources
      * @return True if a valid solution exists. False in other case.
@@ -180,7 +180,7 @@ public class WorkGroup extends SimulationObject implements IWorkGroup {
         res.removeFromSolution(solution, ei);
         ned[pos[0]]++;
         // ... and the search continues
-        return findSolution(solution, pos, ned, ei);        
+        return findSolution(solution, pos, ned, ei);
     }
 
     @Override
@@ -190,7 +190,7 @@ public class WorkGroup extends SimulationObject implements IWorkGroup {
 			str.append(" [" + resourceTypes[i] + "," + needed[i] + "]");
 		return str.toString();
 	}
-    
+
 	@Override
 	protected void assignSimulation(final SimulationEngine engine) {
 		// Nothing to do

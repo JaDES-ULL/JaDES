@@ -42,10 +42,10 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	protected final TimeUnit unit;
 	/** A unique simulation identifier */
 	protected final int id;
-	
+
 	/** Component registry - DIP: depends on abstraction */
 	private final ISimulationRegistry registry;
-	
+
 	/** ID generator - DIP: depends on abstraction */
 	private final IIdGenerator idGenerator;
 
@@ -86,7 +86,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	public Simulation(final int id, final String description, final TimeUnit unit) {
 		this(id, description, unit, new SimulationRegistry(), new SequentialIdGenerator());
 	}
-	
+
 	/**
 	 * Creates a new instance of a simulation with custom registry and ID generator (DIP constructor)
 	 *
@@ -96,7 +96,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param registry Component registry implementation
 	 * @param idGenerator ID generator implementation
 	 */
-	public Simulation(final int id, final String description, final TimeUnit unit, 
+	public Simulation(final int id, final String description, final TimeUnit unit,
 			final ISimulationRegistry registry, final IIdGenerator idGenerator) {
 		this.id = id;
 		this.description = description;

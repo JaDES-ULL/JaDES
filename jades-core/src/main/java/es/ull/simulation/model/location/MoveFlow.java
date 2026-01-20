@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model.location;
 
@@ -15,7 +15,7 @@ import es.ull.simulation.model.flow.ITaskFlow;
 
 /**
  * A workflow step that allows {@link Element elements} to move from one {@link Location} to another.
- * The route IFlow uses a {@link IRouter} to define the path of the element, ensures that the destination is reachable, and moves the 
+ * The route IFlow uses a {@link IRouter} to define the path of the element, ensures that the destination is reachable, and moves the
  * element from one location to another until reaching the destination.
  * @author Iván Castilla Rodríguez
  *
@@ -23,7 +23,7 @@ import es.ull.simulation.model.flow.ITaskFlow;
 public class MoveFlow extends AbstractSingleSuccessorFlow implements ITaskFlow, IActionFlow {
     /** A brief description of the route */
     private final String description;
-    /** Final destination of the element */ 
+    /** Final destination of the element */
     private final Location destination;
     /** Instance that returns the path for the element */
     private final IRouter router;
@@ -47,7 +47,7 @@ public class MoveFlow extends AbstractSingleSuccessorFlow implements ITaskFlow, 
 	public String getDescription() {
 		return description;
 	}
-    
+
 	@Override
 	public void addPredecessor(final IFlow predecessor) {
 	}
@@ -96,7 +96,7 @@ public class MoveFlow extends AbstractSingleSuccessorFlow implements ITaskFlow, 
     		error("Destination unreachable. Current: " + elem.getLocation() + "; destination: " + destination);
 		}
 		else if (IRouter.isConditionalWaitLocation(nextLoc)) {
-			simul.notifyInfo(new EntityLocationInfo(simul, elem, elem.getLocation(), EntityLocationInfo.Type.COND_WAIT, getTs()));			
+			simul.notifyInfo(new EntityLocationInfo(simul, elem, elem.getLocation(), EntityLocationInfo.Type.COND_WAIT, getTs()));
 		}
 		else {
 			final Location nextLocation = (Location) nextLoc;
@@ -114,9 +114,9 @@ public class MoveFlow extends AbstractSingleSuccessorFlow implements ITaskFlow, 
 				}
 			}
 		}
-				
+
 	}
-	
+
 	@Override
 	public void finish(final ElementInstance ei) {
 		afterFinalize(ei);
@@ -125,7 +125,7 @@ public class MoveFlow extends AbstractSingleSuccessorFlow implements ITaskFlow, 
 
 
 	/**
-	 * Returns the final destination 
+	 * Returns the final destination
 	 * @return the final destination
 	 */
 	public Location getDestination() {
