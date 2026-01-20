@@ -9,7 +9,6 @@ import java.util.Collection;
 
 import es.ull.simulation.info.EntityLocationInfo;
 import es.ull.simulation.info.ResourceInfo;
-import es.ull.simulation.model.engine.ResourceEngine;
 import es.ull.simulation.model.engine.SimulationEngine;
 import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.IMovable;
@@ -23,42 +22,22 @@ import es.ull.simulation.utils.cycle.DiscreteCycleIterator;
  * Timetable entries can overlap in time, thus allowing the resource for being potentially available for
  * different resource types simultaneously.
  * A resource finishes its execution when it has no longer valid timetable entries.
+ * 
+ * <p>Following the Dependency Inversion Principle, Resource depends on the {@link IResourceEngine} interface
+ * rather than the concrete {@link es.ull.simulation.model.engine.ResourceEngine} implementation.
+ * This improves testability and reduces coupling.</p>
+ * 
  * @author Iván Castilla Rodríguez
- *
  */
 public class Resource extends VariableStoreSimulationObject implements IDescribable, IEventSource, IMovable {
     /** A brief description of the resource */
     protected final String description;
 	/** Manages location and movement for this resource */
 	private final ResourceLocation resourceLocation;
-	/** The current location of the resource - DEPRECATED: use resourceLocation */
-	@Deprecated
-	private Location currentLocation;
-	/** The initial location of the resource - DEPRECATED: use resourceLocation */
-	@Deprecated
-	private Location initLocation;
-	/** The size of the resource - DEPRECATED: use resourceLocation */
-	@Deprecated
-	private final int size;
-	/** The current element instance that drives the movement of the resource - DEPRECATED: use resourceLocation */
-	@Deprecated
-	private ElementInstance movingInstance = null;
 	/** Manages availability, timetables, and resource types for this resource */
 	private final ResourceAvailability resourceAvailability;
-	/** Timetable which defines the availability estructure of the resource - DEPRECATED: use resourceAvailability */
-	@Deprecated
-    protected final ArrayList<TimeTableEntry> timeTable;
-    /** Availability time table - DEPRECATED: use resourceAvailability */
-	@Deprecated
-    protected final ArrayList<TimeTableEntry> cancelPeriodTable;
-    /** If true, indicates that this resource is being used after its availability time has expired - DEPRECATED: use resourceAvailability */
-	@Deprecated
-    private boolean timeOut = false;
-    /** The resource type which this resource is being booked for - DEPRECATED: use resourceAvailability */
-	@Deprecated
-    protected ResourceType currentResourceType = null;
-    /** The engine in charge of executing specific actions */
-    private ResourceEngine engine;
+    /** The engine in charge of executing specific actions (DIP: depends on interface) */
+    private IResourceEngine engine;
 
     /**
      * Creates a resource with size 0
@@ -83,11 +62,6 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		this.resourceLocation = new ResourceLocation(this, initLocation, size);
 		// Initialize new ResourceAvailability
 		this.resourceAvailability = new ResourceAvailability(this);
-		// Keep deprecated fields for backward compatibility
-		this.size = size;
-		this.initLocation = initLocation;
-		this.timeTable = (ArrayList<TimeTableEntry>) resourceAvailability.getTimeTableEntries();
-		this.cancelPeriodTable = (ArrayList<TimeTableEntry>) resourceAvailability.getCancellationPeriodEntries();
 		model.add(this);
 	}
 
@@ -97,10 +71,12 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	}      
 	
 	/**
-	 * Returns the associated {@link IResourceEngine}
+	 * Returns the associated {@link IResourceEngine}.
+	 * Following DIP, returns the interface rather than concrete implementation.
+	 * 
 	 * @return the associated {@link IResourceEngine}
 	 */
-	public ResourceEngine getEngine() {
+	public IResourceEngine getEngine() {
 		return engine;
 	}
 
@@ -116,17 +92,12 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 
 	@Override
 	public Location getLocation() {
-		// Delegate to ResourceLocation and sync deprecated field
-		currentLocation = resourceLocation.getLocation();
-		return currentLocation;
+		return resourceLocation.getLocation();
 	}
 
 	@Override
 	public void setLocation(final Location location) {
-		// Delegate to ResourceLocation
 		resourceLocation.setLocation(location);
-		// Sync deprecated field for backward compatibility
-		currentLocation = location;
 	}
 
 	/**
@@ -151,8 +122,6 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		if (!resourceLocation.initialize()) {
 			return onDestroy(ts);
 		}
-		// Sync deprecated field for backward compatibility
-		currentLocation = resourceLocation.getLocation();
 		return new CreateResourceEvent(ts);
 	}
 
@@ -174,9 +143,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
      * @return Value of property currentResourceType.
      */
     public ResourceType getCurrentResourceType() {
-        ResourceType rt = resourceAvailability.getCurrentResourceType();
-        currentResourceType = rt; // Sync deprecated field
-        return rt;
+        return resourceAvailability.getCurrentResourceType();
     }
 
     /**
@@ -186,7 +153,6 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
      */
     public void setCurrentResourceType(final ResourceType rt) {
     	resourceAvailability.setCurrentResourceType(rt);
-    	currentResourceType = rt; // Sync deprecated field
     }
     
     /**
@@ -203,9 +169,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
      * <code>false</code> otherwise.
      */
     public boolean isTimeOut() {
-        boolean result = resourceAvailability.isTimeOut();
-        this.timeOut = result; // Sync deprecated field
-        return result;
+        return resourceAvailability.isTimeOut();
     }
     
     /**
@@ -215,7 +179,6 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
      */
     public void setTimeOut(final boolean timeOut) {
         resourceAvailability.setTimeOut(timeOut);
-        this.timeOut = timeOut; // Sync deprecated field
     }
     
 	/**
@@ -291,7 +254,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
      */
     public void generateCancelPeriodOffEvent(final long ts, final long duration) {
     	final CancelPeriodOffEvent aEvent = new CancelPeriodOffEvent(ts + duration, null, 0);
-        simul.addEvent(aEvent);
+        simul.scheduleEvent(aEvent);
     }
 
 	/**
@@ -308,7 +271,6 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		trace("Start route\t" + this + "\t" + destination);
     	// Delegate to ResourceLocation
     	resourceLocation.setMovingInstance(ei);
-    	movingInstance = ei; // Sync deprecated field
     	// No need to move
     	if (resourceLocation.getLocation().equals(destination)) {
     		endMove(flow, true);
@@ -319,7 +281,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	    		endMove(flow, false);
 			}
 			else {
-		    	simul.addEvent(new MoveEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this), nextLoc, destination, router));
+		    	simul.scheduleEvent(new MoveEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this), nextLoc, destination, router));
 			}
     	}
     }
@@ -339,7 +301,6 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		trace("Start transport\t" + this + "\t" + destination);
     	// Delegate to ResourceLocation
     	resourceLocation.setMovingInstance(ei);
-    	movingInstance = ei; // Sync deprecated field
     	// No need to move
     	if (resourceLocation.getLocation().equals(destination)) {
     		endTransport(flow, true);
@@ -350,7 +311,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	    		endTransport(flow, false);
 			}
 			else {
-		    	simul.addEvent(new TransportEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
+		    	simul.scheduleEvent(new TransportEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
 						nextLoc, destination, router));
 			}
     	}
@@ -369,7 +330,6 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		flow.notifyArrival(resourceLocation.getMovingInstance(), success);
     	// Clear moving instance in both locations
     	resourceLocation.setMovingInstance(null);
-    	movingInstance = null; // Sync deprecated field
     	if (success)
 			trace("Finishes route\t" + this + "\t" + flow.getDestination());
     	else
@@ -389,7 +349,6 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
     	if (success) {
 			flow.finish(resourceLocation.getMovingInstance());
     		resourceLocation.setMovingInstance(null);
-    		movingInstance = null; // Sync deprecated field
     		trace("Finishes transport\t" + this + "\t" + flow.getDestination());
     	}
     	else {
@@ -397,7 +356,6 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 			ei.cancel(flow);
 			flow.next(ei);
 	    	resourceLocation.setMovingInstance(null);
-	    	movingInstance = null; // Sync deprecated field
     		error("Destination unreachable. Current: " + resourceLocation.getLocation() + "; destination: " +
 					flow.getDestination());
     	}
@@ -405,10 +363,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 
 	@Override
 	public void notifyLocationAvailable(final Location location) {
-		// Delegate to ResourceLocation
 		resourceLocation.notifyLocationAvailable(location);
-		// Sync deprecated field
-		currentLocation = resourceLocation.getLocation();
 	}
 	
 	/**
@@ -434,7 +389,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					endMove(flow, false);
 				}
 				else {
-			    	simul.addEvent(new MoveEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
+			    	simul.scheduleEvent(new MoveEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
 							nextLoc, destination, router));
 				}
 			}			
@@ -455,7 +410,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					endTransport(flow, false);
 				}
 				else {
-			    	simul.addEvent(new TransportEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
+			    	simul.scheduleEvent(new TransportEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
 							nextLoc, destination, router));
 				}
 			}			
@@ -494,12 +449,12 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		@Override
 		public void event() {
 			simul.notifyInfo(new ResourceInfo(simul, Resource.this, null, ResourceInfo.Type.START, getTs()));
-			for (int i = 0 ; i < timeTable.size(); i++) {
-				TimeTableEntry tte = timeTable.get(i);
+			Collection<TimeTableEntry> timeTableEntries = resourceAvailability.getTimeTableEntries();
+			for (TimeTableEntry tte : timeTableEntries) {
 				if (tte.isPermanent()) {
 		            final RoleOnEvent rEvent = new RoleOnEvent(getTs(), tte.getRole(), null,
 							Long.MAX_VALUE - getTs());
-		            simul.addEvent(rEvent);
+		            simul.scheduleEvent(rEvent);
 		            engine.incValidTimeTableEntries();
 				}
 				else {
@@ -510,13 +465,13 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 			        if (nextTs != -1) {
 			            RoleOnEvent rEvent = new RoleOnEvent(nextTs, tte.getRole(), iter,
 								simul.simulationTime2Long(tte.getDuration()));
-			            simul.addEvent(rEvent);
+		            simul.scheduleEvent(rEvent);
 			            engine.incValidTimeTableEntries();
 			        }
 				}
 			}
-			for (int i = 0 ; i < cancelPeriodTable.size(); i++) {
-				final TimeTableEntry tte = cancelPeriodTable.get(i);
+			Collection<TimeTableEntry> cancelPeriodEntries = resourceAvailability.getCancellationPeriodEntries();
+			for (TimeTableEntry tte : cancelPeriodEntries) {
 				/* FIXME: Check whether it works when using a condition to end simulation:
 				 should I use simul.getEndTs() instead of Long.MAX_VALUE?*/
 		        final DiscreteCycleIterator iter = tte.getCycle().getCycle().iterator(getTs(), Long.MAX_VALUE);
@@ -524,7 +479,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		        if (nextTs != -1) {
 		            final CancelPeriodOnEvent aEvent = new CancelPeriodOnEvent(nextTs, iter,
 							simul.simulationTime2Long(tte.getDuration()));
-		            simul.addEvent(aEvent);
+		            simul.scheduleEvent(aEvent);
 		            engine.incValidTimeTableEntries();
 		        }
 			}
@@ -570,10 +525,10 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
         		engine.addRole(role, ts + duration);
         		role.afterRoleOn();
         		RoleOffEvent rEvent = new RoleOffEvent(ts + duration, role, iter, duration);
-        		simul.addEvent(rEvent);
+        		simul.scheduleEvent(rEvent);
         	} else {
         		RoleOnEvent rEvent = new RoleOnEvent(ts + waitTime, role, iter, duration);
-        		simul.addEvent(rEvent);
+        		simul.scheduleEvent(rEvent);
         	}
         }
 
@@ -623,7 +578,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
         		final long nextTs = (iter == null) ? -1 : iter.next();
         		if (nextTs != -1) {
         			RoleOnEvent rEvent = new RoleOnEvent(nextTs, role, iter, duration);
-        			simul.addEvent(rEvent);            	
+        		simul.scheduleEvent(rEvent);            	
         		}
         		else if (engine.decValidTimeTableEntries() == 0) {
         			role.afterRoleOff();
@@ -631,7 +586,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
         		}
         	} else {
         		RoleOffEvent rEvent = new RoleOffEvent(ts + waitTime, role, iter, duration);
-        		simul.addEvent(rEvent);
+        		simul.scheduleEvent(rEvent);
         	}
         }
 
@@ -673,7 +628,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					ResourceInfo.Type.CANCELON, ts));
 			engine.setNotCanceled(false);
 			CancelPeriodOffEvent aEvent = new CancelPeriodOffEvent(ts + duration, iter, duration);
-			simul.addEvent(aEvent);
+			simul.scheduleEvent(aEvent);
 		}
 
 	}
@@ -712,7 +667,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 				nextTs = iter.next();
 			if (nextTs != -1) {
 				CancelPeriodOnEvent aEvent = new CancelPeriodOnEvent(nextTs, iter, duration);
-				simul.addEvent(aEvent);            	
+				simul.scheduleEvent(aEvent);            	
 			}
 		}
 	}
@@ -775,7 +730,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					else {
 						final MoveEvent mEvent = new MoveEvent(getTs() +
 								resourceLocation.getLocation().getDelayAtExit(Resource.this), nextLoc, destination, router);
-				    	simul.addEvent(mEvent);						
+				    	simul.scheduleEvent(mEvent);						
 					}
 				}
 			}
@@ -849,7 +804,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					else {
 						final TransportEvent mEvent = new TransportEvent(getTs() +
 								resourceLocation.getLocation().getDelayAtExit(Resource.this), nextLoc, destination, router);
-				    	simul.addEvent(mEvent);						
+				    	simul.scheduleEvent(mEvent);						
 					}
 				}
 			}

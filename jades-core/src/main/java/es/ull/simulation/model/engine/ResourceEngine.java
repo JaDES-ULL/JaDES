@@ -8,6 +8,7 @@ import es.ull.simulation.info.ResourceUsageInfo;
 import es.ull.simulation.model.ActivityManager;
 import es.ull.simulation.model.Element;
 import es.ull.simulation.model.ElementInstance;
+import es.ull.simulation.model.IResourceEngine;
 import es.ull.simulation.model.Resource;
 import es.ull.simulation.model.ResourceType;
 import es.ull.simulation.model.flow.IResourceHandlerFlow;
@@ -17,9 +18,10 @@ import es.ull.simulation.model.flow.IResourceHandlerFlow;
  * becomes unavailable at other simulation time. The availability of a resource is controlled
  * by means of timetable entries, which define a resource type and an availability cycle.
  * A resource finishes its execution when it has no longer valid timetable entries.
+ * 
  * @author Carlos Martín Galán
  */
-public class ResourceEngine extends AbstractEngineObject {
+public class ResourceEngine extends AbstractEngineObject implements IResourceEngine {
     /** If true, indicates that this resource is being used after its availability time has expired */
     private boolean timeOut = false;
     /** List of currently active roles and the timestamp which marks the end of their availibity time. */
@@ -208,7 +210,7 @@ public class ResourceEngine extends AbstractEngineObject {
 	}
 	
     public void notifyEnd() {
-        simul.addEvent(modelRes.onDestroy(simul.getTs()));
+        model.scheduleEvent(modelRes.onDestroy(model.getCurrentTimestamp()));
     }
     
 
