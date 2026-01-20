@@ -53,6 +53,7 @@
     <!-- Plugin versions -->
     <maven.surefire.version>3.5.2</maven.surefire.version>
     <maven.compiler.version>3.13.0</maven.compiler.version>
+    <mockito.version>5.14.2</mockito.version>
 
     <!-- SonarCloud -->
     <sonar.organization>jades</sonar.organization>
@@ -133,6 +134,20 @@
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
         <version>${junit.jupiter.version}</version>
+        <scope>test</scope>
+      </dependency>
+      
+      <!-- Tests: Mockito -->
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
+        <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
