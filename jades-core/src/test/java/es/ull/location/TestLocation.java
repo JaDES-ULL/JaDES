@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.location;
 
@@ -33,7 +33,7 @@ import es.ull.simulation.model.location.IRouter;
 public class TestLocation extends BaseExperiment {
 	private static final long ENDTS = 100;
 	private static final int NELEM = 3;
-	private static final int ELEMSIZE = 1;	
+	private static final int ELEMSIZE = 1;
 	private static final int NPATHS = 3;
 	private static final long DELAY_HOME = 5;
 	private static final long DELAY_PATH = 10;
@@ -48,7 +48,7 @@ public class TestLocation extends BaseExperiment {
 		final private Node home;
 		final private Node destination;
 		final private Path[] paths;
-		
+
 		public MyRouter() {
 			home = NOSIZE ? new Node("Home",
 					TimeFunctionFactory.getInstance("ConstantVariate", DELAY_HOME)) :
@@ -72,8 +72,8 @@ public class TestLocation extends BaseExperiment {
 			if (!UNREACHABLE)
 				paths[NPATHS - 1].linkTo(destination);
 		}
-		
-		
+
+
 		/**
 		 * @return the home
 		 */
@@ -95,13 +95,13 @@ public class TestLocation extends BaseExperiment {
 				return links.get(0);
 			return IRouter.UNREACHABLE_LOCATION;
 		}
-		
+
 	}
 
 	class SimulLocation extends Simulation {
 		public SimulLocation(int id) {
 			super(id, "Simulating locations " + id);
-			final MyRouter IRouter = new MyRouter(); 
+			final MyRouter IRouter = new MyRouter();
 			final MoveFlow initFlow = new MoveFlow(this, "From home to destination",
 					IRouter.getDestination(), IRouter);
 			final ElementType et = new ElementType(this, "Car");
@@ -109,7 +109,7 @@ public class TestLocation extends BaseExperiment {
 					new SimulationPeriodicCycle(getTimeUnit(), 0L, new SimulationTimeFunction(
 							getTimeUnit(), "ConstantVariate", getEndTs()), 1));
 		}
-		
+
 	}
 
 	class LocationListener extends BasicListener {
@@ -124,7 +124,7 @@ public class TestLocation extends BaseExperiment {
 			final EntityLocationInfo eInfo = (EntityLocationInfo)info;
 			System.out.println(eInfo);
 		}
-		
+
 	}
 
 		@Override
