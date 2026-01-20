@@ -11,6 +11,8 @@ import es.ull.simulation.functions.AbstractTimeFunction;
 import es.ull.simulation.functions.TimeFunctionFactory;
 import es.ull.simulation.model.IIdentifiable;
 import es.ull.simulation.model.SimulationObject;
+import es.ull.simulation.model.location.ILocation;
+import es.ull.simulation.model.location.IMovable;
 
 /**
  * A physical place where one or more entities can be at any time. Locations have a capacity, that determines how many entities fit in.
@@ -20,7 +22,7 @@ import es.ull.simulation.model.SimulationObject;
  * @author Iván Castilla Rodríguez
  *
  */
-public abstract class Location implements ILocated, IIdentifiable, Comparable<Location> {
+public abstract class Location implements ILocation, IIdentifiable, Comparable<Location> {
 	/** An array of the locations that this location is linked to */
 	private final ArrayList<Location> linkedTo; 
 	/** An array of the locations that this location is linked from */
@@ -111,6 +113,11 @@ public abstract class Location implements ILocated, IIdentifiable, Comparable<Lo
 		return capacity;
 	}
 
+	@Override
+	public String getDescription() {
+		return description;
+	}
+
 	/**
 	 * Returns the available capacity left in the location
 	 * @return the available capacity left in the location
@@ -195,10 +202,10 @@ public abstract class Location implements ILocated, IIdentifiable, Comparable<Lo
 	public void enter(IMovable entity) {
 		occupied += entity.getCapacity();
 		entitiesIn.add(entity);
-		final Location currentLocation = entity.getLocation();
+		final ILocation currentLocation = entity.getLocation();
 		entity.setLocation(this);
 		if (currentLocation != null) {
-			currentLocation.leave(entity);
+			((Location) currentLocation).leave(entity);
 		}
 	}
 	

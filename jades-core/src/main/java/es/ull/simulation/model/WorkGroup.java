@@ -15,7 +15,7 @@ import es.ull.simulation.model.flow.ActivityFlow;
  * resources.
  * @author Iván Castilla Rodríguez
  */
-public class WorkGroup extends SimulationObject implements IDescribable {
+public class WorkGroup extends SimulationObject implements IWorkGroup {
 	/** List of resource types required to do something */
 	protected final ResourceType[] resourceTypes;
 	/** Amount of resource types required to do something */

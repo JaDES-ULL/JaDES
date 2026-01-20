@@ -14,7 +14,7 @@ import es.ull.simulation.model.flow.RequestResourcesFlow;
  * finishes, the <code>signalSemaphore()</code> method must be invoked.  
  * @author Iván Castilla Rodríguez
  */
-public class ActivityManager extends SimulationObject implements IDescribable {
+public class ActivityManager extends SimulationObject implements IActivityManager {
     /** Static counter for assigning each new id */
 	private static int nextid = 0;
 	/** A prioritized table of activities */

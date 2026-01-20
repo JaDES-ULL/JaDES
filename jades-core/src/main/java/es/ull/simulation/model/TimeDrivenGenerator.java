@@ -5,6 +5,7 @@ package es.ull.simulation.model;
 
 import es.ull.simulation.functions.AbstractTimeFunction;
 import es.ull.simulation.utils.cycle.DiscreteCycleIterator;
+import es.ull.simulation.utils.cycle.Cycle;
 
 /**
  * @author Iván Castilla Rodríguez
@@ -58,7 +59,7 @@ public abstract class TimeDrivenGenerator<INF extends Generator.GenerationInfo>
     
 	@Override
 	public DiscreteEvent onCreate(final long ts) {
-		cycleIter = cycle.getCycle().iterator(simul.getStartTs(), Long.MAX_VALUE);
+		cycleIter = ((Cycle) cycle.getCycle()).iterator(simul.getStartTs(), Long.MAX_VALUE);
     	final long newTs = nextEvent();
     	if (newTs == -1)
             return onDestroy(ts);

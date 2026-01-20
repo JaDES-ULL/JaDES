@@ -6,7 +6,7 @@ package es.ull.simulation.model.flow;
 import java.util.Set;
 
 import es.ull.simulation.model.ElementInstance;
-import es.ull.simulation.model.IIdentifiable;
+import es.ull.simulation.model.flow.IFlowDescriptor;
 
 /**
  * The process an element has to carry out.<p>
@@ -22,7 +22,7 @@ import es.ull.simulation.model.IIdentifiable;
  * @author Iván Castilla Rodríguez
  *
  */
-public interface IFlow extends IIdentifiable {
+public interface IFlow extends IFlowDescriptor {
 	/**
 	 * Adds a IFlow's successor. This method must invoke <code>successor.addPredecessor</code>
 	 * to build the graph properly. 

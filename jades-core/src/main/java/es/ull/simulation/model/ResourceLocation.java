@@ -1,6 +1,7 @@
 package es.ull.simulation.model;
 
 import es.ull.simulation.info.EntityLocationInfo;
+import es.ull.simulation.model.location.ILocation;
 import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.IMovable;
 
@@ -42,23 +43,24 @@ public class ResourceLocation implements IMovable {
     }
     
     @Override
-    public Location getLocation() {
+    public ILocation getLocation() {
         return currentLocation;
     }
     
     @Override
-    public void setLocation(final Location location) {
+    public void setLocation(final ILocation location) {
+        final Location resolvedLocation = (Location) location;
         final Simulation simul = resource.getSimulation();
         final long ts = resource.getTs();
         
         if (currentLocation == null) {
-            simul.notifyInfo(new EntityLocationInfo(simul, resource, location,
+            simul.notifyInfo(new EntityLocationInfo(simul, resource, resolvedLocation,
                     EntityLocationInfo.Type.START, ts));
-            currentLocation = location;
+            currentLocation = resolvedLocation;
         } else {
             simul.notifyInfo(new EntityLocationInfo(simul, resource, currentLocation,
                     EntityLocationInfo.Type.LEAVE, ts));
-            currentLocation = location;
+            currentLocation = resolvedLocation;
             simul.notifyInfo(new EntityLocationInfo(simul, resource, currentLocation,
                     EntityLocationInfo.Type.ARRIVE, ts));
         }
@@ -108,12 +110,13 @@ public class ResourceLocation implements IMovable {
     }
     
     @Override
-    public void notifyLocationAvailable(final Location location) {
-        location.enter(resource);
+    public void notifyLocationAvailable(final ILocation location) {
+        final Location resolvedLocation = (Location) location;
+        resolvedLocation.enter(resource);
         
         if (movingInstance != null) {
             // Delegate to Resource for flow-specific logic
-            resource.handleLocationAvailable(location, movingInstance);
+            resource.handleLocationAvailable(resolvedLocation, movingInstance);
         }
     }
 }

@@ -16,6 +16,7 @@ import es.ull.simulation.model.flow.IInitializerFlow;
 import es.ull.simulation.model.flow.ReleaseResourcesFlow;
 import es.ull.simulation.model.flow.RequestResourcesFlow;
 import es.ull.simulation.model.flow.ITaskFlow;
+import es.ull.simulation.model.location.ILocation;
 import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.IMovable;
 import es.ull.simulation.model.location.MoveFlow;
@@ -30,7 +31,7 @@ import es.ull.simulation.utils.Prioritizable;
  * @author Iván Castilla Rodríguez
  *
  */
-public class Element extends VariableStoreSimulationObject implements Prioritizable, IEventSource, IMovable {
+public class Element extends VariableStoreSimulationObject implements IElement, IEventSource, IMovable {
 	/** Element type */
 	protected ElementType elementType;
 	/** Workflow manager for initial flow and main instance */
@@ -338,18 +339,18 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	}
 
 	@Override
-	public Location getLocation() {
+	public ILocation getLocation() {
 		return movementManager.getLocation();
 	}
 
 	@Override
-	public void setLocation(final Location location) {
-		movementManager.setLocation(location);
+	public void setLocation(final ILocation location) {
+		movementManager.setLocation((Location) location);
 	}
 
 	@Override
-	public void notifyLocationAvailable(final Location location) {
-		movementManager.notifyLocationAvailable(location);
+	public void notifyLocationAvailable(final ILocation location) {
+		movementManager.notifyLocationAvailable((Location) location);
 	}
 	
 	/**

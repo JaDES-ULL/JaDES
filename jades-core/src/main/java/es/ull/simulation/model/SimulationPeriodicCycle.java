@@ -49,7 +49,8 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 	 */
 	public SimulationPeriodicCycle(TimeUnit unit, TimeStamp startTs, AbstractTimeFunction period,
 			TimeStamp endTs, ISimulationCycle subCycle) {
-		cycle = new PeriodicCycle(unit.convert(startTs), period, unit.convert(endTs), subCycle.getCycle());
+		cycle = new PeriodicCycle(unit.convert(startTs), period, unit.convert(endTs),
+				(Cycle) subCycle.getCycle());
 	}
 
 	/**
@@ -62,7 +63,8 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 	 */
 	public SimulationPeriodicCycle(TimeUnit unit, TimeStamp startTs, AbstractTimeFunction period,
 			int iterations, ISimulationCycle subCycle) {
-		cycle = new PeriodicCycle(unit.convert(startTs), period, iterations, subCycle.getCycle());
+		cycle = new PeriodicCycle(unit.convert(startTs), period, iterations,
+				(Cycle) subCycle.getCycle());
 	}
 
 	/**

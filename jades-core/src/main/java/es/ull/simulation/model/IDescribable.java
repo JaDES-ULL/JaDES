@@ -13,5 +13,7 @@ public interface IDescribable {
 	 * Returns this object's description.
 	 * @return this object's description
 	 */
-	String getDescription();
+	default String getDescription() {
+		return "";
+	}
 }

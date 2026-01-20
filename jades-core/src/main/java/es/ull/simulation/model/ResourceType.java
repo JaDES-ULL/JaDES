@@ -19,7 +19,7 @@ import es.ull.simulation.model.location.Location;
  * @author Iván Castilla Rodríguez
  * @author Carlos Martín Galán
  */
-public class ResourceType extends SimulationObject implements IEntityType {
+public class ResourceType extends SimulationObject implements IResourceType {
     /** A list of the currently available resources. */
     protected AbstractResourceList availableResourceList = null;
     /** A brief description of the resource type */

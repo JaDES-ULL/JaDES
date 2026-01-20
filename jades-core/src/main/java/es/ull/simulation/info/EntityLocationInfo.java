@@ -4,7 +4,7 @@
 package es.ull.simulation.info;
 
 import es.ull.simulation.model.Simulation;
-import es.ull.simulation.model.location.Location;
+import es.ull.simulation.model.location.ILocation;
 import es.ull.simulation.model.location.IMovable;
 
 /**
@@ -34,7 +34,7 @@ public class EntityLocationInfo extends SimulationInfo {
 	
 	final private IMovable entity;
 	final private Type type;
-	final private Location location;
+	final private ILocation location;
 	
 
 	/**
@@ -42,7 +42,7 @@ public class EntityLocationInfo extends SimulationInfo {
 	 * @param ts
 	 */
 	public EntityLocationInfo(final Simulation model, final IMovable entity,
-							  final Location location, final Type type, final long ts) {
+							  final ILocation location, final Type type, final long ts) {
 		super(model, ts);
 		this.entity = entity;
 		this.location = location;
@@ -70,7 +70,7 @@ public class EntityLocationInfo extends SimulationInfo {
 	/**
 	 * @return the location
 	 */
-	public Location getLocation() {
+	public ILocation getLocation() {
 		return location;
 	}
 

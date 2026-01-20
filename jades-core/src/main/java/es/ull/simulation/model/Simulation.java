@@ -10,8 +10,8 @@ import java.util.TreeMap;
 
 import es.ull.simulation.info.IPieceOfInformation;
 import es.ull.simulation.info.SimulationStartStopInfo;
-import es.ull.simulation.inforeceiver.BasicListener;
 import es.ull.simulation.inforeceiver.IHandlesInformation;
+import es.ull.simulation.inforeceiver.IListener;
 import es.ull.simulation.inforeceiver.InfoHandler;
 import es.ull.simulation.model.engine.SimulationEngine;
 import es.ull.simulation.model.flow.BasicFlow;
@@ -583,7 +583,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	}
 
 	@Override
-	public void registerListener(final BasicListener receiver) {
+	public void registerListener(final IListener receiver) {
 		infoHandler.registerListener(receiver);
 	}
 
@@ -597,7 +597,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * @param infoTypeClass The type of information.
 	 * @return The listeners that are interested in receiving information of the given type.
 	 */
-	public ArrayList<BasicListener> getListeners(final Class<? extends IPieceOfInformation> infoTypeClass) {
+	public ArrayList<IListener> getListeners(final Class<? extends IPieceOfInformation> infoTypeClass) {
 		return infoHandler.getListeners(infoTypeClass);
 	}
 
@@ -605,7 +605,7 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * Returns all the listeners attached to this simulation that are interested in receiving information.
 	 * @return All the listeners that are interested in receiving information.
 	 */
-	public ArrayList<BasicListener> getListeners() {
+	public ArrayList<IListener> getListeners() {
 		return infoHandler.getListeners();
 	}
 

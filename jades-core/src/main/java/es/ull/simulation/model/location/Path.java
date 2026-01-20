@@ -73,7 +73,6 @@ public class Path extends Location {
 		return nLanes;
 	}
 
-	@Override
 	public Location getLocation() {
 		return this;
 	}

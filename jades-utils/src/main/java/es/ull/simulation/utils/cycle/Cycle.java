@@ -1,12 +1,14 @@
 package es.ull.simulation.utils.cycle;
 
+import es.ull.simulation.model.ICycle;
+
 /**
  * Defines a repeated sequence of events. <p>
  * A cycle can be defined as containing a subcycle. The subcycle total duration
  * should be restricted to the main cycle period.
  * @author Iván Castilla Rodríguez
  */
-public abstract class Cycle {
+public abstract class Cycle implements ICycle {
   /** Subcycle contained in this cycle. */
   protected Cycle subCycle = null;
 

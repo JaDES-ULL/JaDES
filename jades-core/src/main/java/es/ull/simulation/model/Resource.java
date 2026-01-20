@@ -10,6 +10,7 @@ import java.util.Collection;
 import es.ull.simulation.info.EntityLocationInfo;
 import es.ull.simulation.info.ResourceInfo;
 import es.ull.simulation.model.engine.SimulationEngine;
+import es.ull.simulation.model.location.ILocation;
 import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.IMovable;
 import es.ull.simulation.model.location.MoveResourcesFlow;
@@ -29,7 +30,7 @@ import es.ull.simulation.utils.cycle.DiscreteCycleIterator;
  * 
  * @author Iván Castilla Rodríguez
  */
-public class Resource extends VariableStoreSimulationObject implements IDescribable, IEventSource, IMovable {
+public class Resource extends VariableStoreSimulationObject implements IResource, IEventSource, IMovable {
     /** A brief description of the resource */
     protected final String description;
 	/** Manages location and movement for this resource */
@@ -91,13 +92,13 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 	}
 
 	@Override
-	public Location getLocation() {
+	public ILocation getLocation() {
 		return resourceLocation.getLocation();
 	}
 
 	@Override
-	public void setLocation(final Location location) {
-		resourceLocation.setLocation(location);
+	public void setLocation(final ILocation location) {
+		resourceLocation.setLocation((Location) location);
 	}
 
 	/**
@@ -276,12 +277,13 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
     		endMove(flow, true);
     	}
     	else {
-			final Location nextLoc = router.getNextLocationTo(this, destination);
+			final ILocation nextLoc = router.getNextLocationTo(this, destination);
 			if (IRouter.isUnreachableLocation(nextLoc)) {
 	    		endMove(flow, false);
 			}
 			else {
-		    	simul.scheduleEvent(new MoveEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this), nextLoc, destination, router));
+				final Location resolvedNext = (Location) nextLoc;
+			    	simul.scheduleEvent(new MoveEvent(getTs() + ((Location) resourceLocation.getLocation()).getDelayAtExit(this), resolvedNext, destination, router));
 			}
     	}
     }
@@ -306,13 +308,14 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
     		endTransport(flow, true);
     	}
     	else {
-			final Location nextLoc = router.getNextLocationTo(this, destination);
+			final ILocation nextLoc = router.getNextLocationTo(this, destination);
 			if (IRouter.isUnreachableLocation(nextLoc)) {
 	    		endTransport(flow, false);
 			}
 			else {
-		    	simul.scheduleEvent(new TransportEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
-						nextLoc, destination, router));
+				final Location resolvedNext = (Location) nextLoc;
+			    	simul.scheduleEvent(new TransportEvent(getTs() + ((Location) resourceLocation.getLocation()).getDelayAtExit(this),
+						resolvedNext, destination, router));
 			}
     	}
     }
@@ -362,8 +365,8 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
     }
 
 	@Override
-	public void notifyLocationAvailable(final Location location) {
-		resourceLocation.notifyLocationAvailable(location);
+	public void notifyLocationAvailable(final ILocation location) {
+		resourceLocation.notifyLocationAvailable((Location) location);
 	}
 	
 	/**
@@ -384,13 +387,14 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 				endMove(flow, true);
 			}
 			else {
-				final Location nextLoc = router.getNextLocationTo(this, destination);
+				final ILocation nextLoc = router.getNextLocationTo(this, destination);
 				if (IRouter.isUnreachableLocation(nextLoc)) {
 					endMove(flow, false);
 				}
 				else {
-			    	simul.scheduleEvent(new MoveEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
-							nextLoc, destination, router));
+					final Location resolvedNext = (Location) nextLoc;
+			    		simul.scheduleEvent(new MoveEvent(getTs() + ((Location) resourceLocation.getLocation()).getDelayAtExit(this),
+							resolvedNext, destination, router));
 				}
 			}			
 		}
@@ -405,13 +409,14 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 				endTransport(flow, true);
 			}
 			else {
-				final Location nextLoc = router.getNextLocationTo(this, destination);
+				final ILocation nextLoc = router.getNextLocationTo(this, destination);
 				if (IRouter.isUnreachableLocation(nextLoc)) {
 					endTransport(flow, false);
 				}
 				else {
-			    	simul.scheduleEvent(new TransportEvent(getTs() + resourceLocation.getLocation().getDelayAtExit(this),
-							nextLoc, destination, router));
+					final Location resolvedNext = (Location) nextLoc;
+			    		simul.scheduleEvent(new TransportEvent(getTs() + ((Location) resourceLocation.getLocation()).getDelayAtExit(this),
+							resolvedNext, destination, router));
 				}
 			}			
 		}
@@ -460,7 +465,8 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 				else {
 					/* FIXME: Check whether it works when using a condition to end simulation:
 					should I use simul.getEndTs() instead of Long.MAX_VALUE?*/
-			        DiscreteCycleIterator iter = tte.getCycle().getCycle().iterator(getTs(), Long.MAX_VALUE);
+			        DiscreteCycleIterator iter = ((es.ull.simulation.utils.cycle.Cycle) tte.getCycle().getCycle())
+						.iterator(getTs(), Long.MAX_VALUE);
 			        final long nextTs = iter.next();
 			        if (nextTs != -1) {
 			            RoleOnEvent rEvent = new RoleOnEvent(nextTs, tte.getRole(), iter,
@@ -474,7 +480,8 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 			for (TimeTableEntry tte : cancelPeriodEntries) {
 				/* FIXME: Check whether it works when using a condition to end simulation:
 				 should I use simul.getEndTs() instead of Long.MAX_VALUE?*/
-		        final DiscreteCycleIterator iter = tte.getCycle().getCycle().iterator(getTs(), Long.MAX_VALUE);
+		        final DiscreteCycleIterator iter = ((es.ull.simulation.utils.cycle.Cycle) tte.getCycle().getCycle())
+					.iterator(getTs(), Long.MAX_VALUE);
 		        long nextTs = iter.next();
 		        if (nextTs != -1) {
 		            final CancelPeriodOnEvent aEvent = new CancelPeriodOnEvent(nextTs, iter,
@@ -692,7 +699,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		 * @param IRouter Instance that returns the path for the resource
 		 */
 		public MoveEvent(final long ts, final Location destination, final IRouter IRouter) {
-			this(ts, resourceLocation.getLocation(), destination, IRouter);
+			this(ts, (Location) resourceLocation.getLocation(), destination, IRouter);
 		}
 
 		/**
@@ -723,13 +730,14 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					endMove(flow, true);
 				}
 				else {
-					final Location nextLoc = router.getNextLocationTo(Resource.this, destination);
+					final ILocation nextLoc = router.getNextLocationTo(Resource.this, destination);
 					if (IRouter.isUnreachableLocation(nextLoc)) {
 						endMove(flow, false);
 					}
 					else {
+						final Location resolvedNext = (Location) nextLoc;
 						final MoveEvent mEvent = new MoveEvent(getTs() +
-								resourceLocation.getLocation().getDelayAtExit(Resource.this), nextLoc, destination, router);
+								((Location) resourceLocation.getLocation()).getDelayAtExit(Resource.this), resolvedNext, destination, router);
 				    	simul.scheduleEvent(mEvent);						
 					}
 				}
@@ -762,7 +770,7 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 		 * @param IRouter Instance that returns the path for the resource
 		 */
 		public TransportEvent(final long ts, final Location destination, final IRouter IRouter) {
-			this(ts, resourceLocation.getLocation(), destination, IRouter);
+			this(ts, (Location) resourceLocation.getLocation(), destination, IRouter);
 		}
 
 		/**
@@ -797,13 +805,14 @@ public class Resource extends VariableStoreSimulationObject implements IDescriba
 					endTransport(flow, true);
 				}
 				else {
-					final Location nextLoc = router.getNextLocationTo(Resource.this, destination);
+					final ILocation nextLoc = router.getNextLocationTo(Resource.this, destination);
 					if (IRouter.isUnreachableLocation(nextLoc)) {
 						endTransport(flow, false);
 					}
 					else {
+						final Location resolvedNext = (Location) nextLoc;
 						final TransportEvent mEvent = new TransportEvent(getTs() +
-								resourceLocation.getLocation().getDelayAtExit(Resource.this), nextLoc, destination, router);
+								((Location) resourceLocation.getLocation()).getDelayAtExit(Resource.this), resolvedNext, destination, router);
 				    	simul.scheduleEvent(mEvent);						
 					}
 				}

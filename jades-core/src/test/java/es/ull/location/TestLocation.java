@@ -18,8 +18,9 @@ import es.ull.simulation.model.Simulation;
 import es.ull.simulation.model.SimulationPeriodicCycle;
 import es.ull.simulation.model.SimulationTimeFunction;
 import es.ull.simulation.model.TimeDrivenElementGenerator;
-import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.IMovable;
+import es.ull.simulation.model.location.ILocation;
+import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.MoveFlow;
 import es.ull.simulation.model.location.Node;
 import es.ull.simulation.model.location.Path;
@@ -88,8 +89,8 @@ public class TestLocation extends BaseExperiment {
 		}
 
 		@Override
-		public Location getNextLocationTo(IMovable entity, Location finalLocation) {
-			ArrayList<Location> links = entity.getLocation().getLinkedTo();
+		public ILocation getNextLocationTo(IMovable entity, ILocation finalLocation) {
+			ArrayList<Location> links = ((Location) entity.getLocation()).getLinkedTo();
 			if (links.size() > 0)
 				return links.get(0);
 			return IRouter.UNREACHABLE_LOCATION;

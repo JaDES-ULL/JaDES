@@ -23,8 +23,9 @@ import es.ull.simulation.model.TimeDrivenElementGenerator;
 import es.ull.simulation.model.WorkGroup;
 import es.ull.simulation.model.flow.ReleaseResourcesFlow;
 import es.ull.simulation.model.flow.RequestResourcesFlow;
-import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.IMovable;
+import es.ull.simulation.model.location.ILocation;
+import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.MoveResourcesFlow;
 import es.ull.simulation.model.location.Node;
 import es.ull.simulation.model.location.Path;
@@ -94,14 +95,15 @@ public class TestResourcesLocation extends BaseExperiment {
 		}
 
 		@Override
-		public Location getNextLocationTo(IMovable entity, Location finalLocation) {
+		public ILocation getNextLocationTo(IMovable entity, ILocation finalLocation) {
+			final Location current = (Location) entity.getLocation();
 			if (destination.equals(finalLocation)) {
-				final ArrayList<Location> links = entity.getLocation().getLinkedTo();
+				final ArrayList<Location> links = current.getLinkedTo();
 				if (links.size() > 0)
 					return links.get(0);
 			}
 			else if (home.equals(finalLocation)) {
-				final ArrayList<Location> links = entity.getLocation().getLinkedFrom();
+				final ArrayList<Location> links = current.getLinkedFrom();
 				if (links.size() > 0)
 					return links.get(0);
 			}

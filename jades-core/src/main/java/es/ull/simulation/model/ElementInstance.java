@@ -36,7 +36,7 @@ import es.ull.simulation.utils.Prioritizable;
  * @author Ivan Castilla Rodriguez
  *
  */
-public class ElementInstance implements Prioritizable, Comparable<ElementInstance>, IIdentifiable {
+public class ElementInstance implements IElementInstance, Comparable<ElementInstance>, Prioritizable {
 	/** A string that identifies the instance */
 	private final String description; 
     /** Element which carries out this IFlow. */    

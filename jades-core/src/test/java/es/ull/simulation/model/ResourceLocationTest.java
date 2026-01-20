@@ -1,6 +1,6 @@
 package es.ull.simulation.model;
 
-import es.ull.simulation.model.location.Location;
+import es.ull.simulation.model.location.ILocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class ResourceLocationTest {
         resource = new Resource(simulation, "Test Resource", 0, null);
 
         // When: getting location
-        Location location = resource.getLocation();
+        ILocation location = resource.getLocation();
 
         // Then: location should be null
         assertNull(location);
@@ -88,7 +88,7 @@ class ResourceLocationTest {
         resource = new Resource(simulation, "Test Resource", 5, null);
 
         // When: checking location
-        Location loc = resource.getLocation();
+        ILocation loc = resource.getLocation();
 
         // Then: location should be null
         assertNull(loc);
@@ -142,8 +142,8 @@ class ResourceLocationTest {
         Resource r2 = new Resource(simulation, "R2", 2, null);
 
         // When: checking locations
-        Location loc1 = r1.getLocation();
-        Location loc2 = r2.getLocation();
+        ILocation loc1 = r1.getLocation();
+        ILocation loc2 = r2.getLocation();
 
         // Then: both should be independent (both null in this case)
         assertNull(loc1);

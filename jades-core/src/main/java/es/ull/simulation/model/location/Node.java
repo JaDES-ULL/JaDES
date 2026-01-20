@@ -67,7 +67,6 @@ public class Node extends Location {
 		super(description);
 	}
 	
-	@Override
 	public Location getLocation() {
 		return this;
 	}

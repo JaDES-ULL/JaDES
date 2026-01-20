@@ -13,24 +13,24 @@ public class InfoHandler implements IHandlesInformation {
 	/**
 	 * A map between the type of information and the listeners that are interested in receiving it.
 	 */
-	private final HashMap<Class<? extends IPieceOfInformation>, ArrayList<BasicListener> > registeredListeners;
+	private final HashMap<Class<? extends IPieceOfInformation>, ArrayList<IListener> > registeredListeners;
 	
 	/**
 	 * Creates a handler for the simulation information.
 	 */
 	public InfoHandler() {
-		registeredListeners = new HashMap<Class<? extends IPieceOfInformation>, ArrayList<BasicListener>>();
+		registeredListeners = new HashMap<Class<? extends IPieceOfInformation>, ArrayList<IListener>>();
 	}
 	
 	/**
 	 * Registers a listener to receive information of a certain type.
 	 * @param listener The listener that wants to receive the information.
 	 */
-	public void registerListener(BasicListener listener) {	
+	public void registerListener(IListener listener) {	
 		for (Class<? extends IPieceOfInformation> cl: listener.getTargetInformation()) {
-			ArrayList<BasicListener> list;
+			ArrayList<IListener> list;
 			if (!registeredListeners.containsKey(cl)) {
-				list = new ArrayList<BasicListener>();
+				list = new ArrayList<IListener>();
 				registeredListeners.put(cl, list);
 			}
 			else {
@@ -45,7 +45,7 @@ public class InfoHandler implements IHandlesInformation {
 	 * @param infoTypeClass The type of information.
 	 * @return The listeners that are interested in receiving information of the given type.
 	 */
-	public ArrayList<BasicListener> getListeners(Class<? extends IPieceOfInformation> infoTypeClass) {
+	public ArrayList<IListener> getListeners(Class<? extends IPieceOfInformation> infoTypeClass) {
 		return registeredListeners.get(infoTypeClass);
 	}
 
@@ -53,9 +53,9 @@ public class InfoHandler implements IHandlesInformation {
 	 * Returns all the listeners that are interested in receiving information.
 	 * @return All the listeners that are interested in receiving information.
 	 */
-	public ArrayList<BasicListener> getListeners() {
-		ArrayList<BasicListener> listeners = new ArrayList<BasicListener>();
-		for (ArrayList<BasicListener> list: registeredListeners.values()) {
+	public ArrayList<IListener> getListeners() {
+		ArrayList<IListener> listeners = new ArrayList<IListener>();
+		for (ArrayList<IListener> list: registeredListeners.values()) {
 			listeners.addAll(list);
 		}
 		return listeners;
@@ -67,8 +67,8 @@ public class InfoHandler implements IHandlesInformation {
 	 */
 	public void notifyInfo(IPieceOfInformation info) {
 		if (registeredListeners.containsKey(info.getClass())) {
-			final ArrayList<BasicListener> list = registeredListeners.get(info.getClass());
-			for(BasicListener listener: list)
+			final ArrayList<IListener> list = registeredListeners.get(info.getClass());
+			for(IListener listener: list)
 				listener.infoEmited(info);
 		}
 	}

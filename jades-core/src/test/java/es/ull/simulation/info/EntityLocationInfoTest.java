@@ -2,8 +2,9 @@ package es.ull.simulation.info;
 
 import es.ull.simulation.model.Simulation;
 import es.ull.simulation.model.TimeUnit;
-import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.IMovable;
+import es.ull.simulation.model.location.ILocation;
+import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.Node;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EntityLocationInfoTest {
 
     private Simulation simulation;
-    private Location location;
+    private ILocation location;
 
     @BeforeEach
     void setUp() {
@@ -63,7 +64,7 @@ class EntityLocationInfoTest {
         EntityLocationInfo info = new EntityLocationInfo(simulation, entity, location, EntityLocationInfo.Type.ARRIVE, 0L);
 
         // When: getting location
-        Location result = info.getLocation();
+        ILocation result = info.getLocation();
 
         // Then: should return correct location
         assertEquals(location, result);
@@ -170,8 +171,8 @@ class EntityLocationInfoTest {
     void shouldCreateInfoWithDifferentLocations() {
         // Given: different locations
         IMovable entity = new TestMovableEntity("Entity");
-        Location location1 = new Node("Location 1");
-        Location location2 = new Node("Location 2");
+        ILocation location1 = new Node("Location 1");
+        ILocation location2 = new Node("Location 2");
         EntityLocationInfo info1 = new EntityLocationInfo(simulation, entity, location1, EntityLocationInfo.Type.ARRIVE, 0L);
         EntityLocationInfo info2 = new EntityLocationInfo(simulation, entity, location2, EntityLocationInfo.Type.LEAVE, 0L);
 
@@ -209,24 +210,24 @@ class EntityLocationInfoTest {
     // Helper class for testing
     private static class TestMovableEntity implements IMovable {
         private final String name;
-        private Location location;
+        private ILocation location;
 
         public TestMovableEntity(String name) {
             this.name = name;
         }
 
         @Override
-        public Location getLocation() {
+        public ILocation getLocation() {
             return location;
         }
 
         @Override
-        public void setLocation(Location location) {
+        public void setLocation(ILocation location) {
             this.location = location;
         }
 
         @Override
-        public void notifyLocationAvailable(Location location) {
+        public void notifyLocationAvailable(ILocation location) {
             // Implementation not needed for tests
         }
 

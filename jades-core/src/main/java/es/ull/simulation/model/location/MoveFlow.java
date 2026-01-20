@@ -7,6 +7,7 @@ import es.ull.simulation.info.EntityLocationInfo;
 import es.ull.simulation.model.Element;
 import es.ull.simulation.model.ElementInstance;
 import es.ull.simulation.model.Simulation;
+import es.ull.simulation.model.location.ILocation;
 import es.ull.simulation.model.flow.IActionFlow;
 import es.ull.simulation.model.flow.IFlow;
 import es.ull.simulation.model.flow.AbstractSingleSuccessorFlow;
@@ -88,26 +89,29 @@ public class MoveFlow extends AbstractSingleSuccessorFlow implements ITaskFlow, 
 	 */
 	public void move(final ElementInstance ei) {
 		final Element elem = ei.getElement();
-		final Location nextLocation = router.getNextLocationTo(elem, destination);
-		if (IRouter.isUnreachableLocation(nextLocation)) {
+		final ILocation nextLoc = router.getNextLocationTo(elem, destination);
+		if (IRouter.isUnreachableLocation(nextLoc)) {
 			ei.cancel(this);
 			next(ei);
     		error("Destination unreachable. Current: " + elem.getLocation() + "; destination: " + destination);
 		}
-		else if (IRouter.isConditionalWaitLocation(nextLocation)) {
+		else if (IRouter.isConditionalWaitLocation(nextLoc)) {
 			simul.notifyInfo(new EntityLocationInfo(simul, elem, elem.getLocation(), EntityLocationInfo.Type.COND_WAIT, getTs()));			
 		}
-		else if (!nextLocation.fitsIn(elem)) {
-			nextLocation.waitFor(elem);
-			simul.notifyInfo(new EntityLocationInfo(simul, elem, elem.getLocation(), EntityLocationInfo.Type.WAIT_FOR, getTs()));
-		}
 		else {
-			nextLocation.enter(elem);
-			if (nextLocation.equals(destination)) {
-				finish(ei);
+			final Location nextLocation = (Location) nextLoc;
+			if (!nextLocation.fitsIn(elem)) {
+				nextLocation.waitFor(elem);
+			simul.notifyInfo(new EntityLocationInfo(simul, elem, elem.getLocation(), EntityLocationInfo.Type.WAIT_FOR, getTs()));
 			}
 			else {
-				elem.keepMoving(this, ei);
+				nextLocation.enter(elem);
+				if (nextLocation.equals(destination)) {
+					finish(ei);
+				}
+				else {
+					elem.keepMoving(this, ei);
+				}
 			}
 		}
 				
