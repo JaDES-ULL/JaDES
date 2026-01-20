@@ -35,30 +35,12 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	protected ElementType elementType;
 	/** Workflow manager for initial flow and main instance */
 	private final ElementFlow flowManager;
-	/** @deprecated Use flowManager.getInitialFlow() instead */
-	@Deprecated
-	protected final IInitializerFlow initialFlow;
 	/** If true, the element is in exclusive mode, and cannot perform other exclusive tasks concurrently */ 
 	protected boolean exclusive = false;
 	/** Movement manager for location and transport */
 	private final ElementMovement movementManager;
-	/** @deprecated Use movementManager.getLocation() instead */
-	@Deprecated
-	private Location currentLocation;
-	/** @deprecated Use movementManager.getInitLocation() instead */
-	@Deprecated
-	private final Location initLocation;
-	/** @deprecated Use movementManager.getMovingInstance() instead */
-	@Deprecated
-	private ElementInstance movingInstance = null;
-	/** @deprecated Use movementManager.getCapacity() instead */
-	@Deprecated
-	private final int size;
-	/** @deprecated Use flowManager.getMainInstance() instead */
-	@Deprecated
-	protected ElementInstance mainInstance = null;
-    /** Collection manager for seized resources */
-    final protected SeizedResourcesCollection seizedResources;
+    /** Collection manager for seized resources - DIP: depends on abstraction */
+    final protected IResourceManager resourceManager;
 	/** The engine that executes specific behavior of the element */
 	private ElementEngine engine;
 	
@@ -69,7 +51,7 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	 * @param initialFlow First step of the IFlow of the element
 	 */
 	public Element(final Simulation simul, final ElementType elementType, final IInitializerFlow initialFlow) {
-		this(simul, "E", elementType, initialFlow, 0, null);
+		this(simul, "E", elementType, initialFlow, 0, null, new SeizedResourcesCollection(null));
 	}
 	
 	/**
@@ -82,18 +64,31 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	 */
 	public Element(final Simulation simul, String objectTypeId, final ElementType elementType,
 				   final IInitializerFlow initialFlow, final int size, final Location initLocation) {
-		super(simul, simul.getNewElementId(), objectTypeId);
+		this(simul, objectTypeId, elementType, initialFlow, size, initLocation, new SeizedResourcesCollection(null));
+	}
+	
+	/**
+	 * Creates an element with dependency injection (DIP constructor)
+	 * @param simul Simulation model this element belongs to
+	 * @param objectTypeId Object type identifier
+	 * @param elementType Element type
+	 * @param initialFlow First step of the IFlow of the element
+	 * @param size The size of the element
+     * @param initLocation The initial location of the element
+     * @param resourceManager Resource manager implementation
+	 */
+	public Element(final Simulation simul, String objectTypeId, final ElementType elementType,
+				   final IInitializerFlow initialFlow, final int size, final Location initLocation,
+				   final IResourceManager resourceManager) {
+		super(simul, simul.generateId(), objectTypeId);
 		this.elementType = elementType;
 		this.flowManager = new ElementFlow(this, initialFlow);
-		// Sync deprecated fields
-		this.initialFlow = initialFlow;
-		this.mainInstance = null;
-        this.seizedResources = new SeizedResourcesCollection(this);
+        this.resourceManager = resourceManager;
+        // Fix element reference after construction for default case
+        if (resourceManager instanceof SeizedResourcesCollection) {
+        	((SeizedResourcesCollection)resourceManager).setElement(this);
+        }
         this.movementManager = new ElementMovement(this, size, initLocation);
-        // Sync deprecated fields
-        this.size = size;
-        this.initLocation = initLocation;
-        this.currentLocation = null;
 		initializeElementVars(this.elementType.getElementValues());
 	}
 	
@@ -103,20 +98,13 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	 * @param info Information required to create the element  
 	 */
 	public Element(final Simulation simul, String objectTypeId, final StandardElementGenerationInfo info) {
-		super(simul, simul.getNewElementId(), objectTypeId);
+		super(simul, simul.generateId(), objectTypeId);
 		this.elementType = info.getElementType();
 		this.flowManager = new ElementFlow(this, info.getFlow());
-		// Sync deprecated fields
-		this.initialFlow = info.getFlow();
-		this.mainInstance = null;
-        this.seizedResources = new SeizedResourcesCollection(this);
+        this.resourceManager = new SeizedResourcesCollection(this);
         final int elemSize = info.getSize(this);
         final Location elemInitLocation = info.getInitLocation();
         this.movementManager = new ElementMovement(this, elemSize, elemInitLocation);
-        // Sync deprecated fields
-        this.initLocation = elemInitLocation;
-        this.size = elemSize;
-        this.currentLocation = null;
 		initializeElementVars(this.elementType.getElementValues());
 	}
 	
@@ -200,10 +188,10 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
     protected void seizeResources(final RequestResourcesFlow reqFlow,
 								  final ElementInstance ei, final ArrayDeque<Resource> newResources) {
     	final int resId = (reqFlow.getResourcesId() < 0) ? -ei.getIdentifier() : reqFlow.getResourcesId();
-    	seizedResources.addResources(resId, newResources);
+    	resourceManager.addResources(resId, newResources);
     }
-
-    /**
+    
+	/**
      * Removes the resources specified in the workgroup from the list of seized resources
      * @param relFlow The IFlow that released the resources
      * @param ei Element instance performing the releasing
@@ -212,18 +200,17 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
     protected ArrayDeque<Resource> releaseResources(final ReleaseResourcesFlow relFlow, final ElementInstance ei) {
     	final int resId = (relFlow.getResourcesId() < 0) ? -ei.getIdentifier() : relFlow.getResourcesId();
     	final WorkGroup wg = relFlow.getWorkGroup();
-    	return seizedResources.removeResources(resId, wg);
-    	
+    	return resourceManager.removeResources(resId, wg);
     }
-
+    
     /**
      * Returns the list of resources currently seized by the element
      * @return the list of resources currently seized by the element
      */
 	public ArrayDeque<Resource> getCaughtResources() {
-		return seizedResources.getAll();
+		return resourceManager.getAllResources();
 	}
-
+	
 	/**
 	 * Returns the list of resources caught by the specified element instance when performing the specified IFlow
 	 * @param reqFlow The IFlow that seized the resources
@@ -231,18 +218,17 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	 * @return the list of resources caught by the specified element instance when performing the specified IFlow
 	 */
 	public ArrayDeque<Resource> getCaughtResources(final RequestResourcesFlow reqFlow, final ElementInstance ei) {
-    	final int resId = (reqFlow.getResourcesId() < 0) ? -ei.getIdentifier() : reqFlow.getResourcesId();
-		return seizedResources.get(resId);
-	}
-
-    /**
-     * Returns the list of resources identifier by the resourcesId and belonging to the specified workgroup
-     * @param resourcesId Identifier of the group of resources
-     * @param wg Resource types 
-     * @return the list of resources caught by the specified element instance when performing the specified IFlow
-     */
+    	return resourceManager.getResourcesByFlow(reqFlow, ei);
+    }
+    
+	/**
+	 * Returns the list of resources caught by the specified element instance when performing the specified IFlow
+	 * @param resourcesId Identifier of the group of resources
+	 * @param wg Resource types
+	 * @return the list of resources caught by the specified element instance when performing the specified IFlow
+	 */
 	public ArrayDeque<Resource> getCaughtResources(final int resourcesId, final WorkGroup wg) {
-		return seizedResources.get(resourcesId, wg);
+		return resourceManager.getResourcesByWorkGroup(resourcesId, wg);
 	}
 
 	/**
@@ -252,7 +238,7 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	 * @return <code>true</code> if the element has currently acquired any resource of type <code>rt</code>
 	 */
 	public boolean isAcquiredResourceType(final ResourceType rt) {
-		return seizedResources.containsResourceType(rt);
+		return resourceManager.hasResourceType(rt);
 	}
 	
 	/**
@@ -293,8 +279,6 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 		}
 		if (flowManager.hasInitialFlow()) {
 			ElementInstance instance = flowManager.initializeMainInstance();
-			// Sync deprecated field
-			this.mainInstance = flowManager.getMainInstance();
 			return (new RequestFlowEvent(ts, flowManager.getInitialFlow(), instance.getDescendantElementInstance(flowManager.getInitialFlow())));
 		}
 		else
@@ -321,7 +305,7 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
      * @param ei Element instance that will perform the IFlow
      */
 	public void addRequestEvent(final IFlow f, final ElementInstance ei) {
-		simul.addEvent(new RequestFlowEvent(getTs(), f, ei));
+		simul.scheduleEvent(new RequestFlowEvent(getTs(), f, ei));
 	}
 	
 	/**
@@ -331,7 +315,7 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	 * @param ei Element instance that will finish the IFlow
 	 */
 	public void addFinishEvent(final long ts, final ITaskFlow f, final ElementInstance ei) {
-		simul.addEvent(new FinishFlowEvent(ts, f, ei));
+		simul.scheduleEvent(new FinishFlowEvent(ts, f, ei));
 	}
 
 	@Override
@@ -355,23 +339,17 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 
 	@Override
 	public Location getLocation() {
-		Location loc = movementManager.getLocation();
-		this.currentLocation = loc; // Sync deprecated
-		return loc;
+		return movementManager.getLocation();
 	}
 
 	@Override
 	public void setLocation(final Location location) {
 		movementManager.setLocation(location);
-		this.currentLocation = movementManager.getLocation(); // Sync deprecated
 	}
 
 	@Override
 	public void notifyLocationAvailable(final Location location) {
 		movementManager.notifyLocationAvailable(location);
-		// Sync deprecated fields
-		this.currentLocation = movementManager.getLocation();
-		this.movingInstance = movementManager.getMovingInstance();
 	}
 	
 	/**
@@ -381,7 +359,6 @@ public class Element extends VariableStoreSimulationObject implements Prioritiza
 	 */
 	public void keepMoving(final MoveFlow IFlow, final ElementInstance ei) {
 		movementManager.keepMoving(IFlow, ei);
-		this.movingInstance = movementManager.getMovingInstance(); // Sync deprecated
 	}
 	
 	/**

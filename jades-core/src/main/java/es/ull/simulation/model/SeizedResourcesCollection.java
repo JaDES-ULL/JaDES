@@ -3,18 +3,21 @@ package es.ull.simulation.model;
 import java.util.ArrayDeque;
 import java.util.TreeMap;
 
+import es.ull.simulation.model.flow.RequestResourcesFlow;
+
 /**
  * A collection of resources that have been seized by an element. They are arranged in two levels: the
  * first level represents resource groups, as logically defined by the modeler; the second level represents
  * resource types.
  * 
  * Extracted from Element inner class to improve maintainability and testability.
+ * Implements IResourceManager following DIP.
  * 
  * @author Iván Castilla Rodríguez
  */
-public class SeizedResourcesCollection {
+public class SeizedResourcesCollection implements IResourceManager {
 	/** Reference to the owning element for error reporting */
-	private final Element element;
+	private Element element;
 	/** List of seized resources indexed as groups by an identifier */
 	final protected TreeMap<Integer, TreeMap<ResourceType, ArrayDeque<Resource>>> resources;
 	
@@ -26,6 +29,19 @@ public class SeizedResourcesCollection {
 		this.element = element;
 		resources = new TreeMap<Integer, TreeMap<ResourceType,ArrayDeque<Resource>>>();
 		resources.put(0, new TreeMap<ResourceType, ArrayDeque<Resource>>());
+	}
+	
+	/**
+	 * Sets the element reference. Used for dependency injection pattern.
+	 * @param element The element that owns this collection
+	 */
+	public void setElement(final Element element) {
+		this.element = element;
+	}
+	
+	@Override
+	public boolean hasResourceType(final ResourceType rt) {
+		return containsResourceType(rt);
 	}
 	
 	/**
@@ -41,6 +57,11 @@ public class SeizedResourcesCollection {
 		return false;
 	}
 	
+	@Override
+	public ArrayDeque<Resource> getAllResources() {
+		return getAll();
+	}
+	
 	/**
 	 * Returns the whole list of resources seized by the element
 	 * @return the whole list of resources seized by the element
@@ -54,6 +75,17 @@ public class SeizedResourcesCollection {
 			}
 		}
 		return list;
+	}
+	
+	@Override
+	public ArrayDeque<Resource> getResourcesByFlow(final RequestResourcesFlow reqFlow, final ElementInstance ei) {
+		final int resId = (reqFlow.getResourcesId() < 0) ? -ei.getIdentifier() : reqFlow.getResourcesId();
+		return get(resId);
+	}
+	
+	@Override
+	public ArrayDeque<Resource> getResourcesByWorkGroup(final int resourcesId, final WorkGroup wg) {
+		return get(resourcesId, wg);
 	}
 	
 	/**
@@ -91,6 +123,7 @@ public class SeizedResourcesCollection {
 	 * @param resourcesId Identifier of the group of resources
 	 * @param newResources New resources seized by the element
 	 */
+	@Override
 	public void addResources(final int resourcesId, final ArrayDeque<Resource> newResources) {
 		// If it's a request flow inside an activity, use minus the element instance identifier
 		TreeMap<ResourceType, ArrayDeque<Resource>> collection = resources.get(resourcesId);
@@ -113,6 +146,7 @@ public class SeizedResourcesCollection {
 	 * @param wg Workgroup
 	 * @return The released resources
 	 */
+	@Override
 	public ArrayDeque<Resource> removeResources(final int resourcesId, final WorkGroup wg) {
 		final TreeMap<ResourceType, ArrayDeque<Resource>> collection = resources.get(resourcesId);
 		// Not already created
@@ -159,5 +193,12 @@ public class SeizedResourcesCollection {
 			}
 		}
 		return toRemove;
+	}
+	
+	@Override
+	public void releaseAll() {
+		for (TreeMap<ResourceType, ArrayDeque<Resource>> collection : resources.values()) {
+			collection.clear();
+		}
 	}
 }
