@@ -1,0 +1,7 @@
+"GROUP","PACKAGE","CLASS","INSTRUCTION_MISSED","INSTRUCTION_COVERED","BRANCH_MISSED","BRANCH_COVERED","LINE_MISSED","LINE_COVERED","COMPLEXITY_MISSED","COMPLEXITY_COVERED","METHOD_MISSED","METHOD_COVERED"
+"JaDES Utils","es.ull.simulation.ontology","OWLOntologyWrapper","960","1040","97","64","202","203","84","69","26","46"
+"JaDES Utils","es.ull.simulation.ontology","PrefixManagerBuilder","106","97","5","7","23","22","13","5","9","3"
+"JaDES Utils","es.ull.simulation.utils.cycle","PeriodicCycle.PeriodicDiscreteIteratorLevel","71","122","9","13","16","29","7","9","1","4"
+"JaDES Utils","es.ull.simulation.utils.cycle","RoundedPeriodicCycle","70","53","0","0","18","15","6","7","6","7"
+"JaDES Utils","es.ull.simulation.utils","ExcelTools","59","349","6","33","14","88","9","28","3","12"
+"JaDES Utils","simkit.random","InverseGaussian2Variate","45","153","4","6","6","25","5","9","1","8"
