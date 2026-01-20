@@ -37,6 +37,12 @@ See [Architecture Issues](../docs/architecture/overview.md#known-architectural-i
 - [Custom Functions Guide](../docs/guides/custom-functions.md)
 - [Excel I/O Guide](../docs/guides/excel-io.md)
 
+Module docs:
+- [Functional](docs/functional.md)
+- [Technical](docs/technical.md)
+- [Architecture](docs/architecture.md)
+- [Diagrams](docs/diagrams/utils-architecture.md)
+
 ## 🔗 Dependencies
 
 - **Apache POI**: Excel file manipulation (~8MB)

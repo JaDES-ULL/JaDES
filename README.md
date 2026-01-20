@@ -10,6 +10,7 @@ JaDES is a comprehensive Java framework for discrete event simulation, developed
 This is a multi-module Maven project with the following structure:
 
 - **jades-core**: Core simulation engine with workflow patterns and execution logic
+- **jades-api**: Public interfaces and contracts shared across modules
 - **jades-utils**: Utility library with time functions, cycles, Excel I/O, ontology support, and more
 
 ## Requirements

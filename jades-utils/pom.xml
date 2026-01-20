@@ -5,9 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>es.ull.simulation</groupId>
+    <groupId>io.github.jades-ull.jades</groupId>
     <artifactId>jades-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>jades-utils</artifactId>
@@ -17,6 +18,12 @@
   <description>Utility library for JaDES simulation framework</description>
 
   <dependencies>
+    <!-- API contracts -->
+    <dependency>
+      <groupId>io.github.jades-ull.jades</groupId>
+      <artifactId>jades-api</artifactId>
+    </dependency>
+
     <!-- Logging -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>

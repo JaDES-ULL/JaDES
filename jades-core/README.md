@@ -27,6 +27,12 @@ See the main project documentation:
 - [Architecture Overview](../docs/architecture/overview.md)
 - [Examples](../docs/examples/)
 
+Module docs:
+- [Functional](docs/functional.md)
+- [Technical](docs/technical.md)
+- [Architecture](docs/architecture.md)
+- [Diagrams](docs/diagrams/core-architecture.md)
+
 ## 🔗 Dependencies
 
 - **jades-utils**: Utility library (functions, I/O, ontology support)
