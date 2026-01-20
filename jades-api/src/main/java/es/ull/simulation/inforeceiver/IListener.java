@@ -25,5 +25,5 @@ public interface IListener {
 	 * Returns a list with the {@link IPieceOfInformation pieces of information} this listener is interested in.
 	 * @return A list with the {@link IPieceOfInformation pieces of information} this listener is interested in.
 	 */
-	public ArrayList<Class<? extends IPieceOfInformation>> getTargetInformation();    
+	public ArrayList<Class<? extends IPieceOfInformation>> getTargetInformation();
 }

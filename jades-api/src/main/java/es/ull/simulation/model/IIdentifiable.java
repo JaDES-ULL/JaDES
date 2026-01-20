@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 

@@ -1,11 +1,11 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model.location;
 
 /**
  * Class that calculates the steps that an entity has to follow to reach a destination
- * 
+ *
  * @author Iván Castilla Rodríguez
  *
  */
@@ -15,11 +15,11 @@ public interface IRouter {
 	/** Abstract location for an unreachable destination */
 	static final ILocation UNREACHABLE_LOCATION = new SpecialLocation(-2, "Abstract location for an unreachable destination");
 	/**
-	 * Returns the next location in the way for an entity trying to reach a destination; null if the destination is not reachable from 
-	 * the current location 
+	 * Returns the next location in the way for an entity trying to reach a destination; null if the destination is not reachable from
+	 * the current location
 	 * @param entity Entity moving from its current location to destination
 	 * @param destination Destination of the entity
-	 * @return the next location in the way for an entity trying to reach a destination; {@link #UNREACHABLE_LOCATION} if the destination 
+	 * @return the next location in the way for an entity trying to reach a destination; {@link #UNREACHABLE_LOCATION} if the destination
 	 * is not reachable from the current location; and {@link #COND_WAIT_LOCATION} if the entity has to wait before moving
 	 */
 	ILocation getNextLocationTo(final IMovable entity, final ILocation destination);

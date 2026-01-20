@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -21,31 +21,31 @@ public abstract class DiscreteEvent implements Runnable, Comparable<DiscreteEven
     public DiscreteEvent(final long ts) {
         this.ts = ts;
     }
-    
+
     /**
-     * Performs a task and then it removes this event from the execution 
+     * Performs a task and then it removes this event from the execution
      * queue. It also updates the element's timestamp.
-     */        
+     */
     public void run() {
     	if (!cancelled)
     		event();
     }
-    
+
     /**
      * The action/task that this event carries out.
      */
     public abstract void event();
-    
+
     /**
-     * Cancels this event. This function only works when the event is currently scheduled in the 
+     * Cancels this event. This function only works when the event is currently scheduled in the
      * simulation.
-     * @return True if the event can be cancelled; false otherwise. 
+     * @return True if the event can be cancelled; false otherwise.
      */
     public boolean cancel() {
     	cancelled = true;
     	return true;
     }
-    
+
     /**
      * Checks if this event has been cancelled.
      * @return True if the event has been cancelled; false otherwise.
@@ -61,7 +61,7 @@ public abstract class DiscreteEvent implements Runnable, Comparable<DiscreteEven
     public String toString() {
         return "Ev(" + getClass().getName() + ")[" + ts + "]";
     }
-    
+
     /**
      * Getter for property ts.
      * @return Value of property ts.
@@ -69,13 +69,13 @@ public abstract class DiscreteEvent implements Runnable, Comparable<DiscreteEven
     public long getTs() {
         return ts;
     }
-    
+
     /**
      * Checks if this event is greater than, less than, or equal to other.
      * @param e Compared event.
      * @return 1, -1 or 0 if the current timestamp is greater than, less than, or equal to
      * the timestamp of the event passed by parameters.
-     */    
+     */
 	public int compareTo(final DiscreteEvent e) {
 		final long evTs = e.getTs();
 		if (ts > evTs)
@@ -92,12 +92,12 @@ public abstract class DiscreteEvent implements Runnable, Comparable<DiscreteEven
      */
     public static class DefaultFinalizeEvent extends DiscreteEvent {
     	final protected IEventSource source;
-        
+
         public DefaultFinalizeEvent(final IEventSource source, final long ts) {
             super(ts);
             this.source = source;
         }
-        
+
         public void event() {
         	ILoggable.logger.trace(this + "\tEnds execution");
         }

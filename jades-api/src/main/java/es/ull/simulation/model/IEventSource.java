@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -10,7 +10,7 @@ package es.ull.simulation.model;
  *
  */
 public interface IEventSource extends ILoggable {
-	
+
 	/**
 	 * Creates an event for the moment the simulation creates this object
 	 * @param ts Timestamp when the simulation creates the object
@@ -25,8 +25,8 @@ public interface IEventSource extends ILoggable {
 	DiscreteEvent onDestroy(final long ts);
 
     /**
-     * Informs the element that it must finish its execution and launch the destroy event. 
+     * Informs the element that it must finish its execution and launch the destroy event.
      */
     void notifyEnd();
-    
+
 }

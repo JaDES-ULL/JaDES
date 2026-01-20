@@ -15,21 +15,21 @@ public interface IVariableStore
 	 * @return The Variable.
 	 */
 	public IVariable getVar(final String varName);
-	
+
 	/**
 	 * Assigns a value to a variable.
 	 * @param varName Variable name.
 	 * @param value The new value.
 	 */
 	public void putVar(final String varName, final IVariable value);
-	
+
 	/**
 	 * Assigns a value to a variable.
 	 * @param varName Variable name.
 	 * @param value The new value.
 	 */
 	public void putVar(final String varName, final double value);
-	
+
 	/**
 	 * Assigns a value to a variable.
 	 * @param varName Variable name.
@@ -43,14 +43,14 @@ public interface IVariableStore
 	 * @param value The new value.
 	 */
 	public void putVar(final String varName, final boolean value);
-	
+
 	/**
 	 * Assigns a value to a variable.
 	 * @param varName Variable name.
 	 * @param value The new value.
 	 */
 	public void putVar(final String varName, final char value);
-	
+
 	/**
 	 * Assigns a value to a variable.
 	 * @param varName Variable name
@@ -64,14 +64,14 @@ public interface IVariableStore
 	 * @param value The new value.
 	 */
 	public void putVar(final String varName, final float value);
-	
+
 	/**
 	 * Assigns a value to a variable.
 	 * @param varName Variable name.
 	 * @param value The new value.
 	 */
 	public void putVar(final String varName, final long value);
-	
+
 	/**
 	 * Assigns a value to a variable.
 	 * @param varName Variable name.

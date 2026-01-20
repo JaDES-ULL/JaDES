@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model.location;
 
@@ -11,7 +11,7 @@ package es.ull.simulation.model.location;
 public interface IMovable extends ILocated {
 	/**
 	 * Sets the current location of the object
-	 * @param location The current location of the object 
+	 * @param location The current location of the object
 	 */
 	void setLocation(final ILocation location);
 	void notifyLocationAvailable(final ILocation location);

@@ -8,7 +8,7 @@ public interface ExcelFormula {
         for (int i = 0; i < operands.length; i++) {
             if (operands[i] instanceof CellReference) {
                 operands[i] = ((CellReference)operands[i]).formatAsString();
-            } 
+            }
         }
         return String.format(getTemplate(), operands);
     }

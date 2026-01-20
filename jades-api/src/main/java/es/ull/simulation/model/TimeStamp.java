@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -9,11 +9,11 @@ package es.ull.simulation.model;
  *
  */
 public final class TimeStamp {
-	/** The time unit of the value */ 
+	/** The time unit of the value */
 	private final TimeUnit unit;
-	/** A time value expressed in the corresponding unit */ 
+	/** A time value expressed in the corresponding unit */
 	private final long value;
-	
+
 	/**
 	 * Creates a new timestamp.
 	 * @param unit The time unit of the value
@@ -39,7 +39,7 @@ public final class TimeStamp {
 	public long getValue() {
 		return value;
 	}
-	
+
 	/**
 	 * Converts the value of this timestamp to the specified unit.
 	 * @param unit The unit of the new timestamp
@@ -57,16 +57,16 @@ public final class TimeStamp {
 	public TimeStamp add(final TimeStamp op) {
 		return new TimeStamp(unit, value + op.convert(unit).value);
 	}
-	
+
 	/**
 	 * Multiplies this timestamp by the specified factor
 	 * @param factor The multiplying timestamp
 	 * @return A new timestamp whose value is the product of this timestamp and the received factor.
 	 */
 	public TimeStamp multiply(final double factor) {
-		return new TimeStamp(unit, Math.round(value * factor));		
+		return new TimeStamp(unit, Math.round(value * factor));
 	}
-	
+
 	@Override
 	public String toString() {
 		return "" + value + " " + unit.getName();
@@ -79,13 +79,13 @@ public final class TimeStamp {
 	public static TimeStamp getZero() {
 		return new TimeStamp(TimeUnit.MINUTE, 0);
 	}
-	
+
 	/**
 	 * Returns a "1 MINUTE" timestamp.
 	 * @return A "1 MINUTE" timestamp
 	 */
 	public static TimeStamp getMinute() {
-		return new TimeStamp(TimeUnit.MINUTE, 1);		
+		return new TimeStamp(TimeUnit.MINUTE, 1);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public final class TimeStamp {
 	 * @return A "1 HOUR" timestamp
 	 */
 	public static TimeStamp getHour() {
-		return new TimeStamp(TimeUnit.HOUR, 1);		
+		return new TimeStamp(TimeUnit.HOUR, 1);
 	}
 
 	/**
@@ -101,7 +101,7 @@ public final class TimeStamp {
 	 * @return A "1 DAY" timestamp
 	 */
 	public static TimeStamp getDay() {
-		return new TimeStamp(TimeUnit.DAY, 1);		
+		return new TimeStamp(TimeUnit.DAY, 1);
 	}
 
 	/**
@@ -109,7 +109,7 @@ public final class TimeStamp {
 	 * @return A "1 WEEK" timestamp
 	 */
 	public static TimeStamp getWeek() {
-		return new TimeStamp(TimeUnit.WEEK, 1);		
+		return new TimeStamp(TimeUnit.WEEK, 1);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public final class TimeStamp {
 	 * @return A "1 MONTH" timestamp
 	 */
 	public static TimeStamp getMonth() {
-		return new TimeStamp(TimeUnit.MONTH, 1);		
+		return new TimeStamp(TimeUnit.MONTH, 1);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public final class TimeStamp {
 	 * @return A "1 YEAR" timestamp
 	 */
 	public static TimeStamp getYear() {
-		return new TimeStamp(TimeUnit.YEAR, 1);		
+		return new TimeStamp(TimeUnit.YEAR, 1);
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.ull.simulation.model;
 
@@ -9,15 +9,15 @@ package es.ull.simulation.model;
  *
  */
 public enum TimeUnit {
-	MILLISECOND("Milliseconds"), 
-	SECOND("Seconds"), 
-	MINUTE("Minutes"), 
-	HOUR("Hours"), 
-	DAY("Days"), 
-	WEEK("Weeks"), 
-	MONTH("Months"), 
+	MILLISECOND("Milliseconds"),
+	SECOND("Seconds"),
+	MINUTE("Minutes"),
+	HOUR("Hours"),
+	DAY("Days"),
+	WEEK("Weeks"),
+	MONTH("Months"),
 	YEAR("Years");
-	
+
 	private final static double[][] conversion = {
 		{1, 0.001, 1/60000.0, 1/3600000.0, 1/86400000.0, 1/608400000.0, 1/2592000000.0, 1/31536000000.0},
 		{1000, 1, 1/60.0, 1/3600.0, 1/8640.0, 1/60840.0, 1/259200.0, 1/3153600.0},
@@ -28,7 +28,7 @@ public enum TimeUnit {
 		{2592000000.0, 2592000, 43200, 720, 30, 4, 1, 1/12.0},
 		{31536000000.0, 31536000, 525600, 8760, 365, 52, 12, 1}
 	};
-	
+
 	/** The name of the unit */
 	private String name;
 	/**
@@ -43,8 +43,8 @@ public enum TimeUnit {
 	 * Returns the name of the time unit
 	 * @return the name of the time unit
 	 */
-	public String getName() { 
-		return name; 
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -56,7 +56,7 @@ public enum TimeUnit {
 	public long convert(final double sourceValue, final TimeUnit sourceUnit) {
 		return Math.round(sourceValue * conversion[sourceUnit.ordinal()][ordinal()]);
 	}
-	
+
 	/**
 	 * Converts from one time unit to this one.
 	 * @param sourceValue Source timestamp
