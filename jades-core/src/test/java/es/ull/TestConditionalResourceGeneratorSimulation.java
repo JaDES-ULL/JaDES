@@ -33,7 +33,7 @@ public class TestConditionalResourceGeneratorSimulation extends StandardTestSimu
 			// Here it is created the resource
 			final Resource res = new Resource(simul, "Container later 1");
 			res.newTimeTableOrCancelEntriesAdder(rt1).addTimeTableEntry();
-			simul.addEvent(res.onCreate(simul.getTs()));
+			simul.scheduleEvent(res.onCreate(simul.getCurrentTimestamp()));
 		}
 	}
 

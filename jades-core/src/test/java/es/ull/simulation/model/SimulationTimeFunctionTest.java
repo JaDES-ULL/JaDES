@@ -2,8 +2,6 @@ package es.ull.simulation.model;
 
 import org.junit.jupiter.api.Test;
 
-import es.ull.simulation.functions.TimeFunctionParams;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

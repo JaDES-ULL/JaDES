@@ -2,8 +2,6 @@ package es.ull.simulation.model.flow;
 
 import es.ull.simulation.model.ElementInstance;
 import es.ull.simulation.model.Simulation;
-import es.ull.simulation.model.SimulationPeriodicCycle;
-import es.ull.simulation.model.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

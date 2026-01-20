@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import es.ull.simulation.model.Simulation;
-
 class BaseExperimentTest {
 
     private TestExperiment experiment;

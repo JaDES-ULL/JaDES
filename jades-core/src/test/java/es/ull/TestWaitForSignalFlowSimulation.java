@@ -84,7 +84,7 @@ public class TestWaitForSignalFlowSimulation extends StandardTestSimulation {
 	@Override
 	public void init() {
 		super.init();
-		addEvent(listener.onCreate(getTs()));
+		scheduleEvent(listener.onCreate(getCurrentTimestamp()));
 	}
 	
 	class SimListener extends SimulationObject implements IEventSource, WaitForSignalFlow.Listener {
@@ -110,7 +110,7 @@ public class TestWaitForSignalFlowSimulation extends StandardTestSimulation {
 
 		@Override
 		public void notifyEnd() {
-	        simul.addEvent(onDestroy(simul.getTs()));		
+	        simul.scheduleEvent(onDestroy(simul.getCurrentTimestamp()));		
 		}
 
 		@Override
@@ -138,7 +138,7 @@ public class TestWaitForSignalFlowSimulation extends StandardTestSimulation {
 				for (int i = 0; i < n; i++) {
 					IFlow.signal(waiting.remove(0));
 				}
-				simul.addEvent(new CheckEvent(ts + CHECK_DELAY));
+				simul.scheduleEvent(new CheckEvent(ts + CHECK_DELAY));
 			}
 			
 		}

@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import es.ull.simulation.model.Element;
-import es.ull.simulation.model.ElementInstance;
-import es.ull.simulation.model.ElementType;
 import es.ull.simulation.model.ResourceType;
 import es.ull.simulation.model.Simulation;
 import es.ull.simulation.model.TimeUnit;

@@ -41,9 +41,9 @@ class SimulationTest {
 
     @Test
     void shouldGenerateUniqueElementIds_whenRequested() {
-        int firstId = simulation.getNewElementId();
-        int secondId = simulation.getNewElementId();
-        int thirdId = simulation.getNewElementId();
+        int firstId = simulation.generateId();
+        int secondId = simulation.generateId();
+        int thirdId = simulation.generateId();
 
         assertEquals(0, firstId);
         assertEquals(1, secondId);
