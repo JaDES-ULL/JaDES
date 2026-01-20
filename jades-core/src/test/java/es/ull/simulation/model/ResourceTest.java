@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import es.ull.simulation.model.engine.SimulationEngine;
 import es.ull.simulation.model.location.Node;
 
 class ResourceTest {
@@ -21,6 +22,8 @@ class ResourceTest {
     @BeforeEach
     void setUp() {
         simulation = new Simulation(SIMULATION_ID, SIMULATION_DESC);
+        SimulationEngine engine = new SimulationEngine(SIMULATION_ID, simulation);
+        simulation.setSimulationEngine(engine);
     }
 
     @Test

@@ -134,6 +134,37 @@ class BaseExperimentTest {
         assertEquals(3, exp3.getNExperiments());
     }
 
+    @Test
+    void shouldRunExperimentsSequentially() {
+        CommonArguments args = new CommonArguments();
+        args.nRuns = 3;
+        args.parallel = false;
+        args.quiet = true;
+
+        TrackingExperiment tracking = new TrackingExperiment("Seq", args);
+        tracking.run();
+
+        assertEquals(3, tracking.executed.size());
+        assertEquals(1, tracking.beforeCalls);
+        assertEquals(1, tracking.afterCalls);
+    }
+
+    @Test
+    void shouldRunExperimentsInParallel() {
+        CommonArguments args = new CommonArguments();
+        args.nRuns = 2;
+        args.parallel = true;
+        args.nThreads = 1;
+        args.quiet = true;
+
+        TrackingExperiment tracking = new TrackingExperiment("Par", args);
+        tracking.run();
+
+        assertEquals(2, tracking.executed.size());
+        assertEquals(1, tracking.beforeCalls);
+        assertEquals(1, tracking.afterCalls);
+    }
+
     // Concrete implementation for testing
     private static class TestExperiment extends BaseExperiment {
 
@@ -154,6 +185,31 @@ class BaseExperimentTest {
         @Override
         public void runExperiment(int ind) {
             // Test implementation
+        }
+    }
+
+    private static class TrackingExperiment extends BaseExperiment {
+        private int beforeCalls = 0;
+        private int afterCalls = 0;
+        private final java.util.List<Integer> executed = new java.util.ArrayList<>();
+
+        public TrackingExperiment(String description, CommonArguments arguments) {
+            super(description, arguments);
+        }
+
+        @Override
+        public void beforeStart() {
+            beforeCalls++;
+        }
+
+        @Override
+        public void afterFinalize() {
+            afterCalls++;
+        }
+
+        @Override
+        public void runExperiment(int ind) {
+            executed.add(ind);
         }
     }
 }

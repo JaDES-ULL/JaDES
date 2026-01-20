@@ -203,8 +203,7 @@ class LongVariableTest {
 
         // When: comparing them
         // Note: LongVariable has a typo - method is "equas" not "equals"
-        // So we can't test equals properly, but getValue should work
-        assertEquals(var1.getValue(), var2.getValue());
+        assertTrue(var1.equas(var2));
     }
 
     @Test
@@ -215,7 +214,7 @@ class LongVariableTest {
 
         // When: checking their values
         // Then: they should not be equal
-        assertFalse(var1.getValue().equals(var2.getValue()));
+        assertFalse(var1.equas(var2));
     }
 
     @Test

@@ -132,6 +132,26 @@ class CharacterVariableTest {
     }
 
     @Test
+    void shouldReturnFalse_whenComparingWithIVariableValue() {
+        // Given: a CharacterVariable and a stub IVariable
+        CharacterVariable variable = new CharacterVariable('A');
+        IVariable other = new IVariable() {
+            @Override
+            public Number getValue(Object... params) {
+                return Integer.valueOf(1);
+            }
+
+            @Override
+            public String toString() {
+                return "1";
+            }
+        };
+
+        // When/Then: equals should be false based on current implementation
+        assertEquals(false, variable.equals(other));
+    }
+
+    @Test
     void shouldSetValueFromFloat() {
         // Given: a CharacterVariable
         // When: setting value from float (68.5 truncates to 68 = 'D')

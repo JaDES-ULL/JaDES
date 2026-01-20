@@ -1,6 +1,15 @@
 package es.ull.simulation.info;
 
 import es.ull.simulation.info.ResourceUsageInfo.Type;
+import es.ull.simulation.model.Element;
+import es.ull.simulation.model.ElementType;
+import es.ull.simulation.model.Resource;
+import es.ull.simulation.model.ResourceType;
+import es.ull.simulation.model.Simulation;
+import es.ull.simulation.model.flow.AbstractSingleSuccessorFlow;
+import es.ull.simulation.model.flow.IFlow;
+import es.ull.simulation.model.flow.IResourceHandlerFlow;
+import es.ull.simulation.model.flow.ITaskFlow;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -115,5 +124,59 @@ class ResourceUsageInfoTest {
         // Then: names should match
         assertEquals("CAUGHT", caughtName);
         assertEquals("RELEASED", releasedName);
+    }
+
+    @Test
+    void shouldExposePropertiesAndFormatString() {
+        Simulation simulation = new Simulation(1, "Test Simulation");
+        Resource resource = new Resource(simulation, "Res1");
+        ResourceType resourceType = new ResourceType(simulation, "Role1");
+        ElementType elementType = new ElementType(simulation, "Type1");
+        DummyResourceFlow activity = new DummyResourceFlow(simulation);
+        Element element = new Element(simulation, elementType, activity);
+
+        ResourceUsageInfo info = new ResourceUsageInfo(simulation, resource, resourceType, null, element, activity,
+                ResourceUsageInfo.Type.CAUGHT, 5L);
+
+        assertEquals(resource, info.getResource());
+        assertEquals(resourceType, info.getResourceType());
+        assertEquals(ResourceUsageInfo.Type.CAUGHT, info.getType());
+        assertEquals(activity, info.getActivity());
+        assertEquals(null, info.getElementInstance());
+
+        String text = info.toString();
+        assertNotNull(text);
+        assertTrue(text.contains("CAUGHT RESOURCE"));
+        assertTrue(text.contains(resource.getDescription()));
+        assertTrue(text.contains(resourceType.getDescription()));
+    }
+
+    private static final class DummyResourceFlow extends AbstractSingleSuccessorFlow implements IResourceHandlerFlow, ITaskFlow {
+        private DummyResourceFlow(Simulation model) {
+            super(model);
+        }
+
+        @Override
+        public int getResourcesId() {
+            return 0;
+        }
+
+        @Override
+        public void request(es.ull.simulation.model.ElementInstance ei) {
+            next(ei);
+        }
+
+        @Override
+        public void addPredecessor(IFlow predecessor) {
+        }
+
+        @Override
+        public void finish(es.ull.simulation.model.ElementInstance ei) {
+            next(ei);
+        }
+
+        @Override
+        public void afterFinalize(es.ull.simulation.model.ElementInstance ei) {
+        }
     }
 }
