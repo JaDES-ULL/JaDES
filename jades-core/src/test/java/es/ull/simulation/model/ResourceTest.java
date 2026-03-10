@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -305,5 +307,286 @@ class ResourceTest {
         var event = resource.onDestroy(timestamp);
 
         assertNotNull(event);
+    }
+
+    // -----------------------------------------------------------------------
+    // Tests requiring engine assignment (resource created after setUp)
+    // assignSimulation is protected but accessible from the same package
+    // -----------------------------------------------------------------------
+
+    @Test
+    void shouldReturnNotNull_getEngine_afterManualAssignSimulation() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        resource.assignSimulation(simulation.getSimulationEngine());
+
+        assertNotNull(resource.getEngine());
+    }
+
+    @Test
+    void shouldReturnFalse_isSeized_whenNoElementHoldsResource() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        resource.assignSimulation(simulation.getSimulationEngine());
+
+        assertFalse(resource.isSeized());
+    }
+
+    @Test
+    void shouldReturnNull_getCurrentElement_whenResourceNotSeized() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        resource.assignSimulation(simulation.getSimulationEngine());
+
+        assertNull(resource.getEngine().getCurrentElement());
+    }
+
+    @Test
+    void shouldReturnEmptyList_getCurrentManagers_whenNoRolesAssigned() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        resource.assignSimulation(simulation.getSimulationEngine());
+
+        ArrayList<ActivityManager> managers = resource.getCurrentManagers();
+        assertNotNull(managers);
+        assertTrue(managers.isEmpty());
+    }
+
+    @Test
+    void shouldReturnZero_getValidTimeTableEntries_initially() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        resource.assignSimulation(simulation.getSimulationEngine());
+
+        assertEquals(0, resource.getEngine().getValidTimeTableEntries());
+    }
+
+    @Test
+    void shouldIncrement_validTimeTableEntries_whenIncCalled() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        resource.assignSimulation(simulation.getSimulationEngine());
+
+        int result = resource.getEngine().incValidTimeTableEntries();
+
+        assertEquals(1, result);
+        assertEquals(1, resource.getEngine().getValidTimeTableEntries());
+    }
+
+    @Test
+    void shouldDecrement_validTimeTableEntries_whenDecCalled() {
+        Resource resource = new Resource(simulation, RESOURCE_DESC);
+        resource.assignSimulation(simulation.getSimulationEngine());
+        resource.getEngine().incValidTimeTableEntries();
+        resource.getEngine().incValidTimeTableEntries();
+
+        int result = resource.getEngine().decValidTimeTableEntries();
+
+        assertEquals(1, result);
+        assertEquals(1, resource.getEngine().getValidTimeTableEntries());
+    }
+
+    // -----------------------------------------------------------------------
+    // Tests requiring ActivityManager + ResourceType + full engine setup
+    // These create a dedicated Simulation so everything is initialized together
+    // -----------------------------------------------------------------------
+
+    /**
+     * Helper: builds a fully initialised simulation where AM, RT and Resource
+     * have their engines assigned via setSimulationEngine.
+     */
+    private static final class FullSetup {
+        final Simulation sim;
+        final ActivityManager am;
+        final ResourceType rt;
+        final Resource resource;
+
+        FullSetup(int id) {
+            sim = new Simulation(id, "FullSetup-" + id);
+            am = new ActivityManager(sim);
+            rt = new ResourceType(sim, "Type-" + id);
+            rt.setManager(am);
+            resource = new Resource(sim, "Res-" + id);
+            SimulationEngine eng = new SimulationEngine(id, sim);
+            sim.setSimulationEngine(eng);
+        }
+    }
+
+    @Test
+    void shouldReturnFalse_isAvailable_whenNoRoleAdded() {
+        FullSetup s = new FullSetup(200);
+
+        assertFalse(s.resource.isAvailable(s.rt));
+    }
+
+    @Test
+    void shouldReturnTrue_isAvailable_whenRoleAddedWithFutureTimestamp() {
+        FullSetup s = new FullSetup(201);
+
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+
+        assertTrue(s.resource.isAvailable(s.rt));
+    }
+
+    @Test
+    void shouldReturnFalse_isAvailable_whenResourceIsCanceled() {
+        FullSetup s = new FullSetup(202);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+
+        s.resource.getEngine().setNotCanceled(false);
+
+        assertFalse(s.resource.isAvailable(s.rt));
+    }
+
+    @Test
+    void shouldReturnFalse_isAvailable_whenRoleTimestampExpired() {
+        FullSetup s = new FullSetup(203);
+        // Sim ts starts at 0; role with avEnd=0 → 0 > 0 is false
+        s.resource.getEngine().addRole(s.rt, 0L);
+
+        assertFalse(s.resource.isAvailable(s.rt));
+    }
+
+    @Test
+    void shouldReturnManager_getCurrentManagers_afterAddRole() {
+        FullSetup s = new FullSetup(204);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+
+        ArrayList<ActivityManager> managers = s.resource.getCurrentManagers();
+
+        assertEquals(1, managers.size());
+        assertEquals(s.am, managers.get(0));
+    }
+
+    @Test
+    void shouldNotDuplicate_getCurrentManagers_whenSameManagerAddedTwice() {
+        FullSetup s = new FullSetup(205);
+        ResourceType rt2 = new ResourceType(s.sim, "Type2-205");
+        rt2.setManager(s.am);  // same manager as rt
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+        s.resource.getEngine().addRole(rt2, Long.MAX_VALUE);
+
+        ArrayList<ActivityManager> managers = s.resource.getCurrentManagers();
+
+        // Both roles share the same AM → list contains it only once
+        assertEquals(1, managers.size());
+    }
+
+    @Test
+    void shouldAddRole_withoutThrowing_whenActivityManagerIsSet() {
+        FullSetup s = new FullSetup(206);
+
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+
+        // Role is now present: isAvailable reflects it
+        assertTrue(s.resource.isAvailable(s.rt));
+    }
+
+    @Test
+    void shouldKeepRole_whenRemoveRoleCalledButNotYetExpired() {
+        FullSetup s = new FullSetup(207);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+
+        // At ts=0, avEnd=MAX_VALUE is NOT <= ts → removeRole is a no-op
+        s.resource.getEngine().removeRole(s.rt);
+
+        assertTrue(s.resource.isAvailable(s.rt));
+    }
+
+    @Test
+    void shouldRemoveRole_whenAvailabilityTimestampExpired() {
+        FullSetup s = new FullSetup(208);
+        s.resource.getEngine().addRole(s.rt, 0L); // avEnd=0, ts=0 → 0<=0 → will remove
+        assertFalse(s.resource.isAvailable(s.rt)); // already not available
+
+        s.resource.getEngine().removeRole(s.rt);
+
+        // Role removed → getCurrentManagers returns empty
+        assertTrue(s.resource.getCurrentManagers().isEmpty());
+    }
+
+    @Test
+    void shouldSkipSilently_removeRole_whenRoleNeverAdded() {
+        FullSetup s = new FullSetup(209);
+
+        // Must not throw
+        s.resource.getEngine().removeRole(s.rt);
+
+        assertTrue(s.resource.getCurrentManagers().isEmpty());
+    }
+
+    @Test
+    void shouldKeepHigherTimestamp_whenAddRoleCalledTwiceForSameType() {
+        FullSetup s = new FullSetup(210);
+        s.resource.getEngine().addRole(s.rt, 1000L);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE); // higher → replaces
+
+        // Still available (avEnd is MAX_VALUE)
+        assertTrue(s.resource.isAvailable(s.rt));
+    }
+
+    @Test
+    void shouldNotReplaceTimestamp_whenAddRoleCalledWithLowerValue() {
+        FullSetup s = new FullSetup(211);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+        s.resource.getEngine().addRole(s.rt, 1L); // lower → ignored
+
+        // Still available (avEnd kept at MAX_VALUE)
+        assertTrue(s.resource.isAvailable(s.rt));
+    }
+
+    @Test
+    void shouldNotifyCurrentManagers_withoutThrowing_whenRolesPresent() {
+        FullSetup s = new FullSetup(212);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+
+        // notifyCurrentManagers only sets availableResource=true in the AM engine
+        s.resource.getEngine().notifyCurrentManagers();
+
+        // No exception thrown and resource still available
+        assertTrue(s.resource.isAvailable(s.rt));
+    }
+
+    @Test
+    void shouldAddResourceToSolution_whenResourceIsAvailable() {
+        FullSetup s = new FullSetup(213);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+        java.util.ArrayDeque<Resource> solution = new java.util.ArrayDeque<>();
+
+        boolean added = s.resource.getEngine().add2Solution(solution, s.rt, null);
+
+        assertTrue(added);
+        assertTrue(solution.contains(s.resource));
+        assertEquals(s.rt, s.resource.getCurrentResourceType());
+    }
+
+    @Test
+    void shouldNotAddResourceToSolution_whenResourceHasNoRole() {
+        FullSetup s = new FullSetup(214);
+        java.util.ArrayDeque<Resource> solution = new java.util.ArrayDeque<>();
+
+        boolean added = s.resource.getEngine().add2Solution(solution, s.rt, null);
+
+        assertFalse(added);
+        assertTrue(solution.isEmpty());
+    }
+
+    @Test
+    void shouldNotAddResourceToSolution_whenAlreadyInUse() {
+        FullSetup s = new FullSetup(215);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+        s.resource.setCurrentResourceType(s.rt); // simulate already in use
+        java.util.ArrayDeque<Resource> solution = new java.util.ArrayDeque<>();
+
+        boolean added = s.resource.getEngine().add2Solution(solution, s.rt, null);
+
+        assertFalse(added);
+    }
+
+    @Test
+    void shouldRemoveResourceFromSolution_andClearCurrentResourceType() {
+        FullSetup s = new FullSetup(216);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+        java.util.ArrayDeque<Resource> solution = new java.util.ArrayDeque<>();
+        s.resource.getEngine().add2Solution(solution, s.rt, null);
+
+        s.resource.getEngine().removeFromSolution(solution, null);
+
+        assertFalse(solution.contains(s.resource));
+        assertNull(s.resource.getCurrentResourceType());
     }
 }

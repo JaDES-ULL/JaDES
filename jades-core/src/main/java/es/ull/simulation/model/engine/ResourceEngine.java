@@ -181,7 +181,8 @@ public class ResourceEngine extends AbstractEngineObject implements IResourceEng
 	 * @return True if the resource is available.
 	 */
 	public boolean isAvailable(ResourceType rt) {
-		return ((currentElem == null) && (notCanceled) && (getAvailability(rt) > simul.getTs()));
+		Long avEnd = getAvailability(rt);
+		return ((currentElem == null) && (notCanceled) && (avEnd != null) && (avEnd > simul.getTs()));
 	}
 	
 	/**
