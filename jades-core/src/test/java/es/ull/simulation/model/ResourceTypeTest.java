@@ -1,11 +1,16 @@
 package es.ull.simulation.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import es.ull.simulation.model.engine.SimulationEngine;
+import es.ull.simulation.model.location.Node;
 
 class ResourceTypeTest {
     private Simulation simulation;
@@ -185,5 +190,177 @@ class ResourceTypeTest {
         assertTrue(simulation.getResourceTypeList().contains(rt1));
         assertTrue(simulation.getResourceTypeList().contains(rt2));
         assertTrue(simulation.getResourceTypeList().contains(rt3));
+    }
+
+    // -----------------------------------------------------------------------
+    // Tests requiring full engine setup (AM + RT + Resource + SimulationEngine)
+    // Methods that access availableResourceList need assignSimulation called
+    // -----------------------------------------------------------------------
+
+    /**
+     * Helper: fully initialised simulation where AM, RT and Resource have their engines.
+     */
+    private static final class RTFullSetup {
+        final Simulation sim;
+        final ActivityManager am;
+        final ResourceType rt;
+        final Resource resource;
+
+        RTFullSetup(int id) {
+            sim = new Simulation(id, "RTSetup-" + id);
+            am = new ActivityManager(sim);
+            rt = new ResourceType(sim, "RT-" + id);
+            rt.setManager(am);
+            resource = new Resource(sim, "Res-" + id);
+            SimulationEngine eng = new SimulationEngine(id, sim);
+            sim.setSimulationEngine(eng);
+        }
+    }
+
+    @Test
+    void shouldReturnNonNullAvailableResourceList_afterEngineAssignment() {
+        RTFullSetup s = new RTFullSetup(300);
+
+        assertNotNull(s.rt.getAvailableResourceList());
+    }
+
+    @Test
+    void shouldHaveResourceInList_afterIncAvailable() {
+        RTFullSetup s = new RTFullSetup(301);
+
+        s.rt.incAvailable(s.resource);
+
+        assertEquals(1, s.rt.getAvailableResourceList().size());
+        assertEquals(s.resource, s.rt.getResource(0));
+    }
+
+    @Test
+    void shouldRemoveResourceFromList_afterDecAvailable() {
+        RTFullSetup s = new RTFullSetup(302);
+        s.rt.incAvailable(s.resource);
+        assertEquals(1, s.rt.getAvailableResourceList().size());
+
+        s.rt.decAvailable(s.resource);
+
+        assertEquals(0, s.rt.getAvailableResourceList().size());
+    }
+
+    @Test
+    void shouldMarkResourceTimeOut_whenDecAvailable_andResourceCurrentlyInUseForThisType() {
+        RTFullSetup s = new RTFullSetup(303);
+        s.resource.setCurrentResourceType(s.rt); // simulate in-use
+        s.rt.incAvailable(s.resource);
+
+        s.rt.decAvailable(s.resource);
+
+        assertTrue(s.resource.isTimeOut());
+    }
+
+    @Test
+    void shouldClearTimeOut_whenIncAvailable_andResourceCurrentlyTimedOut() {
+        RTFullSetup s = new RTFullSetup(304);
+        s.resource.setCurrentResourceType(s.rt);
+        s.resource.setTimeOut(true);
+
+        s.rt.incAvailable(s.resource);
+
+        assertFalse(s.resource.isTimeOut());
+    }
+
+    @Test
+    void shouldReturnZeroAvailableResources_whenNoRoleAdded() {
+        RTFullSetup s = new RTFullSetup(305);
+        s.rt.incAvailable(s.resource);
+
+        // Without addRole, isAvailable returns false → count = 0
+        assertEquals(0, s.rt.getAvailableResources());
+    }
+
+    @Test
+    void shouldReturnOneAvailableResource_whenRoleAddedWithFutureTimestamp() {
+        RTFullSetup s = new RTFullSetup(306);
+        s.rt.incAvailable(s.resource);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+
+        assertEquals(1, s.rt.getAvailableResources());
+    }
+
+    @Test
+    void shouldReturnTrue_checkNeeded_whenOneResourcePresent() {
+        RTFullSetup s = new RTFullSetup(307);
+        s.rt.incAvailable(s.resource);
+
+        // checkNeeded(0, 1): starting at index 0, needing 1 unseized resource
+        assertTrue(s.rt.checkNeeded(0, 1));
+    }
+
+    @Test
+    void shouldReturnFalse_checkNeeded_whenNotEnoughResources() {
+        RTFullSetup s = new RTFullSetup(308);
+        s.rt.incAvailable(s.resource); // only 1 resource
+
+        // checkNeeded(0, 2): needs 2, only 1 available
+        assertFalse(s.rt.checkNeeded(0, 2));
+    }
+
+    @Test
+    void shouldReturnFalse_checkNeeded_whenResourceIsSeized() {
+        RTFullSetup s = new RTFullSetup(309);
+        s.rt.incAvailable(s.resource);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+        // Seize the resource by adding it to a solution (sets currentResourceType)
+        java.util.ArrayDeque<Resource> sol = new java.util.ArrayDeque<>();
+        s.resource.getEngine().add2Solution(sol, s.rt, null);
+        // Now currentResourceType != null → checkNeeded won't count it
+        assertFalse(s.rt.checkNeeded(0, 1));
+    }
+
+    @Test
+    void shouldReturnMinusOne_getNextAvailableResource_whenNoRoleAdded() {
+        RTFullSetup s = new RTFullSetup(310);
+        s.rt.incAvailable(s.resource);
+        // Without role, add2Solution returns false → getNextAvailableResource returns -1
+        java.util.ArrayDeque<Resource> sol = new java.util.ArrayDeque<>();
+        int idx = s.rt.getNextAvailableResource(sol, 0, null);
+
+        assertEquals(-1, idx);
+    }
+
+    @Test
+    void shouldReturnValidIndex_getNextAvailableResource_whenRoleAdded() {
+        RTFullSetup s = new RTFullSetup(311);
+        s.rt.incAvailable(s.resource);
+        s.resource.getEngine().addRole(s.rt, Long.MAX_VALUE);
+        java.util.ArrayDeque<Resource> sol = new java.util.ArrayDeque<>();
+
+        int idx = s.rt.getNextAvailableResource(sol, 0, null);
+
+        assertEquals(0, idx);
+        assertTrue(sol.contains(s.resource));
+    }
+
+    @Test
+    void shouldAddGenericResourcesWithLocation_whenRequested() {
+        RTFullSetup s = new RTFullSetup(312);
+        Node location = new Node("Loc-312");
+
+        Resource[] resources = s.rt.addGenericResources(3, 2, location);
+
+        assertNotNull(resources);
+        assertEquals(3, resources.length);
+        for (Resource res : resources) {
+            assertNotNull(res);
+            // currentLocation is null until simulation runs onCreate; check capacity instead
+            assertEquals(2, res.getCapacity());
+            assertFalse(res.getTimeTableEntries().isEmpty());
+        }
+    }
+
+    @Test
+    void shouldReturnNull_getAvailableResourceList_beforeEngineAssignment() {
+        // No setSimulationEngine called → availableResourceList stays null
+        ResourceType rt = new ResourceType(simulation, "Uninitialized RT");
+
+        assertNull(rt.getAvailableResourceList());
     }
 }
