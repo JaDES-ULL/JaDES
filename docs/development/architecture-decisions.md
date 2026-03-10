@@ -526,35 +526,159 @@ jades-utils/          (aggregator, depends on all below)
 
 ---
 
-## Index of Decisions
+## ADR-009: Módulo `jades-random` para Distribuciones de Probabilidad
 
-| ADR | Title | Status | Date |
-|-----|-------|--------|------|
-| ADR-001 | Multi-Module Maven Structure | Accepted | 2026-01-08 |
-| ADR-002 | Java 17 LTS as Target | Accepted | 2026-01-08 |
-| ADR-003 | Deprecate Factory Package | Accepted | 2026-01-08 |
-| ADR-004 | Self-Registration Pattern | Accepted | 2026-01-08 |
-| ADR-005 | JaCoCo Coverage by Default | Accepted | 2026-01-08 |
-| ADR-006 | Conventional Commits | Accepted | 2026-01-08 |
-| ADR-007 | Google Java Style Guide | Accepted | 2026-01-08 |
-| ADR-008 | Modularize jades-utils | Proposed | 2026-01-08 |
+**Fecha**: 2026-01-09  
+**Estado**: Aceptado  
+**Decisores**: Mantenedores de JaDES  
+**Contexto**: Las distribuciones de probabilidad (exponencial, normal, uniforme, etc.)
+estaban distribuidas de forma inconsistente entre `jades-utils/simkit/random` (código copiado
+de la dependencia *simkit*) y la propia dependencia externa. Problemas:
+
+- Código duplicado con riesgo de CVE no gestionado
+- No había un punto canónico para añadir nuevas distribuciones
+- Los proyectos que solo necesitaban distribuciones debían cargar el monolito `jades-utils`
+
+**Opción 1: Mantener la situación actual**  
+Rechazada — sigue acumulando deuda técnica y seguridad.
+
+**Opción 2: Eliminar el paquete simkit/ de jades-utils**  
+Solo resuelve el duplicado, pero no ofrece un módulo independiente.
+
+**Opción 3: Crear módulo `jades-random`** ← *Elegida*
+
+### Decisión
+Crear **`jades-random`** como módulo Maven autónomo:
+
+```
+jades-random/
+└── src/main/java/es/ull/simulation/random/
+    ├── ExponentialFunction.java
+    ├── NormalFunction.java
+    ├── UniformFunction.java
+    ├── PoissonFunction.java
+    └── ...
+```
+
+- Implementa `TimeFunction` de `jades-utils` (sin dependencia de `jades-core`)
+- Puede usarse en cualquier proyecto Java sin arrastrar el motor de simulación
+- `jades-core` declara `jades-random` como dependencia opcional
+
+### Consecuencias
+
+**Positivas:**
+- Punto único de verdad para distribuciones
+- Sin código duplicado de simkit
+- Dependencia ligera para proyectos externos (~50 KB)
+- Facilita pruebas unitarias aisladas
+
+**Negativas:**
+- Un artefacto Maven más que publicar y versionar
+- Migración necesaria desde simkit/ en jades-utils
+
+**Neutras:**
+- El módulo `jades-utils/simkit/` se marcará como *deprecated* y se eliminará en v2.0
+
+### Referencias
+- [ADR-008: Modularización de jades-utils](architecture-decisions.md#adr-008-planned-modularization-of-jades-utils-future)
+- [jades-random/pom.xml](../../jades-random/pom.xml)
 
 ---
 
-## Contributing New ADRs
+## ADR-010: Módulo `jades-examples` No Publicado en Maven Central
 
-To propose a new architectural decision:
+**Fecha**: 2026-01-09  
+**Estado**: Aceptado  
+**Decisores**: Mantenedores de JaDES  
+**Contexto**: Al madurar el framework, se necesitaban ejemplos de uso reales y verificables.
+Opciones para distribuir los ejemplos:
 
-1. Copy ADR template above
-2. Number sequentially (ADR-009, ADR-010, etc.)
-3. Fill in all sections (especially "Alternatives Considered")
-4. Create PR with `docs:` prefix
-5. Get review from 2+ maintainers
-6. Update index table above
+**Opción 1: Publicar como artefacto en Maven Central**  
+Rechazada — los ejemplos no son una librería reutilizable; publicarlos infla el catálogo
+de artefactos y crea confusión sobre qué añadir como dependencia.
 
-**Guidelines:**
-- Keep decisions immutable (don't edit accepted ADRs)
-- Supersede old decisions with new ADR (link both)
-- Mark deprecated with ~~strikethrough~~ in index
-- Include concrete code examples
-- Link to relevant issues/discussions
+**Opción 2: Repositorio separado**  
+Rechazada (ver ADR-001) — fragmenta la base de código y complica el mantenimiento.
+
+**Opción 3: Módulo Maven en el monorepo, sin publicar** ← *Elegida*
+
+### Decisión
+Crear **`jades-examples`** como módulo Maven incluido en el repositorio pero excluido
+del ciclo de publicación a Maven Central:
+
+```xml
+<!-- jades-examples/pom.xml -->
+<properties>
+  <maven.deploy.skip>true</maven.deploy.skip>
+  <maven.install.skip>false</maven.install.skip>
+</properties>
+```
+
+**Contenido:**
+- `EmergencyDeptModel` — Urgencias: ExclusiveChoiceFlow, llegadas Poisson
+- `ICUModel` — UCI: ParallelFlow + SynchronizationFlow + DoWhileFlow, multi-réplica
+- `EmergencyDeptSimulation` / `ICUSimulation` — puntos de entrada ejecutables
+- Tests de humo con aserciones estadísticas (IC al 95%)
+
+**Documentación académica:**  
+El `README.md` de `jades-examples` está redactado en español con nivel de artículo
+científico: fundamentos DES (tupla de Zeigler), métricas formales en LaTeX, comparación
+con aproximaciones analíticas (M/D/3, distribución geométrica) y referencias bibliográficas.
+
+### Consecuencias
+
+**Positivas:**
+- Los ejemplos siempre están sincronizados con el código del framework
+- CI valida que los ejemplos compilar y sus tests pasan con cada PR
+- Sirven como referencia canónica de la API actual
+- La documentación científica facilita la citación académica
+
+**Negativas:**
+- `mvn clean install` tarda algo más (4 tests adicionales)
+- Hay que mantener los ejemplos actualizados al evolucionar la API
+
+**Neutras:**
+- Los ejemplos son ejecutables directamente con `mvn exec:java`
+- No se publican en Maven Central: no crean dependencias externas
+
+### Referencias
+- [jades-examples/README.md](../../jades-examples/README.md)
+- [Guía de inicio rápido](../guides/getting-started.md#ejemplos-de-referencia)
+- [ADR-001: Estructura Multi-módulo](architecture-decisions.md#adr-001)
+
+---
+
+## Índice de decisiones
+
+| ADR | Título | Estado | Fecha |
+|-----|--------|--------|-------|
+| ADR-001 | Estructura Maven Multi-módulo | Aceptado | 2026-01-08 |
+| ADR-002 | Java 17 LTS como objetivo | Aceptado | 2026-01-08 |
+| ADR-003 | Deprecar paquete Factory | Aceptado | 2026-01-08 |
+| ADR-004 | Patrón de Auto-registro | Aceptado | 2026-01-08 |
+| ADR-005 | JaCoCo por defecto | Aceptado | 2026-01-08 |
+| ADR-006 | Conventional Commits | Aceptado | 2026-01-08 |
+| ADR-007 | Google Java Style Guide | Aceptado | 2026-01-08 |
+| ADR-008 | Modularizar jades-utils (futuro) | Propuesto | 2026-01-08 |
+| ADR-009 | Módulo jades-random | Aceptado | 2026-01-09 |
+| ADR-010 | jades-examples no publicado | Aceptado | 2026-01-09 |
+
+---
+
+## Contribuir nuevos ADRs
+
+Para proponer una nueva decisión arquitectural:
+
+1. Copia la plantilla ADR de arriba
+2. Numera secuencialmente (ADR-011, ADR-012, …)
+3. Rellena todas las secciones (especialmente "Alternativas Consideradas")
+4. Crea una PR con prefijo `docs:`
+5. Obtén revisión de ≥2 mantenedores
+6. Actualiza la tabla de índice
+
+**Directrices:**
+- Los ADRs aceptados son inmutables (no editar)
+- Supersede decisiones antiguas con un nuevo ADR (enlaza ambos)
+- Marca los obsoletos con ~~tachado~~ en el índice
+- Incluye ejemplos de código concretos
+- Enlaza a issues/discusiones relevantes

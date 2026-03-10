@@ -1,216 +1,274 @@
 # Getting Started with JaDES
 
-## 📋 Prerequisites
+## 📋 Requisitos previos
 
-- **Java**: 17 or higher (LTS recommended)
-- **Maven**: 3.8 or higher
-- **IDE**: IntelliJ IDEA, Eclipse, or VS Code (optional)
+- **Java**: 17 o superior (LTS recomendado)
+- **Maven**: 3.8 o superior
+- **IDE**: IntelliJ IDEA, Eclipse, o VS Code (opcional)
 
-## 🚀 Installation
+## 🚀 Instalación
 
-### Option 1: Maven Dependency (Once Published)
+### Opción 1: Dependencia Maven (instalación local)
 
-Add to your `pom.xml`:
+Clona el repositorio e instálalo en tu repositorio local Maven:
+
+```bash
+git clone https://github.com/JaDES-ULL/JaDES.git
+cd JaDES
+mvn clean install -DskipTests
+```
+
+Luego añade la dependencia en tu `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>es.ull.simulation</groupId>
+    <groupId>io.github.jades-ull</groupId>
     <artifactId>jades-core</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
 
-### Option 2: Build from Source
+Si necesitas distribuciones de probabilidad integradas, añade también:
+
+```xml
+<dependency>
+    <groupId>io.github.jades-ull</groupId>
+    <artifactId>jades-random</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+### Opción 2: Build desde el código fuente (todo en uno)
 
 ```bash
-# Clone the repository
+# Clona el repositorio
 git clone https://github.com/JaDES-ULL/JaDES.git
 cd JaDES
 
-# Build and install locally
+# Compila e instala localmente (con tests)
 mvn clean install
 
-# Skip tests if you just want to install
+# Sin tests si solo quieres instalarlo rápido
 mvn clean install -DskipTests
 ```
 
-## 📝 Your First Simulation
+## 📝 Tu primera simulación
 
-### Example: Simple Queue System
+### Ejemplo: cola de servicio simple
+
+La unidad de trabajo en JaDES es el `ActivityFlow`, que encapsula la solicitud de
+recursos, el tiempo de servicio y la liberación en un solo objeto configurador.
 
 ```java
 import es.ull.simulation.model.*;
+import es.ull.simulation.model.flow.ActivityFlow;
+import es.ull.simulation.model.flow.TimeDrivenElementGenerator;
 import es.ull.simulation.inforeceiver.StdInfoListener;
+import es.ull.simulation.functions.ConstantFunction;
 
 public class SimpleQueueExample {
     public static void main(String[] args) {
-        // 1. Create simulation (0 to 100 time units)
-        Simulation sim = new Simulation(0, "Queue Example", TimeUnit.MINUTE, 0, 100);
-        
-        // 2. Define resource type (e.g., "Server")
+        // 1. Crear la simulación (unidad de tiempo: minutos)
+        Simulation sim = new Simulation(0, "Queue Example", TimeUnit.MINUTE);
+
+        // 2. Definir el tipo de recurso (p.ej., "Servidor")
         ResourceType serverType = new ResourceType(sim, "Server Type");
-        
-        // 3. Create resource (1 server)
-        Resource server = new Resource(sim, "Server 1", serverType);
-        
-        // 4. Define element type (e.g., "Customer")
-        ElementType customerType = new ElementType(sim, "Customer Type");
-        
-        // 5. Create activity manager (service activity)
-        ActivityManager serviceActivity = new ActivityManager(sim, "Service Activity", false);
-        
-        // 6. Define work group (requires 1 server)
-        WorkGroup wg = new WorkGroup(sim, serverType, 1);
-        serviceActivity.addWorkGroup(0, wg);
-        
-        // 7. Create flow (request → delay → release)
-        RequestResourcesFlow requestFlow = new RequestResourcesFlow(sim, "Request Server", 0);
-        requestFlow.addWorkGroup(wg);
-        
-        DelayFlow serviceFlow = new DelayFlow(sim, "Service Time", 
-            new ConstantFunction(5.0)); // 5 minutes
-        
-        ReleaseResourcesFlow releaseFlow = new ReleaseResourcesFlow(sim, "Release Server", 0);
-        releaseFlow.addWorkGroup(wg);
-        
-        // Chain flows
-        requestFlow.link(serviceFlow);
-        serviceFlow.link(releaseFlow);
-        
-        serviceActivity.addPredecessor(requestFlow);
-        
-        // 8. Generate customers every 10 minutes
-        TimeDrivenElementGenerator generator = new TimeDrivenElementGenerator(
-            sim, 10, customerType, requestFlow);
-        
-        // 9. Add listener to see what's happening
-        sim.addInfoReceiver(new StdInfoListener());
-        
-        // 10. Run simulation
-        sim.run();
-        
-        System.out.println("Simulation completed!");
+
+        // 3. Crear el recurso y su horario de disponibilidad
+        //    Cycle de 100 min, disponible 100 min desde el inicio
+        PeriodicCycle cycle = new PeriodicCycle(TimeUnit.MINUTE, 0, 100, 0);
+        new Resource(sim, "Server 1")
+            .newTimeTableOrCancelEntriesAdder(serverType)
+            .withDuration(cycle, 100)
+            .addTimeTableEntry();
+
+        // 4. Definir el tipo de elemento (p.ej., "Cliente")
+        ElementType customerType = new ElementType(sim, "Customer");
+
+        // 5. Crear la actividad con su grupo de trabajo
+        //    ActivityFlow gestiona solicitud + servicio + liberación
+        ActivityFlow service = new ActivityFlow(sim, "Service");
+        WorkGroup wg = new WorkGroup(sim, serverType, 1); // 1 servidor
+        service.newWorkGroupAdder(wg)
+               .withDelay(new ConstantFunction(5.0))   // 5 minutos
+               .add();
+
+        // 6. Generar un cliente cada 10 minutos durante 100 minutos
+        new TimeDrivenElementGenerator(sim, new ConstantFunction(10.0),
+            customerType, service);
+
+        // 7. Registrar un listener para ver los eventos
+        sim.registerListener(new StdInfoListener());
+
+        // 8. Ejecutar la simulación (t = 0 a 100 minutos)
+        sim.run(0, 100);
+
+        System.out.println("Simulación completada.");
     }
 }
 ```
 
-## 🔍 Understanding the Code
+## 🔍 Conceptos clave
 
-### 1. Simulation Object
+### 1. Objeto Simulation
 ```java
-Simulation sim = new Simulation(id, name, timeUnit, startTime, endTime);
-```
-- **id**: Unique identifier (usually 0)
-- **name**: Descriptive name
-- **timeUnit**: SECOND, MINUTE, HOUR, DAY, etc.
-- **startTime/endTime**: Simulation time bounds
+// Con unidad de tiempo explícita
+Simulation sim = new Simulation(int id, String description, TimeUnit unit);
 
-### 2. Resources
+// Con unidad de tiempo por defecto (minutos)
+Simulation sim = new Simulation(int id, String description);
+```
+- **id**: Identificador único (normalmente 0)
+- **description**: Nombre descriptivo
+- **unit**: `TimeUnit.SECOND`, `MINUTE`, `HOUR`, `DAY`, …
+
+La simulación se ejecuta con:
 ```java
-ResourceType type = new ResourceType(sim, "Type Name");
-Resource resource = new Resource(sim, "Resource Name", type);
+sim.run(double startTime, double endTime);
 ```
-- Resources have limited capacity
-- Elements compete for them
-- Can represent: servers, machines, people, etc.
 
-### 3. Elements
+### 2. Recursos
 ```java
-ElementType type = new ElementType(sim, "Customer");
-// Elements created by generators or manually
+ResourceType rt = new ResourceType(sim, "Doctor");
+new Resource(sim, "Dr. Smith")
+    .newTimeTableOrCancelEntriesAdder(rt)
+    .withDuration(cycle, durationInTimeUnits)
+    .addTimeTableEntry();
 ```
-- Entities flowing through simulation
-- Can be: customers, jobs, patients, etc.
+- `ResourceType`: categoría (p.ej., "Médico")
+- `Resource`: instancia concreta (p.ej., "Dr. Smith")
+- El horario de disponibilidad se define con `PeriodicCycle` + `addTimeTableEntry()`
 
-### 4. Flows
-Flows define Element behavior:
-- **RequestResourcesFlow**: Seize resources
-- **DelayFlow**: Wait for time period
-- **ReleaseResourcesFlow**: Free resources
-- **ConditionalFlow**: Branch based on condition
-- Many more (see Workflow Patterns)
-
-### 5. Generators
+### 3. Elementos
 ```java
-TimeDrivenElementGenerator gen = new TimeDrivenElementGenerator(
-    sim, interval, elementType, initialFlow);
+ElementType et = new ElementType(sim, "Patient");
 ```
-Creates elements at regular intervals.
+- Entidades que circulan por la simulación
+- Pueden ser: clientes, pacientes, trabajos, pedidos, etc.
 
-### 6. Listeners
+### 4. ActivityFlow — unidad de trabajo central
 ```java
-sim.addInfoReceiver(new StdInfoListener());
+ActivityFlow act = new ActivityFlow(sim, "Consultation");
+WorkGroup wg = new WorkGroup(sim, doctorType, 1);
+act.newWorkGroupAdder(wg)
+   .withDelay(new ConstantFunction(15.0))  // 15 min de servicio
+   .add();
+act.link(nextFlow);  // encadenar con la siguiente actividad
 ```
-Receive notifications about simulation events.
+Un `ActivityFlow` realiza internamente:
+1. Solicitar los recursos del `WorkGroup`
+2. Esperar el tiempo de servicio
+3. Liberar los recursos
 
-## 🧪 Running Tests
+### 5. Generadores de elementos
+```java
+// Llegadas cada 8 minutos (constante)
+new TimeDrivenElementGenerator(sim, new ConstantFunction(8.0), et, firstFlow);
+
+// Llegadas exponenciales (media 10 min)
+new TimeDrivenElementGenerator(sim, new ExponentialFunction(10.0), et, firstFlow);
+```
+
+### 6. Listeners / observadores
+```java
+sim.registerListener(new StdInfoListener());  // salida por consola
+```
+Reciben notificaciones de eventos durante la simulación.
+
+## 🔀 Patrones de flujo de trabajo
+
+JaDES implementa los Workflow Patterns de van der Aalst:
+
+| Patrón | Clase JaDES | Descripción |
+|--------|-------------|-------------|
+| WFP-01 Secuencia | `flow1.link(flow2)` | Ejecución en orden |
+| WFP-02 Parallel Split | `ParallelFlow` | Bifurcación paralela |
+| WFP-03 Synchronization | `SynchronizationFlow` | Espera a todas las ramas |
+| WFP-04 Exclusive Choice | `ExclusiveChoiceFlow` | Rama única por condición |
+| WFP-05 Simple Merge | `SimpleMergeFlow` | Convergencia sin espera |
+| WFP-21 Structured Loop | `DoWhileFlow` | Bucle con condición de salida |
+
+Consulta [docs/examples/workflow-patterns.md](../examples/workflow-patterns.md) para código completo.
+
+## 🏥 Ejemplos de referencia
+
+El módulo `jades-examples` contiene dos simulaciones sanitarias completas y verificadas:
+
+- **Urgencias** (`EmergencyDeptModel`): llegadas Poisson + `ExclusiveChoiceFlow`
+- **UCI** (`ICUModel`): `ParallelFlow` + `SynchronizationFlow` + `DoWhileFlow` + multi-réplica
 
 ```bash
-# Run all tests
-mvn test
-
-# Run specific test
-mvn test -Dtest=YourTestClass
-
-# Run with coverage
-mvn verify
-# See: target/site/jacoco/index.html
+# Ejecutar ejemplos
+mvn exec:java -pl jades-examples \
+  -Dexec.mainClass="es.ull.simulation.examples.healthcare.emergencydept.EmergencyDeptSimulation"
 ```
 
-## 📊 Viewing Results
+Consulta [`jades-examples/README.md`](../../jades-examples/README.md) para la documentación completa.
 
-### Built-in Listeners
-- **StdInfoListener**: Prints events to console
-- **ProgressListener**: Shows progress bar
-- **CpuTimeView**: Displays CPU time usage
+## 🧪 Ejecutar los tests
 
-### Custom Listener Example
+```bash
+# Todos los tests
+mvn test
+
+# Test específico
+mvn test -Dtest=NombreDeTest
+
+# Con cobertura (reporte en target/site/jacoco/index.html)
+mvn verify
+```
+
+## 📊 Visualizar resultados
+
+### Listeners incluidos
+- `StdInfoListener`: imprime eventos por consola
+- `ProgressListener`: barra de progreso
+- `CpuTimeView`: tiempo de CPU utilizado
+
+### Listener personalizado
 ```java
 public class MyListener extends BasicListener {
     @Override
     public void infoEmitted(SimulationInfo info) {
-        if (info instanceof ElementInfo) {
-            ElementInfo eInfo = (ElementInfo) info;
-            System.out.println("Element " + eInfo.getElement().getIdentifier() 
-                + " event: " + eInfo.getType());
+        if (info instanceof ElementInfo ei) {
+            System.out.println("Elemento " + ei.getElement().getIdentifier()
+                + " evento: " + ei.getType());
         }
     }
 }
 
-sim.addInfoReceiver(new MyListener());
+sim.registerListener(new MyListener());
 ```
 
-## 🎯 Next Steps
+## 🎯 Próximos pasos
 
-1. Explore [Examples](../examples/)
-2. Read [Architecture Overview](../architecture/overview.md)
-3. Check [Advanced Usage Guide](advanced-usage.md)
-4. Browse [API Documentation](../api/)
+1. Explorar los [Ejemplos](../examples/)
+2. Leer el [Resumen de arquitectura](../architecture/overview.md)
+3. Estudiar los [Workflow Patterns](../examples/workflow-patterns.md)
+4. Consultar los ejemplos sanitarios en [`jades-examples/README.md`](../../jades-examples/README.md)
 
-## ❓ Common Issues
+## ❓ Problemas frecuentes
 
-### Java Version Error
+### Error de versión de Java
 ```
 error: release version 17 not supported
 ```
-**Solution**: Install Java 17+ or update `JAVA_HOME`
+**Solución**: Instala Java 17+ o actualiza `JAVA_HOME`
 
-### Build Fails
+### Build falla
 ```bash
-# Clean and rebuild
 mvn clean install -U
 ```
 
-### Tests Fail
+### Los tests fallan
 ```bash
-# Skip tests temporarily
+# Omite tests temporalmente para instalar
 mvn install -DskipTests
-
-# But investigate why they fail!
+# Luego investiga el fallo
 ```
 
-## 💬 Get Help
+## 💬 Obtener ayuda
 
 - [GitHub Issues](https://github.com/JaDES-ULL/JaDES/issues)
 - [Discussions](https://github.com/JaDES-ULL/JaDES/discussions)
-- Check [CONTRIBUTING.md](../../CONTRIBUTING.md)
+- Consulta [CONTRIBUTING.md](../../CONTRIBUTING.md)

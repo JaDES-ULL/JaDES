@@ -1,264 +1,236 @@
-# Example: Workflow Patterns Implementation
+# Workflow Patterns en JaDES
 
-## Scenario
-Demonstrates how JaDES implements workflow patterns (WFP) from van der Aalst's taxonomy.
+JaDES implementa el catálogo de [Workflow Patterns](http://www.workflowpatterns.com)
+de van der Aalst & ter Hofstede (WFP).  
+Todos los ejemplos usan la API actual del framework.
 
-## WFP-01: Sequence
+---
 
-Execute activities in order: A → B → C
+## WFP-01: Sequence (Secuencia)
 
-```java
-public class SequencePattern {
-    public static void main(String[] args) {
-        Simulation sim = new Simulation(0, "Sequence", TimeUnit.MINUTE, 0, 100);
-        
-        ElementType elementType = new ElementType(sim, "Element");
-        
-        // Three sequential activities
-        DelayFlow activityA = new DelayFlow(sim, "Activity A", new ConstantFunction(5.0));
-        DelayFlow activityB = new DelayFlow(sim, "Activity B", new ConstantFunction(3.0));
-        DelayFlow activityC = new DelayFlow(sim, "Activity C", new ConstantFunction(4.0));
-        
-        // Chain them
-        activityA.link(activityB);
-        activityB.link(activityC);
-        
-        // Create element at t=0
-        new SingleFlow(sim, "Start", activityA).addElement(elementType);
-        
-        sim.addInfoReceiver(new StdInfoListener());
-        sim.run();
-        
-        // Expected: A(5) → B(3) → C(4) = 12 minutes total
-    }
-}
-```
-
-## WFP-02: Parallel Split
-
-Execute B and C in parallel after A
+Actividades en orden estricto: A → B → C
 
 ```java
-public class ParallelSplitPattern {
-    public static void main(String[] args) {
-        Simulation sim = new Simulation(0, "Parallel Split", TimeUnit.MINUTE, 0, 100);
-        
-        ElementType elementType = new ElementType(sim, "Element");
-        
-        DelayFlow activityA = new DelayFlow(sim, "Activity A", new ConstantFunction(5.0));
-        
-        // Fork: creates 2 branches
-        ForkFlow fork = new ForkFlow(sim, "Fork");
-        activityA.link(fork);
-        
-        // Branch 1: Activity B
-        DelayFlow activityB = new DelayFlow(sim, "Activity B", new ConstantFunction(3.0));
-        fork.link(activityB);
-        
-        // Branch 2: Activity C
-        DelayFlow activityC = new DelayFlow(sim, "Activity C", new ConstantFunction(4.0));
-        fork.link(activityC);
-        
-        new SingleFlow(sim, "Start", activityA).addElement(elementType);
-        
-        sim.addInfoReceiver(new StdInfoListener());
-        sim.run();
-        
-        // Expected: A(5), then B(3) and C(4) execute concurrently
-    }
-}
+Simulation sim = new Simulation(0, "WFP-01 Sequence", TimeUnit.MINUTE);
+
+ElementType et = new ElementType(sim, "Element");
+ResourceType rt = new ResourceType(sim, "Worker");
+
+PeriodicCycle c = new PeriodicCycle(TimeUnit.MINUTE, 0, 100, 0);
+new Resource(sim, "W-1")
+    .newTimeTableOrCancelEntriesAdder(rt).withDuration(c, 100).addTimeTableEntry();
+
+WorkGroup wg = new WorkGroup(sim, rt, 1);
+
+ActivityFlow actA = new ActivityFlow(sim, "Activity A");
+actA.newWorkGroupAdder(wg).withDelay(new ConstantFunction(5.0)).add();
+
+ActivityFlow actB = new ActivityFlow(sim, "Activity B");
+actB.newWorkGroupAdder(wg).withDelay(new ConstantFunction(3.0)).add();
+
+ActivityFlow actC = new ActivityFlow(sim, "Activity C");
+actC.newWorkGroupAdder(wg).withDelay(new ConstantFunction(4.0)).add();
+
+// WFP-01: encadenamiento simple
+actA.link(actB);
+actB.link(actC);
+
+new TimeDrivenElementGenerator(sim, new ConstantFunction(20.0), et, actA);
+sim.registerListener(new StdInfoListener());
+sim.run(0, 100);
+// Tiempo total por elemento: A(5) + B(3) + C(4) = 12 min
 ```
 
-## WFP-03: Synchronization
+---
 
-Wait for both branches before continuing
+## WFP-02: Parallel Split + WFP-03: Synchronization
+
+Bifurcación paralela seguida de una barrera de sincronización.
 
 ```java
-public class SynchronizationPattern {
-    public static void main(String[] args) {
-        Simulation sim = new Simulation(0, "Synchronization", TimeUnit.MINUTE, 0, 100);
-        
-        ElementType elementType = new ElementType(sim, "Element");
-        
-        // Fork into 2 branches
-        ForkFlow fork = new ForkFlow(sim, "Fork");
-        
-        DelayFlow branchA = new DelayFlow(sim, "Branch A", new ConstantFunction(5.0));
-        DelayFlow branchB = new DelayFlow(sim, "Branch B", new ConstantFunction(8.0));
-        
-        fork.link(branchA);
-        fork.link(branchB);
-        
-        // Join: waits for BOTH branches
-        JoinFlow join = new JoinFlow(sim, "Join");
-        branchA.link(join);
-        branchB.link(join);
-        
-        // Continue after sync
-        DelayFlow activityC = new DelayFlow(sim, "Activity C", new ConstantFunction(2.0));
-        join.link(activityC);
-        
-        new SingleFlow(sim, "Start", fork).addElement(elementType);
-        
-        sim.addInfoReceiver(new StdInfoListener());
-        sim.run();
-        
-        // Expected: Fork → A(5) & B(8) → Join waits 8 → C(2) = 10 minutes total
-    }
+Simulation sim = new Simulation(0, "WFP-02/03 Parallel", TimeUnit.MINUTE);
+
+ElementType et = new ElementType(sim, "Element");
+ResourceType rt = new ResourceType(sim, "Worker");
+
+PeriodicCycle c = new PeriodicCycle(TimeUnit.MINUTE, 0, 200, 0);
+// 2 workers para que B y C puedan ejecutarse en paralelo
+for (int i = 1; i <= 2; i++) {
+    new Resource(sim, "W-" + i)
+        .newTimeTableOrCancelEntriesAdder(rt).withDuration(c, 200).addTimeTableEntry();
 }
+WorkGroup wg = new WorkGroup(sim, rt, 1);
+
+ActivityFlow actB = new ActivityFlow(sim, "Branch B");
+actB.newWorkGroupAdder(wg).withDelay(new ConstantFunction(5.0)).add();
+
+ActivityFlow actC = new ActivityFlow(sim, "Branch C");
+actC.newWorkGroupAdder(wg).withDelay(new ConstantFunction(8.0)).add();
+
+ActivityFlow actD = new ActivityFlow(sim, "After Sync");
+actD.newWorkGroupAdder(wg).withDelay(new ConstantFunction(2.0)).add();
+
+// WFP-02: ParallelFlow bifurca a B y C simultáneamente
+ParallelFlow parallel = new ParallelFlow(sim);
+parallel.link(actB);
+parallel.link(actC);
+
+// WFP-03: SynchronizationFlow espera a que AMBAS ramas terminen
+SynchronizationFlow sync = new SynchronizationFlow(sim);
+actB.link(sync);
+actC.link(sync);
+sync.link(actD);
+
+new TimeDrivenElementGenerator(sim, new ConstantFunction(30.0), et, parallel);
+sim.registerListener(new StdInfoListener());
+sim.run(0, 200);
+// Tiempo de paralelo: max(B=5, C=8) = 8 min; total = 8+2 = 10 min
 ```
 
-## WFP-04: Exclusive Choice
+> **Nota**: `ParallelFlow` sustituye al antiguo `ForkFlow` (eliminado).  
+> `SynchronizationFlow` sustituye a `JoinFlow`.
 
-Choose one path based on condition
+---
+
+## WFP-04: Exclusive Choice (Decisión exclusiva)
+
+Exactamente una rama se activa según una condición.
 
 ```java
-public class ExclusiveChoicePattern {
-    public static void main(String[] args) {
-        Simulation sim = new Simulation(0, "Exclusive Choice", TimeUnit.MINUTE, 0, 100);
-        
-        ElementType vipType = new ElementType(sim, "VIP");
-        ElementType regularType = new ElementType(sim, "Regular");
-        
-        // Conditional flow: VIP → fast lane, Regular → normal lane
-        ConditionalFlow choice = new ConditionalFlow(sim, "Choose Lane") {
-            @Override
-            public boolean condition(Element elem) {
-                return elem.getType().equals(vipType);
-            }
-        };
-        
-        // Branch 1: VIP path (fast)
-        DelayFlow vipService = new DelayFlow(sim, "VIP Service", new ConstantFunction(2.0));
-        choice.link(vipService);
-        
-        // Branch 2: Regular path (slower)
-        DelayFlow regularService = new DelayFlow(sim, "Regular Service", new ConstantFunction(5.0));
-        choice.linkElse(regularService);
-        
-        // Create elements
-        new SingleFlow(sim, "VIP Start", choice).addElement(vipType);
-        new SingleFlow(sim, "Regular Start", choice).addElement(regularType);
-        
-        sim.addInfoReceiver(new StdInfoListener());
-        sim.run();
-        
-        // Expected: VIP takes 2 min, Regular takes 5 min
-    }
-}
+Simulation sim = new Simulation(0, "WFP-04 Exclusive Choice", TimeUnit.MINUTE);
+
+ElementType urgentType   = new ElementType(sim, "Urgent");
+ElementType regularType  = new ElementType(sim, "Regular");
+
+ResourceType rt = new ResourceType(sim, "Doctor");
+PeriodicCycle c = new PeriodicCycle(TimeUnit.MINUTE, 0, 480, 0);
+new Resource(sim, "Dr. Smith")
+    .newTimeTableOrCancelEntriesAdder(rt).withDuration(c, 480).addTimeTableEntry();
+WorkGroup wg = new WorkGroup(sim, rt, 1);
+
+ActivityFlow urgentService  = new ActivityFlow(sim, "Urgent Service");
+urgentService.newWorkGroupAdder(wg).withDelay(new ConstantFunction(10.0)).add();
+
+ActivityFlow regularService = new ActivityFlow(sim, "Regular Service");
+regularService.newWorkGroupAdder(wg).withDelay(new ConstantFunction(20.0)).add();
+
+// WFP-04: ExclusiveChoiceFlow selecciona la rama "urgente" si se cumple la condición
+ExclusiveChoiceFlow choice = new ExclusiveChoiceFlow(sim,
+    ei -> ei.getElement().getType() == urgentType,   // condición
+    urgentService,    // rama "verdadero"
+    regularService);  // rama "falso"
+
+new TimeDrivenElementGenerator(sim, new ConstantFunction(15.0), urgentType,  choice);
+new TimeDrivenElementGenerator(sim, new ConstantFunction(12.0), regularType, choice);
+
+sim.registerListener(new StdInfoListener());
+sim.run(0, 480);
 ```
 
-## WFP-05: Simple Merge
+---
 
-Multiple paths converge (no synchronization)
+## WFP-05: Simple Merge (Convergencia sin espera)
+
+Varias ramas convergen en un punto común sin sincronización.
 
 ```java
-public class SimpleMergePattern {
-    public static void main(String[] args) {
-        Simulation sim = new Simulation(0, "Simple Merge", TimeUnit.MINUTE, 0, 100);
-        
-        ElementType type1 = new ElementType(sim, "Type1");
-        ElementType type2 = new ElementType(sim, "Type2");
-        
-        // Two different paths
-        DelayFlow pathA = new DelayFlow(sim, "Path A", new ConstantFunction(3.0));
-        DelayFlow pathB = new DelayFlow(sim, "Path B", new ConstantFunction(5.0));
-        
-        // Merge point (no waiting)
-        MergeFlow merge = new MergeFlow(sim, "Merge");
-        pathA.link(merge);
-        pathB.link(merge);
-        
-        // Shared activity after merge
-        DelayFlow shared = new DelayFlow(sim, "Shared Activity", new ConstantFunction(2.0));
-        merge.link(shared);
-        
-        // Elements take different paths
-        new SingleFlow(sim, "Start A", pathA).addElement(type1);
-        new SingleFlow(sim, "Start B", pathB).addElement(type2);
-        
-        sim.addInfoReceiver(new StdInfoListener());
-        sim.run();
-        
-        // Expected: Type1 takes A(3)+shared(2)=5, Type2 takes B(5)+shared(2)=7
-    }
-}
+Simulation sim = new Simulation(0, "WFP-05 Simple Merge", TimeUnit.MINUTE);
+
+ElementType typeA = new ElementType(sim, "Type-A");
+ElementType typeB = new ElementType(sim, "Type-B");
+
+ResourceType rt = new ResourceType(sim, "Processor");
+PeriodicCycle c = new PeriodicCycle(TimeUnit.MINUTE, 0, 200, 0);
+new Resource(sim, "CPU-1")
+    .newTimeTableOrCancelEntriesAdder(rt).withDuration(c, 200).addTimeTableEntry();
+WorkGroup wg = new WorkGroup(sim, rt, 1);
+
+ActivityFlow pathA = new ActivityFlow(sim, "Path A");
+pathA.newWorkGroupAdder(wg).withDelay(new ConstantFunction(3.0)).add();
+
+ActivityFlow pathB = new ActivityFlow(sim, "Path B");
+pathB.newWorkGroupAdder(wg).withDelay(new ConstantFunction(7.0)).add();
+
+// WFP-05: cualquier rama puede continuar independientemente
+ActivityFlow shared = new ActivityFlow(sim, "Shared Step");
+shared.newWorkGroupAdder(wg).withDelay(new ConstantFunction(2.0)).add();
+
+pathA.link(shared);
+pathB.link(shared);
+
+new TimeDrivenElementGenerator(sim, new ConstantFunction(20.0), typeA, pathA);
+new TimeDrivenElementGenerator(sim, new ConstantFunction(25.0), typeB, pathB);
+
+sim.registerListener(new StdInfoListener());
+sim.run(0, 200);
 ```
 
-## Advanced Pattern: Deferred Choice
+---
 
-Decision made at runtime by external event
+## WFP-21: Structured Loop (Bucle estructurado)
+
+Un bloque se repite hasta que se cumple una condición de salida.
 
 ```java
-public class DeferredChoicePattern {
-    public static void main(String[] args) {
-        Simulation sim = new Simulation(0, "Deferred Choice", TimeUnit.MINUTE, 0, 100);
-        
-        ElementType orderType = new ElementType(sim, "Order");
-        
-        // Create activity with multiple completion paths
-        ResourceType paymentType = new ResourceType(sim, "Payment Method");
-        Resource creditCard = new Resource(sim, "Credit Card", paymentType);
-        Resource cash = new Resource(sim, "Cash", paymentType);
-        
-        // WorkGroup allows "any" resource from type
-        WorkGroup paymentWG = new WorkGroup(sim, paymentType, 1);
-        
-        ActivityManager payment = new ActivityManager(sim, "Payment", false);
-        payment.addWorkGroup(0, paymentWG);
-        
-        RequestResourcesFlow request = new RequestResourcesFlow(sim, "Request Payment", 0);
-        request.addWorkGroup(paymentWG);
-        
-        // Process based on which resource was seized
-        StructuredFlow process = new StructuredFlow(sim, "Process Payment") {
-            @Override
-            public void request(Element elem) {
-                super.request(elem);
-                Resource seized = elem.getCaughtResources().get(0);
-                if (seized.equals(creditCard)) {
-                    System.out.println("Processing credit card...");
-                } else {
-                    System.out.println("Processing cash...");
-                }
-            }
-        };
-        
-        request.link(process);
-        
-        ReleaseResourcesFlow release = new ReleaseResourcesFlow(sim, "Release", 0);
-        release.addWorkGroup(paymentWG);
-        process.link(release);
-        
-        payment.addPredecessor(request);
-        
-        // Create multiple orders
-        for (int i = 0; i < 5; i++) {
-            new SingleFlow(sim, "Order " + i, request).addElement(orderType);
-        }
-        
-        sim.addInfoReceiver(new StdInfoListener());
-        sim.run();
-        
-        // Expected: Orders compete for available payment method
-    }
-}
+Simulation sim = new Simulation(0, "WFP-21 Do-While", TimeUnit.MINUTE);
+
+ElementType et = new ElementType(sim, "Patient");
+ResourceType rt = new ResourceType(sim, "Nurse");
+PeriodicCycle c = new PeriodicCycle(TimeUnit.MINUTE, 0, 1440, 0);
+new Resource(sim, "Nurse-1")
+    .newTimeTableOrCancelEntriesAdder(rt).withDuration(c, 1440).addTimeTableEntry();
+WorkGroup wg = new WorkGroup(sim, rt, 1);
+
+// Tratamiento que puede repetirse varias veces
+ActivityFlow treatment = new ActivityFlow(sim, "Treatment Round");
+treatment.newWorkGroupAdder(wg).withDelay(new ConstantFunction(60.0)).add();
+
+// Evaluación: el paciente se da de alta con p=0.40 tras cada ronda
+ActivityFlow evaluation = new ActivityFlow(sim, "Evaluation");
+evaluation.newWorkGroupAdder(wg).withDelay(new ConstantFunction(10.0)).add();
+
+// WFP-21: DoWhileFlow repite { treatment → evaluation } mientras condición = true
+DoWhileFlow loop = new DoWhileFlow(sim,
+    ei -> Math.random() > 0.40);  // continuar si random > 0.40 (~media 2.5 rondas)
+
+loop.link(treatment);
+treatment.link(evaluation);
+evaluation.link(loop);  // cierre del bucle
+
+new TimeDrivenElementGenerator(sim, new ConstantFunction(120.0), et, loop);
+sim.registerListener(new StdInfoListener());
+sim.run(0, 1440);
 ```
 
-## Pattern Summary
+---
 
-| Pattern | JaDES Implementation | Key Classes |
-|---------|---------------------|-------------|
-| WFP-01 Sequence | `flow1.link(flow2)` | Flow chaining |
-| WFP-02 Parallel Split | `ForkFlow` | ForkFlow |
-| WFP-03 Synchronization | `JoinFlow` | JoinFlow |
-| WFP-04 Exclusive Choice | `ConditionalFlow` | ConditionalFlow |
-| WFP-05 Simple Merge | `MergeFlow` | MergeFlow |
-| WFP-06 Multi-Choice | Multiple `ConditionalFlow` | ConditionalFlow |
-| WFP-16 Deferred Choice | Resource competition | WorkGroup |
-| WFP-17 Interleaved Parallel | Resource serialization | WorkGroup |
+## Tabla resumen
 
-## Next Steps
-- [Custom Flow Implementation](custom-flows.md)
-- [Event Listeners](event-listeners.md)
-- [Resource Scheduling](resource-scheduling.md)
+| Patrón WFP | Descripción | Clase JaDES | Notas |
+|-----------|-------------|-------------|-------|
+| WFP-01 | Sequence | `flow.link(next)` | Encadenamiento directo |
+| WFP-02 | Parallel Split | `ParallelFlow` | Sustituye a `ForkFlow` |
+| WFP-03 | Synchronization | `SynchronizationFlow` | Sustituye a `JoinFlow` |
+| WFP-04 | Exclusive Choice | `ExclusiveChoiceFlow` | Condición lambda |
+| WFP-05 | Simple Merge | `flow.link(shared)` desde varias ramas | Sin barrera |
+| WFP-21 | Structured Loop | `DoWhileFlow` | Condición de salida |
+
+---
+
+## Casos de estudio completos
+
+Los patrones anteriores se combinan en escenarios reales en el módulo `jades-examples`:
+
+- **Urgencias** → WFP-04 (`ExclusiveChoiceFlow` para triaje)  
+- **UCI** → WFP-02 + WFP-03 + WFP-21 (terapias paralelas con alta condicionada)
+
+Consulta [`jades-examples/README.md`](../../jades-examples/README.md) para los modelos completos
+con métricas formales y verificación.
+
+---
+
+## Próximos pasos
+
+- [Simulación básica](basic-simulation.md) — servidor único paso a paso
+- [Getting Started](../guides/getting-started.md) — instalación y primeros pasos
+- [Arquitectura](../architecture/overview.md) — visión global del framework
