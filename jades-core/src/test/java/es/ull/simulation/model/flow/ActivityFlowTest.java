@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import es.ull.simulation.condition.AbstractCondition;
+import es.ull.simulation.model.ElementInstance;
 import es.ull.simulation.model.ResourceType;
 import es.ull.simulation.model.Simulation;
 import es.ull.simulation.model.WorkGroup;
@@ -149,5 +151,72 @@ class ActivityFlowTest {
 
         RequestResourcesFlow requestFlow = (RequestResourcesFlow) activity.getInitialFlow();
         assertEquals(1, requestFlow.getWorkGroupSize());
+    }
+
+    @Test
+    void shouldReturnWorkGroupSize_whenAccessedViaActivityFlow() {
+        ActivityFlow activity = new ActivityFlow(simulation, ACTIVITY_DESC);
+        assertEquals(0, activity.getWorkGroupSize());
+
+        ResourceType rt = new ResourceType(simulation, "RT");
+        WorkGroup wg = new WorkGroup(simulation, rt, 1);
+        activity.newWorkGroupAdder(wg).add();
+
+        assertEquals(1, activity.getWorkGroupSize());
+    }
+
+    @Test
+    void shouldReturnWorkGroupById_whenWorkGroupAdded() {
+        ActivityFlow activity = new ActivityFlow(simulation, ACTIVITY_DESC);
+        ResourceType rt = new ResourceType(simulation, "RT");
+        WorkGroup wg = new WorkGroup(simulation, rt, 1);
+        // wg ocupa id=0 en la lista de WGs; el ActivityWorkGroup interno ocupa id=1
+        activity.newWorkGroupAdder(wg).add();
+
+        assertNotNull(activity.getWorkGroup(1));
+    }
+
+    @Test
+    void shouldAddResourceCancellation_withDurationOnly() {
+        ActivityFlow activity = new ActivityFlow(simulation, ACTIVITY_DESC);
+        ResourceType rt = new ResourceType(simulation, "RT");
+
+        // No debe lanzar excepción
+        activity.addResourceCancellation(rt, 100L);
+    }
+
+    @Test
+    void shouldAddResourceCancellation_withDurationAndCondition() {
+        ActivityFlow activity = new ActivityFlow(simulation, ACTIVITY_DESC);
+        ResourceType rt = new ResourceType(simulation, "RT");
+        AbstractCondition<ElementInstance> cond = new AbstractCondition<>() {
+            @Override
+            public boolean check(ElementInstance fe) {
+                return true;
+            }
+        };
+
+        // No debe lanzar excepción
+        activity.addResourceCancellation(rt, 200L, cond);
+    }
+
+    @Test
+    void shouldReturnACT_forObjectTypeIdentifier() {
+        ActivityFlow activity = new ActivityFlow(simulation, ACTIVITY_DESC);
+        assertEquals("ACT", activity.getObjectTypeIdentifier());
+    }
+
+    @Test
+    void shouldReturnNegativeResourcesId_whenCreated() {
+        ActivityFlow activity = new ActivityFlow(simulation, ACTIVITY_DESC);
+        assertTrue(activity.getResourcesId() < 0);
+    }
+
+    @Test
+    void shouldHaveConsecutiveResourcesIds_whenMultipleActivitiesCreated() {
+        ActivityFlow a1 = new ActivityFlow(simulation, "A1");
+        ActivityFlow a2 = new ActivityFlow(simulation, "A2");
+        // Los IDs son negativos y consecutivos (decrecientes)
+        assertTrue(a2.getResourcesId() < a1.getResourcesId());
     }
 }

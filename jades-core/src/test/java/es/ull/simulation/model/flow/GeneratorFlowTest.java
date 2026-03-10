@@ -104,6 +104,28 @@ class GeneratorFlowTest {
         assertFalse(testFlow.afterFinalizeExecuted);
     }
 
+    // ── Cobertura de métodos del cuerpo de GeneratorFlow ──────────────────────
+
+    @Test
+    void shouldNotThrow_whenAddPredecessorCalledOnBaseClass() {
+        // addPredecessor es un no-op en GeneratorFlow
+        generatorFlow.addPredecessor(null);
+    }
+
+    @Test
+    void shouldNotThrow_whenBaseCreateCalledWithNull() {
+        // Crear instancia directa (no subclase) → llama al create() vacío de GeneratorFlow
+        GeneratorFlow baseFlow = new GeneratorFlow(simulation, "base");
+        baseFlow.create(null);
+    }
+
+    @Test
+    void shouldNotThrow_whenBaseAfterFinalizeCalledWithNull() {
+        // afterFinalize es un no-op en GeneratorFlow
+        GeneratorFlow baseFlow = new GeneratorFlow(simulation, "base");
+        baseFlow.afterFinalize(null);
+    }
+
     /**
      * Test subclass to verify extensibility
      */

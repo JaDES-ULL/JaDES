@@ -149,4 +149,42 @@ class ResourceLocationTest {
         assertNull(loc1);
         assertNull(loc2);
     }
+
+    // ── Tests adicionales de ResourceLocation ─────────────────────────────────
+
+    @Test
+    void shouldReturnNullInitLocation_whenCreatedWithNull() {
+        ResourceLocation rl = new ResourceLocation(
+                new Resource(simulation, "R"), null, 5);
+
+        assertNull(rl.getInitLocation());
+    }
+
+    @Test
+    void shouldReturnNullMovingInstance_initially() {
+        ResourceLocation rl = new ResourceLocation(
+                new Resource(simulation, "R"), null, 3);
+
+        assertNull(rl.getMovingInstance());
+    }
+
+    @Test
+    void shouldSetMovingInstance_whenCalled() {
+        ResourceLocation rl = new ResourceLocation(
+                new Resource(simulation, "R"), null, 1);
+
+        // Establecer null de nuevo no lanza excepción
+        rl.setMovingInstance(null);
+
+        assertNull(rl.getMovingInstance());
+    }
+
+    @Test
+    void shouldReturnTrue_whenInitializeWithNullInitLocation() {
+        ResourceLocation rl = new ResourceLocation(
+                new Resource(simulation, "R"), null, 2);
+
+        // null initLocation → initialize() devuelve true inmediatamente
+        assertTrue(rl.initialize());
+    }
 }

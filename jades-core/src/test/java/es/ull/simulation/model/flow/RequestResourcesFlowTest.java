@@ -3,10 +3,15 @@ package es.ull.simulation.model.flow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Iterator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import es.ull.simulation.model.ActivityManager;
 import es.ull.simulation.model.ResourceType;
 import es.ull.simulation.model.Simulation;
 import es.ull.simulation.model.WorkGroup;
@@ -137,5 +142,101 @@ class RequestResourcesFlowTest {
 
         assertEquals(0, id);
         assertEquals(1, flow.getWorkGroupSize());
+    }
+
+    // ── Nuevos tests ──────────────────────────────────────────────────────────
+
+    @Test
+    void shouldReturnNullManager_whenNotSet() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        assertNull(flow.getManager());
+    }
+
+    @Test
+    void shouldSetManager_whenActivityManagerProvided() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        ActivityManager am = new ActivityManager(simulation);
+        flow.setManager(am);
+
+        assertEquals(am, flow.getManager());
+    }
+
+    @Test
+    void shouldReturnResourcesId_whenCreatedWithExplicitId() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC, -3, 0);
+        assertEquals(-3, flow.getResourcesId());
+    }
+
+    @Test
+    void shouldReturnACQ_forObjectTypeIdentifier() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        assertEquals("ACQ", flow.getObjectTypeIdentifier());
+    }
+
+    @Test
+    void shouldReturnEmptyIterator_whenNoWorkGroupsAdded() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        Iterator<RequestResourcesFlow.ActivityWorkGroup> it = flow.iterator();
+        assertNotNull(it);
+        assertFalse(it.hasNext());
+    }
+
+    @Test
+    void shouldReturnIteratorWithElements_whenWorkGroupsAdded() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        ResourceType rt = new ResourceType(simulation, "RT");
+        WorkGroup wg = new WorkGroup(simulation, rt, 1);
+        flow.newWorkGroupAdder(wg).add();
+
+        Iterator<RequestResourcesFlow.ActivityWorkGroup> it = flow.iterator();
+        assertTrue(it.hasNext());
+    }
+
+    @Test
+    void shouldNotThrow_whenAddPredecessorCalled() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        flow.addPredecessor(null);
+    }
+
+    @Test
+    void shouldNotThrow_whenAfterAcquireCalledWithNull() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        flow.afterAcquire(null);
+    }
+
+    @Test
+    void shouldNotThrow_whenInqueueCalledWithNull() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        flow.inqueue(null);
+    }
+
+    @Test
+    void shouldNotThrow_whenAfterFinalizeCalledWithNull() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        flow.afterFinalize(null);
+    }
+
+    @Test
+    void shouldReturnFalse_whenPartOfInterruptibleAndNoParent() {
+        RequestResourcesFlow flow = new RequestResourcesFlow(simulation, FLOW_DESC);
+        assertFalse(flow.partOfInterruptible());
+    }
+
+    @Test
+    void shouldReturnTrue_whenPartOfInterruptibleActivityFlow() {
+        // ActivityFlow with interruptible=true → initialFlow.partOfInterruptible() == true
+        ActivityFlow activity = new ActivityFlow(simulation, "Act", true, true);
+        RequestResourcesFlow requestFlow = (RequestResourcesFlow) activity.getInitialFlow();
+
+        assertTrue(requestFlow.partOfInterruptible());
+    }
+
+    @Test
+    void shouldReturnFalse_whenPartOfNonInterruptibleActivityFlow() {
+        // ActivityFlow with interruptible=false → initialFlow.partOfInterruptible() == false
+        ActivityFlow activity = new ActivityFlow(simulation, "Act", true, false);
+        RequestResourcesFlow requestFlow = (RequestResourcesFlow) activity.getInitialFlow();
+
+        assertFalse(requestFlow.partOfInterruptible());
     }
 }

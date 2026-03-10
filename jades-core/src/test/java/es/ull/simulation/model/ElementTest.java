@@ -1,7 +1,9 @@
 package es.ull.simulation.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -108,12 +110,13 @@ class ElementTest {
     void shouldAllowSettingExclusiveFlag() {
         Element element = new Element(simulation, elementType, initialFlow);
 
-        // When: setting exclusive to true
-        element.setExclusive(true);
+        // Initially false
+        assertFalse(element.isExclusive());
 
-        // Then: element should be created successfully
-        // (exclusive flag is internal, no getter available)
-        assertNotNull(element);
+        // setExclusive(true) sets the flag
+        element.setExclusive(true);
+        assertTrue(element.isExclusive());
+        // Note: setExclusive(false) notifies the engine, which requires a running simulation
     }
 
     @Test
