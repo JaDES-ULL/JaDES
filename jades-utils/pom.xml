@@ -48,10 +48,10 @@
       <artifactId>poi-ooxml</artifactId>
     </dependency>
 
-    <!-- Simkit -->
+    <!-- JaDES Random (replaces simkit) -->
     <dependency>
-      <groupId>com.zenuevo.simkit</groupId>
-      <artifactId>simkit</artifactId>
+      <groupId>io.github.jades-ull.jades</groupId>
+      <artifactId>jades-random</artifactId>
     </dependency>
 
     <!-- OWLAPI / HermiT -->

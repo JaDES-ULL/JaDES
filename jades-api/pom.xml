@@ -24,10 +24,10 @@
       <artifactId>log4j-api</artifactId>
     </dependency>
 
-    <!-- Simkit (required by IExperiment) -->
+    <!-- JaDES Random (replaces simkit, required by IExperiment) -->
     <dependency>
-      <groupId>com.zenuevo.simkit</groupId>
-      <artifactId>simkit</artifactId>
+      <groupId>io.github.jades-ull.jades</groupId>
+      <artifactId>jades-random</artifactId>
     </dependency>
 
     <!-- Apache POI (required by ExcelFormula) -->

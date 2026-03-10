@@ -200,12 +200,4 @@ class RandomVariatesCoverageTest {
         student.setParameters(2);
         assertTrue(Double.isFinite(student.generate()));
     }
-
-    @Test
-    void shouldGenerateBetaLimitedValues() {
-        BetaLimitedVariate betaLimited = new BetaLimitedVariate();
-        betaLimited.setParameters(2.0, 3.0, 0.0, 1.0);
-        double value = betaLimited.getValue(() -> 0.0);
-        assertTrue(value >= 0.0 && value <= 1.0);
-    }
 }

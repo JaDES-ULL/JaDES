@@ -57,7 +57,6 @@
     <poi.version>5.4.1</poi.version>
     <owlapi.version>5.5.0</owlapi.version>
     <hermit.version>1.4.5.519</hermit.version>
-    <simkit.version>1.4.1</simkit.version>
     <jcommander.version>1.82</jcommander.version>
 
     <!-- Plugin versions -->
@@ -75,6 +74,7 @@
   </properties>
 
   <modules>
+    <module>jades-random</module>
     <module>jades-api</module>
     <module>jades-core</module>
     <module>jades-utils</module>
@@ -125,11 +125,11 @@
         <version>${poi.version}</version>
       </dependency>
 
-      <!-- Simkit -->
+      <!-- JaDES Random (replaces simkit) -->
       <dependency>
-        <groupId>com.zenuevo.simkit</groupId>
-        <artifactId>simkit</artifactId>
-        <version>${simkit.version}</version>
+        <groupId>io.github.jades-ull.jades</groupId>
+        <artifactId>jades-random</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
       <!-- OWLAPI / HermiT -->
