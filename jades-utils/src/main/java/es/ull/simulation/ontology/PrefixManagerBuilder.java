@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PrefixManagerBuilder {
 
     /**
-     * Construye un DefaultPrefixManager para la ontología raíz y todas sus importadas.
-     * Respeta los prefijos declarados si existen, y detecta namespace automáticamente si no.
+     * Construye un DefaultPrefixManager para la ontolog├¡a ra├¡z y todas sus importadas.
+     * Respeta los prefijos declarados si existen, y detecta namespace autom├íticamente si no.
      */
     public static DefaultPrefixManager buildPrefixManager(OWLOntologyManager manager, OWLOntology root) {
         DefaultPrefixManager pm = new DefaultPrefixManager();
@@ -49,7 +49,7 @@ public class PrefixManagerBuilder {
         return pm;
     }
 
-    // Detecta namespace de la ontología a partir de cualquier entidad presente
+    // Detecta namespace de la ontolog├¡a a partir de cualquier entidad presente
     private static Optional<String> detectNamespaceFromEntities(OWLOntology ont) {
         return ont.classesInSignature()
                 .map(c -> c.getIRI().toString())
@@ -73,7 +73,7 @@ public class PrefixManagerBuilder {
         return cut > 0 ? fullIRI.substring(0, cut + 1) : fullIRI;
     }
 
-    // Garantiza prefijos únicos
+    // Garantiza prefijos ├║nicos
     private static String uniquePrefix(String base, Map<String, String> used) {
         String candidate = base;
         int i = 1;
