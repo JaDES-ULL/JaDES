@@ -65,7 +65,7 @@ public class GompertzVariate extends RandomVariateBase {
 	}
 
 	/**
-	 * @param alfa the alpha to set
+	 * @param alpha the alpha to set
 	 */
 	public void setAlpha(double alpha) {
 		this.alpha = alpha;

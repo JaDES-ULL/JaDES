@@ -26,9 +26,9 @@ import es.ull.simulation.utils.Prioritizable;
  * <ol>
  * <li>Main instance. The element's main instance. Must be created by invoking the static method
  * {@link #getMainElementInstance(Element)}</li>
- * <li>Descendant thread</li>A thread created to carry out the inner flows of a structured IFlow.
+ * <li>Descendant thread: A thread created to carry out the inner flows of a structured IFlow.
  * To invoke, use: {@link #getDescendantElementInstance(IInitializerFlow)}</li>
- * <li>Subsequent thread</li>A thread created to carry out a new IFlow after a split.
+ * <li>Subsequent thread: A thread created to carry out a new IFlow after a split.
  * To invoke, use: {@link #getSubsequentElementInstance(boolean, IFlow, WorkToken)}</li>
  * </ol><p>
  *  An instance has an associated token, which can be true or false. A false token is used

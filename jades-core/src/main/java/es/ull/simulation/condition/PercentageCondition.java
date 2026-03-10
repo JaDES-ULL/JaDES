@@ -20,9 +20,9 @@ public final class PercentageCondition<E> extends AbstractCondition<E> {
 	
 	/**
 	 * Calculates a random (0, 100) number. If that number is
-	 * lower than the percentage of success, returns <tt>true</tt>.
+	 * lower than the percentage of success, returns {@code true}.
 	 * @param fe Element used to check the condition (useless in this case).
-	 * @return <tt>True</tt> if success, <tt>false</tt> otherwise 
+	 * @return {@code true} if success, {@code false} otherwise 
 	 */
 	public boolean check(E fe) {
 		double randomProb = Math.random();

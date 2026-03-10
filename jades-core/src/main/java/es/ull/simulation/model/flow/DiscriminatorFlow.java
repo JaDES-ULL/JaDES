@@ -12,7 +12,7 @@ public class DiscriminatorFlow extends ANDJoinFlow {
 	
 	/**
 	 * Create a new DiscriminatorFlow.
-	 * @param simul Simulation this IFlow belongs to.
+	 * @param model Simulation this IFlow belongs to.
 	 */
 	public DiscriminatorFlow(Simulation model) {
 		super(model,1 );
@@ -20,7 +20,7 @@ public class DiscriminatorFlow extends ANDJoinFlow {
 
 	/**
 	 * Create a new discriminator IFlow which can be used in a safe context or a general one.
-	 * @param simul Simulation this IFlow belongs to
+	 * @param model Simulation this IFlow belongs to
 	 * @param safe True for safe context; false in other case
 	 */
 	public DiscriminatorFlow(Simulation model, boolean safe) {

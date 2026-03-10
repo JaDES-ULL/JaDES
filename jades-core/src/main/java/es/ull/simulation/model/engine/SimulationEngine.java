@@ -32,32 +32,26 @@ import es.ull.simulation.utils.Output;
  * Main simulation class, identified by means of an identifier and a description.
  * A simulation executes a model defined by means of different structures: 
  * <ul>
- * <li>{@link ResourceTypeEngine}</li>
- * <li>{@link IResourceEngine}</li>
- * <li>{@link WorkGroup}</li>
- * <li>{@link ActivityFlow}</li>
- * <li>{@link ElementType}</li>
- * <li>{@link IFlow}</li>
- * <li>{@link TimeDrivenElementGenerator}</li>
+ * <li>{@code ResourceType} engines</li>
+ * <li>{@code Resource} engines</li>
+ * <li>{@link es.ull.simulation.model.WorkGroup}</li>
+ * <li>{@link es.ull.simulation.model.flow.ActivityFlow}</li>
+ * <li>{@link es.ull.simulation.model.ElementType}</li>
+ * <li>{@link es.ull.simulation.model.flow.IFlow}</li>
+ * <li>{@link es.ull.simulation.model.TimeDrivenElementGenerator}</li>
  * </ul>
- * A simulation has an associated clock which starts in <tt>startTs</tt> and advances according 
- * to the events produced by the {@link Element}s, {@link IResourceEngine}s and {@link TimeDrivenElementGenerator}s. 
+ * A simulation has an associated clock which starts in {@code startTs} and advances according 
+ * to the events produced by the elements, resources and generators. 
  * A "next-event" technique is used to determine the next timestamp to advance. A minimum 
- * {@link TimeUnit} determines the accuracy of the simulation's clock. The simulation ends when the 
- * simulation clock reaches the <tt>endTs</tt> timestamp or no more events are available.<br>
+ * {@link es.ull.simulation.model.TimeUnit} determines the accuracy of the simulation's clock.
+ * The simulation ends when the simulation clock reaches the {@code endTs} timestamp or no more events are available.<br>
  * Depending on the specific implementation, a simulation can use one or more "worker" threads to 
  * execute the event's actions.
  * <p>
  * A user can interact with this Simulation by filling in some user methods that are activated in different
- * instants:
- * <ul>
- * <li>Just before the simulation starts {@link #init()}</li>
- * <li>Just after the simulation ends {@link #end()}</li>
- * <li>Just before the simulation clock advances {@link #beforeClockTick()}</li> 
- * <li>Just After the simulation clock advances {@link #afterClockTick()}</li> 
- * </ul> 
+ * instants: init(), end(), beforeClockTick(), afterClockTick().
  * <p>
- * For debugging purposes, an {@link Output} can be associated to this simulation, thus
+ * For debugging purposes, an {@link es.ull.simulation.utils.Output} can be associated to this simulation, thus
  * defining the destination for error and debug messages.
  * @author Iván Castilla Rodríguez
  */
@@ -85,10 +79,7 @@ public class SimulationEngine implements IIdentifiable {
 	 * Creates a new instance of Simulation
 	 *
 	 * @param id This simulation's identifier
-	 * @param description A short text describing this simulation.
-	 * @param unit This simulation's time unit
-	 * @param startTs Timestamp of simulation's start expressed in Simulation Time Units
-	 * @param endTs Timestamp of simulation's end expressed in Simulation Time Units
+	 * @param simul The associated simulation model
 	 */
 	public SimulationEngine(int id, Simulation simul) {
 		this.id = id;

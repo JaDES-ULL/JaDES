@@ -10,10 +10,9 @@ import es.ull.simulation.model.ElementInstance;
 import es.ull.simulation.model.Simulation;
 
 /**
-/**
  * A {@link MultipleSuccessorFlow} whose successors are conditioned, that is, the successor
  * can only be activated if certain condition is met. When adding successors, if no condition 
- * is indicated, it is supposed to be <tt>true</tt>.
+ * is indicated, it is supposed to be {@code true}.
  * @author Yeray Callero
  *
  */

@@ -12,7 +12,7 @@ public class TimeChangeInfo extends SimulationInfo {
 
 	/**
 	 * Creates a new piece of information related to a change in the clock of a simulation
-	 * @param simul Simulation
+	 * @param model Simulation
 	 * @param ts Timestamp
 	 */
 	public TimeChangeInfo(Simulation model, long ts) {

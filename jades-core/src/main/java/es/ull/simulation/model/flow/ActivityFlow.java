@@ -110,21 +110,21 @@ public class ActivityFlow extends AbstractStructuredFlow implements IResourceHan
     }
 
 	/** 
-	 * Returns <tt>true</tt> if the activity is exclusive, i.e., an element cannot perform other 
+	 * Returns {@code true} if the activity is exclusive, i.e., an element cannot perform other 
 	 * exclusive activities at the same time. 
-	 * @return <tt>True</tt> if the activity is exclusive, <tt>false</tt> in other case.
+	 * @return {@code true} if the activity is exclusive, {@code false} in other case.
 	 */
     public boolean isExclusive() {
         return exclusive;
     }
 
     /**
-     * Returns <tt>true</tt> if this activity is interruptible, i.e., the activity is
+     * Returns {@code true} if this activity is interruptible, i.e., the activity is
      * suspended when any of the the resources taken to perform the activity finalize 
      * their availability. The activity can be resumed when there are available resources 
      * again (<b>but not necessarily the same resources</b>). 
      * <p>By default, an activity is not interruptible.  
-     * @return Always <tt>false</tt>. Subclasses overriding this method must change the 
+     * @return Always {@code false}. Subclasses overriding this method must change the 
      * default behavior. 
      */
 	public boolean isInterruptible() {
@@ -133,7 +133,7 @@ public class ActivityFlow extends AbstractStructuredFlow implements IResourceHan
 
 	/**
 	 * Creates a builder object for adding workgroups to this IFlow. 
-	 * @param wg The set of pairs <ResurceType, amount> which will be seized
+	 * @param wg The set of pairs (ResourceType, amount) which will be seized
 	 * @return The builder object for adding workgroups to this IFlow
 	 */
 	public WorkGroupAdder newWorkGroupAdder(final WorkGroup wg) {

@@ -203,7 +203,7 @@ public class ActivityManagerEngine extends AbstractEngineObject {
 
     /**
      * Adds an element instance to the waiting queue.
-     * @param ei Element instance which is added to the waiting queue.
+     * @param fe Element instance which is added to the waiting queue.
      */
     public void queueAdd(ElementInstance fe) {
     	waitingQueue.add(fe);
@@ -211,7 +211,7 @@ public class ActivityManagerEngine extends AbstractEngineObject {
 
     /**
      * Removes an element instance from the waiting queue.
-     * @param ei Element instance which is removed from the waiting queue.
+     * @param fe Element instance which is removed from the waiting queue.
      */
     public void queueRemove(ElementInstance fe) {
     	waitingQueue.remove(fe);
@@ -219,7 +219,7 @@ public class ActivityManagerEngine extends AbstractEngineObject {
     
     /**
      * Notifies the engine that an element is now available to perform activities
-     * @param ei Element instance 
+     * @param fe Element instance 
      */
     public void notifyAvailableElement(ElementInstance fe) {
     	currentQueue.add(fe);

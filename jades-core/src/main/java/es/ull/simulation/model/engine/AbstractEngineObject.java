@@ -7,7 +7,7 @@ import es.ull.simulation.model.IIdentifiable;
 import es.ull.simulation.model.Simulation;
 
 /**
- * An {@link Identifiable} object associated to a {@link SimulationEngine}. The identifier is
+ * An {@link IIdentifiable} object associated to a {@link SimulationEngine}. The identifier is
  * unique per type of simulation object, thus different types of simulation objects can use 
  * the same identifiers.
  * @author Iván Castilla Rodríguez

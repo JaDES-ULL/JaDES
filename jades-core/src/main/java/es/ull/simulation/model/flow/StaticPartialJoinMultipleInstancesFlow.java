@@ -7,9 +7,8 @@ import es.ull.simulation.model.Simulation;
 
 /**
  * Meets the Static Partial Join for Multiple Instances pattern (WFP34) if 
- * <code>acceptValue > 1</code> and <code>acceptValue < nInstances</code>.
- * If <code>nInstances = acceptValue</code> is equivalent to the <code>
- * SynchronizedMultipleInstanceFlow</code>.
+ * {@code acceptValue > 1} and {@code acceptValue < nInstances}.
+ * If {@code nInstances = acceptValue} is equivalent to the {@code SynchronizedMultipleInstanceFlow}.
  * 
  * @author Iván Castilla Rodríguez
  *

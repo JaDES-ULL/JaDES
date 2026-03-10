@@ -9,7 +9,7 @@ import es.ull.simulation.model.engine.SimulationEngine;
 import es.ull.simulation.model.flow.ActivityFlow;
 
 /**
- * A set of pairs &lt{@link ResourceType}, {@link Integer}&gt which defines how many resources
+ * A set of pairs &lt;{@link ResourceType}, {@link Integer}&gt; which defines how many resources
  * from each type are required to do something (typically an {@link ActivityFlow}).
  * Contains several methods to help the simulation find a suitable solution with the currently available
  * resources.

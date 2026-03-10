@@ -26,9 +26,9 @@ public class DirichletBetaVariate extends RandomVariateBase {
 
 	/**
 	 * Generates probabilities according to the Dirichlet distribution. Note that the probabilities are not scaled unless explicitly indicated: 
-	 * the {@link DiscreteIntegerVariate} can use these values to select among several discrete values 
+	 * the {@link DiscreteSelectorVariate} can use these values to select among several discrete values 
 	 * @param scale If true, scales the values generated to sum 1.0.
-	 * @return
+	 * @return the generated probability values
 	 */
 	public double[] generateValues(boolean scale) {
 		double sum = 0.0;

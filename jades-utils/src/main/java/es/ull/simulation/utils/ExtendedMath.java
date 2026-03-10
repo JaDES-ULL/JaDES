@@ -84,7 +84,7 @@ public class ExtendedMath {
    * @param x
    *            number to be taken to a power.
    * @param n
-   *            power to take x to. 0 <= n <= Integer.MAX_VALUE Negative
+   *            power to take x to. 0 &lt;= n &lt;= Integer.MAX_VALUE Negative
    *            numbers will be treated as unsigned positives.
    * @return x to the power n
    */

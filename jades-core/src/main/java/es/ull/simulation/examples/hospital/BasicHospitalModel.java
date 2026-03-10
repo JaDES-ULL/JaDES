@@ -40,10 +40,8 @@ import es.ull.simulation.model.flow.ExclusiveChoiceFlow;
 public class BasicHospitalModel extends Simulation {
 
 	/**
-	 * @param id
-	 * @param unit
-	 * @param startTs
-	 * @param endTs
+	 * Creates a new BasicHospitalModel
+	 * @param id Model identifier
 	 */
 	public BasicHospitalModel(int id) {
 		super(id, "Hospital");

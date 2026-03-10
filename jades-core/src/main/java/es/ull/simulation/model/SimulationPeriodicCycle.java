@@ -70,9 +70,9 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 	/**
 	 * Creates a new cycle which runs until the specified timestamp is reached.
 	 * @param unit Time unit used in the simulation
-	 * @param startTs Relative time when this cycle is expected to start expressed in <tt>unit</tt>
+	 * @param startTs Relative time when this cycle is expected to start expressed in {@code unit}
 	 * @param period Time interval between two successive ocurrences of an event
-	 * @param endTs Relative time when this cycle is expected to finish expressed in <tt>unit</tt>
+	 * @param endTs Relative time when this cycle is expected to finish expressed in {@code unit}
 	 */
 	public SimulationPeriodicCycle(TimeUnit unit, long startTs, SimulationTimeFunction period, long endTs) {
 		this(unit, new TimeStamp(unit, startTs), period, new TimeStamp(unit, endTs));
@@ -81,7 +81,7 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 	/**
 	 * Creates a new cycle which runs N times.
 	 * @param unit Time unit used in the simulation
-	 * @param startTs Relative time when this cycle is expected to start expressed in <tt>unit</tt>
+	 * @param startTs Relative time when this cycle is expected to start expressed in {@code unit}
 	 * @param period Time interval between two successive ocurrences of an event
 	 * @param iterations How many times this cycle is executed. A value of 0 indicates infinite iterations
 	 */
@@ -93,9 +93,9 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 	/**
 	 * Creates a new cycle which runs until the specified timestamp is reached.
 	 * @param unit Time unit used in the simulation
-	 * @param startTs Relative time when this cycle is expected to start expressed in <tt>unit</tt>
+	 * @param startTs Relative time when this cycle is expected to start expressed in {@code unit}
 	 * @param period Time interval between two successive ocurrences of an event
-	 * @param endTs Relative time when this cycle is expected to finish expressed in <tt>unit</tt>
+	 * @param endTs Relative time when this cycle is expected to finish expressed in {@code unit}
 	 * @param subCycle Subcycle contained in this cycle
 	 */
 	public SimulationPeriodicCycle(TimeUnit unit, long startTs, SimulationTimeFunction period,
@@ -106,7 +106,7 @@ public class SimulationPeriodicCycle implements ISimulationCycle {
 	/**
 	 * Creates a new cycle which runs N times.
 	 * @param unit Time unit used in the simulation
-	 * @param startTs Relative time when this cycle is expected to start expressed in <tt>unit</tt>
+	 * @param startTs Relative time when this cycle is expected to start expressed in {@code unit}
 	 * @param period Time interval between two successive ocurrences of an event
 	 * @param iterations How many times this cycle is executed. A value of 0 indicates infinite iterations
 	 * @param subCycle Subcycle contained in this cycle

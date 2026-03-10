@@ -62,9 +62,9 @@ public class RequestResourcesEngine extends AbstractEngineObject {
 	 * Checks whether there is a combination of available resources that satisties the 
 	 * requirements of a workgroup
 	 * @param solution Tentative solution with booked resources
-	 * @param wg 
-	 * @param fe
-	 * @return
+	 * @param wg The workgroup to check
+	 * @param ei Element instance requesting resources
+	 * @return {@code true} if the workgroup can be satisfied with current resources
 	 */
 	public boolean checkWorkGroup(ArrayDeque<Resource> solution, ActivityWorkGroup wg, ElementInstance ei) {
     	if (!wg.getCondition().check(ei))

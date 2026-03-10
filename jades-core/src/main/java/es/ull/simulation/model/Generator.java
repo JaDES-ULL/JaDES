@@ -113,17 +113,17 @@ public abstract class Generator<INF extends Generator.GenerationInfo> extends Si
 	
 	/**
 	 * Returns the function that characterizes the total number of entities to be created each
-	 * time the {@link #create(long)} method is invoked
+	 * time the {@link #create()} method is invoked
 	 * @return the function that characterizes the total number of entities to be created each
-	 * time the {@link #create(long)} method is invoked
+	 * time the {@link #create()} method is invoked
 	 */
 	public AbstractTimeFunction getNElem() {
 		return nElem;
 	}
 
 	/**
-	 * Returns the total number of entities to be created each time the {@link #create(long)} method is invoked
-	 * @return the total number of entities to be created each time the {@link #create(long)} method is invoked
+	 * Returns the total number of entities to be created each time the {@link #create()} method is invoked
+	 * @return the total number of entities to be created each time the {@link #create()} method is invoked
 	 */	
 	public int getSampleNElem() {
 		return (int) nElem.getValue(this);

@@ -200,9 +200,9 @@ public class RequestResourcesFlow extends AbstractSingleSuccessorFlow implements
 	public void afterAcquire(final ElementInstance ei) {}
 
 	/**
-	 * Allows a user for adding a customized code when a {@link com.ull.simulation.model.ElementInstance} from an {@link com.ull.simulation.model.Element}
-	 * is enqueued, waiting for available {@link com.ull.simulation.model.Resource}. 
-	 * @param ei {@link com.ull.simulation.model.ElementInstance} requesting resources
+	 * Allows a user for adding a customized code when a {@link ElementInstance} from an {@link Element}
+	 * is enqueued, waiting for available {@link es.ull.simulation.model.Resource}. 
+	 * @param ei {@link ElementInstance} requesting resources
 	 */
 	public void inqueue(final ElementInstance ei) {}
 	
@@ -304,7 +304,7 @@ public class RequestResourcesFlow extends AbstractSingleSuccessorFlow implements
 
 	/**
 	 * Creates a builder object for adding workgroups to this IFlow. 
-	 * @param wg The set of pairs <ResurceType, amount> which will be seized
+	 * @param wg The set of pairs (ResourceType, amount) which will be seized
 	 * @return The builder object for adding workgroups to this IFlow
 	 */
 	public WorkGroupAdder newWorkGroupAdder(final WorkGroup wg) {

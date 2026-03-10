@@ -5,7 +5,7 @@ package es.ull.simulation.model;
 
 /**
  * Represents the role that a resource plays at a specific time cycle.
- * A timetable entry uses a trio &lt{@link ResourceType}, {@link ISimulationCycle}, long&gt which defines a 
+ * A timetable entry uses a trio &lt;{@link ResourceType}, {@link ISimulationCycle}, long&gt; which defines a 
  * resource type, an availability cycle, and the duration of each availability period. 
  * @author Iván Castilla Rodríguez
  */

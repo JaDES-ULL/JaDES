@@ -26,7 +26,8 @@ public class RoundedPeriodicCycle extends PeriodicCycle {
    * <li>ROUND: Events are going to be rounded. 1.1 is 1 and 1.6 is 2</li>
    * <li>CEIL: Events are going to be ceiled. 1.1 is 2 and 1.6 is 2</li>
    * <li>FLOOR: Events are going to be floored. 1.1 is 1 and 1.6 is 1</li>
-   * @author Iv8n Castilla Rodrdguez
+   * </ul>
+   * @author Iv8n Castilla Rodrdguez
    */
   public enum Type {
     ROUND,

@@ -216,8 +216,6 @@ public final class OntologyDebugPrinter {
 	 * Prints the list of properties of the specified individual. This list includes the class it belongs to, the object properties and the data properties.
 	 * @param individualIRI An individual in the ontology
 	 * @param sep A separator to use between the property name and its value
-	 * @return a list of strings representing the properties of the specified individual. This list includes the class it belongs to, the object properties and the data properties.
-	 * Each string in the list is formatted as "PROPERTY_NAME" + sep + "PROPERTY_VALUE".
 	 */
 	public void prettyPrintIndividualProperties(IRI individualIRI, String sep) {
 		for (IRI clazz : individualQuery.getAssertedTypes(individualIRI, false, Imports.INCLUDED)) {

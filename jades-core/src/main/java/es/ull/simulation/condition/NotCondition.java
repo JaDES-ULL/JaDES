@@ -1,7 +1,7 @@
 package es.ull.simulation.condition;
 /**
  * Condition used to build NOT logical operations. This NotCondition 
- * returns <tt>true</tt> if the associated {@link AbstractCondition} returns <tt>false</tt>,
+ * returns {@code true} if the associated {@link AbstractCondition} returns {@code false},
  * and vice versa.
  * @author Yeray Callero
  *

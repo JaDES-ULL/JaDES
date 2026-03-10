@@ -96,7 +96,7 @@ public class MoveResourcesFlow extends AbstractSingleSuccessorFlow implements IT
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * The element creates {@link MoveEvent move events} for each resource 
+	 * The element creates move events for each resource 
 	 */
 	public void request(final ElementInstance ei) {
 		if (!ei.wasVisited(this)) {

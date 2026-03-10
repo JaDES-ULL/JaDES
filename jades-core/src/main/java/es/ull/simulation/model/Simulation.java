@@ -219,7 +219,6 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 
 	/**
 	 * Starts the execution of the simulation at timestamp 0 using the default time unit.
-	 * @param unit This simulation's time unit
 	 * @param endTs Simulation end expressed in simulation default time units
 	 */
 	public void run(final long endTs) {
@@ -241,9 +240,8 @@ public class Simulation implements IIdentifiable, IDescribable, IVariableStore, 
 	 * structures.<p> The following checks and initializations are performed within this method:
 	 * <ol>
 	 * <li>If no customized {@link ActivityManagerCreator AM creator} has been defined, the
-	 * {@link StandardActivityManagerCreator default one} is used.</li>
-	 * <li>If no customized {@link SimulationEngine simulation engine} has been defined, a
-	 * {@link SequentialSimulationEngine sequential engine} is used.</li>
+	 * default one is used.</li>
+	 * <li>If no customized simulation engine has been defined, a sequential engine is used.</li>
 	 * <li>The user defined method {@link #init()} is invoked.</li>
 	 * <li>{@link Resource Resources} and {@link Generator generators} are started.</li>
 	 * <li>The main simulation loop is run</li>

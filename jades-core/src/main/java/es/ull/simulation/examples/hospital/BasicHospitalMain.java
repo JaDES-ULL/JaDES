@@ -33,7 +33,8 @@ import es.ull.simulation.model.Simulation;
  */
 public class BasicHospitalMain extends BaseExperiment {
 	/**
-	 * @param nExperiments
+	 * Creates a new BasicHospitalMain experiment
+	 * @param arguments Experiment arguments
 	 */
 	public BasicHospitalMain(CommonArguments arguments) {
 		super("Basic Hospital Experiment", arguments);

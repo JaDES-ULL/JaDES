@@ -4,7 +4,8 @@
 package simkit.random;
 
 /**
- * Implements a bivariate normal random number generator, as in {@link https://wernerantweiler.ca/blog.php?item=2019-03-03}.
+ * Implements a bivariate normal random number generator. See
+ * <a href="https://wernerantweiler.ca/blog.php?item=2019-03-03">Werner Antweiler's blog</a>.
  * @author Iván Castilla
  *
  */

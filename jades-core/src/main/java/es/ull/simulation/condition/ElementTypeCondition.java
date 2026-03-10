@@ -23,8 +23,8 @@ public final class ElementTypeCondition extends AbstractCondition<ElementInstanc
 	}
 
 	/**
-	 * Checks the condition, returning <tt>true</tt> if the {@link ElementType} of the specified 
-	 * {@link Element} is the one set in this condition, and <tt>false</tt> otherwise. 
+	 * Checks the condition, returning {@code true} if the {@link ElementType} of the specified 
+	 * {@link Element} is the one set in this condition, and {@code false} otherwise. 
 	 * @param fe {@link Element} to be checked with the condition.
 	 * @return The result of the logical condition.
 	 */

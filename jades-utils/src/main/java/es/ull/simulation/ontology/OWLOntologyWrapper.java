@@ -103,7 +103,7 @@ public class OWLOntologyWrapper {
 
 	/**
 	 * Creates a wrapper for the specified ontology
-	 * @param ontology The OWL ontology
+	 * @param loaded The loaded OWL ontology
 	 */
 	public OWLOntologyWrapper(LoadedOntology loaded) {
 		final OWLOntology ont = Objects.requireNonNull(loaded.ontology(), "OWL Ontology should never be null");
@@ -264,7 +264,7 @@ public class OWLOntologyWrapper {
 
 	/**
 	 * Loads another ontology from the specified source and makes it available in the manager
-	 * @param iri The IRI of the new ontology
+	 * @param source The document source of the new ontology
 	 * @return The loaded ontology
 	 * @throws OWLOntologyCreationException 
 	 */

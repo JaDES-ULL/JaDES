@@ -4,7 +4,7 @@
 package es.ull.simulation.model;
 
 /**
- * A timed value expressed as a pair &lt{@link TimeUnit}, long}&gt.
+ * A timed value expressed as a pair &lt;{@link TimeUnit}, long&gt;.
  * @author Iván Castilla Rodríguez
  *
  */
