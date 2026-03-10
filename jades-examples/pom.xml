@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.jades-ull.jades</groupId>
+    <artifactId>jades-parent</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>jades-examples</artifactId>
+  <packaging>jar</packaging>
+
+  <name>JaDES Examples</name>
+  <description>Executable, pedagogical simulation examples for the JaDES framework.
+    Not published to Maven Central.</description>
+
+  <properties>
+    <!-- Skip GPG signing — this module is not published to Maven Central -->
+    <gpg.skip>true</gpg.skip>
+  </properties>
+
+  <dependencies>
+    <!-- Core simulation engine (brings jades-api and jades-random transitively) -->
+    <dependency>
+      <groupId>io.github.jades-ull.jades</groupId>
+      <artifactId>jades-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Explicit dependency on utils (ontology, math, Excel helpers) -->
+    <dependency>
+      <groupId>io.github.jades-ull.jades</groupId>
+      <artifactId>jades-utils</artifactId>
+    </dependency>
+
+    <!-- CLI argument parsing (-r/-s/-q flags via JCommander) -->
+    <dependency>
+      <groupId>com.beust</groupId>
+      <artifactId>jcommander</artifactId>
+    </dependency>
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+    </dependency>
+
+    <!-- Tests -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <!-- Prevent this module from being published to Maven Central -->
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

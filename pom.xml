@@ -67,6 +67,7 @@
     <module>jades-api</module>
     <module>jades-core</module>
     <module>jades-utils</module>
+    <module>jades-examples</module>
   </modules>
 
   <dependencyManagement>

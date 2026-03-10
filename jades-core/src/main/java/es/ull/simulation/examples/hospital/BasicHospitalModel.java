@@ -105,7 +105,7 @@ public class BasicHospitalModel extends Simulation {
 		// Create a conditional IFlow to determine if a patient requires surgery
 		ExclusiveChoiceFlow fRequireSurgery = new ExclusiveChoiceFlow(this);
 		// Define 5% of patients requiring surgery
-		PercentageCondition<ElementInstance> requiresSurgeryCondition = new PercentageCondition<ElementInstance>(50.0);
+		PercentageCondition<ElementInstance> requiresSurgeryCondition = new PercentageCondition<ElementInstance>(5.0);
 		
 		actAppointment.link(fRequireSurgery);
 		fRequireSurgery.link(actSurgery, requiresSurgeryCondition);
