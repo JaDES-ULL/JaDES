@@ -22,7 +22,7 @@ Luego añade la dependencia en tu `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>io.github.jades-ull</groupId>
+    <groupId>io.github.jades-ull.jades</groupId>
     <artifactId>jades-core</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -32,7 +32,7 @@ Si necesitas distribuciones de probabilidad integradas, añade también:
 
 ```xml
 <dependency>
-    <groupId>io.github.jades-ull</groupId>
+    <groupId>io.github.jades-ull.jades</groupId>
     <artifactId>jades-random</artifactId>
     <version>1.0.0</version>
 </dependency>
