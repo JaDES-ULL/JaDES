@@ -24,7 +24,6 @@ class ICUTest {
     void shouldRunWithoutErrors() {
         final CommonArguments args = new CommonArguments();
         args.nRuns  = 1;
-        args.quiet  = true;
 
         assertDoesNotThrow(() -> new ICUMain(args).run(),
                 "ICUMain.run() must not throw any exception");
@@ -37,7 +36,6 @@ class ICUTest {
     void shouldRunMultipleReplications() {
         final CommonArguments args = new CommonArguments();
         args.nRuns  = 3;
-        args.quiet  = true;
 
         assertDoesNotThrow(() -> new ICUMain(args).run(),
                 "ICUMain.run() must not throw any exception with 3 replications");

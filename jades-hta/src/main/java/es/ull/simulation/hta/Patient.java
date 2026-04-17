@@ -208,7 +208,7 @@ public class Patient extends VariableStoreSimulationObject implements IEventSour
 	
 	@Override
 	public void notifyEnd() {
-        simul.addEvent(onDestroy(simul.getSimulationEngine().getTs()));
+        simul.scheduleEvent(onDestroy(simul.getSimulationEngine().getTs()));
 	}
 
 	@Override
@@ -405,7 +405,7 @@ public class Patient extends VariableStoreSimulationObject implements IEventSour
 		if (newTimeToDeath < deathEvent.getTs()) {
 			deathEvent.cancel();
 			deathEvent = new DeathEvent(newTimeToDeath, progression);
-			simul.addEvent(deathEvent);
+			simul.scheduleEvent(deathEvent);
 		}		
 	}
 	
@@ -417,7 +417,7 @@ public class Patient extends VariableStoreSimulationObject implements IEventSour
 		for (DiseaseProgressionEventPair pr : progs.getNewEvents()) {
 			final DiseaseProgressionEvent ev = new DiseaseProgressionEvent(pr); 
 			nextProgressionEvents.put(pr.getDiseaseProgression(), ev);
-			simul.addEvent(ev);
+			simul.scheduleEvent(ev);
 		}
 	}
 	
@@ -443,7 +443,7 @@ public class Patient extends VariableStoreSimulationObject implements IEventSour
 		final TimeToEventCalculator deathCalculator = population.getDeathCharacterization();
 		final long timeToDeath = this.getTs() + simul.getTimeUnit().convert(deathCalculator.getTimeToEvent(this), deathCalculator.getTimeUnit());
 		deathEvent = new DeathEvent(timeToDeath);
-		simul.addEvent(deathEvent);
+		simul.scheduleEvent(deathEvent);
 		
 		for (DiseaseProgression progression : getDisease().getInitialStage(this)) {
 			ArrayDeque<DiseaseProgressionEvent> events = new ArrayDeque<>();
@@ -469,7 +469,7 @@ public class Patient extends VariableStoreSimulationObject implements IEventSour
 		applyProgression(progs);
 		// Schedules events related to the intervention
 		for (DiscreteEvent ev : intervention.getEvents(this)) {
-			simul.addEvent(ev);
+			simul.scheduleEvent(ev);
 		}
 	}
 

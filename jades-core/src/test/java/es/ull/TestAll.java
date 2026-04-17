@@ -63,7 +63,6 @@ public class TestAll {
     @EnumSource(TestType.class)
     public void testAll(TestType type) {
         final TestArguments arguments = new TestArguments();
-        arguments.quiet = true;
         final TestMoreFlowsExperiment experiment = new TestMoreFlowsExperiment(type, arguments);
         experiment.run();
     }

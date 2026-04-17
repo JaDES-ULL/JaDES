@@ -7,6 +7,7 @@ import com.beust.jcommander.JCommander;
 
 import es.ull.StandardTestSimulation;
 import es.ull.simulation.experiment.BaseExperiment;
+import es.ull.simulation.experiment.CommonArgumentsDefaultProvider;
 
 /**
  * @author Iván Castilla Rodríguez
@@ -55,7 +56,7 @@ public class WFPTestExperiment extends BaseExperiment {
 	 */
 	public static void main(String[] args) {
 		final TestWFP.TestWFPArguments arguments = new TestWFP.TestWFPArguments();
-		final JCommander jc = JCommander.newBuilder().addObject(arguments).build();
+		final JCommander jc = JCommander.newBuilder().addObject(arguments).defaultProvider(new CommonArgumentsDefaultProvider()).build();
 		jc.parse(args);
 
 		new WFPTestExperiment(arguments).run();

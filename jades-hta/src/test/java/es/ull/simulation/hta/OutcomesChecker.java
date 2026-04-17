@@ -12,6 +12,7 @@ import es.ull.simulation.hta.params.StandardParameter;
 import es.ull.simulation.info.IPieceOfInformation;
 import es.ull.simulation.info.SimulationStartStopInfo;
 import es.ull.simulation.inforeceiver.BasicListener;
+import es.ull.simulation.inforeceiver.IListener;
 
 /**
  * A listener that checks the outcomes of the simulation against the expected values.
@@ -61,7 +62,7 @@ public class OutcomesChecker extends BasicListener {
                     assertTrue(Math.abs(expectedFinalLY - resultsLY.getAverage()) < DELTA, "The expected LYs for the tested patient (" + resultsLY.getAverage() + " do not fit the obtained value (" + expectedFinalLY + " )");
                     break;
                 case START:
-                    for (BasicListener listener : simul.getListeners()) {
+                    for (IListener listener : simul.getListeners()) {
                         if (listener instanceof QALYListener) {
                             qalyListener = (QALYListener) listener;
                         }

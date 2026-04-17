@@ -21,7 +21,6 @@ public class TestWFP {
     @DisplayName("Test all WFP")
     public void testAllWFP(int wfp) {
         arguments.wfp = wfp;
-        arguments.quiet = true;
         final WFPTestExperiment exp = new WFPTestExperiment(arguments);
         exp.run();
     }

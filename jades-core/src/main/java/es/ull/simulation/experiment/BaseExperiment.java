@@ -2,29 +2,37 @@ package es.ull.simulation.experiment;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+
 /**
  * A class to execute several simulation experiments sequentially. It uses a single thread to execute the simuation experiments.
  */
 public abstract class BaseExperiment implements IExperiment {
+	/**
+	 * The logger for this class
+	 */
+	private final static Logger log = org.slf4j.LoggerFactory.getLogger(BaseExperiment.class); 
+	
 	/** A short text describing this experiment */
 	private final String description;
 	/** The arguments for the experiment */
-	private final CommonArguments arguments;
+	private final IExperimentConfigurationProvider configProvider;
 	/** A structure to print the progress of simulations */
 	private final PrintProgress progress;
+	/** The number of experiments to be carried out */
+	private final int nExperiments;
 
 	/**
 	 * Creates a new experiment.
 	 * @param description A short text describing this experiment
 	 */
-    public BaseExperiment(String description, CommonArguments arguments) {
+    public BaseExperiment(String description, IExperimentConfigurationProvider config) {
         super();
         this.description = description;
-		this.arguments = arguments;
-		this.progress = new PrintProgress(arguments.nRuns + 1);
-		if (arguments.seed != IExperiment.getSeed()) {
-			IExperiment.setSeed(arguments.seed);
-		}
+		this.configProvider = config;
+		this.nExperiments = (config.getNRuns().isPresent()) ? config.getNRuns().getAsInt() : IExperiment.DEFAULT_RUNS;
+		this.progress = new PrintProgress(nExperiments + 1);
+		IExperiment.setSeed(config.getSeed().isPresent() ? config.getSeed().getAsLong() : IExperiment.getSeed());
     }
 
 	@Override
@@ -37,26 +45,26 @@ public abstract class BaseExperiment implements IExperiment {
 	 * @return The number of experiments to be carried out
 	 */
 	public int getNExperiments() {
-		return arguments.nRuns;
+		return nExperiments;
 	}
 
 	/**
 	 * Returns the arguments for the experiment.
 	 * @return The arguments for the experiment
 	 */
-	public CommonArguments getArguments() {
-		return arguments;
+	public IExperimentConfigurationProvider getConfigProvider() {
+		return configProvider;
 	}
 
 	@Override
     public void run() {
 		final long time = System.currentTimeMillis();
         beforeStart();
-		final int nExperiments = getNExperiments();
 		progress.print();
 		if (nExperiments > 0) {
-			if (arguments.parallel) {
-				final int nThreads = arguments.nThreads;
+			if (configProvider.isParallel().orElse(false)) {
+				final int nThreads = configProvider.getNThreads().isPresent() ? configProvider.getNThreads().getAsInt()
+						: IExperiment.DEFAULT_N_THREADS;
 				try {
 					final Thread[] workers = new Thread[nThreads];
 					int nExperimentsPerThread = nExperiments / nThreads;
@@ -79,8 +87,7 @@ public abstract class BaseExperiment implements IExperiment {
 			}
 		}
         afterFinalize();
-		if (!arguments.quiet)
-			System.out.println("Execution time: " + ((System.currentTimeMillis() - time) / 1000) + " sec");
+		log.info("Execution time: {} sec", (System.currentTimeMillis() - time) / 1000);
     }
 	
 	protected class ParallelExperimentsLauncher implements Runnable {
@@ -120,15 +127,13 @@ public abstract class BaseExperiment implements IExperiment {
 
 		public PrintProgress(int totalSim) {
 			this.totalSim = totalSim;
-			this.gap = (arguments.nRuns > N_PROGRESS) ? arguments.nRuns / N_PROGRESS : 1;
+			this.gap = (nExperiments > N_PROGRESS) ? nExperiments / N_PROGRESS : 1;
 			this.counter = new AtomicInteger();
 		}
 
 		public void print() {
-			if (!arguments.quiet) {
-				if (counter.incrementAndGet() % gap == 0)
-					System.out.println("" + (counter.get() * 100 / totalSim) + "% finished");
-			}
+			if (counter.incrementAndGet() % gap == 0)
+				log.info("{}% finished", (counter.get() * 100 / totalSim));
 		}
 
 	}

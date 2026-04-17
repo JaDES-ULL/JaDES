@@ -68,7 +68,8 @@ public abstract class StandardTestSimulation extends Simulation {
 	 * Adds the required listeners to check that the simulation behaves as expected.
 	 */
 	protected void addCheckers() {
-		if (!args.quiet)
+		// TODO: This listener should be only added when a verbose mode is enabled. Must integrate with logger levels.
+		//if (!args.quiet)
 			registerListener(new StdInfoListener());
 		registerListener(new CheckResourcesListener(roleOns, roleOffs));
 		registerListener(new CheckElementsListener(nElems));

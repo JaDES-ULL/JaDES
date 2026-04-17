@@ -17,7 +17,6 @@ class BaseExperimentTest {
         arguments.seed = 42L;
         arguments.parallel = false;
         arguments.nThreads = 1;
-        arguments.quiet = false;
         experiment = new TestExperiment("Test Experiment", arguments);
     }
 
@@ -26,7 +25,7 @@ class BaseExperimentTest {
         assertNotNull(experiment);
         assertEquals("Test Experiment", experiment.getDescription());
         assertEquals(5, experiment.getNExperiments());
-        assertEquals(arguments, experiment.getArguments());
+        assertEquals(arguments, experiment.getConfigProvider());
     }
 
     @Test
@@ -47,14 +46,13 @@ class BaseExperimentTest {
 
     @Test
     void shouldGetArguments() {
-        CommonArguments args = experiment.getArguments();
+        CommonArguments args = (CommonArguments) experiment.getConfigProvider();
 
         assertNotNull(args);
         assertEquals(5, args.nRuns);
         assertEquals(42L, args.seed);
         assertFalse(args.parallel);
         assertEquals(1, args.nThreads);
-        assertFalse(args.quiet);
     }
 
     @Test
@@ -74,18 +72,8 @@ class BaseExperimentTest {
         parallelArgs.nThreads = 4;
         TestExperiment parallelExperiment = new TestExperiment("Parallel Experiment", parallelArgs);
 
-        assertTrue(parallelExperiment.getArguments().parallel);
-        assertEquals(4, parallelExperiment.getArguments().nThreads);
-    }
-
-    @Test
-    void shouldCreateBaseExperiment_withQuietMode() {
-        CommonArguments quietArgs = new CommonArguments();
-        quietArgs.nRuns = 3;
-        quietArgs.quiet = true;
-        TestExperiment quietExperiment = new TestExperiment("Quiet Experiment", quietArgs);
-
-        assertTrue(quietExperiment.getArguments().quiet);
+        assertTrue(((CommonArguments) parallelExperiment.getConfigProvider()).parallel);
+        assertEquals(4, ((CommonArguments) parallelExperiment.getConfigProvider()).nThreads);
     }
 
     @Test
@@ -100,8 +88,8 @@ class BaseExperimentTest {
         TestExperiment exp1 = new TestExperiment("Exp1", args1);
         TestExperiment exp2 = new TestExperiment("Exp2", args2);
 
-        assertEquals(100L, exp1.getArguments().seed);
-        assertEquals(200L, exp2.getArguments().seed);
+        assertEquals(100L, ((CommonArguments) exp1.getConfigProvider()).seed);
+        assertEquals(200L, ((CommonArguments) exp2.getConfigProvider()).seed);
     }
 
     @Test
@@ -112,8 +100,8 @@ class BaseExperimentTest {
         multiThreadArgs.nThreads = 8;
         TestExperiment multiThreadExperiment = new TestExperiment("Multi-thread Experiment", multiThreadArgs);
 
-        assertEquals(8, multiThreadExperiment.getArguments().nThreads);
-        assertTrue(multiThreadExperiment.getArguments().parallel);
+        assertEquals(8, ((CommonArguments) multiThreadExperiment.getConfigProvider()).nThreads);
+        assertTrue(((CommonArguments) multiThreadExperiment.getConfigProvider()).parallel);
     }
 
     @Test
@@ -139,7 +127,6 @@ class BaseExperimentTest {
         CommonArguments args = new CommonArguments();
         args.nRuns = 3;
         args.parallel = false;
-        args.quiet = true;
 
         TrackingExperiment tracking = new TrackingExperiment("Seq", args);
         tracking.run();
@@ -155,7 +142,6 @@ class BaseExperimentTest {
         args.nRuns = 2;
         args.parallel = true;
         args.nThreads = 1;
-        args.quiet = true;
 
         TrackingExperiment tracking = new TrackingExperiment("Par", args);
         tracking.run();
