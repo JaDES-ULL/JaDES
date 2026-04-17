@@ -8,8 +8,8 @@
 @base <https://w3id.org/ontologies-ULL//individuals/test> .
 
 <https://w3id.org/ontologies-ULL//individuals/test> rdf:type owl:Ontology ;
-                                                     owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.0> ;
-                                                     rdfs:comment "Individuals for OSDi ontology, version 1.0"@en ;
+                                                     owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.1> ;
+                                                     rdfs:comment "Individuals for OSDi ontology, version 1.1"@en ;
                                                      rdfs:label "OSDi individuals for Testing"@en .
 
 #################################################################
