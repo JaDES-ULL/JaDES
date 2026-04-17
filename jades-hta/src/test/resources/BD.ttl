@@ -1,0 +1,1086 @@
+@prefix : <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix osdi: <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/ontologies-ULL/OSDi#> .
+
+<https://w3id.org/ontologies-ULL/OSDi/individuals/BD> rdf:type owl:Ontology ;
+                                                       owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.0> ;
+                                                       rdfs:comment "Individuals for OSDi ontology, version 1.0"@en ;
+                                                       rdfs:label "OSDi individuals for Biotinidase Deficiency"@en .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  https://w3id.org/ontologies-ULL/OSDi#affects
+osdi:affects rdf:type owl:AnnotationProperty .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasEffect
+osdi:hasEffect rdf:type owl:AnnotationProperty .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasEffectMagnitude
+osdi:hasEffectMagnitude rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  https://w3id.org/ontologies-ULL/OSDi#Effect
+osdi:Effect rdf:type owl:Class .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#InstantDeathEffect
+osdi:InstantDeathEffect rdf:type owl:Class .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#LifeExpectancyReductionEffect
+osdi:LifeExpectancyReductionEffect rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BasePopulation
+osdi:BD_BasePopulation rdf:type owl:NamedIndividual ,
+                                osdi:Population ;
+                       osdi:hasAge osdi:BD_BasePopulationAge ;
+                       osdi:hasEpidemiologicalParameter osdi:BD_BirthPrevalenceProfoundSpain ;
+                       osdi:hasLifeExpectancy osdi:BD_BasePopulationLifeExpectancy ;
+                       osdi:hasSex osdi:BD_BasePopulationFemaleProportion ;
+                       osdi:hasUtility osdi:BD_BasePopulationUtility ;
+                       osdi:includedByModel osdi:PBD_ModelTree ,
+                                            osdi:PBD_ModelTreeDebug ,
+                                            osdi:PBD_ModelTreeFake ;
+                       osdi:hasDescription "Base population of newborns" ;
+                       osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                       osdi:hasMinAge "0.0"^^xsd:double ;
+                       osdi:hasSize 540963 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BasePopulationAge
+osdi:BD_BasePopulationAge rdf:type owl:NamedIndividual ,
+                                   osdi:DeterministicParameter ,
+                                   osdi:Parameter ;
+                          osdi:includedByModel osdi:PBD_ModelTree ,
+                                               osdi:PBD_ModelTreeDebug ,
+                                               osdi:PBD_ModelTreeFake ;
+                          osdi:isValueOfAttribute osdi:Attribute_Age ;
+                          osdi:hasExpectedValue "0.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BasePopulationFemaleProportion
+osdi:BD_BasePopulationFemaleProportion rdf:type owl:NamedIndividual ,
+                                                osdi:DeterministicParameter ,
+                                                osdi:Parameter ;
+                                       osdi:includedByModel osdi:PBD_ModelTree ,
+                                                            osdi:PBD_ModelTreeDebug ,
+                                                            osdi:PBD_ModelTreeFake ;
+                                       osdi:isValueOfAttribute osdi:Attribute_Sex ;
+                                       osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BasePopulationLifeExpectancy
+osdi:BD_BasePopulationLifeExpectancy rdf:type owl:NamedIndividual ,
+                                              osdi:Parameter ,
+                                              osdi:SecondOrderUncertaintyParameter ;
+                                     osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                                     osdi:hasUncertaintyCharacterization osdi:BD_BasePopulationLifeExpectancyStochasticUncertainty ;
+                                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                                          osdi:PBD_ModelTreeDebug ,
+                                                          osdi:PBD_ModelTreeFake ;
+                                     osdi:isValueOfAttribute osdi:Attribute_LifeExpectancy ;
+                                     osdi:hasExpectedValue "82.272854"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BasePopulationLifeExpectancyStochasticUncertainty
+osdi:BD_BasePopulationLifeExpectancyStochasticUncertainty rdf:type owl:NamedIndividual ,
+                                                                   osdi:GammaDistributionExpression ;
+                                                          osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                               osdi:PBD_ModelTreeDebug ,
+                                                                               osdi:PBD_ModelTreeFake ;
+                                                          osdi:hasAlfaParameter "25.0"^^xsd:double ;
+                                                          osdi:hasLambdaParameter "3.29"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BasePopulationUtility
+osdi:BD_BasePopulationUtility rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ,
+                                       osdi:Utility ;
+                              osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                              osdi:includedByModel osdi:PBD_ModelTree ,
+                                                   osdi:PBD_ModelTreeDebug ,
+                                                   osdi:PBD_ModelTreeFake ;
+                              osdi:isParameterOf osdi:BD_BasePopulation ;
+                              osdi:appliesOneTime "false"^^xsd:boolean ;
+                              osdi:hasExpectedValue "0.8861"^^xsd:double ;
+                              osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                              osdi:isDisutility "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BirthPrevalencePartialSpain
+osdi:BD_BirthPrevalencePartialSpain rdf:type owl:NamedIndividual ,
+                                             osdi:EpidemiologicalParameter ,
+                                             osdi:SecondOrderUncertaintyParameter ;
+                                    osdi:hasDataItemType osdi:DI_BirthPrevalence ;
+                                    osdi:hasUncertaintyCharacterization osdi:BD_BirthPrevalencePartialSpain_ParamUncertainty ;
+                                    osdi:includedByModel osdi:PBD_ModelTree ,
+                                                         osdi:PBD_ModelTreeDebug ,
+                                                         osdi:PBD_ModelTreeFake ;
+                                    osdi:isParameterOf osdi:BD_BasePopulation ,
+                                                       osdi:PBD_ProfoundBiotinidaseDeficiency ;
+                                    osdi:hasExpectedValue "2.95769E-5"^^xsd:double ;
+                                    osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                    osdi:isTrueEpidemiologicalParameterEstimate "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BirthPrevalencePartialSpain_ParamUncertainty
+osdi:BD_BirthPrevalencePartialSpain_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                              osdi:BetaDistributionExpression ;
+                                                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                          osdi:PBD_ModelTreeDebug ,
+                                                                          osdi:PBD_ModelTreeFake ;
+                                                     osdi:hasAlfaParameter "16.0"^^xsd:double ;
+                                                     osdi:hasBetaParameter "540947.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BirthPrevalenceProfoundSpain
+osdi:BD_BirthPrevalenceProfoundSpain rdf:type owl:NamedIndividual ,
+                                              osdi:EpidemiologicalParameter ,
+                                              osdi:SecondOrderUncertaintyParameter ;
+                                     osdi:hasDataItemType osdi:DI_BirthPrevalence ;
+                                     osdi:hasUncertaintyCharacterization osdi:BD_BirthPrevalenceProfoundSpain_ParamUncertainty ;
+                                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                                          osdi:PBD_ModelTreeDebug ,
+                                                          osdi:PBD_ModelTreeFake ;
+                                     osdi:isParameterOf osdi:BD_BasePopulation ,
+                                                        osdi:PBD_ProfoundBiotinidaseDeficiency ;
+                                     osdi:hasExpectedValue "1.48E-5"^^xsd:double ;
+                                     osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                     osdi:isTrueEpidemiologicalParameterEstimate "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_BirthPrevalenceProfoundSpain_ParamUncertainty
+osdi:BD_BirthPrevalenceProfoundSpain_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                               osdi:BetaDistributionExpression ;
+                                                      osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                           osdi:PBD_ModelTreeDebug ,
+                                                                           osdi:PBD_ModelTreeFake ;
+                                                      osdi:hasAlfaParameter "8.0"^^xsd:double ;
+                                                      osdi:hasBetaParameter "540955.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_ClinicalDiagnosis
+osdi:BD_ClinicalDiagnosis rdf:type owl:NamedIndividual ,
+                                   osdi:DiagnosisStrategy ;
+                          osdi:detects osdi:PBD_ProfoundBiotinidaseDeficiency ;
+                          osdi:hasCost osdi:BD_CostDiagnosis ;
+                          osdi:hasSensitivity osdi:ConstantSensitivity1 ;
+                          osdi:hasSpecificity osdi:ConstantSpecificity1 ;
+                          osdi:includedByModel osdi:PBD_ModelTree ,
+                                               osdi:PBD_ModelTreeDebug ,
+                                               osdi:PBD_ModelTreeFake ;
+                          osdi:hasDescription "Quantitative enzymatic determination of biotinidase activity in serum and plasma,and analysis of mutations of the biotinidase gene." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_ConstantAge0
+osdi:BD_ConstantAge0 rdf:type owl:NamedIndividual ,
+                              osdi:DeterministicParameter ,
+                              osdi:Parameter ;
+                     osdi:hasDataItemType osdi:DI_Count ;
+                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                          osdi:PBD_ModelTreeDebug ,
+                                          osdi:PBD_ModelTreeFake ;
+                     osdi:hasDescription "A constant that represents 0 years" ;
+                     osdi:hasExpectedValue "0.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_ConstantAge1
+osdi:BD_ConstantAge1 rdf:type owl:NamedIndividual ,
+                              osdi:DeterministicParameter ,
+                              osdi:Parameter ;
+                     osdi:hasDataItemType osdi:DI_Count ;
+                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                          osdi:PBD_ModelTreeDebug ,
+                                          osdi:PBD_ModelTreeFake ;
+                     osdi:hasDescription "A constant that represents 1 year" ;
+                     osdi:hasExpectedValue "1.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_ConstantAge2
+osdi:BD_ConstantAge2 rdf:type owl:NamedIndividual ,
+                              osdi:DeterministicParameter ,
+                              osdi:Parameter ;
+                     osdi:hasDataItemType osdi:DI_Count ;
+                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                          osdi:PBD_ModelTreeDebug ,
+                                          osdi:PBD_ModelTreeFake ;
+                     osdi:hasDescription "A constant that represents 2 years" ;
+                     osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_CostDiagnosis
+osdi:BD_CostDiagnosis rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:SecondOrderUncertaintyParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:hasUncertaintyCharacterization osdi:BD_CostDiagnosis_ParamUncertainty ;
+                      osdi:includedByModel osdi:PBD_ModelTree ,
+                                           osdi:PBD_ModelTreeDebug ,
+                                           osdi:PBD_ModelTreeFake ;
+                      osdi:appliesOneTime "true"^^xsd:boolean ;
+                      osdi:hasDescription "Cost of diagnosis for profound BD in Spain. Includes retest for screening, two diagnostic tests and two blood extraction." ;
+                      osdi:hasExpectedValue "509.65"^^xsd:double ;
+                      osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                      osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_CostDiagnosis_ParamUncertainty
+osdi:BD_CostDiagnosis_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                osdi:UniformDistributionExpression ;
+                                       osdi:includedByModel osdi:PBD_ModelTree ,
+                                                            osdi:PBD_ModelTreeDebug ,
+                                                            osdi:PBD_ModelTreeFake ;
+                                       osdi:hasLowerLimitParameter "409.65"^^xsd:double ;
+                                       osdi:hasUpperLimitParameter "609.65"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_CostManifestationHearingProblems
+osdi:BD_CostManifestationHearingProblems rdf:type owl:NamedIndividual ,
+                                                  osdi:Cost ,
+                                                  osdi:DeterministicParameter ;
+                                         osdi:hasDataItemType osdi:Currency_Euro ;
+                                         osdi:includedByModel osdi:PBD_ModelTree ,
+                                                              osdi:PBD_ModelTreeDebug ,
+                                                              osdi:PBD_ModelTreeFake ;
+                                         osdi:appliesOneTime "false"^^xsd:boolean ;
+                                         osdi:hasDescription "Annual costs for hearing problems." ;
+                                         osdi:hasExpectedValue "155.14"^^xsd:double ;
+                                         osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                         osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_ManifestationHearingProblems
+osdi:BD_ManifestationHearingProblems rdf:type owl:NamedIndividual ,
+                                              osdi:ChronicManifestation ;
+                                     osdi:hasCost osdi:BD_CostManifestationHearingProblems ,
+                                                  osdi:PBD_CostManifestationHearingProblemsInitial ;
+                                     osdi:hasEndAge osdi:BD_ConstantAge2 ;
+                                     osdi:hasOnsetAge osdi:BD_ConstantAge1 ;
+                                     osdi:hasRiskCharacterization osdi:PBD_ManifestationHearingProblemsProportion ;
+                                     osdi:hasUtility osdi:PBD_UtilityManifestationHearingProblems ;
+                                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                                          osdi:PBD_ModelTreeDebug ,
+                                                          osdi:PBD_ModelTreeFake .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#ConstantProbability1
+osdi:ConstantProbability1 rdf:type owl:NamedIndividual .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#ConstantSensitivity1
+osdi:ConstantSensitivity1 rdf:type owl:NamedIndividual .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#ConstantSpecificity1
+osdi:ConstantSpecificity1 rdf:type owl:NamedIndividual .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#GuidelineLifeExpectancyAnual
+osdi:GuidelineLifeExpectancyAnual rdf:type owl:NamedIndividual .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostFollowUpStrategy
+osdi:PBD_CostFollowUpStrategy rdf:type owl:NamedIndividual ,
+                                       osdi:Cost ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:Currency_Euro ;
+                              osdi:includedByModel osdi:PBD_ModelTree ,
+                                                   osdi:PBD_ModelTreeDebug ,
+                                                   osdi:PBD_ModelTreeFake ;
+                              osdi:appliesOneTime "false"^^xsd:boolean ;
+                              osdi:hasDescription "Cost for annual ophthalmologic, auditory, and medical geneticist or metabolic specialist evaluations, and urinary organic acid and acylcarnitine analyses" ;
+                              osdi:hasExpectedValue "616.75672"^^xsd:double ;
+                              osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                              osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostManifestationHearingProblemsInitial
+osdi:PBD_CostManifestationHearingProblemsInitial rdf:type owl:NamedIndividual ,
+                                                          osdi:Cost ,
+                                                          osdi:DeterministicParameter ;
+                                                 osdi:hasDataItemType osdi:Currency_Euro ;
+                                                 osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                      osdi:PBD_ModelTreeDebug ,
+                                                                      osdi:PBD_ModelTreeFake ;
+                                                 osdi:appliesOneTime "true"^^xsd:boolean ;
+                                                 osdi:hasDescription "Initial costs for hearing problems." ;
+                                                 osdi:hasExpectedValue "31169.95"^^xsd:double ;
+                                                 osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                                 osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostManifestationHypotonia
+osdi:PBD_CostManifestationHypotonia rdf:type owl:NamedIndividual ,
+                                             osdi:Cost ,
+                                             osdi:DeterministicParameter ;
+                                    osdi:hasDataItemType osdi:Currency_Euro ;
+                                    osdi:includedByModel osdi:PBD_ModelTree ,
+                                                         osdi:PBD_ModelTreeFake ;
+                                    osdi:appliesOneTime "true"^^xsd:boolean ;
+                                    osdi:hasDescription "Annual costs for hypotonia." ;
+                                    osdi:hasExpectedValue "3665.56"^^xsd:double ;
+                                    osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                    osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostManifestationMentalDelay
+osdi:PBD_CostManifestationMentalDelay rdf:type owl:NamedIndividual ,
+                                               osdi:Cost ,
+                                               osdi:DeterministicParameter ;
+                                      osdi:hasDataItemType osdi:Currency_Euro ;
+                                      osdi:includedByModel osdi:PBD_ModelTree ,
+                                                           osdi:PBD_ModelTreeFake ;
+                                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                                      osdi:hasDescription "Annual costs for mental delay." ;
+                                      osdi:hasExpectedValue "217.74"^^xsd:double ;
+                                      osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                      osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostManifestationMentalDelayInitial
+osdi:PBD_CostManifestationMentalDelayInitial rdf:type owl:NamedIndividual ,
+                                                      osdi:Cost ,
+                                                      osdi:DeterministicParameter ;
+                                             osdi:hasDataItemType osdi:Currency_Euro ;
+                                             osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                  osdi:PBD_ModelTreeFake ;
+                                             osdi:appliesOneTime "true"^^xsd:boolean ;
+                                             osdi:hasDescription "Initial costs for mental delay." ;
+                                             osdi:hasExpectedValue "1218.02"^^xsd:double ;
+                                             osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                             osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostManifestationSeizure
+osdi:PBD_CostManifestationSeizure rdf:type owl:NamedIndividual ,
+                                           osdi:Cost ,
+                                           osdi:DeterministicParameter ;
+                                  osdi:hasDataItemType osdi:Currency_Euro ;
+                                  osdi:includedByModel osdi:PBD_ModelTree ,
+                                                       osdi:PBD_ModelTreeFake ;
+                                  osdi:appliesOneTime "true"^^xsd:boolean ;
+                                  osdi:hasDescription "Annual costs for seizures." ;
+                                  osdi:hasExpectedValue "3665.56"^^xsd:double ;
+                                  osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                  osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostManifestationSkinProblems
+osdi:PBD_CostManifestationSkinProblems rdf:type owl:NamedIndividual ,
+                                                osdi:Cost ,
+                                                osdi:DeterministicParameter ;
+                                       osdi:hasDataItemType osdi:Currency_Euro ;
+                                       osdi:includedByModel osdi:PBD_ModelTree ,
+                                                            osdi:PBD_ModelTreeFake ;
+                                       osdi:appliesOneTime "true"^^xsd:boolean ;
+                                       osdi:hasDescription "Annual costs for skin problems." ;
+                                       osdi:hasExpectedValue "3665.56"^^xsd:double ;
+                                       osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                       osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostManifestationVisionLoss
+osdi:PBD_CostManifestationVisionLoss rdf:type owl:NamedIndividual ,
+                                              osdi:Cost ,
+                                              osdi:DeterministicParameter ;
+                                     osdi:hasDataItemType osdi:Currency_Euro ;
+                                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                                          osdi:PBD_ModelTreeFake ;
+                                     osdi:appliesOneTime "false"^^xsd:boolean ;
+                                     osdi:hasDescription "Annual costs for vision loss." ;
+                                     osdi:hasExpectedValue "121.86"^^xsd:double ;
+                                     osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                     osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostManifestationVisionLossInitial
+osdi:PBD_CostManifestationVisionLossInitial rdf:type owl:NamedIndividual ,
+                                                     osdi:Cost ,
+                                                     osdi:DeterministicParameter ;
+                                            osdi:hasDataItemType osdi:Currency_Euro ;
+                                            osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                 osdi:PBD_ModelTreeFake ;
+                                            osdi:appliesOneTime "true"^^xsd:boolean ;
+                                            osdi:hasDescription "Initial costs for vision loss." ;
+                                            osdi:hasExpectedValue "251.8"^^xsd:double ;
+                                            osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                                            osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostScreening
+osdi:PBD_CostScreening rdf:type owl:NamedIndividual ,
+                                osdi:Cost ,
+                                osdi:SecondOrderUncertaintyParameter ;
+                       osdi:hasDataItemType osdi:Currency_Euro ;
+                       osdi:hasUncertaintyCharacterization osdi:PBD_CostScreening_ParamUncertainty ;
+                       osdi:includedByModel osdi:PBD_ModelTree ,
+                                            osdi:PBD_ModelTreeDebug ,
+                                            osdi:PBD_ModelTreeFake ;
+                       osdi:appliesOneTime "true"^^xsd:boolean ;
+                       osdi:hasDescription "Cost of screening test for profound biotinidase deficiency in Spain" ;
+                       osdi:hasExpectedValue "0.89"^^xsd:double ;
+                       osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                       osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostScreening_ParamUncertainty
+osdi:PBD_CostScreening_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                 osdi:UniformDistributionExpression ;
+                                        osdi:includedByModel osdi:PBD_ModelTree ,
+                                                             osdi:PBD_ModelTreeDebug ,
+                                                             osdi:PBD_ModelTreeFake ;
+                                        osdi:hasLowerLimitParameter "0.5"^^xsd:double ;
+                                        osdi:hasUpperLimitParameter "2.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostSuddenDeath
+osdi:PBD_CostSuddenDeath rdf:type owl:NamedIndividual ,
+                                  osdi:Cost ,
+                                  osdi:DeterministicParameter ;
+                         osdi:hasDataItemType osdi:Currency_Euro ;
+                         osdi:includedByModel osdi:PBD_ModelTree ,
+                                              osdi:PBD_ModelTreeFake ;
+                         osdi:appliesOneTime "true"^^xsd:boolean ;
+                         osdi:hasDescription "Cost of sudden death." ;
+                         osdi:hasExpectedValue "19146.72"^^xsd:double ;
+                         osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                         osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_CostTreatmentStrategy
+osdi:PBD_CostTreatmentStrategy rdf:type owl:NamedIndividual ,
+                                        osdi:Cost ,
+                                        osdi:DeterministicParameter ;
+                               osdi:hasDataItemType osdi:Currency_Euro ;
+                               osdi:includedByModel osdi:PBD_ModelTree ,
+                                                    osdi:PBD_ModelTreeDebug ,
+                                                    osdi:PBD_ModelTreeFake ;
+                               osdi:appliesOneTime "false"^^xsd:boolean ;
+                               osdi:hasDescription "Cost of annual use of biotin for profound biotinidase deficiency" ;
+                               osdi:hasExpectedValue "66.2475"^^xsd:double ;
+                               osdi:hasGeographicalContext "Spain @https://www.wikidata.org/wiki/q29" ;
+                               osdi:hasYear "2013"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_FakeBirthPrevalence
+osdi:PBD_FakeBirthPrevalence rdf:type owl:NamedIndividual ,
+                                      osdi:DeterministicParameter ,
+                                      osdi:EpidemiologicalParameter ;
+                             osdi:includedByModel osdi:PBD_ModelTreeFake ;
+                             osdi:isParameterOf osdi:PBD_FakePopulation ,
+                                                osdi:PBD_ProfoundBiotinidaseDeficiency ;
+                             osdi:hasExpectedValue "1.0"^^xsd:double ;
+                             osdi:isTrueEpidemiologicalParameterEstimate "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_FakePopulation
+osdi:PBD_FakePopulation rdf:type owl:NamedIndividual ,
+                                 osdi:Population ;
+                        osdi:hasAge osdi:BD_BasePopulationAge ;
+                        osdi:hasEpidemiologicalParameter osdi:PBD_FakeBirthPrevalence ;
+                        osdi:hasSex osdi:BD_BasePopulationFemaleProportion ;
+                        osdi:hasUtility osdi:BD_BasePopulationUtility ;
+                        osdi:includedByModel osdi:PBD_ModelTreeFake ;
+                        osdi:hasMinAge "0.0"^^xsd:double ;
+                        osdi:hasSize 540963 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_FollowUpStrategy
+osdi:PBD_FollowUpStrategy rdf:type owl:NamedIndividual ,
+                                   osdi:FollowUpStrategy ;
+                          osdi:hasCost osdi:PBD_CostFollowUpStrategy ;
+                          osdi:includedByModel osdi:PBD_ModelTree ,
+                                               osdi:PBD_ModelTreeDebug ,
+                                               osdi:PBD_ModelTreeFake ;
+                          osdi:hasDescription "Ophthalmologic, auditory, and medical geneticist or metabolic specialist evaluations and urinary organic acid and acylcarnitine analyses." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_InterventionNoScreening
+osdi:PBD_InterventionNoScreening rdf:type owl:NamedIndividual ,
+                                          osdi:DiagnosisIntervention ;
+                                 osdi:hasStrategy osdi:BD_ClinicalDiagnosis ;
+                                 osdi:includedByModel osdi:PBD_ModelTree ,
+                                                      osdi:PBD_ModelTreeDebug ,
+                                                      osdi:PBD_ModelTreeFake ;
+                                 osdi:hasDescription "No screening, i.e., clinical detection, of PBD" ;
+                                 osdi:isAssessedIntervention "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_InterventionScreening
+osdi:PBD_InterventionScreening rdf:type owl:NamedIndividual ,
+                                        osdi:ScreeningIntervention ;
+                               osdi:hasStrategy osdi:PBD_ScreeningStrategy ;
+                               osdi:includedByModel osdi:PBD_ModelTree ,
+                                                    osdi:PBD_ModelTreeDebug ,
+                                                    osdi:PBD_ModelTreeFake ;
+                               osdi:hasDescription "Basic screening intervention for PBD" ;
+                               osdi:isAssessedIntervention "true"^^xsd:boolean ;
+                               osdi:hasEffect osdi:PBD_InterventionScreeningEffect .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_InterventionScreeningEffect
+osdi:PBD_InterventionScreeningEffect rdf:type owl:NamedIndividual ,
+                                              osdi:Effect ;
+                                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                                          osdi:PBD_ModelTreeDebug ,
+                                                          osdi:PBD_ModelTreeFake ;
+                                     osdi:hasDescription "Sets the probabilities of all the manifestations to 0" ;
+                                     osdi:affects osdi:PBD_ManifestationHearingProblemsProportion ,
+                                                  osdi:PBD_ManifestationHypotoniaProportion ,
+                                                  osdi:PBD_ManifestationMentalDelayProportion ,
+                                                  osdi:PBD_ManifestationSeizureProportion ,
+                                                  osdi:PBD_ManifestationSkinProblemsProportion ,
+                                                  osdi:PBD_ManifestationVisionLossProportion ,
+                                                  osdi:PBD_ProbabilityOfSuddenDeathMagnitude ;
+                                     osdi:hasEffectMagnitude osdi:PBD_InterventionScreeningEffectMagnitude .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_InterventionScreeningEffectMagnitude
+osdi:PBD_InterventionScreeningEffectMagnitude rdf:type owl:NamedIndividual ,
+                                                       osdi:DeterministicParameter ;
+                                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                                              osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                   osdi:PBD_ModelTreeDebug ,
+                                                                   osdi:PBD_ModelTreeFake ;
+                                              osdi:hasExpectedValue "0.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationHearingProblemsProportion
+osdi:PBD_ManifestationHearingProblemsProportion rdf:type owl:NamedIndividual ,
+                                                         osdi:EpidemiologicalParameter ,
+                                                         osdi:SecondOrderUncertaintyParameter ;
+                                                osdi:hasDataItemType osdi:DI_Proportion ;
+                                                osdi:hasUncertaintyCharacterization osdi:PBD_ManifestationHearingProblemsProportion_ParamUncertainty ;
+                                                osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                     osdi:PBD_ModelTreeDebug ,
+                                                                     osdi:PBD_ModelTreeFake ;
+                                                osdi:hasExpectedValue "0.515"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationHearingProblemsProportion_ParamUncertainty
+osdi:PBD_ManifestationHearingProblemsProportion_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                                          osdi:BetaDistributionExpression ;
+                                                                 osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                                      osdi:PBD_ModelTreeDebug ,
+                                                                                      osdi:PBD_ModelTreeFake ;
+                                                                 osdi:hasAlfaParameter "24.0"^^xsd:double ;
+                                                                 osdi:hasBetaParameter "34.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationHypotonia
+osdi:PBD_ManifestationHypotonia rdf:type owl:NamedIndividual ,
+                                         osdi:ChronicManifestation ;
+                                osdi:hasCost osdi:PBD_CostManifestationHypotonia ;
+                                osdi:hasEndAge osdi:BD_ConstantAge1 ;
+                                osdi:hasOnsetAge osdi:BD_ConstantAge0 ;
+                                osdi:hasRiskCharacterization osdi:PBD_ManifestationHypotoniaProportion ;
+                                osdi:includedByModel osdi:PBD_ModelTree ,
+                                                     osdi:PBD_ModelTreeFake .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationHypotoniaProportion
+osdi:PBD_ManifestationHypotoniaProportion rdf:type owl:NamedIndividual ,
+                                                   osdi:EpidemiologicalParameter ,
+                                                   osdi:SecondOrderUncertaintyParameter ;
+                                          osdi:hasDataItemType osdi:DI_Proportion ;
+                                          osdi:hasUncertaintyCharacterization osdi:PBD_ManifestationHypotoniaProportion_ParamUncertainty ;
+                                          osdi:includedByModel osdi:PBD_ModelTree ,
+                                                               osdi:PBD_ModelTreeFake ;
+                                          osdi:hasExpectedValue "0.457"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationHypotoniaProportion_ParamUncertainty
+osdi:PBD_ManifestationHypotoniaProportion_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                                    osdi:BetaDistributionExpression ;
+                                                           osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                                osdi:PBD_ModelTreeFake ;
+                                                           osdi:hasAlfaParameter "17.0"^^xsd:double ;
+                                                           osdi:hasBetaParameter "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationMentalDelay
+osdi:PBD_ManifestationMentalDelay rdf:type owl:NamedIndividual ,
+                                           osdi:ChronicManifestation ;
+                                  osdi:hasCost osdi:PBD_CostManifestationMentalDelay ,
+                                               osdi:PBD_CostManifestationMentalDelayInitial ;
+                                  osdi:hasEndAge osdi:BD_ConstantAge2 ;
+                                  osdi:hasOnsetAge osdi:BD_ConstantAge1 ;
+                                  osdi:hasRiskCharacterization osdi:PBD_ManifestationMentalDelayProportion ;
+                                  osdi:hasUtility osdi:PBD_UtilityManifestationMentalDelay ;
+                                  osdi:includedByModel osdi:PBD_ModelTree ,
+                                                       osdi:PBD_ModelTreeFake ;
+                                  osdi:hasEffect osdi:PBD_ManifestationMentalDelayLifeExpectancyReduction .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationMentalDelayLifeExpectancyReduction
+osdi:PBD_ManifestationMentalDelayLifeExpectancyReduction rdf:type owl:NamedIndividual ,
+                                                                  osdi:LifeExpectancyReductionEffect ;
+                                                         osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                              osdi:PBD_ModelTreeFake ;
+                                                         osdi:affects osdi:Attribute_LifeExpectancy ;
+                                                         osdi:hasEffectMagnitude osdi:PBD_ManifestationMentalDelayLifeExpectancyReductionMagnitude .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationMentalDelayLifeExpectancyReductionMagnitude
+osdi:PBD_ManifestationMentalDelayLifeExpectancyReductionMagnitude rdf:type owl:NamedIndividual ,
+                                                                           osdi:SecondOrderUncertaintyParameter ;
+                                                                  osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                                                                  osdi:hasUncertaintyCharacterization osdi:PBD_ManifestationMentalDelayLifeExpectancyReduction_ParamUncertainty ;
+                                                                  osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                                       osdi:PBD_ModelTreeFake ;
+                                                                  osdi:hasExpectedValue "9.6"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationMentalDelayLifeExpectancyReduction_ParamUncertainty
+osdi:PBD_ManifestationMentalDelayLifeExpectancyReduction_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                                                   osdi:GammaDistributionExpression ;
+                                                                          osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                                               osdi:PBD_ModelTreeFake ;
+                                                                          osdi:hasAlfaParameter "25.0"^^xsd:double ;
+                                                                          osdi:hasLambdaParameter "0.38"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationMentalDelayProportion
+osdi:PBD_ManifestationMentalDelayProportion rdf:type owl:NamedIndividual ,
+                                                     osdi:EpidemiologicalParameter ,
+                                                     osdi:SecondOrderUncertaintyParameter ;
+                                            osdi:hasDataItemType osdi:DI_Proportion ;
+                                            osdi:hasUncertaintyCharacterization osdi:PBD_ManifestationMentalDelayProportion_ParamUncertainty ;
+                                            osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                 osdi:PBD_ModelTreeFake ;
+                                            osdi:hasExpectedValue "0.557"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationMentalDelayProportion_ParamUncertainty
+osdi:PBD_ManifestationMentalDelayProportion_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                                      osdi:BetaDistributionExpression ;
+                                                             osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                                  osdi:PBD_ModelTreeFake ;
+                                                             osdi:hasAlfaParameter "14.0"^^xsd:double ;
+                                                             osdi:hasBetaParameter "6.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationSeizure
+osdi:PBD_ManifestationSeizure rdf:type owl:NamedIndividual ,
+                                       osdi:ChronicManifestation ;
+                              osdi:hasCost osdi:PBD_CostManifestationSeizure ;
+                              osdi:hasEndAge osdi:BD_ConstantAge1 ;
+                              osdi:hasOnsetAge osdi:BD_ConstantAge0 ;
+                              osdi:hasRiskCharacterization osdi:PBD_ManifestationSeizureProportion ;
+                              osdi:hasUtility osdi:PBD_UtilityManifestationSeizure ;
+                              osdi:includedByModel osdi:PBD_ModelTree ,
+                                                   osdi:PBD_ModelTreeFake .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationSeizureProportion
+osdi:PBD_ManifestationSeizureProportion rdf:type owl:NamedIndividual ,
+                                                 osdi:EpidemiologicalParameter ,
+                                                 osdi:SecondOrderUncertaintyParameter ;
+                                        osdi:hasDataItemType osdi:DI_Proportion ;
+                                        osdi:hasUncertaintyCharacterization osdi:PBD_ManifestationSeizureProportion_ParamUncertainty ;
+                                        osdi:includedByModel osdi:PBD_ModelTree ,
+                                                             osdi:PBD_ModelTreeFake ;
+                                        osdi:hasExpectedValue "0.564"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationSeizureProportion_ParamUncertainty
+osdi:PBD_ManifestationSeizureProportion_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                                  osdi:BetaDistributionExpression ;
+                                                         osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                              osdi:PBD_ModelTreeFake ;
+                                                         osdi:hasAlfaParameter "65.0"^^xsd:double ;
+                                                         osdi:hasBetaParameter "50.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationSkinProblems
+osdi:PBD_ManifestationSkinProblems rdf:type owl:NamedIndividual ,
+                                            osdi:ChronicManifestation ;
+                                   osdi:hasCost osdi:PBD_CostManifestationSkinProblems ;
+                                   osdi:hasEndAge osdi:BD_ConstantAge1 ;
+                                   osdi:hasOnsetAge osdi:BD_ConstantAge0 ;
+                                   osdi:hasRiskCharacterization osdi:PBD_ManifestationSkinProblemsProportion ;
+                                   osdi:includedByModel osdi:PBD_ModelTree ,
+                                                        osdi:PBD_ModelTreeFake ;
+                                   osdi:hasDescription "Skin problems related to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationSkinProblemsProportion
+osdi:PBD_ManifestationSkinProblemsProportion rdf:type owl:NamedIndividual ,
+                                                      osdi:EpidemiologicalParameter ,
+                                                      osdi:SecondOrderUncertaintyParameter ;
+                                             osdi:hasDataItemType osdi:DI_Proportion ;
+                                             osdi:hasUncertaintyCharacterization osdi:PBD_ManifestationSkinProblemsProportion_ParamUncertainty ;
+                                             osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                  osdi:PBD_ModelTreeFake ;
+                                             osdi:hasExpectedValue "0.41"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationSkinProblemsProportion_ParamUncertainty
+osdi:PBD_ManifestationSkinProblemsProportion_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                                       osdi:BetaDistributionExpression ;
+                                                              osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                                   osdi:PBD_ModelTreeFake ;
+                                                              osdi:hasAlfaParameter "24.0"^^xsd:double ;
+                                                              osdi:hasBetaParameter "34.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationVisionLoss
+osdi:PBD_ManifestationVisionLoss rdf:type owl:NamedIndividual ,
+                                          osdi:ChronicManifestation ;
+                                 osdi:hasCost osdi:PBD_CostManifestationVisionLoss ,
+                                              osdi:PBD_CostManifestationVisionLossInitial ;
+                                 osdi:hasEndAge osdi:BD_ConstantAge2 ;
+                                 osdi:hasOnsetAge osdi:BD_ConstantAge1 ;
+                                 osdi:hasRiskCharacterization osdi:PBD_ManifestationVisionLossProportion ;
+                                 osdi:includedByModel osdi:PBD_ModelTree ,
+                                                      osdi:PBD_ModelTreeFake .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationVisionLossProportion
+osdi:PBD_ManifestationVisionLossProportion rdf:type owl:NamedIndividual ,
+                                                    osdi:EpidemiologicalParameter ,
+                                                    osdi:SecondOrderUncertaintyParameter ;
+                                           osdi:hasDataItemType osdi:DI_Proportion ;
+                                           osdi:hasUncertaintyCharacterization osdi:PBD_ManifestationVisionLossProportion_ParamUncertainty ;
+                                           osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                osdi:PBD_ModelTreeFake ;
+                                           osdi:hasExpectedValue "0.175"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationVisionLossProportion_ParamUncertainty
+osdi:PBD_ManifestationVisionLossProportion_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                                     osdi:BetaDistributionExpression ;
+                                                            osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                                 osdi:PBD_ModelTreeFake ;
+                                                            osdi:hasAlfaParameter "19.0"^^xsd:double ;
+                                                            osdi:hasBetaParameter "91.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ModelTree
+osdi:PBD_ModelTree rdf:type owl:NamedIndividual ,
+                            osdi:DecisionTreeModel ;
+                   osdi:includesModelItem osdi:BD_BasePopulation ,
+                                          osdi:BD_BasePopulationAge ,
+                                          osdi:BD_BasePopulationFemaleProportion ,
+                                          osdi:BD_BasePopulationLifeExpectancy ,
+                                          osdi:BD_BasePopulationLifeExpectancyStochasticUncertainty ,
+                                          osdi:BD_BasePopulationUtility ,
+                                          osdi:BD_BirthPrevalenceProfoundSpain ,
+                                          osdi:BD_BirthPrevalenceProfoundSpain_ParamUncertainty ,
+                                          osdi:BD_ClinicalDiagnosis ,
+                                          osdi:BD_ConstantAge0 ,
+                                          osdi:BD_ConstantAge1 ,
+                                          osdi:BD_ConstantAge2 ,
+                                          osdi:BD_CostDiagnosis ,
+                                          osdi:BD_CostDiagnosis_ParamUncertainty ,
+                                          osdi:BD_CostManifestationHearingProblems ,
+                                          osdi:BD_ManifestationHearingProblems ,
+                                          osdi:Constant_Sensitivity1 ,
+                                          osdi:GuidelineLifeExpectancyAnual ,
+                                          osdi:PBD_CostFollowUpStrategy ,
+                                          osdi:PBD_CostManifestationHearingProblemsInitial ,
+                                          osdi:PBD_CostManifestationHypotonia ,
+                                          osdi:PBD_CostManifestationMentalDelay ,
+                                          osdi:PBD_CostManifestationMentalDelayInitial ,
+                                          osdi:PBD_CostManifestationSeizure ,
+                                          osdi:PBD_CostManifestationSkinProblems ,
+                                          osdi:PBD_CostManifestationVisionLoss ,
+                                          osdi:PBD_CostManifestationVisionLossInitial ,
+                                          osdi:PBD_CostScreening ,
+                                          osdi:PBD_CostScreening_ParamUncertainty ,
+                                          osdi:PBD_CostSuddenDeath ,
+                                          osdi:PBD_CostTreatmentStrategy ,
+                                          osdi:PBD_FollowUpStrategy ,
+                                          osdi:PBD_InterventionNoScreening ,
+                                          osdi:PBD_InterventionScreening ,
+                                          osdi:PBD_InterventionScreeningEffect ,
+                                          osdi:PBD_InterventionScreeningEffectMagnitude ,
+                                          osdi:PBD_ManifestationHearingProblemsProportion ,
+                                          osdi:PBD_ManifestationHearingProblemsProportion_ParamUncertainty ,
+                                          osdi:PBD_ManifestationHypotonia ,
+                                          osdi:PBD_ManifestationHypotoniaProportion ,
+                                          osdi:PBD_ManifestationHypotoniaProportion_ParamUncertainty ,
+                                          osdi:PBD_ManifestationMentalDelay ,
+                                          osdi:PBD_ManifestationMentalDelayLifeExpectancyReduction ,
+                                          osdi:PBD_ManifestationMentalDelayLifeExpectancyReductionMagnitude ,
+                                          osdi:PBD_ManifestationMentalDelayLifeExpectancyReduction_ParamUncertainty ,
+                                          osdi:PBD_ManifestationMentalDelayProportion ,
+                                          osdi:PBD_ManifestationMentalDelayProportion_ParamUncertainty ,
+                                          osdi:PBD_ManifestationSeizure ,
+                                          osdi:PBD_ManifestationSeizureProportion ,
+                                          osdi:PBD_ManifestationSeizureProportion_ParamUncertainty ,
+                                          osdi:PBD_ManifestationSkinProblems ,
+                                          osdi:PBD_ManifestationSkinProblemsProportion ,
+                                          osdi:PBD_ManifestationSkinProblemsProportion_ParamUncertainty ,
+                                          osdi:PBD_ManifestationVisionLoss ,
+                                          osdi:PBD_ManifestationVisionLossProportion ,
+                                          osdi:PBD_ManifestationVisionLossProportion_ParamUncertainty ,
+                                          osdi:PBD_ProbabilityOfSuddenDeath ,
+                                          osdi:PBD_ProbabilityOfSuddenDeathMagnitude ,
+                                          osdi:PBD_ProbabilityOfSuddenDeath_ParamUncertainty ,
+                                          osdi:PBD_ProfoundBiotinidaseDeficiency ,
+                                          osdi:PBD_ScreeningSpecificity ,
+                                          osdi:PBD_ScreeningSpecificity_ParamUncertainty ,
+                                          osdi:PBD_ScreeningStrategy ,
+                                          osdi:PBD_ScreeningTemporaryThreshold ,
+                                          osdi:PBD_TreatmentStrategy ,
+                                          osdi:PBD_UtilityManifestationHearingProblems ,
+                                          osdi:PBD_UtilityManifestationHearingProblems_ParamUncertainty ,
+                                          osdi:PBD_UtilityManifestationMentalDelay ,
+                                          osdi:PBD_UtilityManifestationMentalDelay_ParamUncertainty ,
+                                          osdi:PBD_UtilityManifestationSeizure ,
+                                          osdi:PBD_UtilityManifestationSeizure_ParamUncertainty ;
+                   osdi:hasDisutilityCombinationMethod "ADD" ;
+                   osdi:hasYear "2025"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ModelTreeDebug
+osdi:PBD_ModelTreeDebug rdf:type owl:NamedIndividual ,
+                                 osdi:DecisionTreeModel ;
+                        osdi:includesModelItem osdi:BD_BasePopulation ,
+                                               osdi:BD_BasePopulationAge ,
+                                               osdi:BD_BasePopulationFemaleProportion ,
+                                               osdi:BD_BasePopulationLifeExpectancy ,
+                                               osdi:BD_BasePopulationLifeExpectancyStochasticUncertainty ,
+                                               osdi:BD_BasePopulationUtility ,
+                                               osdi:BD_BirthPrevalenceProfoundSpain ,
+                                               osdi:BD_BirthPrevalenceProfoundSpain_ParamUncertainty ,
+                                               osdi:BD_ClinicalDiagnosis ,
+                                               osdi:BD_ConstantAge0 ,
+                                               osdi:BD_ConstantAge1 ,
+                                               osdi:BD_ConstantAge2 ,
+                                               osdi:BD_CostDiagnosis ,
+                                               osdi:BD_CostDiagnosis_ParamUncertainty ,
+                                               osdi:BD_CostManifestationHearingProblems ,
+                                               osdi:BD_ManifestationHearingProblems ,
+                                               osdi:Constant_Sensitivity1 ,
+                                               osdi:GuidelineLifeExpectancyAnual ,
+                                               osdi:PBD_CostFollowUpStrategy ,
+                                               osdi:PBD_CostManifestationHearingProblemsInitial ,
+                                               osdi:PBD_CostScreening ,
+                                               osdi:PBD_CostScreening_ParamUncertainty ,
+                                               osdi:PBD_CostTreatmentStrategy ,
+                                               osdi:PBD_FollowUpStrategy ,
+                                               osdi:PBD_InterventionNoScreening ,
+                                               osdi:PBD_InterventionScreening ,
+                                               osdi:PBD_InterventionScreeningEffect ,
+                                               osdi:PBD_ManifestationHearingProblemsProportion ,
+                                               osdi:PBD_ManifestationHearingProblemsProportion_ParamUncertainty ,
+                                               osdi:PBD_ProfoundBiotinidaseDeficiency ,
+                                               osdi:PBD_ScreeningSpecificity ,
+                                               osdi:PBD_ScreeningSpecificity_ParamUncertainty ,
+                                               osdi:PBD_ScreeningStrategy ,
+                                               osdi:PBD_ScreeningTemporaryThreshold ,
+                                               osdi:PBD_TreatmentStrategy ,
+                                               osdi:PBD_UtilityManifestationHearingProblems ,
+                                               osdi:PBD_UtilityManifestationHearingProblems_ParamUncertainty ;
+                        osdi:hasDisutilityCombinationMethod "ADD" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ModelTreeFake
+osdi:PBD_ModelTreeFake rdf:type owl:NamedIndividual ,
+                                osdi:DecisionTreeModel .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ProbabilityOfSuddenDeath
+osdi:PBD_ProbabilityOfSuddenDeath rdf:type owl:NamedIndividual ,
+                                           osdi:InstantDeathEffect ;
+                                  osdi:hasCost osdi:PBD_CostSuddenDeath ;
+                                  osdi:includedByModel osdi:PBD_ModelTree ;
+                                  osdi:affects osdi:Attribute_LifeExpectancy ;
+                                  osdi:hasEffectMagnitude osdi:PBD_ProbabilityOfSuddenDeathMagnitude .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ProbabilityOfSuddenDeathMagnitude
+osdi:PBD_ProbabilityOfSuddenDeathMagnitude rdf:type owl:NamedIndividual ,
+                                                    osdi:SecondOrderUncertaintyParameter ;
+                                           osdi:hasDataItemType osdi:DI_Probability ;
+                                           osdi:hasUncertaintyCharacterization osdi:PBD_ProbabilityOfSuddenDeath_ParamUncertainty ;
+                                           osdi:includedByModel osdi:PBD_ModelTree ;
+                                           osdi:hasExpectedValue "0.0641"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ProbabilityOfSuddenDeath_ParamUncertainty
+osdi:PBD_ProbabilityOfSuddenDeath_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                            osdi:BetaDistributionExpression ;
+                                                   osdi:includedByModel osdi:PBD_ModelTree ;
+                                                   osdi:hasAlfaParameter "5.0"^^xsd:double ;
+                                                   osdi:hasBetaParameter "73.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ProfoundBiotinidaseDeficiency
+osdi:PBD_ProfoundBiotinidaseDeficiency rdf:type owl:NamedIndividual ,
+                                                osdi:RareDisease ;
+                                       osdi:hasIntervention osdi:PBD_InterventionNoScreening ,
+                                                            osdi:PBD_InterventionScreening ;
+                                       osdi:hasProgressionElement osdi:BD_ManifestationHearingProblems ,
+                                                                  osdi:PBD_ManifestationHypotonia ,
+                                                                  osdi:PBD_ManifestationMentalDelay ,
+                                                                  osdi:PBD_ManifestationSeizure ,
+                                                                  osdi:PBD_ManifestationSkinProblems ,
+                                                                  osdi:PBD_ManifestationVisionLoss ;
+                                       osdi:hasStrategy osdi:BD_ClinicalDiagnosis ,
+                                                        osdi:PBD_FollowUpStrategy ,
+                                                        osdi:PBD_TreatmentStrategy ;
+                                       osdi:includedByModel osdi:PBD_ModelTree ,
+                                                            osdi:PBD_ModelTreeDebug ,
+                                                            osdi:PBD_ModelTreeFake ;
+                                       osdi:hasDescription "Profound biotinidase deficiency" ;
+                                       osdi:hasRefToDO "do:856" ;
+                                       osdi:hasRefToGARD "https://rarediseases.info.nih.gov/diseases/894/index" ;
+                                       osdi:hasRefToICD "icd:E53.8" ;
+                                       osdi:hasRefToOMIM "omim:253260" ;
+                                       osdi:hasRefToORDO "ordo:79241" ;
+                                       osdi:hasEffect osdi:PBD_ProbabilityOfSuddenDeath .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ScreeningSpecificity
+osdi:PBD_ScreeningSpecificity rdf:type owl:NamedIndividual ,
+                                       osdi:Parameter ,
+                                       osdi:SecondOrderUncertaintyParameter ;
+                              osdi:hasDataItemType osdi:DI_Specificity ;
+                              osdi:hasUncertaintyCharacterization osdi:PBD_ScreeningSpecificity_ParamUncertainty ;
+                              osdi:includedByModel osdi:PBD_ModelTree ,
+                                                   osdi:PBD_ModelTreeDebug ,
+                                                   osdi:PBD_ModelTreeFake ;
+                              osdi:hasExpectedValue "0.999935"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ScreeningSpecificity_ParamUncertainty
+osdi:PBD_ScreeningSpecificity_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                        osdi:BetaDistributionExpression ;
+                                               osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                    osdi:PBD_ModelTreeDebug ,
+                                                                    osdi:PBD_ModelTreeFake ;
+                                               osdi:hasAlfaParameter "540904.0"^^xsd:double ;
+                                               osdi:hasBetaParameter "35.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ScreeningStrategy
+osdi:PBD_ScreeningStrategy rdf:type owl:NamedIndividual ,
+                                    osdi:ScreeningStrategy ;
+                           osdi:followedByStrategy osdi:BD_ClinicalDiagnosis ;
+                           osdi:hasCost osdi:PBD_CostScreening ;
+                           osdi:hasSensitivity osdi:ConstantSensitivity1 ;
+                           osdi:hasSpecificity osdi:PBD_ScreeningSpecificity ;
+                           osdi:includedByModel osdi:PBD_ModelTree ,
+                                                osdi:PBD_ModelTreeDebug ,
+                                                osdi:PBD_ModelTreeFake ;
+                           osdi:hasDescription "Measurement of biotinidase activity in blood-saturated filter paper samples on enzymatic assay or semiquantitative fluorometric determination" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_ScreeningTemporaryThreshold
+osdi:PBD_ScreeningTemporaryThreshold rdf:type owl:NamedIndividual ,
+                                              osdi:DeterministicParameter ,
+                                              osdi:Parameter ;
+                                     osdi:hasDataItemType osdi:DI_TimeToEvent ;
+                                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                                          osdi:PBD_ModelTreeDebug ,
+                                                          osdi:PBD_ModelTreeFake ;
+                                     osdi:hasExpectedValue "1.7"^^xsd:double ;
+                                     rdfs:comment "1.7 days" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_TreatmentStrategy
+osdi:PBD_TreatmentStrategy rdf:type owl:NamedIndividual ,
+                                    osdi:LineOfTherapy ;
+                           osdi:hasCost osdi:PBD_CostTreatmentStrategy ;
+                           osdi:includedByModel osdi:PBD_ModelTree ,
+                                                osdi:PBD_ModelTreeDebug ,
+                                                osdi:PBD_ModelTreeFake ;
+                           osdi:hasDescription "Lifetime treatment with biotin" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_UtilityManifestationHearingProblems
+osdi:PBD_UtilityManifestationHearingProblems rdf:type owl:NamedIndividual ,
+                                                      osdi:SecondOrderUncertaintyParameter ,
+                                                      osdi:Utility ;
+                                             osdi:hasDataItemType osdi:DI_EQ5D_Utility ;
+                                             osdi:hasUncertaintyCharacterization osdi:PBD_UtilityManifestationHearingProblems_ParamUncertainty ;
+                                             osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                  osdi:PBD_ModelTreeDebug ,
+                                                                  osdi:PBD_ModelTreeFake ;
+                                             osdi:appliesOneTime "false"^^xsd:boolean ;
+                                             osdi:hasExpectedValue "0.01"^^xsd:double ;
+                                             osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_UtilityManifestationHearingProblems_ParamUncertainty
+osdi:PBD_UtilityManifestationHearingProblems_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                                       osdi:UniformDistributionExpression ;
+                                                              osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                                   osdi:PBD_ModelTreeDebug ,
+                                                                                   osdi:PBD_ModelTreeFake ;
+                                                              osdi:hasLowerLimitParameter "0.008"^^xsd:double ;
+                                                              osdi:hasUpperLimitParameter "0.012"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_UtilityManifestationMentalDelay
+osdi:PBD_UtilityManifestationMentalDelay rdf:type owl:NamedIndividual ,
+                                                  osdi:SecondOrderUncertaintyParameter ,
+                                                  osdi:Utility ;
+                                         osdi:hasDataItemType osdi:DI_EQ5D_Utility ;
+                                         osdi:hasUncertaintyCharacterization osdi:PBD_UtilityManifestationMentalDelay_ParamUncertainty ;
+                                         osdi:includedByModel osdi:PBD_ModelTree ,
+                                                              osdi:PBD_ModelTreeFake ;
+                                         osdi:appliesOneTime "false"^^xsd:boolean ;
+                                         osdi:hasExpectedValue "0.07"^^xsd:double ;
+                                         osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_UtilityManifestationMentalDelay_ParamUncertainty
+osdi:PBD_UtilityManifestationMentalDelay_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                                   osdi:UniformDistributionExpression ;
+                                                          osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                               osdi:PBD_ModelTreeFake ;
+                                                          osdi:hasLowerLimitParameter "0.056"^^xsd:double ;
+                                                          osdi:hasUpperLimitParameter "0.084"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_UtilityManifestationSeizure
+osdi:PBD_UtilityManifestationSeizure rdf:type owl:NamedIndividual ,
+                                              osdi:SecondOrderUncertaintyParameter ,
+                                              osdi:Utility ;
+                                     osdi:hasDataItemType osdi:DI_EQ5D_Utility ;
+                                     osdi:hasUncertaintyCharacterization osdi:PBD_UtilityManifestationSeizure_ParamUncertainty ;
+                                     osdi:includedByModel osdi:PBD_ModelTree ,
+                                                          osdi:PBD_ModelTreeFake ;
+                                     osdi:appliesOneTime "false"^^xsd:boolean ;
+                                     osdi:hasExpectedValue "0.04"^^xsd:double ;
+                                     osdi:hasSource "Carroll et al" ;
+                                     osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PBD_UtilityManifestationSeizure_ParamUncertainty
+osdi:PBD_UtilityManifestationSeizure_ParamUncertainty rdf:type owl:NamedIndividual ,
+                                                               osdi:UniformDistributionExpression ;
+                                                      osdi:includedByModel osdi:PBD_ModelTree ,
+                                                                           osdi:PBD_ModelTreeFake ;
+                                                      osdi:hasLowerLimitParameter "0.032"^^xsd:double ;
+                                                      osdi:hasUpperLimitParameter "0.048"^^xsd:double .
+
+
+[ <http://ontologydesignpatterns.org/opla-sd#entityPositionX> "80.67230303494442"^^xsd:double ;
+  <http://ontologydesignpatterns.org/opla-sd#entityPositionY> "257.2295616088946"^^xsd:double ;
+  rdfs:comment "This is an entity positioning annotation generated by CoModIDE (https://comodide.com/). Removing this annotation will break rendering the CoModIDE schema diagram view."@en
+] .
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

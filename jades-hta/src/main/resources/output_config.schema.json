@@ -1,0 +1,143 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://www.ull.es/simulation/hta/output_config.schema.json",
+    "title": "Output Configuration",
+    "description": "Outputs to be produced by the simulation, that can be grouped together to use the same destination file",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "phase": {
+                "description": "Whether to collect these outputs from the base case simulation or the PSA runs",
+                "type": "string",
+                "enum" : [
+                    "base_case",
+                    "psa_runs",
+                    "all"
+                ]
+            },
+            "processing": {
+                "description": "How the outputs will be processed",
+                "type": "string",
+                "enum": [
+                    "json",
+                    "csv",
+                    "txt"
+                ]
+            },
+            "file": {
+                "description": "The file where the simulation outputs will be stored (standard output if not specified)",
+                "type": "string"
+            },
+            "list": {
+                "description": "The list of simulation outputs to be produced",
+                "type": "array",
+                "items": {
+                    "anyOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "description": "The name of the output",
+                                    "type": "string",
+                                    "enum": [
+                                        "cost",
+                                        "life_expectancy",
+                                        "quality_adjusted_life_expectancy",
+                                        "time_to_event",
+                                        "manifestation_prevalence",
+                                        "manifestation_incidence",
+                                        "breakdown_costs",
+                                        "individual_outcomes"
+                                    ]
+                                },
+                                "description": {
+                                    "description": "A description of the output",
+                                    "type": "string"
+                                },
+                                "discount": {
+                                    "description": "The discount rates to be applied",
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "exclusiveMaximum": 1
+                                }
+                            },
+                            "required": [
+                                "name"
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "description": "The name of the output",
+                                    "type": "string",
+                                    "enum": [
+                                        "incidence",
+                                        "prevalence",
+                                        "cumulative_incidence"
+                                    ]
+                                },
+                                "description": {
+                                    "description": "A description of the output",
+                                    "type": "string"
+                                },
+                                "relative": {
+                                    "description": "Whether the outcome is relative to the total population",
+                                    "type": "boolean",
+                                    "default": false
+                                },
+                                "intervalSize": {
+                                    "description": "The size of the intervals for the outcome",
+                                    "type": "integer",
+                                    "default": 1,
+                                    "minimum": 1
+                                },
+                                "basedOnAge": {
+                                    "description": "Whether the outcome is based on age",
+                                    "type": "boolean",
+                                    "default": false
+                                }
+                            },
+                            "required": [
+                                "name"
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "description": "The name of the output",
+                                    "type": "string",
+                                    "const": "budget impact"
+                                },
+                                "description": {
+                                    "description": "A description of the output",
+                                    "type": "string"
+                                },
+                                "discount": {
+                                    "description": "The discount rates to be applied",
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "exclusiveMaximum": 1
+                                },
+                                "horizon": {
+                                    "description": "The time horizon for the budget impact analysis",
+                                    "type": "integer",
+                                    "default": 10,
+                                    "minimum": 1
+                                }
+                            },
+                            "required": [
+                                "name"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "required": [
+            "list"
+        ]
+    }
+}

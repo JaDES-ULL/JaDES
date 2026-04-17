@@ -1,0 +1,64 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://www.ull.es/simulation/hta/output_config.schema.json",
+    "title": "Output Configuration",
+    "description": "The configuration of the inputs for a Health Technology Assessment simulation",
+    "type": "object",
+    "properties": {
+      "patients": {
+        "description": "The number of patients to be simulated",
+        "type": "integer",
+        "default": 1,
+        "exclusiveMinimum": 0
+      },
+      "timeHorizon": {
+        "description": "The time horizon of the simulation (expressed in years)",
+        "type": "integer",
+        "default": 100,
+        "exclusiveMinimum": 0
+      },
+      "studyYear": {
+          "description": "The year in which the study is conducted (useful for updating costs)",
+          "type": "integer",
+          "default": 2026,
+          "exclusiveMinimum": 1980
+      },
+      "baseCase": {
+          "description": "Whether to perform a base case simulation by using the expected values for every second order parameter",
+          "type": "boolean",
+          "default": true
+      },
+      "PSARuns": {
+          "description": "The number of runs to be performed within the Probabilistic Sensitivity Analysis",
+          "type": "integer",
+          "default": 0,
+          "minimum": 0
+      },
+      "defaultDiscountRateForCosts": {
+          "description": "The discount rates to be applied by default to costs",
+          "type": "number",
+          "default": 0.00,
+          "minimum": 0,
+          "exclusiveMaximum": 1
+      },
+      "defaultDiscountRateForEffects": {
+          "description": "The discount rates to be applied by default to health outcomes",
+          "type": "number",
+          "default": 0.00,
+          "minimum": 0,
+          "exclusiveMaximum": 1
+      },
+      "disutilityCombinationMethod": {
+          "description": "The method to be used to combine different disutilities",
+          "type": "string",
+          "enum": [
+              "additive",
+              "maximum"
+          ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "patients"
+    ]
+}

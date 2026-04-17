@@ -1,0 +1,421 @@
+@prefix : <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix osdi: <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/ontologies-ULL//individuals/test> .
+
+<https://w3id.org/ontologies-ULL//individuals/test> rdf:type owl:Ontology ;
+                                                     owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.0> ;
+                                                     rdfs:comment "Individuals for OSDi ontology, version 1.0"@en ;
+                                                     rdfs:label "OSDi individuals for Testing"@en .
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_BaseAnnualTreatmentCost
+osdi:TEST_BaseAnnualTreatmentCost rdf:type owl:NamedIndividual ,
+                                           osdi:Cost ,
+                                           osdi:DeterministicParameter ;
+                                  osdi:hasDataItemType osdi:Currency_Euro ;
+                                  osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                       osdi:TEST_DecisionTreeModel2 ,
+                                                       osdi:TEST_DecisionTreeModel3 ;
+                                  osdi:appliesOneTime "false"^^xsd:boolean ;
+                                  osdi:hasExpectedValue "1000.0"^^xsd:double ;
+                                  osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_CoexistentDevelopment1
+osdi:TEST_CoexistentDevelopment1 rdf:type owl:NamedIndividual ,
+                                          osdi:Development ;
+                                 osdi:hasCost osdi:TEST_SevereAnnualTreatmentCost ;
+                                 osdi:hasEffect osdi:TEST_LifeExpectancyReduction ;
+                                 osdi:hasRiskCharacterization osdi:TEST_SevereDevelopmentIncidence ;
+                                 osdi:hasUtility osdi:TEST_SevereDevelopmentDisutility ;
+                                 osdi:includedByModel osdi:TEST_DecisionTreeModel2 ,
+                                                      osdi:TEST_DecisionTreeModel3 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_CoexistentDevelopment2
+osdi:TEST_CoexistentDevelopment2 rdf:type owl:NamedIndividual ,
+                                          osdi:Development ;
+                                 osdi:hasCost osdi:TEST_SevereAnnualTreatmentCost ;
+                                 osdi:hasRiskCharacterization osdi:TEST_SevereDevelopmentIncidence ;
+                                 osdi:hasUtility osdi:TEST_CoexistentDevelopment2Disutility ;
+                                 osdi:includedByModel osdi:TEST_DecisionTreeModel2 ,
+                                                      osdi:TEST_DecisionTreeModel3 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_CoexistentDevelopment2Disutility
+osdi:TEST_CoexistentDevelopment2Disutility rdf:type owl:NamedIndividual ,
+                                                    osdi:DeterministicParameter ,
+                                                    osdi:Utility ;
+                                           osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                                           osdi:includedByModel osdi:TEST_DecisionTreeModel2 ,
+                                                                osdi:TEST_DecisionTreeModel3 ;
+                                           osdi:appliesOneTime "false"^^xsd:boolean ;
+                                           osdi:hasExpectedValue "0.2"^^xsd:double ;
+                                           osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_DecisionTreeModel1
+osdi:TEST_DecisionTreeModel1 rdf:type owl:NamedIndividual ,
+                                      osdi:DecisionTreeModel ;
+                             osdi:includesModelItem osdi:TEST_BaseAnnualTreatmentCost ,
+                                                    osdi:TEST_DevelopmentSet ,
+                                                    osdi:TEST_Disease1 ,
+                                                    osdi:TEST_InterventionEffective ,
+                                                    osdi:TEST_InterventionEffectiveCost ,
+                                                    osdi:TEST_InterventionEffectiveEffect ,
+                                                    osdi:TEST_InterventionEffectiveEffectMagnitude ,
+                                                    osdi:TEST_InterventionIneffective ,
+                                                    osdi:TEST_LifeExpectancy ,
+                                                    osdi:TEST_LifeExpectancyReduction ,
+                                                    osdi:TEST_LifeExpectancyReductionMagnitude ,
+                                                    osdi:TEST_NormalDevelopment ,
+                                                    osdi:TEST_Population ,
+                                                    osdi:TEST_PopulationAge ,
+                                                    osdi:TEST_PopulationBaseUtility ,
+                                                    osdi:TEST_PopulationSex ,
+                                                    osdi:TEST_SevereAnnualTreatmentCost ,
+                                                    osdi:TEST_SevereDevelopment ,
+                                                    osdi:TEST_SevereDevelopmentDisutility ,
+                                                    osdi:TEST_SevereDevelopmentIncidence ;
+                             osdi:hasDescription "Test model 1. A tree that compares a 'do nothing' versus a fully effective intervention. The disease defines two alternative developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a normal development, with no negative effects. The population is a dummy population." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_DecisionTreeModel2
+osdi:TEST_DecisionTreeModel2 rdf:type owl:NamedIndividual ,
+                                      osdi:DecisionTreeModel ;
+                             osdi:includesModelItem osdi:TEST_BaseAnnualTreatmentCost ,
+                                                    osdi:TEST_CoexistentDevelopment1 ,
+                                                    osdi:TEST_CoexistentDevelopment2 ,
+                                                    osdi:TEST_CoexistentDevelopment2Disutility ,
+                                                    osdi:TEST_Disease2 ,
+                                                    osdi:TEST_InterventionEffective ,
+                                                    osdi:TEST_InterventionEffectiveCost ,
+                                                    osdi:TEST_InterventionEffectiveEffect ,
+                                                    osdi:TEST_InterventionEffectiveEffectMagnitude ,
+                                                    osdi:TEST_InterventionIneffective ,
+                                                    osdi:TEST_LifeExpectancy ,
+                                                    osdi:TEST_LifeExpectancyReduction ,
+                                                    osdi:TEST_LifeExpectancyReductionMagnitude ,
+                                                    osdi:TEST_Population ,
+                                                    osdi:TEST_PopulationAge ,
+                                                    osdi:TEST_PopulationBaseUtility ,
+                                                    osdi:TEST_PopulationSex ,
+                                                    osdi:TEST_SevereAnnualTreatmentCost ,
+                                                    osdi:TEST_SevereDevelopmentDisutility ,
+                                                    osdi:TEST_SevereDevelopmentIncidence ;
+                             osdi:hasDescription "Test model 2. A tree that compares a 'do nothing' versus a fully effective intervention. The disease defines two coexistent developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a development with no negative effects apart from a slight reduction on QOL. The population is a dummy population." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_DecisionTreeModel3
+osdi:TEST_DecisionTreeModel3 rdf:type owl:NamedIndividual ,
+                                      osdi:DecisionTreeModel ;
+                             osdi:includesModelItem osdi:TEST_BaseAnnualTreatmentCost ,
+                                                    osdi:TEST_CoexistentDevelopment1 ,
+                                                    osdi:TEST_CoexistentDevelopment2 ,
+                                                    osdi:TEST_CoexistentDevelopment2Disutility ,
+                                                    osdi:TEST_DevelopmentSet ,
+                                                    osdi:TEST_Disease3 ,
+                                                    osdi:TEST_InterventionEffective ,
+                                                    osdi:TEST_InterventionEffectiveCost ,
+                                                    osdi:TEST_InterventionEffectiveEffect ,
+                                                    osdi:TEST_InterventionEffectiveEffectMagnitude ,
+                                                    osdi:TEST_InterventionIneffective ,
+                                                    osdi:TEST_LifeExpectancy ,
+                                                    osdi:TEST_LifeExpectancyReduction ,
+                                                    osdi:TEST_LifeExpectancyReductionMagnitude ,
+                                                    osdi:TEST_NormalDevelopment ,
+                                                    osdi:TEST_Population ,
+                                                    osdi:TEST_PopulationAge ,
+                                                    osdi:TEST_PopulationBaseUtility ,
+                                                    osdi:TEST_PopulationSex ,
+                                                    osdi:TEST_SevereAnnualTreatmentCost ,
+                                                    osdi:TEST_SevereDevelopment ,
+                                                    osdi:TEST_SevereDevelopmentDisutility ,
+                                                    osdi:TEST_SevereDevelopmentIncidence ;
+                             osdi:hasDescription "Test model 3. A tree that compares a 'do nothing' versus a fully effective intervention. The disease defines two coexistent developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a development with no negative effects apart from a slight reduction on QOL; and two alternative developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a normal development, with no negative effects. The population is a dummy population." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_DevelopmentSet
+osdi:TEST_DevelopmentSet rdf:type owl:NamedIndividual ,
+                                  osdi:AlternativeCombinationRule ;
+                         osdi:affectsProgressionElement osdi:TEST_NormalDevelopment ,
+                                                        osdi:TEST_SevereDevelopment ;
+                         osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                              osdi:TEST_DecisionTreeModel3 ;
+                         osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_Disease1
+osdi:TEST_Disease1 rdf:type owl:NamedIndividual ,
+                            osdi:Disease ;
+                   osdi:hasCost osdi:TEST_BaseAnnualTreatmentCost ;
+                   osdi:hasIntervention osdi:InterventionDoNothing ,
+                                        osdi:TEST_InterventionEffective ;
+                   osdi:hasProgressionElement osdi:TEST_DevelopmentSet ,
+                                              osdi:TEST_NormalDevelopment ,
+                                              osdi:TEST_SevereDevelopment ;
+                   osdi:includedByModel osdi:TEST_DecisionTreeModel1 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_Disease2
+osdi:TEST_Disease2 rdf:type owl:NamedIndividual ,
+                            osdi:Disease ;
+                   osdi:hasCost osdi:TEST_BaseAnnualTreatmentCost ;
+                   osdi:hasIntervention osdi:InterventionDoNothing ,
+                                        osdi:TEST_InterventionEffective ;
+                   osdi:hasProgressionElement osdi:TEST_CoexistentDevelopment1 ,
+                                              osdi:TEST_CoexistentDevelopment2 ;
+                   osdi:includedByModel osdi:TEST_DecisionTreeModel2 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_Disease3
+osdi:TEST_Disease3 rdf:type owl:NamedIndividual ,
+                            osdi:Disease ;
+                   osdi:hasCost osdi:TEST_BaseAnnualTreatmentCost ;
+                   osdi:hasIntervention osdi:InterventionDoNothing ,
+                                        osdi:TEST_InterventionEffective ;
+                   osdi:hasProgressionElement osdi:TEST_CoexistentDevelopment1 ,
+                                              osdi:TEST_CoexistentDevelopment2 ,
+                                              osdi:TEST_DevelopmentSet ,
+                                              osdi:TEST_NormalDevelopment ,
+                                              osdi:TEST_SevereDevelopment ;
+                   osdi:includedByModel osdi:TEST_DecisionTreeModel3 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionEffective
+osdi:TEST_InterventionEffective rdf:type owl:NamedIndividual ,
+                                         osdi:TherapeuticIntervention ;
+                                osdi:hasCost osdi:TEST_InterventionEffectiveCost ;
+                                osdi:hasEffect osdi:TEST_InterventionEffectiveEffect ;
+                                osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                     osdi:TEST_DecisionTreeModel2 ,
+                                                     osdi:TEST_DecisionTreeModel3 ;
+                                osdi:isAssessedIntervention "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionEffectiveCost
+osdi:TEST_InterventionEffectiveCost rdf:type owl:NamedIndividual ,
+                                             osdi:Cost ,
+                                             osdi:DeterministicParameter ;
+                                    osdi:hasDataItemType osdi:Currency_Euro ;
+                                    osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                         osdi:TEST_DecisionTreeModel2 ,
+                                                         osdi:TEST_DecisionTreeModel3 ;
+                                    osdi:appliesOneTime "false"^^xsd:boolean ;
+                                    osdi:hasExpectedValue "100.0"^^xsd:double ;
+                                    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionEffectiveEffect
+osdi:TEST_InterventionEffectiveEffect rdf:type owl:NamedIndividual ,
+                                               osdi:Effect ;
+                                      osdi:affects osdi:TEST_SevereDevelopmentIncidence ;
+                                      osdi:hasEffectMagnitude osdi:TEST_InterventionEffectiveEffectMagnitude ;
+                                      osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                           osdi:TEST_DecisionTreeModel2 ,
+                                                           osdi:TEST_DecisionTreeModel3 ;
+                                      osdi:hasDescription "The effect of the intervention, which consists on reducing the incidence of the severe development to 0." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionEffectiveEffectMagnitude
+osdi:TEST_InterventionEffectiveEffectMagnitude rdf:type owl:NamedIndividual ,
+                                                        osdi:DeterministicParameter ;
+                                               osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                                               osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                                    osdi:TEST_DecisionTreeModel2 ,
+                                                                    osdi:TEST_DecisionTreeModel3 ;
+                                               osdi:hasDescription "The effect of the intervention, which consists on reducing the incidence of the severe development to 0." ;
+                                               osdi:hasExpectedValue "0.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionIneffective
+osdi:TEST_InterventionIneffective rdf:type owl:NamedIndividual ,
+                                           osdi:TherapeuticIntervention ;
+                                  osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                       osdi:TEST_DecisionTreeModel2 ,
+                                                       osdi:TEST_DecisionTreeModel3 ;
+                                  osdi:isAssessedIntervention "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_LifeExpectancy
+osdi:TEST_LifeExpectancy rdf:type owl:NamedIndividual ,
+                                  osdi:AttributeValueParameter ,
+                                  osdi:DeterministicParameter ;
+                         osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                         osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                              osdi:TEST_DecisionTreeModel2 ,
+                                              osdi:TEST_DecisionTreeModel3 ;
+                         osdi:isValueOfAttribute osdi:Attribute_LifeExpectancy ;
+                         osdi:hasExpectedValue "65.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_LifeExpectancyReduction
+osdi:TEST_LifeExpectancyReduction rdf:type owl:NamedIndividual ,
+                                           osdi:LifeExpectancyReductionEffect ;
+                                  osdi:hasEffectMagnitude osdi:TEST_LifeExpectancyReductionMagnitude ;
+                                  osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                       osdi:TEST_DecisionTreeModel2 ,
+                                                       osdi:TEST_DecisionTreeModel3 ;
+                                  osdi:hasDescription "Life expectancy reduction in case of severe development" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_LifeExpectancyReductionMagnitude
+osdi:TEST_LifeExpectancyReductionMagnitude rdf:type owl:NamedIndividual ,
+                                                    osdi:DeterministicParameter ;
+                                           osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                                           osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                                osdi:TEST_DecisionTreeModel2 ,
+                                                                osdi:TEST_DecisionTreeModel3 ;
+                                           osdi:hasDescription "Life expectancy reduction in case of severe development" ;
+                                           osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_NormalDevelopment
+osdi:TEST_NormalDevelopment rdf:type owl:NamedIndividual ,
+                                     osdi:Development ;
+                            osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                 osdi:TEST_DecisionTreeModel3 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_Population
+osdi:TEST_Population rdf:type owl:NamedIndividual ,
+                              osdi:Population ;
+                     osdi:hasAge osdi:TEST_PopulationAge ;
+                     osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+                     osdi:hasLifeExpectancy osdi:TEST_LifeExpectancy ;
+                     osdi:hasSex osdi:TEST_PopulationSex ;
+                     osdi:hasUtility osdi:TEST_PopulationBaseUtility ;
+                     osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                          osdi:TEST_DecisionTreeModel2 ,
+                                          osdi:TEST_DecisionTreeModel3 ;
+                     osdi:hasDescription "A dummy population of 1000 individuals infected by a disease. Every one starts at 20 years old, with a life expectancy of 85 years and an expected utility of 0.85" ;
+                     osdi:hasGeographicalContext "Spain" ;
+                     osdi:hasMaxAge "100.0"^^xsd:double ;
+                     osdi:hasMinAge "18.0"^^xsd:double ;
+                     osdi:hasSize 1000 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_PopulationAge
+osdi:TEST_PopulationAge rdf:type owl:NamedIndividual ,
+                                 osdi:AttributeValueParameter ,
+                                 osdi:DeterministicParameter ;
+                        osdi:hasDataItemType osdi:DI_Other ;
+                        osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                             osdi:TEST_DecisionTreeModel2 ,
+                                             osdi:TEST_DecisionTreeModel3 ;
+                        osdi:isValueOfAttribute osdi:Attribute_Age ;
+                        osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_PopulationBaseUtility
+osdi:TEST_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+                                         osdi:DeterministicParameter ,
+                                         osdi:Utility ;
+                                osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                                osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                     osdi:TEST_DecisionTreeModel2 ,
+                                                     osdi:TEST_DecisionTreeModel3 ;
+                                osdi:hasDescription "Base utility for the studied population" ;
+                                osdi:hasExpectedValue "0.85"^^xsd:double ;
+                                osdi:isDisutility "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_PopulationSex
+osdi:TEST_PopulationSex rdf:type owl:NamedIndividual ,
+                                 osdi:AttributeValueParameter ,
+                                 osdi:DeterministicParameter ;
+                        osdi:hasDataItemType osdi:DI_Proportion ;
+                        osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                             osdi:TEST_DecisionTreeModel2 ,
+                                             osdi:TEST_DecisionTreeModel3 ;
+                        osdi:isValueOfAttribute osdi:Attribute_Sex ;
+                        osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_SevereAnnualTreatmentCost
+osdi:TEST_SevereAnnualTreatmentCost rdf:type owl:NamedIndividual ,
+                                             osdi:Cost ,
+                                             osdi:DeterministicParameter ;
+                                    osdi:hasDataItemType osdi:Currency_Euro ;
+                                    osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                         osdi:TEST_DecisionTreeModel2 ,
+                                                         osdi:TEST_DecisionTreeModel3 ;
+                                    osdi:appliesOneTime "false"^^xsd:boolean ;
+                                    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+                                    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_SevereDevelopment
+osdi:TEST_SevereDevelopment rdf:type owl:NamedIndividual ,
+                                     osdi:Development ;
+                            osdi:hasCost osdi:TEST_SevereAnnualTreatmentCost ;
+                            osdi:hasEffect osdi:TEST_LifeExpectancyReduction ;
+                            osdi:hasRiskCharacterization osdi:TEST_SevereDevelopmentIncidence ;
+                            osdi:hasUtility osdi:TEST_SevereDevelopmentDisutility ;
+                            osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                 osdi:TEST_DecisionTreeModel3 ;
+                            osdi:supersedesClinicalProgression osdi:TEST_NormalDevelopment .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_SevereDevelopmentDisutility
+osdi:TEST_SevereDevelopmentDisutility rdf:type owl:NamedIndividual ,
+                                               osdi:DeterministicParameter ,
+                                               osdi:Utility ;
+                                      osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                                      osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                           osdi:TEST_DecisionTreeModel2 ,
+                                                           osdi:TEST_DecisionTreeModel3 ;
+                                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                                      osdi:hasExpectedValue "0.4"^^xsd:double ;
+                                      osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_SevereDevelopmentIncidence
+osdi:TEST_SevereDevelopmentIncidence rdf:type owl:NamedIndividual ,
+                                              osdi:DeterministicParameter ;
+                                     osdi:hasDataItemType osdi:DI_Incidence ;
+                                     osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
+                                                          osdi:TEST_DecisionTreeModel2 ,
+                                                          osdi:TEST_DecisionTreeModel3 ;
+                                     osdi:hasExpectedValue "0.8"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi/individuals/TEST#TEST_Experiment1
+osdi:TEST_Experiment1 rdf:type owl:NamedIndividual ,
+                                  osdi:Experiment ;
+                        osdi:usesModel osdi:TEST_DecisionTreeModel1 ;
+                        osdi:hasDisutilityCombinationMethod "ADD" ;
+                        osdi:hasDiscountForCosts "0.00"^^xsd:double ;
+                        osdi:hasDiscountForEffects "0.00"^^xsd:double ;
+                        osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi/individuals/TEST#TEST_Experiment2
+osdi:TEST_Experiment2 rdf:type owl:NamedIndividual ,
+                                  osdi:Experiment ;
+                        osdi:usesModel osdi:TEST_DecisionTreeModel2 ;
+                        osdi:hasDisutilityCombinationMethod "ADD" ;
+                        osdi:hasDiscountForCosts "0.00"^^xsd:double ;
+                        osdi:hasDiscountForEffects "0.00"^^xsd:double ;
+                        osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi/individuals/TEST#TEST_Experiment3
+osdi:TEST_Experiment3 rdf:type owl:NamedIndividual ,
+                                  osdi:Experiment ;
+                        osdi:usesModel osdi:TEST_DecisionTreeModel3 ;
+                        osdi:hasDisutilityCombinationMethod "ADD" ;
+                        osdi:hasDiscountForCosts "0.00"^^xsd:double ;
+                        osdi:hasDiscountForEffects "0.00"^^xsd:double ;
+                        osdi:hasYear "2026"^^xsd:short .
+
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

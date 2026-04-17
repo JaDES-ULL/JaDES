@@ -1,0 +1,416 @@
+package es.ull.simulation.hta;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+import es.ull.simulation.hta.interventions.Intervention;
+import es.ull.simulation.hta.params.Parameter;
+import es.ull.simulation.hta.params.ParameterGroup;
+import es.ull.simulation.hta.params.SpanishCPIUpdate;
+import es.ull.simulation.hta.params.modifiers.ParameterModifier;
+import es.ull.simulation.hta.populations.Population;
+import es.ull.simulation.hta.progression.Development;
+import es.ull.simulation.hta.progression.Disease;
+import es.ull.simulation.hta.progression.DiseaseProgression;
+import es.ull.simulation.hta.progression.DiseaseProgressionEvents;
+import es.ull.simulation.hta.progression.DiseaseProgressionPathway;
+import es.ull.simulation.model.TimeStamp;
+import es.ull.simulation.model.TimeUnit;
+
+/**
+ * A model for health technology assessment. A model is composed of a {@link Population population}, a set of {@link Disease diseases} (in general, one), and a set of {@link Intervention interventions}. 
+ * Each disease may comprise a set of {@link Development developments}, and a set of {@link DiseaseProgression disease progressions}.
+ * All of these {@link HTAModelComponent model components} may define {@link Parameter parameters} in their {@link HTAModelComponent#createParameters()} method, that are registeres, and 
+ * can be accessed through the {@link #getParameterValue(String, Patient)} method. 
+ * Indeed, the {@link #createParameters()} method must be invoked from the calling {@link HTAExperiment} after all the model components have been created.
+ * TODO El cálculo de tiempo hasta complicación usa siempre el mismo número aleatorio para la misma complicación. Si aumenta el riesgo de esa
+ * complicación en un momento de la simulación, se recalcula el tiempo, pero empezando en el instante actual. Esto produce que no necesariamente se acorte
+ * el tiempo hasta evento en caso de un nuevo factor de riesgo. ¿debería reescalar de alguna manera el tiempo hasta evento en estos casos (¿proporcional al RR?)?
+ * TODO: Make this class a singleton
+ * @author Iván Castilla Rodríguez
+ */
+public class HTAModel {
+    /** The complete collection of Parameters with unique names defined in this model */
+    private final Map<String, Parameter> parameters;
+    /** A collection of modifiers of parameters associated to a specific intervention */
+	final private HashMap<String, TreeMap<Intervention, ParameterModifier>> interventionModifiers;
+
+    /** The experiment this model belongs to */
+    final private HTAExperiment experiment;
+	/** The collection of defined diseases */
+	final protected ArrayList<Disease> registeredDiseases;
+	/** A map between the name that identifies a disease and the corresponding disease */
+	final protected Map<String, Disease> registeredDiseasesMap;
+	/** The collection of defined developments */
+	final protected ArrayList<Development> registeredDevelopments;
+	/** A map between the name that identifies a development and the corresponding development */
+	final protected Map<String, Development> registeredDevelopmentsMap;
+	/** The collection of interventions */
+	final protected ArrayList<Intervention> registeredInterventions;
+	/** A map between the name that identifies an intervention and the corresponding intervention */
+	final protected Map<String, Intervention> registeredInterventionsMap;
+	/** The collection of defined progressions */
+	final protected ArrayList<DiseaseProgression> registeredProgressions;
+	/** A map between the name that identifies a progression and the corresponding progression */
+	final protected Map<String, DiseaseProgression> registeredProgressionsMap;
+	/** The registeredPopulation */
+	private Population registeredPopulation = null;
+ 	/** A dummy disease that represents a non-disease state, i.e., being healthy. Useful to avoid null comparisons. */
+	public final Disease HEALTHY;
+	/** Absence of progression */
+	private static final DiseaseProgressionEvents NULL_PROGRESSION = new DiseaseProgressionEvents(); 
+	/** Simulation time unit: defines the finest grain */
+	private TimeUnit simulationTimeUnit = TimeUnit.DAY;
+
+    /**
+     * Creates a new HTA model
+     */
+    public HTAModel(HTAExperiment experiment) {
+        this.experiment = experiment;
+        this.parameters = new HashMap<>();
+		this.interventionModifiers = new HashMap<>();
+        this.registeredDiseasesMap = new TreeMap<>();
+        this.registeredDevelopmentsMap = new TreeMap<>();
+        this.registeredInterventionsMap = new TreeMap<>();
+        this.registeredProgressionsMap = new TreeMap<>();
+		this.registeredDevelopments = new ArrayList<>();
+		this.registeredDiseases = new ArrayList<>();
+		this.registeredInterventions = new ArrayList<>();
+		this.registeredProgressions = new ArrayList<>();
+        this.HEALTHY = new Disease(this, "HEALTHY", "Healthy") {
+            @Override
+            public DiseaseProgressionEvents getProgression(Patient pat) {
+                return NULL_PROGRESSION;
+            }
+        };
+    }
+
+	/**
+	 * Checks the model validity and returns a string with the missing components.
+	 * @throws MalformedSimulationModelException if the model is not valid
+	 */
+	public void checkValidity() throws MalformedSimulationModelException {
+		final StringBuilder str = new StringBuilder();
+		if (registeredDiseasesMap.size() == 0)
+			str.append("At least one disease must be defined").append(System.lineSeparator());
+		if (registeredInterventionsMap.size() == 0) {
+			str.append("At least one intervention must be defined").append(System.lineSeparator());
+		}
+		if (registeredPopulation == null) {
+			str.append("No population defined").append(System.lineSeparator());
+		}
+		if (str.length() > 0)
+			throw new MalformedSimulationModelException(str.toString());
+	}
+
+	/**
+	 * Registers the  parameters associated to the population, death submodel, diseases, manifestations and interventions that were
+	 * previously included in this model. This method must be invoked after all these components have been created. 
+     */	
+    public void createParameters() {
+		registeredPopulation.createParameters();
+		for (Disease disease : registeredDiseases)
+			disease.createParameters();
+		for (DiseaseProgression progression : registeredProgressions) {
+			progression.createParameters();
+			for (DiseaseProgressionPathway pathway : progression.getPathways()) {
+				pathway.createParameters();
+			}
+		}
+		for (Intervention intervention : registeredInterventions)
+			intervention.createParameters();
+    }
+
+	/**
+	 * Return the year that is used to update the cost parameters
+	 * @return the year that is used to update the cost parameters
+	 */
+	public int getStudyYear() {
+		return experiment.getStudyYear();
+	}
+
+	public int getNExperiments() {
+		return experiment.getNExperiments();
+	}
+
+	public int getNPatients() {
+		return experiment.getNPatients();
+	}
+
+    /**
+     * Registers a disease in this model. Returns false if a disease with the same name already exists,
+     * and cancels the registration. This method is invoked from the constructor of {@link Disease} and should not be invoked elsewhere 
+     * @param disease The disease to be registered
+     * @return False if a disease with the same name already exists, true otherwise
+     */
+    public boolean register(Disease disease) {
+        if (registeredDiseasesMap.containsKey(disease.name()))
+            return false;
+		registeredDiseases.add(disease);
+        registeredDiseasesMap.put(disease.name(), disease);
+        disease.setOrder(registeredDiseasesMap.size() - 1);
+        return true;
+    }
+
+    /**
+     * Registers a development in this model. Returns false if a development with the same name already exists,
+     * and cancels the registration. This method is invoked from the constructor of {@link Development} and should not be invoked elsewhere 
+     * @param development  The development to be registered
+     * @return False if a development with the same name already exists, true otherwise
+     */
+    public boolean register(Development development) {
+        if (registeredDevelopmentsMap.containsKey(development.name()))
+            return false;
+		registeredDevelopments.add(development);
+        registeredDevelopmentsMap.put(development.name(), development);
+        return true;
+    }
+
+    /**
+     * Registers an intervention in this model. Returns false if an intervention with the same name already exists,
+     * and cancels the registration. This method is invoked from the constructor of {@link Intervention} and should not be invoked elsewhere 
+     * @param intervention The intervention to be registered
+     * @return False if an intervention with the same name already exists, true otherwise
+     */
+    public boolean register(Intervention intervention) {
+        if (registeredInterventionsMap.containsKey(intervention.name()))
+            return false;
+		registeredInterventions.add(intervention);
+        registeredInterventionsMap.put(intervention.name(), intervention);
+        intervention.setOrder(registeredInterventionsMap.size() - 1);
+        return true;
+    }
+
+    /**
+     * Registers a progression in this model. Returns false if a progression with the same name already exists,
+     * and cancels the registration. This method is invoked from the constructor of {@link DiseaseProgression} and should not be invoked elsewhere 
+     * @param progression The progression to be registered
+     * @return False if a progression with the same name already exists, true otherwise
+     */
+    public boolean register(DiseaseProgression progression) {
+        if (registeredProgressionsMap.containsKey(progression.name()))
+            return false;
+		registeredProgressions.add(progression);
+        registeredProgressionsMap.put(progression.name(), progression);
+        progression.setOrder(registeredProgressionsMap.size() - 1);
+        return true;
+    }
+
+    /**
+     * Registers a population in this model. Returns false if a population has already been registered,
+     * and cancels the registration. This method is invoked from the constructor of {@link Population} and should not be invoked elsewhere 
+     * @param population The population to be registered
+     * @return False if a population has already been registered, true otherwise.
+     */
+    public boolean register(Population population) {
+        if (registeredPopulation != null)
+            return false;
+        registeredPopulation = population;
+        return true;
+    }
+
+	
+	/**
+	 * Returns the registered diseases
+	 * @return the registered diseases
+	 */
+	public Disease[] getRegisteredDiseases() {
+		final Disease[] array = new Disease[registeredDiseases.size()];
+		return (Disease[])registeredDiseases.toArray(array);
+	}
+	
+	/**
+	 * Returns the registered developments
+	 * @return the registered developments
+	 */
+	public Development[] getRegisteredDevelopments() {
+		final Development[] array = new Development[registeredDevelopments.size()];
+		return (Development[])registeredDevelopments.toArray(array);
+	}
+	
+	/**
+	 * Returns the already registered disease progressions
+	 * @return The already registered disease progressions
+	 */
+	public DiseaseProgression[] getRegisteredDiseaseProgressions() {
+		final DiseaseProgression[] array = new DiseaseProgression[registeredProgressions.size()];
+		return (DiseaseProgression[]) registeredProgressions.toArray(array);
+	}
+
+	/**
+	 * Returns the already registered disease progressions of the specified type
+	 * @return The already registered disease progressions of the specified type
+	 */
+	public DiseaseProgression[] getRegisteredDiseaseProgressions(DiseaseProgression.Type type) {
+		final ArrayList<DiseaseProgression> arrayTyped = new ArrayList<>();
+		for (final DiseaseProgression manif : registeredProgressions) {
+			if (type.equals(manif.getType()))
+				arrayTyped.add(manif);
+		}
+		final DiseaseProgression[] array = new DiseaseProgression[arrayTyped.size()];
+		return (DiseaseProgression[]) arrayTyped.toArray(array);
+	}
+	
+	/**
+	 * Returns the already registered intervention
+	 * @return The already registered interventions
+	 */
+	public Intervention[] getRegisteredInterventions() {
+		final Intervention[] array = new Intervention[registeredInterventions.size()];
+		return (Intervention[]) registeredInterventions.toArray(array);
+	}
+
+	/**
+	 * Returns the number of interventions included in this model
+	 * @return The number of interventions included in this model
+	 */
+	public final int getNInterventions() {
+		return registeredInterventions.size();
+	}
+
+    /**
+     * Returns the population registered in this model
+     * @return the population registered in this model
+     */    
+	public Population getPopulation() {
+		return registeredPopulation;
+	}
+
+	/**
+	 * Returns the disease registered in this model with the specified name
+	 * @param name The name of the disease
+	 */
+	public Disease getDisease(String name) {
+		return registeredDiseasesMap.get(name);
+	}
+
+	/**
+	 * Returns the development registered in this model with the specified name
+	 * @param name The name of the development
+	 */
+	public Development getDevelopment(String name) {
+		return registeredDevelopmentsMap.get(name);
+	}
+
+	/**
+	 * Returns the intervention registered in this model with the specified name
+	 * @param name The name of the intervention
+	 */
+	public Intervention getIntervention(String name) {
+		return registeredInterventionsMap.get(name);
+	}
+
+	/**
+	 * Returns the progression registered in this model with the specified name
+	 * @param name The name of the progression
+	 */
+	public DiseaseProgression getDiseaseProgression(String name) {
+		return registeredProgressionsMap.get(name);
+	}
+
+    /**
+     * Returns the collection of parameters created for a model component
+     * @return the collection of parameters created for a model component
+     */
+    public Map<String, Parameter> getParameters() {
+        return parameters;
+    }
+
+    /**
+     * Adds a parameter to the collection, unless a parameter with the same name already exists.
+     * @param param The parameter to be added
+     * @return true if the parameter was added, false otherwise
+     */
+    public boolean addParameter(Parameter param) {
+        if (parameters.containsKey(param.name()))
+            return false;
+        parameters.put(param.name(), param);
+        return true;
+    }
+
+    /**
+     * Adds a parameter modifier associated to certain intervention
+     * @param paramName The name of the parameter to be modified
+     * @param interv The intervention associated to the modifier
+     * @param modifier The modifier to be added
+     */
+    public void addParameterModifier(String paramName, Intervention interv, ParameterModifier modifier) {
+		TreeMap<Intervention, ParameterModifier> map = interventionModifiers.get(paramName);
+		if (map == null) {
+			map = new TreeMap<>();
+			interventionModifiers.put(paramName, map);
+		}
+		map.put(interv, modifier);
+	}
+
+	/**
+	 * Returns a value for a parameter
+	 * @param name String identifier of the parameter
+	 * @return A value for the specified parameter; {@link Double#NaN} in case the parameter is not defined
+	 */
+	public double getParameterValue(String name, Patient pat) {
+		return getParameterValue(name, Double.NaN, pat);
+	}
+
+	/**
+	 * Returns the value of the parameter for a specific patient, modified according to the intervention
+	 * @param name String identifier of the parameter
+	 * @param defaultValue Default value in case the parameter is not defined
+	 * @param pat A patient
+	 * @return A value for the specified parameter; the specified default value in case the parameter is not defined
+	 */
+	public double getParameterValue(String name, double defaultValue, Patient pat) {
+		final Parameter param = parameters.get(name);
+		if (param == null)
+			return defaultValue;
+		double value = param.getValue(pat);
+		final TreeMap<Intervention, ParameterModifier> map = interventionModifiers.get(name);
+		if (map != null) {
+			final ParameterModifier modifier = map.get(pat.getIntervention());
+			if (modifier != null) {
+				value = modifier.getModifiedValue(pat, value);
+			}
+		}
+		if (ParameterGroup.COST.equals(param.getGroup())) {
+			return SpanishCPIUpdate.updateCost(value, param.getYear(), getStudyYear());
+		}
+		return value;
+	}
+
+    /**
+	 * Sets the time unit of the simulation for this model (default: {@link TimeUnit.DAY DAY})
+     * @param simulationTimeUnit the time unit to set
+     */
+    public void setSimulationTimeUnit(TimeUnit timeUnit) {
+    	simulationTimeUnit = timeUnit;
+    }
+
+    /**
+	 * Gets the time unit used in the simulation of this model (default: {@link TimeUnit.DAY DAY})
+     * @return the time unit used in the simulation of this model
+     */
+    public TimeUnit getSimulationTimeUnit() {
+    	return simulationTimeUnit;
+    }
+
+	/**
+	 * Returns an internal simulation time stamp expressed as years
+	 * @param ts Internal time stamp
+	 * @return an internal simulation time stamp expressed as years
+	 */
+	public double simulationTimeToYears(double ts) {
+		return ts / (double)simulationTimeUnit.convert(TimeStamp.getYear());
+	}
+
+	/**
+	 * Returns an internal simulation time stamp expressed as years
+	 * @param internalTs Internal time stamp
+	 * @return an internal simulation time stamp expressed as years
+	 */
+	public double simulationTimeToYears(long internalTs) {
+		return simulationTimeToYears((double)internalTs);
+	}
+
+}

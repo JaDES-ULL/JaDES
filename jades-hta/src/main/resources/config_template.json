@@ -1,0 +1,77 @@
+{
+    "patients":1,
+    "time horizon":100,
+    "study year":2024,
+    "base case":true,
+    "PSA runs":0,
+    "outputs":
+    [
+        {
+            "processing":"csv",
+            "file":"output.csv",
+            "list":
+            [
+                {
+                    "name":"cost",
+                    "discount":0.03
+                },
+                {
+                    "name":"life expectancy",
+                    "discount":0.03
+                },
+                {
+                    "name":"quality-adjusted life expectancy",
+                    "discount":0.03
+                },
+                {
+                    "name":"time to event",
+                    "discount":0.0
+                },
+                {
+                    "name":"manifestation prevalence",
+                    "discount":0.0
+                },
+                {
+                    "name":"manifestation incidence",
+                    "discount":0.0
+                }
+            ]
+        },
+        {
+            "processing":"json",
+            "file":"",
+            "list":
+            [
+                {
+                    "name": "incidence",
+                    "relative":true,
+                    "interval size":1,
+                    "based on age":false
+                }, 
+                {
+                    "name": "prevalence",
+                    "relative":true,
+                    "interval size":1,
+                    "based on age":false
+                },
+                {
+                    "name": "cumulative incidence",
+                    "relative":true,
+                    "interval size":1,
+                    "based on age":false
+                },
+                {
+                    "name": "breakdown costs"
+                },
+                {
+                    "name": "individual outcomes"
+                },
+                {
+                    "name": "budget impact",
+                    "horizon":10
+                }
+            ]
+        }
+    ]
+
+}

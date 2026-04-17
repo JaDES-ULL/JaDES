@@ -1,0 +1,23 @@
+/**
+ * 
+ */
+package es.ull.simulation.hta.outcomes;
+
+import es.ull.simulation.hta.HTAModel;
+import es.ull.simulation.hta.params.DefinesSensitivityAndSpecificity;
+
+/**
+ * @author Iván Castilla Rodríguez
+ *
+ */
+public class ScreeningTest extends HealthTechnology implements DefinesSensitivityAndSpecificity {
+
+	/**
+	 * @param name
+	 * @param description
+	 */
+	public ScreeningTest(HTAModel model, String name, String description, Guideline guide) {
+		super(model, name, description, guide);
+	}
+
+}

@@ -37,7 +37,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.release>25</maven.compiler.release>
 
     <!-- Dependency versions -->
     <log4j2.version>2.25.3</log4j2.version>
@@ -68,6 +68,7 @@
     <module>jades-core</module>
     <module>jades-utils</module>
     <module>jades-examples</module>
+    <module>jades-hta</module>
   </modules>
 
   <dependencyManagement>
