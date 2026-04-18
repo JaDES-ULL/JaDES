@@ -1,12 +1,19 @@
 package simkit.random;
 
-import java.util.Random;
-
 /**
- * Linear Congruential Generator (LCG) backed by {@link java.util.Random}.
- * Java's {@code Random} uses the same LCG algorithm as the original simkit
- * {@code Congruential} class: multiplier {@code 0x5DEECE66DL}, addend {@code 0xBL},
- * modulus {@code 2^48}. This makes it a transparent drop-in replacement.
+ * Direct 48-bit Linear Congruential Generator (LCG).
+ * Exact port of {@code simkit.random.Congruential} from the original simkit library
+ * (Kirk Stork / Arnold Buss, Naval Postgraduate School).
+ *
+ * <p>Parameters: multiplier {@code 0x5DEECE66DL}, addend {@code 0xBL}, modulus {@code 2^48} —
+ * the same constants as {@link java.util.Random}. The seed is scrambled at initialisation
+ * with {@code (seed ^ MULTIPLIER) & MASK}, also matching Java.</p>
+ *
+ * <p>The key difference from {@link java.util.Random} is that {@link #draw()} performs
+ * <em>one</em> LCG step and returns the full 48-bit state normalised to [0,1), whereas
+ * {@code java.util.Random.nextDouble()} performs <em>two</em> steps and returns 53 bits.
+ * This single-step behaviour produces the same random sequence as the original simkit
+ * library, ensuring reproducibility of results computed with simkit.</p>
  *
  * <p>This is the default {@link RandomNumber} implementation returned by
  * {@link RandomNumberFactory#getInstance()}.</p>
@@ -15,14 +22,16 @@ import java.util.Random;
  */
 public class Congruential implements RandomNumber {
 
-    /** Same multiplier as Java's Random and the original simkit Congruential */
     private static final long MULTIPLIER = 0x5DEECE66DL;
+    private static final long ADDEND     = 0xBL;
+    private static final long MASK       = (1L << 48) - 1;
+    private static final double NORM     = (double) (1L << 48);
 
     /** The seed provided at construction or last {@link #setSeed(long)} call */
     private long initialSeed;
 
-    /** The underlying Java RNG */
-    private final Random rng;
+    /** Current LCG state (48 bits) */
+    private long state;
 
     /**
      * Creates a generator seeded with the current system time.
@@ -37,13 +46,13 @@ public class Congruential implements RandomNumber {
      */
     public Congruential(long seed) {
         this.initialSeed = seed;
-        this.rng = new Random(seed);
+        this.state = (seed ^ MULTIPLIER) & MASK;
     }
 
     @Override
     public void setSeed(long seed) {
         this.initialSeed = seed;
-        rng.setSeed(seed);
+        this.state = (seed ^ MULTIPLIER) & MASK;
     }
 
     @Override
@@ -53,7 +62,7 @@ public class Congruential implements RandomNumber {
 
     @Override
     public void resetSeed() {
-        rng.setSeed(initialSeed);
+        this.state = (initialSeed ^ MULTIPLIER) & MASK;
     }
 
     @Override
@@ -68,14 +77,25 @@ public class Congruential implements RandomNumber {
         return new long[]{initialSeed};
     }
 
+    /**
+     * Advances the LCG by one step and returns the result normalised to [0, 1).
+     * 48-bit precision, matching the original simkit {@code Congruential.draw()}.
+     */
     @Override
     public double draw() {
-        return rng.nextDouble();
+        state = (MULTIPLIER * state + ADDEND) & MASK;
+        return (double) state / NORM;
     }
 
+    /**
+     * Returns a pseudorandom long by combining two consecutive 48-bit LCG steps.
+     */
     @Override
     public long drawLong() {
-        return rng.nextLong();
+        state = (MULTIPLIER * state + ADDEND) & MASK;
+        long high = state;
+        state = (MULTIPLIER * state + ADDEND) & MASK;
+        return (high << 16) | (state >>> 32);
     }
 
     @Override

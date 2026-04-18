@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class RandomNumberFactory {
 
-    protected static final String DEFAULT_CLASS = "simkit.random.Congruential";
+    protected static final String DEFAULT_CLASS = "simkit.random.MersenneTwister";
     protected static Class<?> defaultClass;
     protected static final Map<String, Class<?>> cache = new HashMap<>();
     protected static final List<String> searchPackages = new ArrayList<>();
@@ -35,20 +35,43 @@ public class RandomNumberFactory {
 
     protected RandomNumberFactory() {}
 
-    /** Returns a new {@link Congruential} seeded with the current time. */
+    /**
+     * Returns a new instance of the default {@link RandomNumber} class using its
+     * no-argument constructor — matching simkit's behaviour exactly.
+     * For {@link MersenneTwister} this produces a generator with the default seed (4357).
+     */
     public static RandomNumber getInstance() {
-        return new Congruential(System.currentTimeMillis());
+        try {
+            return (RandomNumber) defaultClass.getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Cannot instantiate default RandomNumber", e);
+        }
     }
 
-    /** Returns a new {@link Congruential} with the given seed. */
+    /**
+     * Returns a new default-class {@link RandomNumber} with the given seed.
+     * Matches simkit's behaviour: creates an instance via reflection then calls
+     * {@link RandomNumber#setSeed(long)}.
+     */
     public static RandomNumber getInstance(long seed) {
-        return new Congruential(seed);
+        try {
+            RandomNumber rng = (RandomNumber) defaultClass.getDeclaredConstructor().newInstance();
+            rng.setSeed(seed);
+            return rng;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Cannot instantiate default RandomNumber", e);
+        }
     }
 
-    /** Returns a new {@link Congruential} seeded with {@code seeds[0]}. */
+    /** Returns a new default-class {@link RandomNumber} seeded with {@code seeds[0]}. */
     public static RandomNumber getInstance(long[] seeds) {
-        long seed = (seeds != null && seeds.length > 0) ? seeds[0] : System.currentTimeMillis();
-        return new Congruential(seed);
+        try {
+            RandomNumber rng = (RandomNumber) defaultClass.getDeclaredConstructor().newInstance();
+            rng.setSeeds(seeds);
+            return rng;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Cannot instantiate default RandomNumber", e);
+        }
     }
 
     /** Returns a new instance of the named {@link RandomNumber} class, seeded with the current time. */
