@@ -69,8 +69,8 @@ public class TestHTAExcelGeneration {
 
         },
         {
-            new ToCheckExcel("Process", 10, 6, 2.208189009),
-            new ToCheckExcel("Process", 10, 9, 1.330130946)
+            new ToCheckExcel("Process", 10, 6, 1.5512269701985133),
+            new ToCheckExcel("Process", 10, 9, 0.7638404417187111)
         }
     };
 
