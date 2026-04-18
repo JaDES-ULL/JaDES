@@ -115,6 +115,48 @@ public class RandomVariateFactory {
         return null;
     }
 
+    /**
+     * Returns a new instance of the named {@link DiscreteRandomVariate} class, configured
+     * with the given parameters and the default RNG.
+     *
+     * @param className  simple or fully-qualified class name (e.g. {@code "BernoulliVariate"})
+     * @param parameters distribution parameters
+     * @return configured discrete variate instance
+     */
+    public static DiscreteRandomVariate getDiscreteRandomVariateInstance(String className, Object... parameters) {
+        return getDiscreteRandomVariateInstance(className, DEFAULT_RNG, parameters);
+    }
+
+    /**
+     * Returns a new instance of the named {@link DiscreteRandomVariate} class, configured
+     * with the given parameters and the specified RNG.
+     *
+     * @param className  simple or fully-qualified class name (e.g. {@code "BernoulliVariate"})
+     * @param rng        the random number generator to use
+     * @param parameters distribution parameters
+     * @return configured discrete variate instance
+     */
+    public static DiscreteRandomVariate getDiscreteRandomVariateInstance(String className, RandomNumber rng, Object... parameters) {
+        Class<?> clazz = findFullyQualifiedNameFor(className);
+        if (clazz == null) {
+            throw new IllegalArgumentException("Cannot find DiscreteRandomVariate class: " + className);
+        }
+        if (!DiscreteRandomVariate.class.isAssignableFrom(clazz)) {
+            throw new IllegalArgumentException("Class is not a DiscreteRandomVariate: " + className);
+        }
+        try {
+            DiscreteRandomVariate rv = (DiscreteRandomVariate) clazz.getDeclaredConstructor().newInstance();
+            rv.setRandomNumber(rng != null ? rng : DEFAULT_RNG);
+            if (parameters != null && parameters.length > 0) {
+                rv.setParameters(parameters);
+            }
+            return rv;
+        } catch (InstantiationException | IllegalAccessException |
+                 NoSuchMethodException | java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException("Cannot instantiate DiscreteRandomVariate: " + className, e);
+        }
+    }
+
     public static void addSearchPackage(String pkg) { searchPackages.add(pkg); }
     public static void setSearchPackages(Set<String> packages) { searchPackages = new LinkedHashSet<>(packages); }
     public static Set<String> getSearchPackages() { return new LinkedHashSet<>(searchPackages); }

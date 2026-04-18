@@ -59,9 +59,9 @@
       <version>1.82</version>
     </dependency>
     <dependency>
-      <groupId>com.zenuevo.simkit</groupId>
-      <artifactId>simkit</artifactId>
-      <version>1.4.1</version>
+      <groupId>io.github.jades-ull.jades</groupId>
+      <artifactId>jades-random</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
