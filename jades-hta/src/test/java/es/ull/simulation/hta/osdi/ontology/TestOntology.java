@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -54,6 +55,7 @@ public class TestOntology {
         );
     }    
 
+    @Disabled("Requires OSDi ontology published on the remote server — enable when server is available")
     @ParameterizedTest
     @MethodSource("provideRemoteOntologyTestCases")
     @OSDiTest
