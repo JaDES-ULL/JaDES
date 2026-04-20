@@ -4,7 +4,6 @@
 package es.ull.simulation.model;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.TreeSet;
 
 import es.ull.simulation.info.ElementActionInfo;

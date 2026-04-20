@@ -4,7 +4,6 @@ import es.ull.simulation.model.Simulation;
 import es.ull.simulation.model.TimeUnit;
 import es.ull.simulation.model.location.IMovable;
 import es.ull.simulation.model.location.ILocation;
-import es.ull.simulation.model.location.Location;
 import es.ull.simulation.model.location.Node;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

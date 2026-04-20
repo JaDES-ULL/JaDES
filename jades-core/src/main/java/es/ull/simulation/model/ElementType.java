@@ -6,7 +6,6 @@ package es.ull.simulation.model;
 import java.util.TreeMap;
 
 import es.ull.simulation.model.engine.SimulationEngine;
-import es.ull.simulation.utils.Prioritizable;
 
 /**
  * Describes a set of elements which have something in common. This is simply a descriptive attribute

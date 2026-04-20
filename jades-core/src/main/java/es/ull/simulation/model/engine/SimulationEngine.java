@@ -15,18 +15,11 @@ import es.ull.simulation.info.TimeChangeInfo;
 import es.ull.simulation.model.ActivityManager;
 import es.ull.simulation.model.DiscreteEvent;
 import es.ull.simulation.model.Element;
-import es.ull.simulation.model.ElementType;
 import es.ull.simulation.model.IIdentifiable;
 import es.ull.simulation.model.Resource;
 import es.ull.simulation.model.Simulation;
-import es.ull.simulation.model.TimeDrivenElementGenerator;
-import es.ull.simulation.model.TimeUnit;
-import es.ull.simulation.model.WorkGroup;
-import es.ull.simulation.model.flow.ActivityFlow;
-import es.ull.simulation.model.flow.IFlow;
 import es.ull.simulation.model.flow.AbstractMergeFlow;
 import es.ull.simulation.model.flow.RequestResourcesFlow;
-import es.ull.simulation.utils.Output;
 
 /**
  * Main simulation class, identified by means of an identifier and a description.

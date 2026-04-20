@@ -2,7 +2,6 @@ package es.ull.simulation.model;
 
 import java.util.ArrayDeque;
 
-import es.ull.simulation.model.flow.ReleaseResourcesFlow;
 import es.ull.simulation.model.flow.RequestResourcesFlow;
 
 /**

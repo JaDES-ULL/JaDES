@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import es.ull.simulation.info.ElementInfo;
-import es.ull.simulation.info.EntityLocationInfo;
 import es.ull.simulation.model.engine.ElementEngine;
 import es.ull.simulation.model.engine.SimulationEngine;
 import es.ull.simulation.model.flow.IFlow;
@@ -18,10 +17,8 @@ import es.ull.simulation.model.flow.RequestResourcesFlow;
 import es.ull.simulation.model.flow.ITaskFlow;
 import es.ull.simulation.model.location.ILocation;
 import es.ull.simulation.model.location.Location;
-import es.ull.simulation.model.location.IMovable;
 import es.ull.simulation.model.location.MoveFlow;
 import es.ull.simulation.variable.EnumVariable;
-import es.ull.simulation.utils.Prioritizable;
 
 /**
  * An entity capable of following a {@link IFlow workflow}. Elements have a {@link ElementType type} and
@@ -31,7 +28,7 @@ import es.ull.simulation.utils.Prioritizable;
  * @author Iván Castilla Rodríguez
  *
  */
-public class Element extends VariableStoreSimulationObject implements IElement, IEventSource, IMovable {
+public class Element extends VariableStoreSimulationObject implements IElement, IEventSource {
 	/** Element type */
 	protected ElementType elementType;
 	/** Workflow manager for initial flow and main instance */

@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.checkerframework.checker.units.qual.s;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.parameters.Imports;
 

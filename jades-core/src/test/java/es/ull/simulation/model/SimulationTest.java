@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import es.ull.simulation.info.IPieceOfInformation;
 import es.ull.simulation.info.SimulationStartStopInfo;
 import es.ull.simulation.inforeceiver.BasicListener;
-import es.ull.simulation.model.engine.SimulationEngine;
 
 class SimulationTest {
     private Simulation simulation;

@@ -12,7 +12,6 @@ import es.ull.simulation.info.ResourceInfo;
 import es.ull.simulation.model.engine.SimulationEngine;
 import es.ull.simulation.model.location.ILocation;
 import es.ull.simulation.model.location.Location;
-import es.ull.simulation.model.location.IMovable;
 import es.ull.simulation.model.location.MoveResourcesFlow;
 import es.ull.simulation.model.location.IRouter;
 import es.ull.simulation.model.location.TransportFlow;
@@ -30,7 +29,7 @@ import es.ull.simulation.utils.cycle.DiscreteCycleIterator;
  *
  * @author Iván Castilla Rodríguez
  */
-public class Resource extends VariableStoreSimulationObject implements IResource, IEventSource, IMovable {
+public class Resource extends VariableStoreSimulationObject implements IResource, IEventSource {
     /** A brief description of the resource */
     protected final String description;
 	/** Manages location and movement for this resource */

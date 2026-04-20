@@ -44,7 +44,6 @@ public class OSDiDESModel extends HTAModel {
 	 * @throws OWLOntologyCreationException 
 	 * @throws MalformedSimulationModelException 
 	 * TODO: Convert all the bernouilli parameters into BernouilliParam (e.g. Population parameters such as sex)
-	 * TODO: Parse and create ParamWrappers in constructors (to be able to throw MalformedOSDiModelException when creating the model and avoid them during the creation of parameters in the repository).
 	 * @throws UnsupportedOSDiFeatureException 
 	 */
 	public OSDiDESModel(OSDiExperiment experiment) throws MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {

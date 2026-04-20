@@ -7,7 +7,6 @@ import es.ull.simulation.info.EntityLocationInfo;
 import es.ull.simulation.model.Element;
 import es.ull.simulation.model.ElementInstance;
 import es.ull.simulation.model.Simulation;
-import es.ull.simulation.model.location.ILocation;
 import es.ull.simulation.model.flow.IActionFlow;
 import es.ull.simulation.model.flow.IFlow;
 import es.ull.simulation.model.flow.AbstractSingleSuccessorFlow;

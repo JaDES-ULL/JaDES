@@ -62,9 +62,6 @@ public class ModelWrapper implements IIndividualWrapper {
 
 		this.registry = new ModelItemWrapperRegistry(wrap, this);
 		// ...plus all data item types and expression languages (these are needed for parameters)
-		// FIXME: This should not be required. Data items and expression languages should be seeked in all the included individuals, not only model items
-		//modelItems.addAll(OSDiClass.DATA_ITEM_TYPE.getIndividuals(wrap));
-		//modelItems.addAll(OSDiClass.EXPRESSION_LANGUAGE.getIndividuals(wrap));
 		diseaseIndividuals = getModelItemsByClassAs(OSDiClass.DISEASE, DiseaseWrapper.class, false);
 		populationIndividuals = getModelItemsByClassAs(OSDiClass.POPULATION, PopulationWrapper.class, false);
 		interventionIndividuals = getModelItemsByClassAs(OSDiClass.INTERVENTION, InterventionWrapper.class, false);

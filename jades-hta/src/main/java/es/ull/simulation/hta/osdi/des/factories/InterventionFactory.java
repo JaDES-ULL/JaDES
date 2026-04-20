@@ -15,7 +15,6 @@ import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
 
 /**
  * @author Iván Castilla
- * TODO: SCREENING should be generalized to DETECTION
  */
 public interface InterventionFactory extends DESModelComponentFactory {
 	public static String DO_NOTHING = "DO_NOTHING";

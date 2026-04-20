@@ -9,10 +9,7 @@ import java.util.List;
 
 import es.ull.simulation.functions.AbstractTimeFunction;
 import es.ull.simulation.functions.TimeFunctionFactory;
-import es.ull.simulation.model.IIdentifiable;
 import es.ull.simulation.model.SimulationObject;
-import es.ull.simulation.model.location.ILocation;
-import es.ull.simulation.model.location.IMovable;
 
 /**
  * A physical place where one or more entities can be at any time. Locations have a capacity, that determines how many entities fit in.
@@ -22,7 +19,7 @@ import es.ull.simulation.model.location.IMovable;
  * @author Iván Castilla Rodríguez
  *
  */
-public abstract class Location implements ILocation, IIdentifiable, Comparable<Location> {
+public abstract class Location implements ILocation, Comparable<Location> {
 	/** An array of the locations that this location is linked to */
 	private final ArrayList<Location> linkedTo;
 	/** An array of the locations that this location is linked from */

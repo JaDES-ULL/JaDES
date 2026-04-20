@@ -46,6 +46,15 @@ public class ElementInstanceResources {
 	}
 	
 	/**
+	 * Gets the element instance that owns this resource manager.
+	 * 
+	 * @return The element instance
+	 */
+	public ElementInstance getElementInstance() {
+		return elementInstance;
+	}
+
+	/**
 	 * Gets the workgroup that the element instance is using to execute a resource handler flow.
 	 * 
 	 * @return the workgroup, or null if no activity is being executed

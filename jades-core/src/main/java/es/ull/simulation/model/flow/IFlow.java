@@ -6,7 +6,6 @@ package es.ull.simulation.model.flow;
 import java.util.Set;
 
 import es.ull.simulation.model.ElementInstance;
-import es.ull.simulation.model.flow.IFlowDescriptor;
 
 /**
  * The process an element has to carry out.<p>

@@ -35,7 +35,16 @@ public class ElementInstanceFlow {
 		this.elementInstance = elementInstance;
 		this.initialFlow = initialFlow;
 	}
-	
+
+	/**
+	 * Gets the element instance that owns this flow manager.
+	 * 
+	 * @return The element instance
+	 */
+	public ElementInstance getElementInstance() {
+		return elementInstance;
+	}
+
 	/**
 	 * Gets the initial flow assigned to this element instance.
 	 * 
