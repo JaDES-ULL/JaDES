@@ -389,7 +389,7 @@ public class PayoffWrapper {
         if (probabilities.size() == 1) {
             return probabilities.get(0).formatAsString();
         }
-        return ExcelFormulaLibrary.PRODUCT.getFormula(String.join(", ", probabilities.stream().map(CellReference::formatAsString).toList()));
+        return ExcelFormulaLibrary.PRODUCT.getFormula(String.join(", ", probabilities.stream().map(celRef -> celRef.formatAsString()).toList()));
     }
 
     /**

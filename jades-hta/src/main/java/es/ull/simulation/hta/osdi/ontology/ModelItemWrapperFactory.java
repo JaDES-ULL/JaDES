@@ -110,7 +110,7 @@ public final class ModelItemWrapperFactory {
     private Optional<IRI> selectBestRegisteredType(Set<IRI> candidateTypes) {
         final List<IRI> matching = candidateTypes.stream()
                 .filter(constructorsByClassIri::containsKey)
-                .sorted(Comparator.comparing(IRI::toString))
+                .sorted(Comparator.comparing(iri -> iri.toString()))
                 .collect(Collectors.toList()); 
 
         if (matching.isEmpty()) return Optional.empty();
@@ -126,7 +126,7 @@ public final class ModelItemWrapperFactory {
             }
         }
         matching.removeAll(toRemove);
-        return matching.stream().sorted(Comparator.comparing(IRI::toString)).findFirst()
+        return matching.stream().sorted(Comparator.comparing(iri -> iri.toString())).findFirst()
                 .or(() -> Optional.of(matching.get(0)));
     }
 }
