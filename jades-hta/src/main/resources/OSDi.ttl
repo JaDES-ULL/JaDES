@@ -8,6 +8,7 @@
 @prefix osdi: <https://w3id.org/ontologies-ULL/OSDi#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix time: <http://www.w3.org/2006/time#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix opla-sd: <http://ontologydesignpatterns.org/opla-sd#> .
 @prefix ontodebug: <http://ainf.aau.at/ontodebug#> .
@@ -15,6 +16,8 @@
 
 <https://w3id.org/ontologies-ULL/OSDi> rdf:type owl:Ontology ;
                                         owl:versionIRI <https://w3id.org/ontologies-ULL/OSDi/1.1> ;
+                                        owl:imports <http://www.w3.org/2006/time> ,
+                                                    <http://www.w3.org/2004/02/skos/core> ;
                                         cc:license <http://creativecommons.org/licenses/by-nc-sa/4.0/> ;
                                         dc:contributor "María Luz Couce Pico (https://orcid.org/0000-0003-4861-9905)" ;
                                         dc:creator "David Prieto González (https://orcid.org/0000-0003-1411-129X)" ,
@@ -72,14 +75,6 @@ dc:source rdf:type owl:AnnotationProperty .
 dcterms:abstract rdf:type owl:AnnotationProperty .
 
 
-###  http://www.w3.org/2004/02/skos/core#definition
-skos:definition rdf:type owl:AnnotationProperty .
-
-
-###  http://www.w3.org/2004/02/skos/core#prefLabel
-skos:prefLabel rdf:type owl:AnnotationProperty .
-
-
 ###  https://w3id.org/ontologies-ULL/OSDi#TODO
 osdi:TODO rdf:type owl:AnnotationProperty .
 
@@ -95,19 +90,6 @@ osdi:creator rdf:type owl:AnnotationProperty .
 #################################################################
 #    Object Properties
 #################################################################
-
-###  http://www.w3.org/2004/02/skos/core#broader
-skos:broader rdf:type owl:ObjectProperty ,
-                      owl:TransitiveProperty .
-
-
-###  http://www.w3.org/2004/02/skos/core#inScheme
-skos:inScheme rdf:type owl:ObjectProperty .
-
-
-###  http://www.w3.org/2004/02/skos/core#topConceptOf
-skos:topConceptOf rdf:type owl:ObjectProperty .
-
 
 ###  https://w3id.org/ontologies-ULL/OSDi#affects
 osdi:affects rdf:type owl:ObjectProperty ;
@@ -1477,14 +1459,6 @@ osdi:isTrueEpidemiologicalParameterEstimate rdf:type owl:DatatypeProperty ;
 #################################################################
 #    Classes
 #################################################################
-
-###  http://www.w3.org/2004/02/skos/core#Concept
-skos:Concept rdf:type owl:Class .
-
-
-###  http://www.w3.org/2004/02/skos/core#ConceptScheme
-skos:ConceptScheme rdf:type owl:Class .
-
 
 ###  https://w3id.org/ontologies-ULL/OSDi#AcuteManifestation
 osdi:AcuteManifestation rdf:type owl:Class ;
