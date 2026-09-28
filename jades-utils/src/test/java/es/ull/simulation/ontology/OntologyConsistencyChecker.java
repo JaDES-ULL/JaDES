@@ -13,7 +13,6 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -45,27 +44,27 @@ public class OntologyConsistencyChecker {
     private void fillEntityTypes() {
         OWLOntology referenceOntology = refWrapper.getOntology();
         Set<IRI> refClasses = referenceOntology.classesInSignature(Imports.INCLUDED)
-                        .map(OWLEntity::getIRI).collect(Collectors.toSet());
+                        .map(entity -> entity.getIRI()).collect(Collectors.toSet());
         for (IRI iri : refClasses) {
             refEntityTypes.put(iri, EntityType.CLASS);
         }
         Set<IRI> refObjProps = referenceOntology.objectPropertiesInSignature(Imports.INCLUDED)
-                        .map(OWLEntity::getIRI).collect(Collectors.toSet());
+                        .map(entity -> entity.getIRI()).collect(Collectors.toSet());
         for (IRI iri : refObjProps) {
             refEntityTypes.put(iri,  EntityType.OBJECT_PROPERTY);
         }
         Set<IRI> refDataProps = referenceOntology.dataPropertiesInSignature(Imports.INCLUDED)
-                        .map(OWLEntity::getIRI).collect(Collectors.toSet());
+                        .map(entity -> entity.getIRI()).collect(Collectors.toSet());
         for (IRI iri : refDataProps) {
             refEntityTypes.put(iri,  EntityType.DATA_PROPERTY);
         }
         Set<IRI> refAnnProps = referenceOntology.annotationPropertiesInSignature(Imports.INCLUDED)
-                        .map(OWLEntity::getIRI).collect(Collectors.toSet());
+                        .map(entity -> entity.getIRI()).collect(Collectors.toSet());
         for (IRI iri : refAnnProps) {
             refEntityTypes.put(iri,  EntityType.ANNOTATION);
         }
         Set<IRI> refIndividuals = referenceOntology.individualsInSignature(Imports.INCLUDED)
-                        .map(OWLEntity::getIRI).collect(Collectors.toSet());
+                        .map(entity -> entity.getIRI()).collect(Collectors.toSet());
         for (IRI iri : refIndividuals) {
             refEntityTypes.put(iri,  EntityType.INDIVIDUAL);
         }
