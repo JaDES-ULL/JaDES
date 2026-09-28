@@ -93,7 +93,7 @@ public final class OntologyDebugPrinter {
     private void printIRISet(final String title, final Set<IRI> iris) {
         out.println(title + " [" + iris.size() + "]");
         iris.stream()
-                .sorted(Comparator.comparing(IRI::toString))
+                .sorted(Comparator.comparing(iri -> iri.toString()))
                 .forEach(iri -> out.println("  " + resolution.toPrefixedName(iri)));
     }
 
@@ -174,7 +174,7 @@ public final class OntologyDebugPrinter {
             table.add(row);
             final Set<IRI> types = individualQuery.getAssertedTypes(individual, true, imports);
             row[0] = individual.getShortForm();
-            row[1] = types.stream().map(IRI::getShortForm).collect(Collectors.joining("; "));
+            row[1] = types.stream().map(iri -> iri.getShortForm()).collect(Collectors.joining("; "));
             Map<IRI, Set<IRI>> objProps = individualQuery.getAllObjectPropertyValues(individual, imports);
             StringBuilder objPropsStr = new StringBuilder();
             for (Map.Entry<IRI, Set<IRI>> entry : objProps.entrySet())

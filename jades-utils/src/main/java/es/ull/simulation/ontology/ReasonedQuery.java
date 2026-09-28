@@ -41,7 +41,7 @@ public final class ReasonedQuery {
         final OWLNamedIndividual ind = Objects.requireNonNull(ctx.getFactory().getOWLNamedIndividual(individualIri));
 
         return ctx.getReasoner().getTypes(ind, directOnly).entities()
-                .map(OWLClass::getIRI)
+            .map(cls -> cls.getIRI())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
@@ -86,7 +86,7 @@ public final class ReasonedQuery {
         final OWLClass cls = Objects.requireNonNull(ctx.getFactory().getOWLClass(classIri));
 
         return ctx.getReasoner().getInstances(cls, directOnly).entities()
-                .map(OWLNamedIndividual::getIRI)
+            .map(individual -> individual.getIRI())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
@@ -101,7 +101,7 @@ public final class ReasonedQuery {
         final OWLClass cls = Objects.requireNonNull(ctx.getFactory().getOWLClass(classIri));
 
         return ctx.getReasoner().getSuperClasses(cls, directOnly).entities().filter(c -> !c.isOWLThing())
-                .map(OWLClass::getIRI)
+                .map(c -> c.getIRI())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
@@ -116,7 +116,7 @@ public final class ReasonedQuery {
         final OWLClass cls = Objects.requireNonNull(ctx.getFactory().getOWLClass(classIri));
 
         return ctx.getReasoner().getSubClasses(cls, directOnly).entities().filter(c -> !c.isOWLNothing())
-                .map(OWLClass::getIRI)
+            .map(c -> c.getIRI())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

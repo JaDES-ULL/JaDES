@@ -16,11 +16,11 @@ public final class SKOSQuery {
     public static final String SKOS_IRI_PREFIX = "http://www.w3.org/2004/02/skos/core#";
 
     // SKOS IRIs
-    private final IRI BROADER_IRI = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "broader"));
-    private final IRI IN_SCHEME_IRI = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "inScheme"));
-    private final IRI CONCEPT_IRI = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "Concept"));
-    private final IRI SCHEME_IRI = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "ConceptScheme"));
-    private final IRI PREF_LABEL = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "prefLabel"));
+    private static final IRI BROADER_IRI = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "broader"));
+    private static final IRI IN_SCHEME_IRI = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "inScheme"));
+    private static final IRI CONCEPT_IRI = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "Concept"));
+    private static final IRI SCHEME_IRI = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "ConceptScheme"));
+    private static final IRI PREF_LABEL = Objects.requireNonNull(IRI.create(SKOS_IRI_PREFIX + "prefLabel"));
 
     public SKOSQuery(final OntologyContext ctx, final IndividualQuery individualQuery) {
         this.ctx = Objects.requireNonNull(ctx);
@@ -34,19 +34,23 @@ public final class SKOSQuery {
      */
     public String getSKOSPrefLabel(IRI conceptIri, String lang) {
         Objects.requireNonNull(conceptIri, "conceptIri cannot be null");
+        final IRI prefLabelIri = Objects.requireNonNull(PREF_LABEL, "PREF_LABEL cannot be null");
         // Define the property explicitly
-        final OWLAnnotationProperty prefLabelAnnotation = ctx.getFactory()
-            .getOWLAnnotationProperty(PREF_LABEL);
+        final OWLAnnotationProperty prefLabelAnnotation = Objects.requireNonNull(
+            ctx.getFactory().getOWLAnnotationProperty(prefLabelIri),
+            "prefLabelAnnotation cannot be null"
+        );
 
-        return org.semanticweb.owlapi.search.EntitySearcher.getAnnotations(
-                ctx.getFactory().getOWLNamedIndividual(conceptIri), 
-                ctx.getOntology(), 
-                prefLabelAnnotation)
-            .map(OWLAnnotation::getValue)
+        final OWLNamedIndividual concept = Objects.requireNonNull(
+            ctx.getFactory().getOWLNamedIndividual(conceptIri),
+            "concept cannot be null");
+
+        return org.semanticweb.owlapi.search.EntitySearcher.getAnnotations(concept, ctx.getOntology(), prefLabelAnnotation)
+            .map(anot -> anot.getValue())
             .filter(v -> v.asLiteral().isPresent())
             .map(v -> v.asLiteral().get())
             .filter(lit -> lit.hasLang(lang))
-            .map(OWLLiteral::getLiteral)
+            .map(lit -> lit.getLiteral())
             .findFirst()
             .orElseGet(() -> individualQuery.getLabelForIRI(conceptIri, lang).orElse(null)); 
     }

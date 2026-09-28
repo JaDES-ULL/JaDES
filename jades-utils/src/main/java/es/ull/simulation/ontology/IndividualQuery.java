@@ -211,9 +211,9 @@ public final class IndividualQuery {
                 ? ctx.getOntology().importsClosure()
                 : Stream.of(ctx.getOntology()))
                 .flatMap(ont -> ont.getClassAssertionAxioms(ind).stream())
-                .map(OWLClassAssertionAxiom::getClassExpression)
+                .map(axiom -> axiom.getClassExpression())
                 .filter(ce -> !ce.isAnonymous())
-                .map(OWLClassExpression::asOWLClass)
+                .map(ce -> ce.asOWLClass())
                 .collect(Collectors.toSet());
 
         if (directOnly) {
@@ -243,7 +243,7 @@ public final class IndividualQuery {
         if (directOnly) {
             return ontologies
                     .flatMap(ont -> ont.getSubClassAxiomsForSubClass(cls).stream())
-                    .map(OWLSubClassOfAxiom::getSuperClass)
+                    .map(axiom -> axiom.getSuperClass())
                     .filter(superExpr -> !superExpr.isAnonymous())
                     .map(superExpr -> superExpr.asOWLClass().getIRI())
                     .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -258,9 +258,9 @@ public final class IndividualQuery {
                         ? ctx.getOntology().importsClosure()
                         : Stream.of(ctx.getOntology()))
                         .flatMap(ont -> ont.getSubClassAxiomsForSubClass(current).stream())
-                        .map(OWLSubClassOfAxiom::getSuperClass)
+                        .map(axiom -> axiom.getSuperClass())
                         .filter(superExpr -> !superExpr.isAnonymous())
-                        .map(OWLClassExpression::asOWLClass)
+                        .map(ce -> ce.asOWLClass())
                         .forEach(superClass -> {
                             if (result.add(superClass.getIRI())) {
                                 queue.add(superClass);
@@ -289,7 +289,7 @@ public final class IndividualQuery {
         if (directOnly) {
             return ontologies
                     .flatMap(ont -> ont.getSubClassAxiomsForSuperClass(cls).stream())
-                    .map(OWLSubClassOfAxiom::getSubClass)
+                    .map(axiom -> axiom.getSubClass())
                     .filter(subExpr -> !subExpr.isAnonymous())
                     .map(subExpr -> subExpr.asOWLClass().getIRI())
                     .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -304,9 +304,9 @@ public final class IndividualQuery {
                         ? ctx.getOntology().importsClosure()
                         : Stream.of(ctx.getOntology()))
                         .flatMap(ont -> ont.getSubClassAxiomsForSuperClass(current).stream())
-                        .map(OWLSubClassOfAxiom::getSubClass)
+                        .map(axiom -> axiom.getSubClass())
                         .filter(subExpr -> !subExpr.isAnonymous())
-                        .map(OWLClassExpression::asOWLClass)
+                        .map(ce -> ce.asOWLClass())
                         .forEach(subClass -> {
                             if (result.add(subClass.getIRI())) {
                                 queue.add(subClass);
@@ -340,7 +340,7 @@ public final class IndividualQuery {
                 ? ctx.getOntology().importsClosure()
                 : Stream.of(ctx.getOntology()))
                 .flatMap(ont -> ont.getClassAssertionAxioms(cls).stream())
-                .map(OWLClassAssertionAxiom::getIndividual)
+                .map(axiom -> axiom.getIndividual())
                 .filter(ind -> !ind.isAnonymous())
                 .map(ind -> ind.asOWLNamedIndividual().getIRI())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -356,7 +356,7 @@ public final class IndividualQuery {
                     ? ctx.getOntology().importsClosure()
                     : Stream.of(ctx.getOntology()))
                     .flatMap(ont -> ont.individualsInSignature())
-                    .map(OWLNamedIndividual::getIRI)
+                    .map(individual -> individual.getIRI())
                     .filter(indIri -> !result.contains(indIri))
                     .filter(indIri -> isInstanceOfAsserted(indIri, classIri, false, imports))
                     .forEach(result::add);

@@ -158,7 +158,7 @@ public final class OntologyContext {
      * Disposes of the reasoner provider if present.
      */
     public void dispose() {
-        reasonerProvider.ifPresent(ReasonerProvider::dispose);
+        reasonerProvider.ifPresent(provider -> provider.dispose());
     }
 
     /**
