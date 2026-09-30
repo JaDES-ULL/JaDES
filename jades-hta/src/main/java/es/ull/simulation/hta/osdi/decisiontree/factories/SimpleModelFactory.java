@@ -1,5 +1,8 @@
 package es.ull.simulation.hta.osdi.decisiontree.factories;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import es.ull.simulation.hta.MalformedSimulationModelException;
 import es.ull.simulation.hta.osdi.decisiontree.Model;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
@@ -32,11 +35,11 @@ public class SimpleModelFactory implements AbstractModelFactory {
         if (modelWrapper.getInterventionIndividuals().size() != 2) {
             score.addSeverePenalty("Found more or less than two intervention instances");
         }
-        final InterventionWrapper intervention1 = (InterventionWrapper) modelWrapper.getInterventionIndividuals().toArray()[0];
-        final InterventionWrapper intervention2 = (InterventionWrapper) modelWrapper.getInterventionIndividuals().toArray()[1];
-        if (!(intervention1.isAssessedIntervention().orElse(false) ^
-            intervention2.isAssessedIntervention().orElse(false))) {
-            score.addSeverePenalty("Exactly one intervention must be marked as assessed intervention and one as comparator");
+        final Set<InterventionWrapper> assessedInterventions = new HashSet<>(modelWrapper.getAssessedInterventionIndividuals());
+        if (assessedInterventions.isEmpty()) {
+            score.addSeverePenalty("No intervention is marked as assessed intervention");
+        } else if (assessedInterventions.size() > 1) {
+            score.addSeverePenalty("More than one intervention is marked as assessed intervention. Only one expected.");
         }
     }
 

@@ -599,7 +599,7 @@ public class OSDiWrapper extends OWLOntologyWrapper {
 		return getReasoner().getObjectPropertyValues(Objects.requireNonNull(individual), Objects.requireNonNull(hasCategory))
             .getFlattened()
             .stream()
-            .map(OWLNamedIndividual::getIRI)
+			.map(individualValue -> individualValue.getIRI())
             .map(ResourceUsageSKOSCategory::fromIRI) 
             .filter(Objects::nonNull) 
             .collect(Collectors.toSet());

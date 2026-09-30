@@ -18,7 +18,6 @@ public enum OSDiDataProperty implements IOSDiComponentWrapper {
 	HAS_EXPECTED_VALUE("hasExpectedValue"),
 	HAS_EXPRESSION_VALUE("hasExpressionValue"),
 	HAS_GEOGRAPHICAL_CONTEXT("hasGeographicalContext"),
-	HAS_HOURS_INTERVAL("hasHoursInterval"),
 	HAS_LAMBDA_PARAMETER("hasLambdaParameter"),
 	HAS_LOWER_LIMIT_PARAMETER("hasLowerLimitParameter"),
 	HAS_MAX_AGE("hasMaxAge"),
@@ -29,7 +28,6 @@ public enum OSDiDataProperty implements IOSDiComponentWrapper {
 	HAS_OFFSET_PARAMETER("hasOffsetParameter"),
 	HAS_PROBABILITY_DISTRIBUTION_PARAMETER("hasProbabilityDistributionParameter"),
 	HAS_PROBABILITY_PARAMETER("hasProbabilityParameter"),
-	HAS_RANGE("hasRange"),
 	HAS_REF_TO("hasRefTo"),
 	HAS_REF_TO_DO("hasRefToDO"),
 	HAS_REF_TO_GARD("hasRefToGARD"),
@@ -47,7 +45,6 @@ public enum OSDiDataProperty implements IOSDiComponentWrapper {
 	HAS_UNIT("hasUnit"),
 	HAS_UPPER_LIMIT_PARAMETER("hasUpperLimitParameter"),
 	HAS_YEAR("hasYear"),
-	IS_ASSESSED_INTERVENTION("isAssessedIntervention"),
 	IS_DISUTILITY("isDisutility"),
 	IS_TRUE_EPIDEMIOLOGICAL_PARAMETER_ESTIMATE("isTrueEpidemiologicalParameterEstimate");
 	

@@ -85,6 +85,8 @@ osdi:TEST_DecisionTreeModel1 rdf:type owl:NamedIndividual ,
                                                     osdi:TEST_SevereDevelopment ,
                                                     osdi:TEST_SevereDevelopmentDisutility ,
                                                     osdi:TEST_SevereDevelopmentIncidence ;
+                             osdi:hasAssessedIntervention osdi:TEST_InterventionEffective ;
+                             osdi:hasComparatorIntervention osdi:TEST_InterventionIneffective ;
                              osdi:hasDescription "Test model 1. A tree that compares a 'do nothing' versus a fully effective intervention. The disease defines two alternative developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a normal development, with no negative effects. The population is a dummy population." .
 
 
@@ -111,6 +113,8 @@ osdi:TEST_DecisionTreeModel2 rdf:type owl:NamedIndividual ,
                                                     osdi:TEST_SevereAnnualTreatmentCost ,
                                                     osdi:TEST_SevereDevelopmentDisutility ,
                                                     osdi:TEST_SevereDevelopmentIncidence ;
+                             osdi:hasAssessedIntervention osdi:TEST_InterventionEffective ;
+                             osdi:hasComparatorIntervention osdi:TEST_InterventionIneffective ;
                              osdi:hasDescription "Test model 2. A tree that compares a 'do nothing' versus a fully effective intervention. The disease defines two coexistent developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a development with no negative effects apart from a slight reduction on QOL. The population is a dummy population." .
 
 
@@ -140,6 +144,8 @@ osdi:TEST_DecisionTreeModel3 rdf:type owl:NamedIndividual ,
                                                     osdi:TEST_SevereDevelopment ,
                                                     osdi:TEST_SevereDevelopmentDisutility ,
                                                     osdi:TEST_SevereDevelopmentIncidence ;
+                             osdi:hasAssessedIntervention osdi:TEST_InterventionEffective ;
+                             osdi:hasComparatorIntervention osdi:TEST_InterventionIneffective ;
                              osdi:hasDescription "Test model 3. A tree that compares a 'do nothing' versus a fully effective intervention. The disease defines two coexistent developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a development with no negative effects apart from a slight reduction on QOL; and two alternative developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a normal development, with no negative effects. The population is a dummy population." .
 
 
@@ -157,8 +163,8 @@ osdi:TEST_DevelopmentSet rdf:type owl:NamedIndividual ,
 osdi:TEST_Disease1 rdf:type owl:NamedIndividual ,
                             osdi:Disease ;
                    osdi:hasCost osdi:TEST_BaseAnnualTreatmentCost ;
-                   osdi:hasIntervention osdi:InterventionDoNothing ,
-                                        osdi:TEST_InterventionEffective ;
+                   osdi:hasIntervention osdi:TEST_InterventionEffective ,
+                                        osdi:TEST_InterventionIneffective ;
                    osdi:hasProgressionElement osdi:TEST_DevelopmentSet ,
                                               osdi:TEST_NormalDevelopment ,
                                               osdi:TEST_SevereDevelopment ;
@@ -169,8 +175,8 @@ osdi:TEST_Disease1 rdf:type owl:NamedIndividual ,
 osdi:TEST_Disease2 rdf:type owl:NamedIndividual ,
                             osdi:Disease ;
                    osdi:hasCost osdi:TEST_BaseAnnualTreatmentCost ;
-                   osdi:hasIntervention osdi:InterventionDoNothing ,
-                                        osdi:TEST_InterventionEffective ;
+                   osdi:hasIntervention osdi:TEST_InterventionEffective ,
+                                        osdi:TEST_InterventionIneffective ;
                    osdi:hasProgressionElement osdi:TEST_CoexistentDevelopment1 ,
                                               osdi:TEST_CoexistentDevelopment2 ;
                    osdi:includedByModel osdi:TEST_DecisionTreeModel2 .
@@ -180,8 +186,8 @@ osdi:TEST_Disease2 rdf:type owl:NamedIndividual ,
 osdi:TEST_Disease3 rdf:type owl:NamedIndividual ,
                             osdi:Disease ;
                    osdi:hasCost osdi:TEST_BaseAnnualTreatmentCost ;
-                   osdi:hasIntervention osdi:InterventionDoNothing ,
-                                        osdi:TEST_InterventionEffective ;
+                   osdi:hasIntervention osdi:TEST_InterventionEffective ,
+                                        osdi:TEST_InterventionIneffective ;
                    osdi:hasProgressionElement osdi:TEST_CoexistentDevelopment1 ,
                                               osdi:TEST_CoexistentDevelopment2 ,
                                               osdi:TEST_DevelopmentSet ,
@@ -197,8 +203,7 @@ osdi:TEST_InterventionEffective rdf:type owl:NamedIndividual ,
                                 osdi:hasEffect osdi:TEST_InterventionEffectiveEffect ;
                                 osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
                                                      osdi:TEST_DecisionTreeModel2 ,
-                                                     osdi:TEST_DecisionTreeModel3 ;
-                                osdi:isAssessedIntervention "true"^^xsd:boolean .
+                                                     osdi:TEST_DecisionTreeModel3 .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionEffectiveCost
@@ -241,8 +246,7 @@ osdi:TEST_InterventionIneffective rdf:type owl:NamedIndividual ,
                                            osdi:TherapeuticIntervention ;
                                   osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
                                                        osdi:TEST_DecisionTreeModel2 ,
-                                                       osdi:TEST_DecisionTreeModel3 ;
-                                  osdi:isAssessedIntervention "false"^^xsd:boolean .
+                                                       osdi:TEST_DecisionTreeModel3 .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#TEST_LifeExpectancy

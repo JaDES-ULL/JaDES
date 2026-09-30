@@ -3,6 +3,7 @@ package es.ull.simulation.hta.osdi.decisiontree.factories;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.semanticweb.owlapi.model.IRI;
 
@@ -19,7 +20,6 @@ import es.ull.simulation.hta.osdi.ontology.EpidemiologicCharacterizationType;
 import es.ull.simulation.hta.osdi.ontology.ExperimentWrapper;
 import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
 import es.ull.simulation.hta.osdi.ontology.ModelWrapper;
-import es.ull.simulation.hta.osdi.ontology.OSDiDataProperty;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.DeterministicParameterData;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.SpecificInformationForUtility;
@@ -89,25 +89,23 @@ public class SimpleModel extends BaseModel implements SingleDiseaseAndPopulation
             log.warn("This type of model requires exactly one disease. Found " + modelWrapper.getDiseaseIndividuals().size() + ". Using " + diseaseWrapper.getShortName() + " as the disease for the model and ignoring the rest.");
         diseaseGenerator = new DiseaseSubTreeGenerator(this, diseaseWrapper);
 
-        final ArrayList<InterventionWrapper> interventions = new ArrayList<>(modelWrapper.getInterventionIndividuals());
+        final Set<InterventionWrapper> interventions = new TreeSet<>(modelWrapper.getInterventionIndividuals());
+        final Set<InterventionWrapper> assessedInterventions = new TreeSet<>(modelWrapper.getAssessedInterventionIndividuals());
         if (interventions.size() != 2) {
             log.warn("This type of model requires exactly two interventions: one assessed intervention and one comparator intervention. Found " + interventions.size() + ".");
         }
-        if (wrap.getBooleanValue(interventions.get(0).getIndividualIRI(), OSDiDataProperty.IS_ASSESSED_INTERVENTION).orElse(false) &&
-            !wrap.getBooleanValue(interventions.get(1).getIndividualIRI(), OSDiDataProperty.IS_ASSESSED_INTERVENTION).orElse(false)) {
-            assessedIntervention = InterventionFactory.getInterventionBuilder(this, interventions.get(0));
-            comparatorIntervention = InterventionFactory.getInterventionBuilder(this, interventions.get(1));
+        // Make the intersection of the two sets to find the assessed intervention. If there is no intersection, or more than one, we will just use the first intervention as the assessed intervention.
+        assessedInterventions.retainAll(interventions);
+        if (assessedInterventions.size() > 1) {
+            log.warn("This type of model requires exactly one assessed intervention. Found " + assessedInterventions.size() + ".");
         }
-        else if (wrap.getBooleanValue(interventions.get(1).getIndividualIRI(), OSDiDataProperty.IS_ASSESSED_INTERVENTION).orElse(false) && 
-                !wrap.getBooleanValue(interventions.get(0).getIndividualIRI(), OSDiDataProperty.IS_ASSESSED_INTERVENTION).orElse(false)) {
-            assessedIntervention = InterventionFactory.getInterventionBuilder(this, interventions.get(1));
-            comparatorIntervention = InterventionFactory.getInterventionBuilder(this, interventions.get(0));
+        assessedIntervention = InterventionFactory.getInterventionBuilder(this, assessedInterventions.iterator().next());
+        // The comparator intervention is the one that is not the assessed intervention. If there is no assessed intervention, we will just use the first intervention as the comparator.
+        interventions.removeAll(assessedInterventions);
+        if (interventions.size() > 1) {
+            log.warn("This type of model requires exactly one comparator intervention. Found " + interventions.size() + ".");
         }
-        else {
-            log.warn("Could not uniquely identify assessed and comparator interventions among the defined interventions. Will use " + interventions.get(0) + " as assessed and " + interventions.get(1) + " as comparator.");
-            assessedIntervention = InterventionFactory.getInterventionBuilder(this, interventions.get(0));
-            comparatorIntervention = InterventionFactory.getInterventionBuilder(this, interventions.get(1));
-        }
+        comparatorIntervention = InterventionFactory.getInterventionBuilder(this, interventions.iterator().next());
     }
 
     public static AbstractModelFactory getFactory() {

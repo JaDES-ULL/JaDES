@@ -51,6 +51,10 @@ public class ModelWrapper implements IIndividualWrapper {
 	 */
     private final Set<InterventionWrapper> interventionIndividuals;
 	/**
+	 * The intervention individuals defined in the model as assessed interventions (i.e., those that are the objective of the assessment)
+	 */
+	private final Set<InterventionWrapper> assessedInterventionIndividuals;
+	/**
 	 * The registry of model item wrappers for the individuals included in the model
 	 */
 	private final ModelItemWrapperRegistry registry;
@@ -65,6 +69,7 @@ public class ModelWrapper implements IIndividualWrapper {
 		diseaseIndividuals = getModelItemsByClassAs(OSDiClass.DISEASE, DiseaseWrapper.class, false);
 		populationIndividuals = getModelItemsByClassAs(OSDiClass.POPULATION, PopulationWrapper.class, false);
 		interventionIndividuals = getModelItemsByClassAs(OSDiClass.INTERVENTION, InterventionWrapper.class, false);
+		assessedInterventionIndividuals = getWrappersForPropertyAs(individualIRI, OSDiObjectProperty.HAS_ASSESSED_INTERVENTION, InterventionWrapper.class);
 		parameters = new TreeSet<>(getModelItemsByClassAs(OSDiClass.PARAMETER, ParameterWrapper.class, false));
 		preliminaryValidation();
 		for (IModelItemWrapper item : registry.getModelItems()) {
@@ -133,6 +138,14 @@ public class ModelWrapper implements IIndividualWrapper {
 		return interventionIndividuals;
 	}
 
+	/**
+	 * Returns the set of IRIs of the interventions defined in the model as assessed interventions (i.e., those that are the objective of the assessment)
+	 * @return The set of IRIs of the assessed interventions
+	 */
+	public Collection<InterventionWrapper> getAssessedInterventionIndividuals() {
+		return assessedInterventionIndividuals;
+	}
+	
 	/**
 	 * Returns the IRIs of the items belonging to the working model
 	 * @return the IRIs of the items belonging to the working model

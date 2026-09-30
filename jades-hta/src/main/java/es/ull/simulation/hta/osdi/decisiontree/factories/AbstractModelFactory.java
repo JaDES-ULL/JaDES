@@ -13,8 +13,6 @@ import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.AttributeWrapper;
 import es.ull.simulation.hta.osdi.ontology.ExperimentWrapper;
 import es.ull.simulation.hta.osdi.ontology.ExpressionLanguageType;
-import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
-import es.ull.simulation.hta.osdi.ontology.ModelWrapper;
 import es.ull.simulation.hta.osdi.ontology.OSDiClass;
 import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
 import es.ull.simulation.hta.osdi.ontology.OSDiWrapper;
@@ -70,34 +68,6 @@ public interface AbstractModelFactory {
             default:
                 throw new UnsupportedOSDiFeatureException("The data type (" + originalParam.getDataItemType() + ") for the parameter " + originalParam.getShortName() + " cannot be used as a probability in the decision tree.");
         }
-    }
-
-    /**
-     * Returns the first intervention marked as "comparator" in the ontology.
-     * @param wrap The OSDi wrapper containing the interventions.
-     * @return The first comparator intervention, or null if not found.
-     */
-    static InterventionWrapper findFirstComparatorIntervention(ModelWrapper modelWrapper) {
-        for (InterventionWrapper intervention : modelWrapper.getInterventionIndividuals()) {
-            if (!intervention.isAssessedIntervention().orElse(false)) {
-                return intervention;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the first intervention marked as "assessed" in the ontology.
-     * @param wrap The OSDi wrapper containing the interventions.
-     * @return The first assessed intervention, or null if not found.
-     */
-    static InterventionWrapper findFirstAssessedIntervention(ModelWrapper modelWrapper) {
-        for (InterventionWrapper intervention : modelWrapper.getInterventionIndividuals()) {
-            if (intervention.isAssessedIntervention().orElse(false)) {
-                return intervention;
-            }
-        }
-        return null;
     }
 
     /**
