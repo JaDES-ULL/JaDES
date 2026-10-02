@@ -11,7 +11,10 @@ import es.ull.simulation.hta.config.IHTAExperimentConfigProvider;
 import es.ull.simulation.hta.config.IHTAOutputConfigProvider;
 import es.ull.simulation.hta.inforeceiver.BasicHTAListener;
 import es.ull.simulation.hta.interventions.Intervention;
+import es.ull.simulation.hta.outcomes.CostCombinationMethod;
 import es.ull.simulation.hta.outcomes.DisutilityCombinationMethod;
+import es.ull.simulation.hta.outcomes.LifeExpectancyReductionCombinationMethod;
+import es.ull.simulation.hta.outcomes.MortalityRateCombinationMethod;
 import es.ull.simulation.hta.output.JsonHasDiscount;
 import es.ull.simulation.hta.output.JsonOutputSpec;
 import es.ull.simulation.hta.output.OutputHub;
@@ -31,6 +34,9 @@ public abstract class HTAExperiment extends BaseExperiment {
     private static final boolean DEFAULT_BASE_CASE = true;
     private static final double DEFAULT_DISCOUNT_RATE = 0.00;
 	private static final DisutilityCombinationMethod DEFAULT_DISUTILITY_COMBINATION_METHOD = DisutilityCombinationMethod.ADD;
+	private static final CostCombinationMethod DEFAULT_COST_COMBINATION_METHOD = CostCombinationMethod.ADD;
+	private static final LifeExpectancyReductionCombinationMethod DEFAULT_LER_COMBINATION_METHOD = LifeExpectancyReductionCombinationMethod.MAX;
+	private static final MortalityRateCombinationMethod DEFAULT_IMR_COMBINATION_METHOD = MortalityRateCombinationMethod.MAX;
 
 	/** Number of patients to be generated during each simulation */
 	private final int nPatients;
@@ -39,7 +45,13 @@ public abstract class HTAExperiment extends BaseExperiment {
 	/** The model to be simulated */
 	private HTAModel model = null;
 	/** The method to combine different disutilities. */
-	private final DisutilityCombinationMethod method;
+	private final DisutilityCombinationMethod duMethod;
+	/** The method used to combine the annual costs of simultaneously active items */
+	private final CostCombinationMethod costMethod;
+	/** The method used to combine the life expectancy reductions of simultaneously active items */
+	private final LifeExpectancyReductionCombinationMethod lerMethod;
+	/** The method used to combine the increased mortality rates of simultaneously active items */
+	private final MortalityRateCombinationMethod imrMethod;
 	/** A hub to handle the listeners and the outputs of the simulations */
 	private final OutputHub outputHub;
 	/** Year of the study for cost updating */
@@ -67,7 +79,10 @@ public abstract class HTAExperiment extends BaseExperiment {
 		this.defaultDiscountRateForCosts = configProvider.getDefaultDiscountRateForCosts().orElse(DEFAULT_DISCOUNT_RATE);
 		this.defaultDiscountRateForEffects = configProvider.getDefaultDiscountRateForEffects().orElse(DEFAULT_DISCOUNT_RATE);
 		this.baseCase = configProvider.isBaseCaseEnabled().orElse(DEFAULT_BASE_CASE);
-		this.method = configProvider.getDisutilityCombinationMethod().orElse(DEFAULT_DISUTILITY_COMBINATION_METHOD);
+		this.duMethod = configProvider.getDisutilityCombinationMethod().orElse(DEFAULT_DISUTILITY_COMBINATION_METHOD);
+		this.costMethod = configProvider.getCostCombinationMethod().orElse(DEFAULT_COST_COMBINATION_METHOD);
+		this.lerMethod = configProvider.getLifeExpectancyReductionCombinationMethod().orElse(DEFAULT_LER_COMBINATION_METHOD);
+		this.imrMethod = configProvider.getMortalityRateCombinationMethod().orElse(DEFAULT_IMR_COMBINATION_METHOD);
 		// Add patient debug listeners
 		for (int patientId : configProvider.getDebugPatients()) {
 			this.outputHub.addSinglePatientListener(patientId);
@@ -145,7 +160,31 @@ public abstract class HTAExperiment extends BaseExperiment {
 	 * @return the combination method used to combine different disutilities
 	 */
 	public DisutilityCombinationMethod getDisutilityCombinationMethod() {
-		return method;
+		return duMethod;
+	}
+
+	/**
+	 * Returns the method used to combine the annual costs of the items that are simultaneously active for a patient
+	 * @return the method used to combine annual costs
+	 */
+	public CostCombinationMethod getCostCombinationMethod() {
+		return costMethod;
+	}
+
+	/**
+	 * Returns the method used to combine the life expectancy reductions of the items that are simultaneously active for a patient
+	 * @return the method used to combine life expectancy reductions
+	 */
+	public LifeExpectancyReductionCombinationMethod getLifeExpectancyReductionCombinationMethod() {
+		return lerMethod;
+	}
+
+	/**
+	 * Returns the method used to combine the increased mortality rates of the items that are simultaneously active for a patient
+	 * @return the method used to combine increased mortality rates
+	 */
+	public MortalityRateCombinationMethod getMortalityRateCombinationMethod() {
+		return imrMethod;
 	}
 	
 	@Override

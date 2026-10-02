@@ -10,7 +10,9 @@ import java.util.TreeSet;
 
 import es.ull.simulation.hta.info.PatientInfo;
 import es.ull.simulation.hta.interventions.Intervention;
+import es.ull.simulation.hta.outcomes.ActiveItemsCombiner;
 import es.ull.simulation.hta.outcomes.DisutilityCombinationMethod;
+import es.ull.simulation.hta.outcomes.PayoffKeys;
 import es.ull.simulation.hta.params.StandardParameter;
 import es.ull.simulation.hta.populations.Population;
 import es.ull.simulation.hta.progression.Disease;
@@ -330,13 +332,16 @@ public class Patient extends VariableStoreSimulationObject implements IEventSour
 	 * @return the utility currently associated to this patient
 	 */
 	public double getUtilityValue(DisutilityCombinationMethod method) {
-		// Uses the base disutility for the disease if available 
-		double du = getDisease().getAnnualDisutility(this);
+		final HTAModel model = getSimulation().getModel();
+		// Uses the base disutility for the disease if available
+		final ActiveItemsCombiner<String> du = new ActiveItemsCombiner<>(method,
+			PayoffKeys.getKey(model, getDisease(), StandardParameter.ANNUAL_DISUTILITY, StandardParameter.ANNUAL_UTILITY), getDisease().getAnnualDisutility(this));
 		for (final DiseaseProgression progression : state) {
-			du = method.combine(du, progression.getAnnualDisutility(this));
+			// Progressions sharing the same utility parameter are considered only once if the method requires so
+			du.add(PayoffKeys.getKey(model, progression, StandardParameter.ANNUAL_DISUTILITY, StandardParameter.ANNUAL_UTILITY), progression.getAnnualDisutility(this));
 		}
-		du = method.combine(du, intervention.getAnnualDisutility(this));
-		return population.getBaseUtility(this) - du;		
+		final double totalDu = method.combine(du.getValue(), intervention.getAnnualDisutility(this));
+		return population.getBaseUtility(this) - totalDu;
 	}
 	
 	/**

@@ -5,6 +5,7 @@ package es.ull.simulation.hta.progression;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -14,6 +15,7 @@ import es.ull.simulation.hta.Named;
 import es.ull.simulation.hta.Patient;
 import es.ull.simulation.hta.PrettyPrintable;
 import es.ull.simulation.hta.outcomes.CostProducer;
+import es.ull.simulation.hta.outcomes.PayoffKeys;
 import es.ull.simulation.hta.outcomes.UtilityProducer;
 import es.ull.simulation.hta.params.Discount;
 import es.ull.simulation.hta.params.ParameterTemplate;
@@ -234,9 +236,12 @@ public class Disease extends HTAModelComponent implements Comparable<Disease>, P
 	public double getCostWithinPeriod(Patient pat, double initYear, double endYear, Discount discountRate) {
 		// The disease may involve a non-specific cost
 		double cost =  discountRate.applyDiscount(getUsedParameterValue(StandardParameter.ANNUAL_COST, pat), initYear, endYear);;
-		// ... plus costs related to each manifestation
+		// ... plus costs related to each manifestation (counting only once those shared, if required by the combination method)
+		final Set<String> costKeys = createAnnualCostKeys();
 		for (final DiseaseProgression manif : pat.getState()) {
-			cost +=  manif.getCostWithinPeriod(pat, initYear, endYear, discountRate);
+			if (!isRepeatedAnnualCost(costKeys, manif)) {
+				cost +=  manif.getCostWithinPeriod(pat, initYear, endYear, discountRate);
+			}
 		}
 		// ... plus specific treatment or follow-up costs 
 		if (pat.isDiagnosed())
@@ -244,13 +249,45 @@ public class Disease extends HTAModelComponent implements Comparable<Disease>, P
 		return cost;
 	}
 	
+	/**
+	 * Creates the set of keys of the annual cost parameters already accounted for when computing the cost of a patient. It starts with the key 
+	 * of the annual cost of the disease itself, if defined.
+	 * @return The set of keys of the annual cost parameters already accounted for
+	 */
+	private Set<String> createAnnualCostKeys() {
+		final Set<String> keys = new TreeSet<>();
+		final String key = PayoffKeys.getKey(getModel(), this, StandardParameter.ANNUAL_COST);
+		if (key != null) {
+			keys.add(key);
+		}
+		return keys;
+	}
+
+	/**
+	 * Checks whether the annual cost of a disease progression must be ignored because it is defined by a cost parameter already accounted for and 
+	 * the cost combination method counts shared items once. Registers the key of the progression's annual cost otherwise.
+	 * @param keys The keys of the annual cost parameters already accounted for
+	 * @param progression A disease progression
+	 * @return true if the annual cost of the progression must be ignored
+	 */
+	private boolean isRepeatedAnnualCost(Set<String> keys, DiseaseProgression progression) {
+		final String key = PayoffKeys.getKey(getModel(), progression, StandardParameter.ANNUAL_COST);
+		if (key == null) {
+			return false;
+		}
+		return !keys.add(key) && getModel().getCostCombinationMethod().countsSharedItemsOnce();
+	}
+
 	@Override
 	public double[] getAnnualizedCostWithinPeriod(Patient pat, double initYear, double endYear, Discount discountRate) {
 		final double []result = discountRate.applyAnnualDiscount(getUsedParameterValue(StandardParameter.ANNUAL_COST, pat), initYear, endYear);;
+		final Set<String> costKeys = createAnnualCostKeys();
 		for (final DiseaseProgression manif : pat.getState()) {
-			final double[] partial = manif.getAnnualizedCostWithinPeriod(pat, initYear, endYear, discountRate);
-			for (int i = 0; i < result.length; i++)
-				result[i] += partial[i];
+			if (!isRepeatedAnnualCost(costKeys, manif)) {
+				final double[] partial = manif.getAnnualizedCostWithinPeriod(pat, initYear, endYear, discountRate);
+				for (int i = 0; i < result.length; i++)
+					result[i] += partial[i];
+			}
 		}
 		if (pat.isDiagnosed()) {
 			final double[] partial = getAnnualizedTreatmentAndFollowUpCosts(pat, initYear, endYear, discountRate);

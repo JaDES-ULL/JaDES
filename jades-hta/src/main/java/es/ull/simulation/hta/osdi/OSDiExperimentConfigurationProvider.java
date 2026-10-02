@@ -15,7 +15,10 @@ import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.ExperimentWrapper;
 import es.ull.simulation.hta.osdi.ontology.OSDiWrapper;
+import es.ull.simulation.hta.outcomes.CostCombinationMethod;
 import es.ull.simulation.hta.outcomes.DisutilityCombinationMethod;
+import es.ull.simulation.hta.outcomes.LifeExpectancyReductionCombinationMethod;
+import es.ull.simulation.hta.outcomes.MortalityRateCombinationMethod;
 
 public class OSDiExperimentConfigurationProvider implements IHTAExperimentConfigProvider {
     private final RunDESOsdiArgs args;
@@ -92,6 +95,21 @@ public class OSDiExperimentConfigurationProvider implements IHTAExperimentConfig
     @Override
     public Optional<DisutilityCombinationMethod> getDisutilityCombinationMethod() {
         return Optional.of(experiment.getDisutilityCombinationMethod());
+    }
+
+    @Override
+    public Optional<CostCombinationMethod> getCostCombinationMethod() {
+        return Optional.of(experiment.getCostCombinationMethod());
+    }
+
+    @Override
+    public Optional<LifeExpectancyReductionCombinationMethod> getLifeExpectancyReductionCombinationMethod() {
+        return Optional.of(experiment.getLifeExpectancyReductionCombinationMethod());
+    }
+
+    @Override
+    public Optional<MortalityRateCombinationMethod> getMortalityRateCombinationMethod() {
+        return Optional.of(experiment.getMortalityRateCombinationMethod());
     }
 
     @Override

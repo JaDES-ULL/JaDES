@@ -288,7 +288,7 @@ public class ModelSheet implements SheetWrapper {
             probCell.setCellFormula(probFormula);
         }
 
-        final String costFormula = payoffWrapper.getCostFormula(new CellReference(undiscountedlyDetail));
+        final String costFormula = payoffWrapper.getCostFormula(new CellReference(undiscountedlyDetail), modelBuilder.getModel().getCostCombinationMethod());
         if (!costFormula.isEmpty()) {
             costDetailCell.setCellFormula(costFormula);
         } else {
@@ -304,7 +304,8 @@ public class ModelSheet implements SheetWrapper {
         }
         qalyCell.setCellFormula(new CellReference(probCell).formatAsString() + " * " + new CellReference(qalyDetailCell).formatAsString());
 
-        String lyFormula = payoffWrapper.getUndiscountedLEFormula(modelBuilder.getModel().getLifeExpectancy());
+        String lyFormula = payoffWrapper.getUndiscountedLEFormula(modelBuilder.getModel().getLifeExpectancy(), 
+            modelBuilder.getModel().getLifeExpectancyReductionCombinationMethod(), modelBuilder.getModel().getMortalityRateCombinationMethod());
         // Tune the formula to use the time horizon (useful for budget impact analysis)
         lyFormula = ExcelFormulaLibrary.MIN.getFormula(lyFormula + ", " + HTAExcelModelFactory.CommonNamedRanges.TIME_HORIZON.getName());
         undiscountedlyDetail.setCellFormula(lyFormula);

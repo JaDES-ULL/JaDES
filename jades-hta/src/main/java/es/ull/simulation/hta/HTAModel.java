@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import es.ull.simulation.hta.interventions.Intervention;
+import es.ull.simulation.hta.outcomes.CostCombinationMethod;
+import es.ull.simulation.hta.outcomes.LifeExpectancyReductionCombinationMethod;
+import es.ull.simulation.hta.outcomes.MortalityRateCombinationMethod;
 import es.ull.simulation.hta.params.Parameter;
 import es.ull.simulation.hta.params.ParameterGroup;
 import es.ull.simulation.hta.params.SpanishCPIUpdate;
@@ -137,6 +140,30 @@ public class HTAModel {
 
 	public int getNPatients() {
 		return experiment.getNPatients();
+	}
+
+	/**
+	 * Returns the method used to combine the annual costs of the items that are simultaneously active for a patient
+	 * @return the method used to combine annual costs
+	 */
+	public CostCombinationMethod getCostCombinationMethod() {
+		return (experiment == null) ? CostCombinationMethod.ADD : experiment.getCostCombinationMethod();
+	}
+
+	/**
+	 * Returns the method used to combine the life expectancy reductions of the items that are simultaneously active for a patient
+	 * @return the method used to combine life expectancy reductions
+	 */
+	public LifeExpectancyReductionCombinationMethod getLifeExpectancyReductionCombinationMethod() {
+		return (experiment == null) ? LifeExpectancyReductionCombinationMethod.MAX : experiment.getLifeExpectancyReductionCombinationMethod();
+	}
+
+	/**
+	 * Returns the method used to combine the increased mortality rates of the items that are simultaneously active for a patient
+	 * @return the method used to combine increased mortality rates
+	 */
+	public MortalityRateCombinationMethod getMortalityRateCombinationMethod() {
+		return (experiment == null) ? MortalityRateCombinationMethod.MAX : experiment.getMortalityRateCombinationMethod();
 	}
 
     /**

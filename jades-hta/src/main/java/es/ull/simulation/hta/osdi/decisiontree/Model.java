@@ -13,7 +13,10 @@ import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
 import es.ull.simulation.hta.osdi.ontology.ModelWrapper;
 import es.ull.simulation.hta.osdi.ontology.OSDiWrapper;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
+import es.ull.simulation.hta.outcomes.CostCombinationMethod;
 import es.ull.simulation.hta.outcomes.DisutilityCombinationMethod;
+import es.ull.simulation.hta.outcomes.LifeExpectancyReductionCombinationMethod;
+import es.ull.simulation.hta.outcomes.MortalityRateCombinationMethod;
 import es.ull.simulation.hta.params.ParameterGroup;
 
 /**
@@ -100,10 +103,35 @@ public interface Model {
 
     /**
      * Returns the disutility combination method used in this model.
-     *
      * @return The disutility combination method.
      */
-    public DisutilityCombinationMethod getDisutilityCombinationMethod();
+    public default DisutilityCombinationMethod getDisutilityCombinationMethod() {
+        return getExperimentWrapper().getDisutilityCombinationMethod();
+    }
+
+    /**
+     * Returns the method used to combine the annual costs of the items along a path of the tree.
+     * @return The cost combination method.
+     */
+    public default CostCombinationMethod getCostCombinationMethod() {
+        return getExperimentWrapper().getCostCombinationMethod();
+    }
+
+    /**
+     * Returns the method used to combine the life expectancy reductions of the items along a path of the tree.
+     * @return The life expectancy reduction combination method.
+     */
+    public default LifeExpectancyReductionCombinationMethod getLifeExpectancyReductionCombinationMethod() {
+        return getExperimentWrapper().getLifeExpectancyReductionCombinationMethod();
+    }
+
+    /**
+     * Returns the method used to combine the increased mortality rates of the items along a path of the tree.
+     * @return The mortality rate combination method.
+     */
+    public default MortalityRateCombinationMethod getMortalityRateCombinationMethod() {
+        return getExperimentWrapper().getMortalityRateCombinationMethod();
+    }
 
     /**
      * Returns the study year defined for this model.

@@ -40,46 +40,52 @@ import es.ull.simulation.utils.ExcelTools;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayNameGeneration(CamelCaseDisplayNameGenerator.class)
 public class TestHTAExcelGeneration {
-    private static final Logger log = LoggerFactory.getLogger(TestSingleDiseaseAndPopulationDecisionTreeModelGeneration.class);
+    private static final Logger log = LoggerFactory.getLogger(TestHTAExcelGeneration.class);
 
-    private final static ToCheckExcel[][] TO_CHECK_EXCEL = {
-        {
+    /**
+     * Expected outcomes for both arms of the OSDi_test models. The values were computed independently, by enumerating every combination of 
+     * active developments and applying the combination methods of each experiment (costs, disutilities, life expectancy reductions and 
+     * increased mortality rates). Discount rates are 0, so cost = annual cost x life expectancy and QALY = utility x life expectancy.
+     * The effective intervention removes every development, so its outcomes are the same in every model: 65 years x (1000 + 100) and 65 x 0.85.
+     * @param ineffectiveCost Expected cost for the ineffective intervention
+     * @param ineffectiveLE Expected life expectancy for the ineffective intervention
+     * @param ineffectiveQALY Expected QALYs for the ineffective intervention
+     * @return the cells to check
+     */
+    private static ToCheckExcel[] testModelArms(double ineffectiveCost, double ineffectiveLE, double ineffectiveQALY) {
+        return new ToCheckExcel[] {
             new ToCheckExcel("Process", 10, 6, 71500.0), // Cost intervention Effective
-            new ToCheckExcel("Process", 10, 9, 85000.0), // Cost intervention Ineffective
+            new ToCheckExcel("Process", 10, 9, ineffectiveCost), // Cost intervention Ineffective
             new ToCheckExcel("Process", 10, 7, 65.0), // LE intervention Effective
-            new ToCheckExcel("Process", 10, 10, 49.0), // LE intervention Ineffective
+            new ToCheckExcel("Process", 10, 10, ineffectiveLE), // LE intervention Ineffective
             new ToCheckExcel("Process", 10, 8, 55.25), // QALY intervention Effective
-            new ToCheckExcel("Process", 10, 11, 27.25) // QALY intervention Ineffective
-        },
-        {
-            new ToCheckExcel("Process", 10, 6, 71500.0), // Cost intervention Effective
-            new ToCheckExcel("Process", 10, 9, 124200.0), // Cost intervention Ineffective
-            new ToCheckExcel("Process", 10, 7, 65.0), // LE intervention Effective
-            new ToCheckExcel("Process", 10, 10, 49.0), // LE intervention Ineffective
-            new ToCheckExcel("Process", 10, 8, 55.25), // QALY intervention Effective
-            new ToCheckExcel("Process", 10, 11, 19.41) // QALY intervention Ineffective
-        },
-        {
-            new ToCheckExcel("Process", 10, 6, 71500.0), // Cost intervention Effective
-            new ToCheckExcel("Process", 10, 9, 154440.0), // Cost intervention Ineffective
-            new ToCheckExcel("Process", 10, 7, 65.0), // LE intervention Effective
-            new ToCheckExcel("Process", 10, 10, 45.8), // LE intervention Ineffective
-            new ToCheckExcel("Process", 10, 8, 55.25), // QALY intervention Effective
-            new ToCheckExcel("Process", 10, 11, 14.322) // QALY intervention Ineffective
-
-        },
-        {
-            new ToCheckExcel("Process", 10, 6, 1.5512269701985133),
-            new ToCheckExcel("Process", 10, 9, 0.7638404417187111)
-        }
-    };
+            new ToCheckExcel("Process", 10, 11, ineffectiveQALY) // QALY intervention Ineffective
+        };
+    }
 
     static Stream<DecisionTreeExcelCase> cases() {
         return Stream.of(
-            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment1", "test1.xlsm", SimpleModel.class, TO_CHECK_EXCEL[0]),
-            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment2", "test2.xlsm", SimpleModel.class, TO_CHECK_EXCEL[1]),
-            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment3", "test3.xlsm", SimpleModel.class, TO_CHECK_EXCEL[2]),
-            new DecisionTreeExcelCase("/PBD.ttl", "PBD_ExperimentBase", "testPBD.xlsm", NBSModel.class, TO_CHECK_EXCEL[3])
+            // Alternative developments
+            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment1", "test1.xlsm", SimpleModel.class, testModelArms(85000.0, 49.0, 27.25)),
+            // Coexistent developments, with default combination methods
+            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment2", "test2.xlsm", SimpleModel.class, testModelArms(124200.0, 49.0, 19.41)),
+            // Coexistent + alternative developments sharing cost, disutility and life expectancy reduction parameters
+            // Costs: ADD; disutilities: ADD_DISTINCT; life expectancy reductions: MAX (default)
+            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment3", "test3.xlsm", SimpleModel.class, testModelArms(154440.0, 45.8, 14.322)),
+            // Same model, adding everything. Some leaves have negative utility (0.85 - 0.4 - 0.2 - 0.4), which is not truncated
+            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment3AddAll", "test3AddAll.xlsm", SimpleModel.class, testModelArms(105800.0, 33.0, 4.21)),
+            // Same model, counting only once every shared parameter
+            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment3Distinct", "test3Distinct.xlsm", SimpleModel.class, testModelArms(91080.0, 45.8, 14.322)),
+            // Same model, taking the maximum disutility and life expectancy reduction
+            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment3Max", "test3Max.xlsm", SimpleModel.class, testModelArms(91080.0, 45.8, 21.234)),
+            // Coexistent developments increasing mortality rates (x2 and x1.25 + 20 years reduction). LE = 65 / IMR - LER
+            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment4Max", "test4Max.xlsm", SimpleModel.class, testModelArms(20920.0, 20.92, 17.782)),
+            new DecisionTreeExcelCase("/OSDi_test.ttl", "TEST_Experiment4Mult", "test4Mult.xlsm", SimpleModel.class, testModelArms(16760.0, 16.76, 14.246)),
+            // Regression values for the PBD model
+            new DecisionTreeExcelCase("/PBD.ttl", "PBD_ExperimentBase", "testPBD.xlsm", NBSModel.class, new ToCheckExcel[] {
+                new ToCheckExcel("Process", 10, 6, 1.5512269701985133),
+                new ToCheckExcel("Process", 10, 9, 0.7638404417187111)
+            })
         );
     }
 
@@ -103,19 +109,19 @@ public class TestHTAExcelGeneration {
         final ExperimentWrapper experimentWrapper = wrapper.buildExperiment(wrapper.toIRI(tc.modelName()));
         Model tempModel = CentralModelFactory.create(experimentWrapper);
         assertTrue(tempModel instanceof SingleDiseaseAndPopulationModel, "The model created is not of the expected type SingleDiseaseAndPopulationModel. Found: " + tempModel.getClass().getSimpleName());
+        assertTrue(tc.expectedClass().isInstance(tempModel), "The model is expected to be an instance of " + tc.expectedClass().getSimpleName() + ", but got " + tempModel.getClass().getSimpleName());
         SingleDiseaseAndPopulationModel model = (SingleDiseaseAndPopulationModel) tempModel;
         Path out = tempDir.resolve(tc.excelFileName());
         assertDoesNotThrow(() -> HTAExcelModelFactory.build(out.toString(), model));
         assertTrue(Files.exists(out), "Excel was not generated: " + out);
         assertTrue(Files.size(out) > 0, "Excel is empty: " + out);
         maybeKeepForManualReview(out, tc.excelFileName());
-        final InputStream fis = Files.newInputStream(out);
-        final XSSFWorkbook workbook = new XSSFWorkbook(fis);
-        final FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-        for (ToCheckExcel check : tc.checks()) {
-            check.checkValue(workbook, evaluator);
+        try (InputStream fis = Files.newInputStream(out); XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
+            final FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+            for (ToCheckExcel check : tc.checks()) {
+                check.checkValue(workbook, evaluator);
+            }
         }
-        fis.close();
     }
 
     private static void maybeKeepForManualReview(Path generatedFile, String fileName) throws Exception {

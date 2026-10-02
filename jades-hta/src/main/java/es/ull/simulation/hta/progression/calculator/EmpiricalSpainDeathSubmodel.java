@@ -8,10 +8,8 @@ import java.util.Arrays;
 import es.ull.simulation.hta.HTAModel;
 import es.ull.simulation.hta.Patient;
 import es.ull.simulation.hta.PatientCommonRandomNumbers;
-import es.ull.simulation.hta.params.StandardParameter;
 import es.ull.simulation.hta.params.modifiers.ParameterModifier;
 import es.ull.simulation.hta.populations.Population;
-import es.ull.simulation.hta.progression.DiseaseProgression;
 import es.ull.simulation.model.TimeUnit;
 import simkit.random.RandomNumber;
 
@@ -110,18 +108,10 @@ public class EmpiricalSpainDeathSubmodel implements TimeToEventCalculator {
 	public double getTimeToEvent(Patient pat) {
 		final double age = pat.getAge();
 		
-		double imr = 1.0;
-		double ler = 0.0;
-		for (final DiseaseProgression state : pat.getState()) {
-			final double newIMR = state.getUsedParameterValue(StandardParameter.INCREASED_MORTALITY_RATE, pat);
-			if (newIMR > imr) {
-				imr = newIMR;
-			}
-			final double newLER = state.getUsedParameterValue(StandardParameter.LIFE_EXPECTANCY_REDUCTION, pat);
-			if (newLER > ler) {
-				ler = newLER;
-			}
-		}
+		// Combines the mortality modifiers of the active progressions according to the methods defined in the experiment
+		final MortalityModifiers modifiers = MortalityModifiers.of(pat);
+		double imr = modifiers.increasedMortalityRate();
+		final double ler = modifiers.lifeExpectancyReduction();
 		
 		// Taking into account modification of death due to the intervention
 		final ParameterModifier leModif = pat.getIntervention().getLifeExpectancyModification();

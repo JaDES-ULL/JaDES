@@ -1219,6 +1219,23 @@ osdi:hasCalculationMethod rdf:type owl:DatatypeProperty ;
                                      "tiene el método de cálculo"@es .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#hasCostCombinationMethod
+osdi:hasCostCombinationMethod rdf:type owl:DatatypeProperty ;
+                              rdfs:domain osdi:Experiment ;
+                              rdfs:range [ rdf:type rdfs:Datatype ;
+                                           owl:oneOf [ rdf:type rdf:List ;
+                                                       rdf:first "ADD" ;
+                                                       rdf:rest [ rdf:type rdf:List ;
+                                                                    rdf:first "ADD_DISTINCT" ;
+                                                                    rdf:rest rdf:nil
+                                                                  ]
+                                                     ]
+                                         ] ;
+                              rdfs:comment "Defines the method used to combine the annual costs of all the model items that are active at the same time. Combination methods are applied, at any moment, to the set of model items (disease, clinical progressions, interventions) that are simultaneously active for an individual: in a decision tree, the items along the path to each leaf; in a discrete-event simulation, the state of the patient between two consecutive events. Methods suffixed with _DISTINCT count only once a parameter individual that is shared by several simultaneously active items (e.g., the same follow-up visit required by two manifestations). ADD sums every cost; ADD_DISTINCT sums the costs, but counts only once each cost parameter. One-time costs (appliesOneTime = true) are not affected by this method: they are always added, once per triggering event. If not defined, ADD is assumed."@en ;
+                              rdfs:label "has cost combination method"@en ,
+                                         "tiene el método de combinación de costes"@es .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#hasDescription
 osdi:hasDescription rdf:type owl:DatatypeProperty ;
                     rdfs:range rdf:PlainLiteral ;
@@ -1252,12 +1269,15 @@ osdi:hasDisutilityCombinationMethod rdf:type owl:DatatypeProperty ;
                                                  owl:oneOf [ rdf:type rdf:List ;
                                                              rdf:first "ADD" ;
                                                              rdf:rest [ rdf:type rdf:List ;
-                                                                        rdf:first "MAX" ;
-                                                                        rdf:rest rdf:nil
-                                                                      ]
+                                                                          rdf:first "ADD_DISTINCT" ;
+                                                                          rdf:rest [ rdf:type rdf:List ;
+                                                                                       rdf:first "MAX" ;
+                                                                                       rdf:rest rdf:nil
+                                                                                     ]
+                                                                        ]
                                                            ]
                                                ] ;
-                                    rdfs:comment "Defines the method used to combine disutilities in the experiment. This is useful for calculating the combined disutility of multiple health conditions or interventions in a population. The most common methods are ADD (which assumes that the disutilities are additive) and MAX (which assumes that the disutility of the combination is equal to the maximum disutility among the combined conditions or interventions)."@en ;
+                                    rdfs:comment "Defines the method used to combine the annual disutilities of all the model items that are active at the same time. Combination methods are applied, at any moment, to the set of model items (disease, clinical progressions, interventions) that are simultaneously active for an individual: in a decision tree, the items along the path to each leaf; in a discrete-event simulation, the state of the patient between two consecutive events. Methods suffixed with _DISTINCT count only once a parameter individual that is shared by several simultaneously active items (e.g., the same follow-up visit required by two manifestations). ADD sums every disutility; ADD_DISTINCT sums them, but counts only once each utility parameter; MAX applies only the largest disutility. One-time disutilities are always added, once per triggering event. If not defined, ADD is assumed."@en ;
                                     rdfs:label "has disutility combination method"@en ,
                                                "tiene el método de combinación de disutilidades"@es .
 
@@ -1315,6 +1335,26 @@ osdi:hasLambdaParameter rdf:type owl:DatatypeProperty ;
                                    "tiene el parámetro lambda"@es .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#hasLifeExpectancyReductionCombinationMethod
+osdi:hasLifeExpectancyReductionCombinationMethod rdf:type owl:DatatypeProperty ;
+                                                 rdfs:domain osdi:Experiment ;
+                                                 rdfs:range [ rdf:type rdfs:Datatype ;
+                                                              owl:oneOf [ rdf:type rdf:List ;
+                                                                          rdf:first "ADD" ;
+                                                                          rdf:rest [ rdf:type rdf:List ;
+                                                                                       rdf:first "ADD_DISTINCT" ;
+                                                                                       rdf:rest [ rdf:type rdf:List ;
+                                                                                                    rdf:first "MAX" ;
+                                                                                                    rdf:rest rdf:nil
+                                                                                                  ]
+                                                                                     ]
+                                                                        ]
+                                                            ] ;
+                                                 rdfs:comment "Defines the method used to combine the life expectancy reductions (magnitudes of LifeExpectancyReductionEffect, in years) of all the model items that are active at the same time. Combination methods are applied, at any moment, to the set of model items (disease, clinical progressions, interventions) that are simultaneously active for an individual: in a decision tree, the items along the path to each leaf; in a discrete-event simulation, the state of the patient between two consecutive events. Methods suffixed with _DISTINCT count only once a parameter individual that is shared by several simultaneously active items (e.g., the same follow-up visit required by two manifestations). ADD sums every reduction; ADD_DISTINCT sums them, but counts only once each magnitude parameter; MAX applies only the largest reduction. If not defined, MAX is assumed. Increased mortality rates (see hasMortalityRateCombinationMethod) are applied first, by dividing the life expectancy by the combined rate; then the combined life expectancy reduction is subtracted."@en ;
+                                                 rdfs:label "has life expectancy reduction combination method"@en ,
+                                                            "tiene el método de combinación de reducciones de esperanza de vida"@es .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#hasLowerLimitParameter
 osdi:hasLowerLimitParameter rdf:type owl:DatatypeProperty ;
                             rdfs:subPropertyOf osdi:hasProbabilityDistributionParameter ;
@@ -1341,6 +1381,23 @@ osdi:hasMinAge rdf:type owl:DatatypeProperty ;
                rdfs:comment "Defines the minimum age of a population"@en ;
                rdfs:label "has minimum age"@en ,
                           "tiene la edad mínima"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasMortalityRateCombinationMethod
+osdi:hasMortalityRateCombinationMethod rdf:type owl:DatatypeProperty ;
+                                       rdfs:domain osdi:Experiment ;
+                                       rdfs:range [ rdf:type rdfs:Datatype ;
+                                                    owl:oneOf [ rdf:type rdf:List ;
+                                                                rdf:first "MAX" ;
+                                                                rdf:rest [ rdf:type rdf:List ;
+                                                                             rdf:first "MULT" ;
+                                                                             rdf:rest rdf:nil
+                                                                           ]
+                                                              ]
+                                                  ] ;
+                                       rdfs:comment "Defines the method used to combine the increased mortality rates (magnitudes of IncreasedMortalityRateEffect, expressed as rate ratios) of all the model items that are active at the same time. Combination methods are applied, at any moment, to the set of model items (disease, clinical progressions, interventions) that are simultaneously active for an individual: in a decision tree, the items along the path to each leaf; in a discrete-event simulation, the state of the patient between two consecutive events. MAX applies only the largest rate ratio; MULT multiplies all of them. If not defined, MAX is assumed. The combined rate ratio divides the life expectancy before applying any life expectancy reduction (see hasLifeExpectancyReductionCombinationMethod)."@en ;
+                                       rdfs:label "has mortality rate combination method"@en ,
+                                                  "tiene el método de combinación de tasas de mortalidad"@es .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#hasNullProgression
@@ -2234,9 +2291,54 @@ osdi:Experiment rdf:type owl:Class ;
                                                     owl:oneOf [ rdf:type rdf:List ;
                                                                 rdf:first "ADD" ;
                                                                 rdf:rest [ rdf:type rdf:List ;
-                                                                           rdf:first "MAX" ;
-                                                                           rdf:rest rdf:nil
-                                                                         ]
+                                                                             rdf:first "ADD_DISTINCT" ;
+                                                                             rdf:rest [ rdf:type rdf:List ;
+                                                                                          rdf:first "MAX" ;
+                                                                                          rdf:rest rdf:nil
+                                                                                        ]
+                                                                           ]
+                                                              ]
+                                                  ]
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty osdi:hasCostCombinationMethod ;
+                                  owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                  owl:onDataRange [ rdf:type rdfs:Datatype ;
+                                                    owl:oneOf [ rdf:type rdf:List ;
+                                                                rdf:first "ADD" ;
+                                                                rdf:rest [ rdf:type rdf:List ;
+                                                                             rdf:first "ADD_DISTINCT" ;
+                                                                             rdf:rest rdf:nil
+                                                                           ]
+                                                              ]
+                                                  ]
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty osdi:hasLifeExpectancyReductionCombinationMethod ;
+                                  owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                  owl:onDataRange [ rdf:type rdfs:Datatype ;
+                                                    owl:oneOf [ rdf:type rdf:List ;
+                                                                rdf:first "ADD" ;
+                                                                rdf:rest [ rdf:type rdf:List ;
+                                                                             rdf:first "ADD_DISTINCT" ;
+                                                                             rdf:rest [ rdf:type rdf:List ;
+                                                                                          rdf:first "MAX" ;
+                                                                                          rdf:rest rdf:nil
+                                                                                        ]
+                                                                           ]
+                                                              ]
+                                                  ]
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty osdi:hasMortalityRateCombinationMethod ;
+                                  owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                  owl:onDataRange [ rdf:type rdfs:Datatype ;
+                                                    owl:oneOf [ rdf:type rdf:List ;
+                                                                rdf:first "MAX" ;
+                                                                rdf:rest [ rdf:type rdf:List ;
+                                                                             rdf:first "MULT" ;
+                                                                             rdf:rest rdf:nil
+                                                                           ]
                                                               ]
                                                   ]
                                 ] ,

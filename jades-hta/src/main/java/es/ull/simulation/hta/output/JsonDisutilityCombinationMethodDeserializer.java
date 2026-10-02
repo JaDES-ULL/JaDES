@@ -27,10 +27,11 @@ public final class JsonDisutilityCombinationMethodDeserializer
 
         return switch (v) {
             case "additive" -> DisutilityCombinationMethod.ADD;
+            case "additive-distinct" -> DisutilityCombinationMethod.ADD_DISTINCT;
             case "maximum"  -> DisutilityCombinationMethod.MAX;
             default -> throw JsonMappingException.from(
                     p,
-                    "Unknown disutilityCombinationMethod: '" + v + "'. Expected: additive|maximum"
+                    "Unknown disutilityCombinationMethod: '" + v + "'. Expected: additive|additive-distinct|maximum"
             );
         };
     }

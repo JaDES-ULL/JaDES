@@ -37,6 +37,8 @@ public class TestSingleDiseaseAndPopulationDecisionTreeModelGeneration {
                 new String[] {"TEST_InterventionEffective", "TEST_InterventionIneffective"}, SimpleModel.class, 3),
             Arguments.of("/OSDi_test.ttl", "TEST_Experiment3", "TEST_Disease3", "TEST_Population", 
                 new String[] {"TEST_InterventionEffective", "TEST_InterventionIneffective"}, SimpleModel.class, 4),
+            Arguments.of("/OSDi_test.ttl", "TEST_Experiment4Max", "TEST_Disease4", "TEST_Population", 
+                new String[] {"TEST_InterventionEffective", "TEST_InterventionIneffective"}, SimpleModel.class, 3),
             Arguments.of("/PBD.ttl", "PBD_ExperimentBase", "PBD_ProfoundBiotinidaseDeficiency", "PBD_BasePopulation", 
                 new String[] {"PBD_InterventionNoScreening", "PBD_InterventionScreening"}, NBSModel.class, 9)
         );
