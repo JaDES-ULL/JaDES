@@ -513,31 +513,29 @@ osdi:PBD_FollowUpStrategy rdf:type owl:NamedIndividual ,
                           osdi:hasDescription "Ophthalmologic, auditory, and medical geneticist or metabolic specialist evaluations and urinary organic acid and acylcarnitine analyses." .
 
 
-###  https://w3id.org/ontologies-ULL/OSDi#PBD_InterventionNoScreening
-osdi:PBD_InterventionNoScreening rdf:type owl:NamedIndividual ,
+###  https://w3id.org/ontologies-ULL/OSDi#BD_InterventionNoScreening
+osdi:BD_InterventionNoScreening rdf:type owl:NamedIndividual ,
                                           osdi:DiagnosisIntervention ;
                                  osdi:hasStrategy osdi:BD_ClinicalDiagnosis ;
                                  osdi:includedByModel osdi:PBD_ModelTree ,
                                                       osdi:PBD_ModelTreeDebug ,
                                                       osdi:PBD_ModelTreeFake ;
-                                 osdi:hasDescription "No screening, i.e., clinical detection, of PBD" ;
-                                 osdi:isAssessedIntervention "false"^^xsd:boolean .
+                                 osdi:hasDescription "No screening, i.e., clinical detection, of PBD"  .
 
 
-###  https://w3id.org/ontologies-ULL/OSDi#PBD_InterventionScreening
-osdi:PBD_InterventionScreening rdf:type owl:NamedIndividual ,
+###  https://w3id.org/ontologies-ULL/OSDi#BD_InterventionScreening
+osdi:BD_InterventionScreening rdf:type owl:NamedIndividual ,
                                         osdi:ScreeningIntervention ;
                                osdi:hasStrategy osdi:PBD_ScreeningStrategy ;
                                osdi:includedByModel osdi:PBD_ModelTree ,
                                                     osdi:PBD_ModelTreeDebug ,
                                                     osdi:PBD_ModelTreeFake ;
                                osdi:hasDescription "Basic screening intervention for PBD" ;
-                               osdi:isAssessedIntervention "true"^^xsd:boolean ;
-                               osdi:hasEffect osdi:PBD_InterventionScreeningEffect .
+                               osdi:hasEffect osdi:BD_InterventionScreeningEffect .
 
 
-###  https://w3id.org/ontologies-ULL/OSDi#PBD_InterventionScreeningEffect
-osdi:PBD_InterventionScreeningEffect rdf:type owl:NamedIndividual ,
+###  https://w3id.org/ontologies-ULL/OSDi#BD_InterventionScreeningEffect
+osdi:BD_InterventionScreeningEffect rdf:type owl:NamedIndividual ,
                                               osdi:Effect ;
                                      osdi:includedByModel osdi:PBD_ModelTree ,
                                                           osdi:PBD_ModelTreeDebug ,
@@ -550,11 +548,11 @@ osdi:PBD_InterventionScreeningEffect rdf:type owl:NamedIndividual ,
                                                   osdi:PBD_ManifestationSkinProblemsProportion ,
                                                   osdi:PBD_ManifestationVisionLossProportion ,
                                                   osdi:PBD_ProbabilityOfSuddenDeathMagnitude ;
-                                     osdi:hasEffectMagnitude osdi:PBD_InterventionScreeningEffectMagnitude .
+                                     osdi:hasEffectMagnitude osdi:BD_InterventionScreeningEffectMagnitude .
 
 
-###  https://w3id.org/ontologies-ULL/OSDi#PBD_InterventionScreeningEffectMagnitude
-osdi:PBD_InterventionScreeningEffectMagnitude rdf:type owl:NamedIndividual ,
+###  https://w3id.org/ontologies-ULL/OSDi#BD_InterventionScreeningEffectMagnitude
+osdi:BD_InterventionScreeningEffectMagnitude rdf:type owl:NamedIndividual ,
                                                        osdi:DeterministicParameter ;
                                               osdi:hasDataItemType osdi:DI_Continuous_Variable ;
                                               osdi:includedByModel osdi:PBD_ModelTree ,
@@ -777,6 +775,8 @@ osdi:PBD_ManifestationVisionLossProportion_ParamUncertainty rdf:type owl:NamedIn
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_ModelTree
 osdi:PBD_ModelTree rdf:type owl:NamedIndividual ,
                             osdi:DecisionTreeModel ;
+                   osdi:hasAssessedIntervention osdi:BD_InterventionScreening ;
+                   osdi:hasComparatorIntervention osdi:BD_InterventionNoScreening ;
                    osdi:includesModelItem osdi:BD_BasePopulation ,
                                           osdi:BD_BasePopulationAge ,
                                           osdi:BD_BasePopulationFemaleProportion ,
@@ -809,10 +809,10 @@ osdi:PBD_ModelTree rdf:type owl:NamedIndividual ,
                                           osdi:PBD_CostSuddenDeath ,
                                           osdi:PBD_CostTreatmentStrategy ,
                                           osdi:PBD_FollowUpStrategy ,
-                                          osdi:PBD_InterventionNoScreening ,
-                                          osdi:PBD_InterventionScreening ,
-                                          osdi:PBD_InterventionScreeningEffect ,
-                                          osdi:PBD_InterventionScreeningEffectMagnitude ,
+                                          osdi:BD_InterventionNoScreening ,
+                                          osdi:BD_InterventionScreening ,
+                                          osdi:BD_InterventionScreeningEffect ,
+                                          osdi:BD_InterventionScreeningEffectMagnitude ,
                                           osdi:PBD_ManifestationHearingProblemsProportion ,
                                           osdi:PBD_ManifestationHearingProblemsProportion_ParamUncertainty ,
                                           osdi:PBD_ManifestationHypotonia ,
@@ -855,6 +855,8 @@ osdi:PBD_ModelTree rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_ModelTreeDebug
 osdi:PBD_ModelTreeDebug rdf:type owl:NamedIndividual ,
                                  osdi:DecisionTreeModel ;
+                        osdi:hasAssessedIntervention osdi:BD_InterventionScreening ;
+                        osdi:hasComparatorIntervention osdi:BD_InterventionNoScreening ;
                         osdi:includesModelItem osdi:BD_BasePopulation ,
                                                osdi:BD_BasePopulationAge ,
                                                osdi:BD_BasePopulationFemaleProportion ,
@@ -879,9 +881,9 @@ osdi:PBD_ModelTreeDebug rdf:type owl:NamedIndividual ,
                                                osdi:PBD_CostScreening_ParamUncertainty ,
                                                osdi:PBD_CostTreatmentStrategy ,
                                                osdi:PBD_FollowUpStrategy ,
-                                               osdi:PBD_InterventionNoScreening ,
-                                               osdi:PBD_InterventionScreening ,
-                                               osdi:PBD_InterventionScreeningEffect ,
+                                               osdi:BD_InterventionNoScreening ,
+                                               osdi:BD_InterventionScreening ,
+                                               osdi:BD_InterventionScreeningEffect ,
                                                osdi:PBD_ManifestationHearingProblemsProportion ,
                                                osdi:PBD_ManifestationHearingProblemsProportion_ParamUncertainty ,
                                                osdi:PBD_ProfoundBiotinidaseDeficiency ,
@@ -929,8 +931,8 @@ osdi:PBD_ProbabilityOfSuddenDeath_ParamUncertainty rdf:type owl:NamedIndividual 
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_ProfoundBiotinidaseDeficiency
 osdi:PBD_ProfoundBiotinidaseDeficiency rdf:type owl:NamedIndividual ,
                                                 osdi:RareDisease ;
-                                       osdi:hasIntervention osdi:PBD_InterventionNoScreening ,
-                                                            osdi:PBD_InterventionScreening ;
+                                       osdi:hasIntervention osdi:BD_InterventionNoScreening ,
+                                                            osdi:BD_InterventionScreening ;
                                        osdi:hasProgressionElement osdi:BD_ManifestationHearingProblems ,
                                                                   osdi:PBD_ManifestationHypotonia ,
                                                                   osdi:PBD_ManifestationMentalDelay ,

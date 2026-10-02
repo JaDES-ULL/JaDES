@@ -389,8 +389,7 @@ osdi:PBD_InterventionNoScreening rdf:type owl:NamedIndividual ,
                                  osdi:hasSensitivity osdi:ConstantSensitivity1 ;
                                  osdi:hasSpecificity osdi:ConstantSpecificity1 ;
                                  osdi:includedByModel osdi:PBD_ModelTree ;
-                                 osdi:hasDescription "No screening, i.e., clinical detection, of PBD. Uses quantitative enzymatic determination of biotinidase activity in serum and plasma,and analysis of mutations of the biotinidase gene." ;
-                                 osdi:isAssessedIntervention "false"^^xsd:boolean .
+                                 osdi:hasDescription "No screening, i.e., clinical detection, of PBD. Uses quantitative enzymatic determination of biotinidase activity in serum and plasma,and analysis of mutations of the biotinidase gene."  .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_InterventionScreening
@@ -402,7 +401,6 @@ osdi:PBD_InterventionScreening rdf:type owl:NamedIndividual ,
                                osdi:hasSpecificity osdi:PBD_ScreeningSpecificity ;
                                osdi:includedByModel osdi:PBD_ModelTree ;
                                osdi:hasDescription "Basic screening intervention for PBD" ;
-                               osdi:isAssessedIntervention "true"^^xsd:boolean ;
                                osdi:hasEffect osdi:PBD_InterventionScreeningEffect .
 
 
@@ -633,6 +631,8 @@ osdi:PBD_ManifestationVisionLossProportion_ParamUncertainty rdf:type owl:NamedIn
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_ModelTree
 osdi:PBD_ModelTree rdf:type owl:NamedIndividual ,
                             osdi:DecisionTreeModel ;
+                   osdi:hasAssessedIntervention osdi:PBD_InterventionScreening ;
+                   osdi:hasComparatorIntervention osdi:PBD_InterventionNoScreening ;
                    osdi:includesModelItem osdi:Constant_Sensitivity1 ,
                                           osdi:PBD_BasePopulation ,
                                           osdi:PBD_BasePopulationAge ,
