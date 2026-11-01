@@ -57,8 +57,6 @@ public final class DecisionTreeCatalog {
     public enum KnownIssue {
         /** ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0 */
         ROOT_PAYOFF("ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0"),
-        /** DiseaseSubTreeGenerator.generateCoexistentManifestationSubTree never processes the alternative manifestations that remain pending after the coexistent ones */
-        COEX_ALT_MANIF("DiseaseSubTreeGenerator.generateCoexistentManifestationSubTree never processes the alternative manifestations that remain pending after the coexistent ones"),
         /** Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid */
         SYNTHETIC("Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid"),
         /** hasOnsetAge and hasEndAge are used as times since the start of the model, not as ages: they are only correct for populations that start at age 0 */
@@ -250,8 +248,7 @@ public final class DecisionTreeCatalog {
         cases.add(tc(MANIFESTATIONS, "TT_S13_Experiment", "Coexistent manifestation plus alternative manifestations",
                 leaves("TT_S13_", leaf(0.2, "ManX", "ManY"), leaf(0.3, "ManY"), leaf(0.12, "ManX", "ManZ"), leaf(0.18, "ManZ"), leaf(0.08, "ManX"),
                     leaf(0.12)),
-                outcomes(88940.0, 64.0, 50.962), outcomes(82540.0, 64.0, 50.962))
-                .knownIssue(KnownIssue.COEX_ALT_MANIF));
+                outcomes(88940.0, 64.0, 50.962), outcomes(82540.0, 64.0, 50.962)));
         // ManY is a sub-progression of DevA: it can only appear together with DevA.
         cases.add(tc(MANIFESTATIONS, "TT_S14_Experiment", "Development with a linked manifestation",
                 leaves("TT_S14_", leaf(0.15, "DevA", "ManY"), leaf(0.15, "DevA"), leaf(0.7)),

@@ -330,6 +330,11 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             generateCoexistentManifestationSubTree(noProgressionNode, new TreeSet<>(pendingCoexistentManifestations), new TreeSet<>(pendingManifestations));
             generateCoexistentManifestationSubTree(progressionNode, pendingCoexistentManifestations, pendingManifestations);
         }
+        else if (!pendingManifestations.isEmpty()) {
+            // Once all the coexistent manifestations are processed, the alternative ones are generated in both branches
+            generateAlternativeManifestationSubTree(noProgressionNode, new TreeSet<>(pendingManifestations));
+            generateAlternativeManifestationSubTree(progressionNode, new TreeSet<>(pendingManifestations));
+        }
     }
 
     private void generateAlternativeManifestationSubTree(BranchDestinationNode rootNode, Set<ClinicalProgressionWrapper> pendingManifestations) throws MalformedSimulationModelException, UnsupportedOSDiFeatureException, MalformedOSDiModelException {
