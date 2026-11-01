@@ -465,7 +465,9 @@ public final class DecisionTreeCatalog {
             // A shared cost cannot be counted once if it applies in different periods.
             new MalformedCase(MALFORMED, "TT_N05_Experiment", "ADD_DISTINCT with a cost shared by manifestations with different temporal constraints", UnsupportedOSDiFeatureException.class),
             // Acute manifestations are not supported yet in decision trees.
-            new MalformedCase(MALFORMED, "TT_N06_Experiment", "Acute manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class)
+            new MalformedCase(MALFORMED, "TT_N06_Experiment", "Acute manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
+            // Decision trees assume that every patient starts without progressions.
+            new MalformedCase(MALFORMED, "TT_N07_Experiment", "Initial proportion of a manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class)
         );
     }
 }

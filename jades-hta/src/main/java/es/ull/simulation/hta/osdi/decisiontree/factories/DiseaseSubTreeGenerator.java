@@ -19,6 +19,7 @@ import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.PathwayWrapper;
+import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleType;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleWrapper;
 import es.ull.simulation.hta.osdi.ontology.ResourceUsageSKOSCategory;
@@ -39,7 +40,7 @@ import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
  * (default) branch of its parent, with probability 1, so its payoffs apply to every leaf of the sub-tree that hangs from it. A manifestation without risk that
  * depends on a development is only active in the branches where such development is active.
  *
- * Acute manifestations are not supported yet.
+ * Acute manifestations and initial proportions of progressions (hasInitialProportion) are not supported yet.
  *
  * Manifestations declared as subprogressions of one or more developments are assumed to appear only together with such developments. Conversely, "orphan" manifestations 
  * are supposed to appear independently of any development. 
@@ -89,6 +90,14 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             // TODO: Support acute manifestations in decision trees (see docs/known-limitations.md)
             if (ClinicalProgressionType.ACUTE_MANIFESTATION.equals(manifestation.getClinicalProgressionType())) {
                 throw new UnsupportedOSDiFeatureException("The manifestation " + manifestation.getShortName() + " is an acute manifestation. Acute manifestations are not supported yet in decision trees.");
+            }
+        }
+        for (PopulationWrapper population : parentTreeModel.getExperimentWrapper().getModelWrapper().getPopulationIndividuals()) {
+            // TODO: Support initial proportions in decision trees (see docs/known-limitations.md)
+            if (!population.getInitialProportions().isEmpty()) {
+                final ClinicalProgressionWrapper progression = population.getInitialProportions().keySet().iterator().next();
+                throw new UnsupportedOSDiFeatureException("The population " + population.getShortName() + " defines an initial proportion (hasInitialProportion) for the progression " + progression.getShortName()
+                    + ". Initial proportions are not supported yet in decision trees, which assume that every patient starts without progressions.");
             }
         }
         final BranchDestinationNode rootNode = new BranchDestinationNode(parentTreeModel, name);
