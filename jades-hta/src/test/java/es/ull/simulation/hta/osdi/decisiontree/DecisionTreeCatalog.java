@@ -57,8 +57,8 @@ public final class DecisionTreeCatalog {
     public enum KnownIssue {
         /** ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0 */
         ROOT_PAYOFF("ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0"),
-        /** DiseaseSubTreeGenerator.generateCoexistentDevelopmentSubTree only generates the manifestations linked to the last coexistent development when other manifestations are already pending (it checks pendingManifestations instead of newPendingManifestations) */
-        LAST_DEV_MANIF("DiseaseSubTreeGenerator.generateCoexistentDevelopmentSubTree only generates the manifestations linked to the last coexistent development when other manifestations are already pending (it checks pendingManifestations instead of newPendingManifestations)"),
+        /** DiseaseWrapper.populateReverseManifestationToDevelopmentMap reads the type of the sub-progressions without initializing them. Since the items of the model are initialized in no particular order (HashMap), loading a model with hasSubProgression may fail or not depending on the names of its individuals */
+        SUBPROGRESSION_NOT_INITIALIZED("DiseaseWrapper.populateReverseManifestationToDevelopmentMap reads the type of the sub-progressions without initializing them. Since the items of the model are initialized in no particular order (HashMap), loading a model with hasSubProgression may fail or not depending on the names of its individuals"),
         /** DiseaseSubTreeGenerator.generateCoexistentManifestationSubTree never processes the alternative manifestations that remain pending after the coexistent ones */
         COEX_ALT_MANIF("DiseaseSubTreeGenerator.generateCoexistentManifestationSubTree never processes the alternative manifestations that remain pending after the coexistent ones"),
         /** Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid */
@@ -257,15 +257,13 @@ public final class DecisionTreeCatalog {
         // ManY is a sub-progression of DevA: it can only appear together with DevA.
         cases.add(tc(MANIFESTATIONS, "TT_S14_Experiment", "Development with a linked manifestation",
                 leaves("TT_S14_", leaf(0.15, "DevA", "ManY"), leaf(0.15, "DevA"), leaf(0.7)),
-                outcomes(78512.5, 62.0, 50.555), outcomes(72312.5, 62.0, 50.555))
-                .knownIssue(KnownIssue.LAST_DEV_MANIF));
+                outcomes(78512.5, 62.0, 50.555), outcomes(72312.5, 62.0, 50.555)));
         // ManY only appears with DevA and ManZ only with DevB: 9 combinations.
         cases.add(tc(MANIFESTATIONS, "TT_S15_Experiment", "Two coexistent developments, each one with its own manifestation",
                 leaves("TT_S15_", leaf(0.03, "DevA", "DevB", "ManY", "ManZ"), leaf(0.045, "DevA", "DevB", "ManY"), leaf(0.03, "DevA", "DevB", "ManZ"),
                     leaf(0.045, "DevA", "DevB"), leaf(0.075, "DevA", "ManY"), leaf(0.075, "DevA"), leaf(0.14, "DevB", "ManZ"),
                     leaf(0.21, "DevB"), leaf(0.35)),
-                outcomes(89996.5, 60.6, 47.4114), outcomes(83936.5, 60.6, 47.4114))
-                .knownIssue(KnownIssue.LAST_DEV_MANIF));
+                outcomes(89996.5, 60.6, 47.4114), outcomes(83936.5, 60.6, 47.4114)));
         // DevA (0.6) may lead to ManY; DevB (default, 0.4) may lead to ManZ.
         cases.add(tc(MANIFESTATIONS, "TT_S16_Experiment", "Alternative developments, each one with its own manifestation",
                 leaves("TT_S16_", leaf(0.3, "DevA", "ManY"), leaf(0.3, "DevA"), leaf(0.16, "DevB", "ManZ"), leaf(0.24, "DevB")),
@@ -280,7 +278,7 @@ public final class DecisionTreeCatalog {
                 leaves("TT_S18_", leaf(0.06, "DevA", "DevB", "ManZ"), leaf(0.09, "DevA", "DevB"), leaf(0.06, "DevA", "ManZ"), leaf(0.09, "DevA"),
                     leaf(0.14, "DevB", "ManZ"), leaf(0.21, "DevB"), leaf(0.35)),
                 outcomes(89089.0, 60.6, 47.7744), outcomes(83029.0, 60.6, 47.7744))
-                .knownIssue(KnownIssue.LAST_DEV_MANIF));
+                .knownIssue(KnownIssue.SUBPROGRESSION_NOT_INITIALIZED));
         // DevA (0.6) leads to ManY, ManZ or none of them; DevB (default) has no manifestations.
         cases.add(tc(MANIFESTATIONS, "TT_S19_Experiment", "Alternative developments, one of them with alternative manifestations",
                 leaves("TT_S19_", leaf(0.3, "DevA", "ManY"), leaf(0.18, "DevA", "ManZ"), leaf(0.12, "DevA"), leaf(0.4, "DevB")),

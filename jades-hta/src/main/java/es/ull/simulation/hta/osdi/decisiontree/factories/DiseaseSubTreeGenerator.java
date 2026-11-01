@@ -237,9 +237,14 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             generateAlternativeDevelopmentSubTree(progressionNode, new ArrayList<>(altDevelopmentCombinationRules), defaultCoexistentManifestations, newPendingManifestations);
             generateAlternativeDevelopmentSubTree(noProgressionNode, new ArrayList<>(altDevelopmentCombinationRules), defaultCoexistentManifestations, pendingManifestations);
         }
-        else if (!pendingManifestations.isEmpty()) {
-            generateManifestationsSubTree(progressionNode, defaultCoexistentManifestations, newPendingManifestations);
-            generateManifestationsSubTree(noProgressionNode, defaultCoexistentManifestations, new TreeSet<>(pendingManifestations));
+        else {
+            // Each branch is checked separately, since the progression branch also includes the manifestations linked to the development
+            if (!newPendingManifestations.isEmpty()) {
+                generateManifestationsSubTree(progressionNode, defaultCoexistentManifestations, newPendingManifestations);
+            }
+            if (!pendingManifestations.isEmpty()) {
+                generateManifestationsSubTree(noProgressionNode, defaultCoexistentManifestations, new TreeSet<>(pendingManifestations));
+            }
         }
     }
     
