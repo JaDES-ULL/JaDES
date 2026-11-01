@@ -55,8 +55,6 @@ public final class DecisionTreeCatalog {
      * Reasons why the current generator is not expected to produce the right tree for a case 
      */
     public enum KnownIssue {
-        /** ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0 */
-        ROOT_PAYOFF("ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0"),
         /** Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid */
         SYNTHETIC("Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid");
 
@@ -190,8 +188,7 @@ public final class DecisionTreeCatalog {
         // The disease defines neither developments nor manifestations.
         cases.add(tc(DEVELOPMENTS, "TT_S01_Experiment", "No progression: each arm is a single payoff",
                 leaves("TT_S01_", leaf(1.0)),
-                outcomes(71500.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25))
-                .knownOutcomesIssue(KnownIssue.ROOT_PAYOFF));
+                outcomes(71500.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
         // One development not affected by any rule: it either appears (0.3) or not.
         cases.add(tc(DEVELOPMENTS, "TT_S02_Experiment", "Single development with risk",
                 leaves("TT_S02_", leaf(0.3, "DevA"), leaf(0.7)),

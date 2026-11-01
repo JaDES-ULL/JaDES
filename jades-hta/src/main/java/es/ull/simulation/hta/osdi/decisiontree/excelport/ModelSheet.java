@@ -158,10 +158,10 @@ public class ModelSheet implements SheetWrapper {
         ExcelTools.applyStyleToRange(sheet, Styles.TREE_NODE.getStyle(workbook), row, row, column - 2, column - 2);
         int oldRow = row;
         PayoffWrapper payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper(), populationAgeName);
-        row = continueTreeDrawing(branch, row, column, payoffWrapper);
+        row = continueTreeDrawing(branch, row, column, payoffWrapper, true);
         drawSummary(0, branch.name(), oldRow, row - 3);
         for (int i = 1; i < successors.size(); i++) {
-            nodesRow = sheet.getRow(row);
+            nodesRow = ExcelTools.getOrCreateRow(sheet, row);
             branch = successors.get(i);
             // Draw the choice node in the specified row and column
             choiceCell = nodesRow.createCell(column);
@@ -169,7 +169,7 @@ public class ModelSheet implements SheetWrapper {
             drawTreeConnection(oldRow + 1, row, column - 1);
             oldRow = row;
             payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper(), populationAgeName);
-            row = continueTreeDrawing(branch, row, column, payoffWrapper);
+            row = continueTreeDrawing(branch, row, column, payoffWrapper, true);
             drawSummary(i, branch.name(), oldRow, row - 3);
         }
     }
@@ -181,16 +181,17 @@ public class ModelSheet implements SheetWrapper {
      * @param row The current row index where the node will be drawn.
      * @param column The column index where the node will be drawn.
      * @param payoffWrapper The wrapper containing payoff information for the node.
+     * @param hangsFromIntervention Whether the branch hangs directly from an intervention (i.e., there are no chance nodes before it).
      * @return The row index available to draw the next branch of the tree.
      * @throws MalformedOSDiModelException
      * @throws UnsupportedOSDiFeatureException
      * @throws MalformedSimulationModelException
      */
-    private int continueTreeDrawing(BranchDestinationNode branch, int row, int column, PayoffWrapper payoffWrapper) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException, MalformedSimulationModelException {
+    private int continueTreeDrawing(BranchDestinationNode branch, int row, int column, PayoffWrapper payoffWrapper, boolean hangsFromIntervention) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException, MalformedSimulationModelException {
         if (!branch.isPayoff()) {
             row = drawProbabilityNode(branch, row, column + COLS_BETWEEN_NODES, payoffWrapper);
         } else {
-            row = drawPayoffNode(branch, row, column, payoffWrapper);
+            row = drawPayoffNode(branch, row, column, payoffWrapper, hangsFromIntervention);
         }
         return row;
     }
@@ -242,7 +243,7 @@ public class ModelSheet implements SheetWrapper {
             rowsUsed.add(row + 1);
             PayoffWrapper newPayoffWrapper = new PayoffWrapper(payoffWrapper);
             newPayoffWrapper.addProbability(new CellReference(row + 1, column, true, true));
-            row = continueTreeDrawing(successor, row, column, newPayoffWrapper);
+            row = continueTreeDrawing(successor, row, column, newPayoffWrapper, false);
             nodesRow = ExcelTools.getOrCreateRow(sheet, row);
             valuesRow = ExcelTools.getOrCreateRow(sheet, row + 1);
         }
@@ -254,7 +255,7 @@ public class ModelSheet implements SheetWrapper {
             }
             PayoffWrapper newPayoffWrapper = new PayoffWrapper(payoffWrapper);
             newPayoffWrapper.addProbability(new CellReference(row + 1, column, true, true));
-            row = continueTreeDrawing(node.getDefaultSuccessor(), row, column, newPayoffWrapper);
+            row = continueTreeDrawing(node.getDefaultSuccessor(), row, column, newPayoffWrapper, false);
             nodesRow = ExcelTools.getOrCreateRow(sheet, row);
             valuesRow = ExcelTools.getOrCreateRow(sheet, row + 1);
         }
@@ -268,12 +269,13 @@ public class ModelSheet implements SheetWrapper {
      * @param row The row index where the payoff node will be drawn.
      * @param column The column index where the payoff node will be drawn.
      * @param payoffWrapper The wrapper containing payoff information for the node.
+     * @param hangsFromIntervention Whether the payoff hangs directly from an intervention. In such a case, there are no chance nodes along its path and its probability is 1.
      * @return The row index available to draw the next branch of the tree.
      * @throws MalformedSimulationModelException 
      * @throws MalformedOSDiModelException
      * @throws UnsupportedOSDiFeatureException
      */
-    private int drawPayoffNode(BranchDestinationNode payoff, int row, int column, PayoffWrapper payoffWrapper) throws MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+    private int drawPayoffNode(BranchDestinationNode payoff, int row, int column, PayoffWrapper payoffWrapper, boolean hangsFromIntervention) throws MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         payoffWrapper.updateWithTreeNode(payoff);
         if (column < payoffColumn) {
             ExcelTools.applyStyleToRange(sheet, Styles.TREE_NODE.getStyle(workbook), row, row, column + 2, payoffColumn - 2);
@@ -299,11 +301,15 @@ public class ModelSheet implements SheetWrapper {
         qalyDetailCell.setCellStyle(Styles.QALY.getStyle(workbook));
         
         // Set the formulas for the cells
-        final String probFormula = payoffWrapper.getProbabilityFormula();
-        if (probFormula.isEmpty()) {
-            probCell.setCellValue(0.0);
+        if (hangsFromIntervention) {
+            // A payoff that hangs directly from an intervention has no chance nodes along its path, so its probability is 1
+            probCell.setCellValue(1.0);
         }
         else {
+            final String probFormula = payoffWrapper.getProbabilityFormula();
+            if (probFormula.isEmpty()) {
+                throw new IllegalStateException("The application logic should prevent this from happening: the payoff " + payoff.name() + " does not hang from an intervention, but its path has no probabilities.");
+            }
             probCell.setCellFormula(probFormula);
         }
 
