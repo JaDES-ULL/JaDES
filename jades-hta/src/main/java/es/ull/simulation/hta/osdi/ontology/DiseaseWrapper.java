@@ -82,7 +82,7 @@ public class DiseaseWrapper extends BaseModelItemWrapper implements HealthCondit
      */
     private void populateReverseManifestationToDevelopmentMap(Set<ClinicalProgressionWrapper> developments) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
         for (ClinicalProgressionWrapper development : developments) {
-            final Set<ClinicalProgressionWrapper> subProgressions = getModelWrapper().getWrappersForPropertyAs(development.getIndividualIRI(), OSDiObjectProperty.HAS_SUB_PROGRESSION, ClinicalProgressionWrapper.class);
+            final Set<ClinicalProgressionWrapper> subProgressions = getModelWrapper().getAndInitializeWrappersForPropertyAs(development.getIndividualIRI(), OSDiObjectProperty.HAS_SUB_PROGRESSION, ClinicalProgressionWrapper.class);
             for (ClinicalProgressionWrapper subProgression : subProgressions) {
                 if (!ClinicalProgressionType.ACUTE_MANIFESTATION.equals(subProgression.getClinicalProgressionType()) 
                     && !ClinicalProgressionType.CHRONIC_MANIFESTATION.equals(subProgression.getClinicalProgressionType())) {

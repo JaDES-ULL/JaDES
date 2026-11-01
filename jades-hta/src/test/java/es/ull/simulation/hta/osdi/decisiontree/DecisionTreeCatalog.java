@@ -57,8 +57,6 @@ public final class DecisionTreeCatalog {
     public enum KnownIssue {
         /** ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0 */
         ROOT_PAYOFF("ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0"),
-        /** DiseaseWrapper.populateReverseManifestationToDevelopmentMap reads the type of the sub-progressions without initializing them. Since the items of the model are initialized in no particular order (HashMap), loading a model with hasSubProgression may fail or not depending on the names of its individuals */
-        SUBPROGRESSION_NOT_INITIALIZED("DiseaseWrapper.populateReverseManifestationToDevelopmentMap reads the type of the sub-progressions without initializing them. Since the items of the model are initialized in no particular order (HashMap), loading a model with hasSubProgression may fail or not depending on the names of its individuals"),
         /** DiseaseSubTreeGenerator.generateCoexistentManifestationSubTree never processes the alternative manifestations that remain pending after the coexistent ones */
         COEX_ALT_MANIF("DiseaseSubTreeGenerator.generateCoexistentManifestationSubTree never processes the alternative manifestations that remain pending after the coexistent ones"),
         /** Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid */
@@ -277,8 +275,7 @@ public final class DecisionTreeCatalog {
         cases.add(tc(MANIFESTATIONS, "TT_S18_Experiment", "Manifestation shared by two coexistent developments",
                 leaves("TT_S18_", leaf(0.06, "DevA", "DevB", "ManZ"), leaf(0.09, "DevA", "DevB"), leaf(0.06, "DevA", "ManZ"), leaf(0.09, "DevA"),
                     leaf(0.14, "DevB", "ManZ"), leaf(0.21, "DevB"), leaf(0.35)),
-                outcomes(89089.0, 60.6, 47.7744), outcomes(83029.0, 60.6, 47.7744))
-                .knownIssue(KnownIssue.SUBPROGRESSION_NOT_INITIALIZED));
+                outcomes(89089.0, 60.6, 47.7744), outcomes(83029.0, 60.6, 47.7744)));
         // DevA (0.6) leads to ManY, ManZ or none of them; DevB (default) has no manifestations.
         cases.add(tc(MANIFESTATIONS, "TT_S19_Experiment", "Alternative developments, one of them with alternative manifestations",
                 leaves("TT_S19_", leaf(0.3, "DevA", "ManY"), leaf(0.18, "DevA", "ManZ"), leaf(0.12, "DevA"), leaf(0.4, "DevB")),
