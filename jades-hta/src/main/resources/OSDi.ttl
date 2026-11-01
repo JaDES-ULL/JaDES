@@ -1648,7 +1648,7 @@ osdi:isDisutility rdf:type owl:DatatypeProperty ,
                            owl:FunctionalProperty ;
                   rdfs:domain osdi:Utility ;
                   rdfs:range xsd:boolean ;
-                  rdfs:comment "Indicates whether a utility parameter represents a disutility or a utility"@en ;
+                  rdfs:comment "Indicates whether a utility parameter represents a disutility or a utility. A utility u (isDisutility = false) of a progression, the disease or an intervention is equivalent to a disutility of (base utility of the population - u), so the patient gets exactly u if it is the only one active. The converted value is combined with the rest of disutilities by using the disutility combination method of the experiment (hasDisutilityCombinationMethod). This applies both to annual and one-time utilities, and assumes that the utility was measured in a population with the same base utility as that of the model."@en ;
                   rdfs:label "es una desutilidad"@es ,
                              "is disutility"@en .
 

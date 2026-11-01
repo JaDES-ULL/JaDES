@@ -65,8 +65,6 @@ public final class DecisionTreeCatalog {
         SYNTHETIC("Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid"),
         /** PayoffWrapper.getQALEFormula includes the one-time disutilities inside MAX(), instead of always adding them */
         ONE_TIME_MAX("PayoffWrapper.getQALEFormula includes the one-time disutilities inside MAX(), instead of always adding them"),
-        /** A utility (isDisutility = false) of a progression is converted into '1 - u' and inserted without parentheses. It should be equivalent to a disutility of (base utility - u), as in the discrete-event simulation */
-        UTILITY("A utility (isDisutility = false) of a progression is converted into '1 - u' and inserted without parentheses. It should be equivalent to a disutility of (base utility - u), as in the discrete-event simulation"),
         /** FormulaLibrary.FUTURE_CONT_DISCOUNT multiplies by (1 + r) ^ start instead of dividing: payoffs that start in the future are compounded instead of discounted */
         FUTURE_DISCOUNT("FormulaLibrary.FUTURE_CONT_DISCOUNT multiplies by (1 + r) ^ start instead of dividing: payoffs that start in the future are compounded instead of discounted"),
         /** hasOnsetAge and hasEndAge are used as times since the start of the model, not as ages: they are only correct for populations that start at age 0 */
@@ -334,8 +332,7 @@ public final class DecisionTreeCatalog {
                 .knownOutcomesIssue(KnownIssue.ONE_TIME_MAX));
         cases.add(tc(PAYOFFS, "TT_P12_Experiment", "Utility (instead of disutility) of a development",
                 leaves("TT_P12_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
-                outcomes(89900.0, 49.0, 32.65), outcomes(85000.0, 49.0, 32.65))
-                .knownOutcomesIssue(KnownIssue.UTILITY));
+                outcomes(89900.0, 49.0, 32.65), outcomes(85000.0, 49.0, 32.65)));
         cases.add(tc(PAYOFFS, "TT_P13_Experiment", "Costs and disutility of the intervention",
                 leaves("TT_P13_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
                 outcomes(91900.0, 49.0, 24.8), outcomes(85000.0, 49.0, 27.25)));

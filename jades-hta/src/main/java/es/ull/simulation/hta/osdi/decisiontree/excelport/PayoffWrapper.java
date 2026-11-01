@@ -337,6 +337,14 @@ public class PayoffWrapper {
     /**
      * Returns the QALE formula for the parameters in this wrapper. Processes each disutility parameter by taking into account whether they are modified or not,
      * whether they applied once or annually, and when they should start and/or end to account. With all this information, the appropriate discounting formula can be applied.
+     * <p>
+     * A utility parameter (isDisutility = false) u of a progression, the disease or an intervention is equivalent to a disutility of (base utility - u), where
+     * the base utility is that of the population. Hence, if it is the only one active, the patient gets exactly the utility u. The converted value is then combined
+     * with the rest of disutilities by using the combination method of the experiment. This rule applies both to annual and one-time utilities, and it is the same
+     * used by the discrete-event simulation (see {@link es.ull.simulation.hta.params.UsesParameters#forceUtilityParameterValue}). It assumes that the utility was
+     * measured in a population with the same base utility as that of the model.
+     * </p>
+     * TODO: Review how absolute utilities and disutilities are combined (see docs/known-limitations.md)
      * @param cellUndiscountedLY The cell reference for the undiscounted life years.
      * @param baseUtilityParam The base utility parameter to which the disutilities will be applied.
      * @param method The method to combine disutilities (ADD, ADD_DISTINCT or MAX).
@@ -358,8 +366,8 @@ public class PayoffWrapper {
             String text = getParameterTextFormula(param);
             final SpecificInformationForUtility specificInfo = (SpecificInformationForUtility)param.getSpecificInformation(); 
             if (!specificInfo.isDisutility()) {
-                // If the parameter is a utility, we need to invert the sign
-                text = "1 - " + text;
+                // A utility u is equivalent to a disutility of (base utility - u)
+                text = "(" + baseUtilityParam.getShortName() + " - " + text + ")";
             }
             text = applyDiscountToFormula(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.getName(), specificInfo.appliesOneTime(), startEnd[0], startEnd[1]);
             disutilityTexts.add(text);

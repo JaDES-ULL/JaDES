@@ -45,7 +45,15 @@ public interface UsesParameters {
 
     /**
      * Returns the value or a utility or disutility parameter. Uses a pair of utility and disutility parameters. If the first one is defined, returns its value;
-     * otherwise, converts the second one into the first one by using the population base utility. 
+     * otherwise, converts the second one into the first one by using the population base utility.
+     * <p>
+     * A utility u is equivalent to a disutility of (base utility - u), where the base utility is that of the population, and viceversa. Hence, if the
+     * utility is the only one active, the patient gets exactly the utility u. The converted value is then combined with the rest of disutilities by
+     * using the combination method of the experiment. This rule applies both to annual and one-time utilities, and it is the same used by the decision
+     * tree generator (see {@link es.ull.simulation.hta.osdi.decisiontree.excelport.PayoffWrapper#getQALEFormula}). It assumes that the utility was
+     * measured in a population with the same base utility as that of the model.
+     * </p>
+     * TODO: Review how absolute utilities and disutilities are combined (see docs/known-limitations.md)
      * @param firstUtilityOption An utility or a disutility parameter
      * @param secondUtilityOption Another parameter that must be a utility if firstUtilityOption is a disutility and viceversa
      * @param pat A patient
