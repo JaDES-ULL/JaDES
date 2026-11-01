@@ -193,7 +193,7 @@ public class OSDiWrapper extends OWLOntologyWrapper {
 				log.warn("Local copy of the imported ontology " + entry.getKey() + " not found in resources: " + entry.getValue() + ". It will be downloaded.");
 			}
 			else {
-				manager.getIRIMappers().add(new SimpleIRIMapper(Objects.requireNonNull(IRI.create(entry.getKey())), Objects.requireNonNull(IRI.create(resource))));
+				manager.getIRIMappers().add(new SimpleIRIMapper(Objects.requireNonNull(IRI.create(Objects.requireNonNull(entry.getKey()))), Objects.requireNonNull(IRI.create(resource))));
 			}
 		}
 	}
