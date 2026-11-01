@@ -3,6 +3,7 @@
  */
 package es.ull.simulation.hta.osdi.ontology;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.IRIDocumentSource;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -54,6 +56,13 @@ public class OSDiWrapper extends OWLOntologyWrapper {
 	 * The local resource that contains the OSDi ontology (expressed as String)
 	 */
 	private final static String LOCAL_ONTOLOGY = "/OSDi.ttl";
+	/**
+	 * Local copies of the ontologies imported by OSDi: ontology IRI (or version IRI) -> resource
+	 */
+	private final static Map<String, String> LOCAL_IMPORTS = Map.of(
+		"http://www.w3.org/2004/02/skos/core", "/skos.rdf",
+		"http://www.w3.org/2006/time", "/time.owl",
+		"http://www.w3.org/2006/time#2016", "/time.owl");
 	/**
 	 * The IRI for the OSDi ontology (expressed as String)
 	 */
@@ -133,7 +142,11 @@ public class OSDiWrapper extends OWLOntologyWrapper {
 		 */
 		public OSDiWrapper build(OWLOntologyDocumentSource individualsSource) throws OWLOntologyCreationException, MalformedOSDiModelException {
 			final OntologyLoader ontologyLoader = new OntologyLoader();
-			final LoadedOntology coreLoaded = (options != null) ? ontologyLoader.load(osdiCoreSource, options) : ontologyLoader.load(osdiCoreSource);
+			// The ontologies imported by OSDi are solved with the local copies included as resources, so that loading OSDi does not 
+			// require Internet access (and is not affected by the availability or the rate limits of the remote servers)
+			final OWLOntologyManager coreManager = OWLManager.createOWLOntologyManager();
+			addLocalImportMappers(coreManager);
+			final LoadedOntology coreLoaded = ontologyLoader.load(osdiCoreSource, coreManager, options);
 			final OWLOntology core = coreLoaded.ontology();
 			final OWLOntologyManager manager = core.getOWLOntologyManager();
 
@@ -165,6 +178,23 @@ public class OSDiWrapper extends OWLOntologyWrapper {
 				throw new MalformedOSDiModelException("The provided ontology is not consistent when loaded with the OSDi ontology.");
 			}
 			return osdiWrapper;
+		}
+	}
+
+	/**
+	 * Registers in the manager a mapper for each ontology imported by OSDi, so that imports are solved with the local copies 
+	 * included as resources instead of downloading them. Imports without a local copy are still downloaded.
+	 * @param manager The ontology manager
+	 */
+	private static void addLocalImportMappers(OWLOntologyManager manager) {
+		for (Map.Entry<String, String> entry : LOCAL_IMPORTS.entrySet()) {
+			final URL resource = OSDiWrapper.class.getResource(entry.getValue());
+			if (resource == null) {
+				log.warn("Local copy of the imported ontology " + entry.getKey() + " not found in resources: " + entry.getValue() + ". It will be downloaded.");
+			}
+			else {
+				manager.getIRIMappers().add(new SimpleIRIMapper(Objects.requireNonNull(IRI.create(entry.getKey())), Objects.requireNonNull(IRI.create(resource))));
+			}
 		}
 	}
 

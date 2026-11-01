@@ -40,18 +40,18 @@
     <maven.compiler.release>25</maven.compiler.release>
 
     <!-- Dependency versions -->
-    <log4j2.version>2.25.3</log4j2.version>
+    <log4j2.version>2.26.1</log4j2.version>
     <junit.jupiter.version>5.10.2</junit.jupiter.version>
-    <jacoco.version>0.8.11</jacoco.version>
-    <poi.version>5.4.1</poi.version>
-    <owlapi.version>5.5.0</owlapi.version>
+    <jacoco.version>0.8.15</jacoco.version>
+    <poi.version>6.0.0</poi.version>
+    <owlapi.version>5.5.1</owlapi.version>
     <hermit.version>1.4.5.519</hermit.version>
     <jcommander.version>1.82</jcommander.version>
 
     <!-- Plugin versions -->
     <maven.surefire.version>3.5.2</maven.surefire.version>
     <maven.compiler.version>3.13.0</maven.compiler.version>
-    <mockito.version>5.14.2</mockito.version>
+    <mockito.version>5.24.0</mockito.version>
     <maven.source.version>3.3.1</maven.source.version>
     <maven.javadoc.version>3.6.3</maven.javadoc.version>
     <maven.gpg.version>3.2.7</maven.gpg.version>
