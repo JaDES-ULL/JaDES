@@ -17,3 +17,10 @@ This approach has the following limitations:
 - Treat each type differently: absolute utilities replace the current utility (taking the worst one), whereas disutilities are added.
 - Add a multiplicative combination method.
 - Indicate in OSDi the reference base utility of each source.
+
+## jades-hta: Onset and end ages in decision trees
+
+The onset and end ages of a progression (`hasOnsetAge`, `hasEndAge`) are ages, not times since the start of the model. The decision tree generator (`PayoffWrapper.applyDiscountToFormula`) translates them into times by subtracting the initial age of the population (`hasAge`; 0 if the population does not define it, with a warning). Only what happens between the initial age of the population and death (the undiscounted life years of each leaf) is accounted:
+
+- Annual costs and disutilities are accounted from `MAX(0, onset age - initial age)` to `MIN(life years, end age - initial age)`. If the window starts after death, nothing is accounted.
+- A one-time cost or disutility with an onset age is accounted at that age only if it happens between the initial age and death. A one-time payoff whose onset age is lower than the initial age is assumed to have happened before the start of the model, and it is not accounted.

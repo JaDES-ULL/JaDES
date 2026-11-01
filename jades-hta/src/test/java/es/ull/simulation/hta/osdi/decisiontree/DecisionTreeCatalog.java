@@ -58,11 +58,7 @@ public final class DecisionTreeCatalog {
         /** ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0 */
         ROOT_PAYOFF("ModelSheet.drawPayoffNode sets a probability of 0 (instead of 1) to a payoff that hangs directly from an intervention, so every outcome of the arm is 0"),
         /** Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid */
-        SYNTHETIC("Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid"),
-        /** hasOnsetAge and hasEndAge are used as times since the start of the model, not as ages: they are only correct for populations that start at age 0 */
-        ONSET_AGE("hasOnsetAge and hasEndAge are used as times since the start of the model, not as ages: they are only correct for populations that start at age 0"),
-        /** Temporal constraints are not limited by the life expectancy of each leaf: costs and disutilities continue after death */
-        AFTER_DEATH("Temporal constraints are not limited by the life expectancy of each leaf: costs and disutilities continue after death");
+        SYNTHETIC("Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid");
 
         private final String description;
 
@@ -352,13 +348,19 @@ public final class DecisionTreeCatalog {
         // The onset is an age (30): for a population that starts at 20, it happens 10 years after the start of the model
         cases.add(tc(PAYOFFS, "TT_P20_Experiment", "One-time cost at the onset age of a manifestation, with discount (population starting at 20 years)",
                 leaves("TT_P20_", leaf(0.5, "ManY"), leaf(0.5)),
-                outcomes(33158.415457451, 28.452891518, 24.184957791), outcomes(30313.126305614, 28.452891518, 24.184957791))
-                .knownOutcomesIssue(KnownIssue.ONSET_AGE));
+                outcomes(33158.415457451, 28.452891518, 24.184957791), outcomes(30313.126305614, 28.452891518, 24.184957791)));
         // Life expectancy is 80: costs and disutilities stop at death
         cases.add(tc(PAYOFFS, "TT_P21_Experiment", "Manifestation whose end age exceeds the life expectancy (newborns, 70 to 90 years)",
                 leaves("TT_P21_", leaf(0.5, "ManY"), leaf(0.5)),
-                outcomes(93000.0, 80.0, 67.5), outcomes(85000.0, 80.0, 67.5))
-                .knownOutcomesIssue(KnownIssue.AFTER_DEATH));
+                outcomes(93000.0, 80.0, 67.5), outcomes(85000.0, 80.0, 67.5)));
+        // Life expectancy is 80: neither the annual payoffs nor the one-time cost of a manifestation that starts at 85 are accounted
+        cases.add(tc(PAYOFFS, "TT_P22_Experiment", "Manifestation whose onset age exceeds the life expectancy (newborns, from 85 years)",
+                leaves("TT_P22_", leaf(0.5, "ManY"), leaf(0.5)),
+                outcomes(88000.0, 80.0, 68.0), outcomes(80000.0, 80.0, 68.0)));
+        // The population starts at 20: the annual payoffs are accounted from the start, and the one-time cost (at 10 years) is not accounted
+        cases.add(tc(PAYOFFS, "TT_P23_Experiment", "Manifestation whose onset age is lower than the initial age of the population (population starting at 20 years, from 10 years)",
+                leaves("TT_P23_", leaf(0.5, "ManY"), leaf(0.5)),
+                outcomes(104000.0, 65.0, 52.0), outcomes(97500.0, 65.0, 52.0)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.

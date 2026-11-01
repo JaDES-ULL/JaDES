@@ -1,6 +1,7 @@
 package es.ull.simulation.hta.osdi.decisiontree.excelport;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -13,9 +14,12 @@ import es.ull.simulation.hta.MalformedSimulationModelException;
 import es.ull.simulation.hta.osdi.decisiontree.ChoiceNode;
 import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode;
 import es.ull.simulation.hta.osdi.decisiontree.Model;
+import es.ull.simulation.hta.osdi.OSDiLogger;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
+import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
+import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.utils.ExcelFormulaLibrary;
 import es.ull.simulation.utils.ExcelTools;
 
@@ -24,6 +28,7 @@ import es.ull.simulation.utils.ExcelTools;
  * This class encapsulates the necessary methods and properties to interact with the model sheet.
  */
 public class ModelSheet implements SheetWrapper {
+    private final static OSDiLogger log = OSDiLogger.getLogger(ModelSheet.class);
     public static final String SHEET_NAME = "Model";
     private static final String PAYOFF_TITLE_RANGE = "payoffTitles";
     private static final String SUMMARY_TITLE_RANGE = "summaryTitles";
@@ -80,6 +85,11 @@ public class ModelSheet implements SheetWrapper {
      * The first row where the tree starts drawing
      */
     private final int firstTreeRow;
+    /**
+     * The name of the parameter that defines the initial age of the population, or "0" if the population does not define it.
+     * Used to translate the onset and end ages of the progressions into times since the start of the model.
+     */
+    private final String populationAgeName;
 
     /**
      * Constructor to initialize the ModelSheet with a given HTAExcelModelBuilder.
@@ -108,6 +118,15 @@ public class ModelSheet implements SheetWrapper {
         // Prepares the payoff area in the Excel sheet
         this.payoffColumn = modelBuilder.getTreeDepth() * 3 + CHOICE_COLUMN; // Calculate the column index for the payoff based on the tree depth
         ExcelTools.copyCellRange(PAYOFF_TITLE_RANGE, sheet, firstTreeRow - 3, payoffColumn);
+        final PopulationWrapper population = modelBuilder.getModel().getPopulationWrapper();
+        final Optional<ParameterWrapper> ageParam = population.getAgeParameter();
+        if (ageParam.isPresent()) {
+            this.populationAgeName = ageParam.get().getShortName();
+        }
+        else {
+            log.warn("The population " + population.getShortName() + " does not define an age. An initial age of 0 is assumed to interpret the onset and end ages of the progressions.");
+            this.populationAgeName = "0";
+        }
     }
     
     /**
@@ -138,7 +157,7 @@ public class ModelSheet implements SheetWrapper {
         // Apply the style also to the cell previous to the first choice node
         ExcelTools.applyStyleToRange(sheet, Styles.TREE_NODE.getStyle(workbook), row, row, column - 2, column - 2);
         int oldRow = row;
-        PayoffWrapper payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper());
+        PayoffWrapper payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper(), populationAgeName);
         row = continueTreeDrawing(branch, row, column, payoffWrapper);
         drawSummary(0, branch.name(), oldRow, row - 3);
         for (int i = 1; i < successors.size(); i++) {
@@ -149,7 +168,7 @@ public class ModelSheet implements SheetWrapper {
             drawNodeText(choiceCell, branch.name());
             drawTreeConnection(oldRow + 1, row, column - 1);
             oldRow = row;
-            payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper());
+            payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper(), populationAgeName);
             row = continueTreeDrawing(branch, row, column, payoffWrapper);
             drawSummary(i, branch.name(), oldRow, row - 3);
         }

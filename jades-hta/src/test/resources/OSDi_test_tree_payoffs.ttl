@@ -41,7 +41,9 @@ osdi:TT_BaseAnnualCost rdf:type owl:NamedIndividual ,
                                             osdi:TT_P18_Model ,
                                             osdi:TT_P19_Model ,
                                             osdi:TT_P20_Model ,
-                                            osdi:TT_P21_Model ;
+                                            osdi:TT_P21_Model ,
+                                            osdi:TT_P22_Model ,
+                                            osdi:TT_P23_Model ;
                        osdi:appliesOneTime "false"^^xsd:boolean ;
                        osdi:hasDescription "Annual cost of the disease, whatever its progression" ;
                        osdi:hasExpectedValue "1000.0"^^xsd:double ;
@@ -71,7 +73,9 @@ osdi:TT_InterventionNone rdf:type owl:NamedIndividual ,
                                               osdi:TT_P18_Model ,
                                               osdi:TT_P19_Model ,
                                               osdi:TT_P20_Model ,
-                                              osdi:TT_P21_Model ;
+                                              osdi:TT_P21_Model ,
+                                              osdi:TT_P22_Model ,
+                                              osdi:TT_P23_Model ;
                          osdi:hasDescription "Comparator: do nothing" .
 
 
@@ -89,7 +93,9 @@ osdi:TT_InterventionTreat rdf:type owl:NamedIndividual ,
                                                osdi:TT_P18_Model ,
                                                osdi:TT_P19_Model ,
                                                osdi:TT_P20_Model ,
-                                               osdi:TT_P21_Model ;
+                                               osdi:TT_P21_Model ,
+                                               osdi:TT_P22_Model ,
+                                               osdi:TT_P23_Model ;
                           osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" .
 
 
@@ -114,7 +120,8 @@ osdi:TT_LifeExpectancy rdf:type owl:NamedIndividual ,
                                             osdi:TT_P14_Model ,
                                             osdi:TT_P15_Model ,
                                             osdi:TT_P16_Model ,
-                                            osdi:TT_P20_Model ;
+                                            osdi:TT_P20_Model ,
+                                            osdi:TT_P23_Model ;
                        osdi:isValueOfAttribute osdi:Attribute_LifeExpectancy ;
                        osdi:hasExpectedValue "65.0"^^xsd:double .
 
@@ -127,7 +134,8 @@ osdi:TT_NewbornLifeExpectancy rdf:type owl:NamedIndividual ,
                               osdi:includedByModel osdi:TT_P17_Model ,
                                                    osdi:TT_P18_Model ,
                                                    osdi:TT_P19_Model ,
-                                                   osdi:TT_P21_Model ;
+                                                   osdi:TT_P21_Model ,
+                                                   osdi:TT_P22_Model ;
                               osdi:isValueOfAttribute osdi:Attribute_LifeExpectancy ;
                               osdi:hasExpectedValue "80.0"^^xsd:double .
 
@@ -143,7 +151,8 @@ osdi:TT_NewbornPopulation rdf:type owl:NamedIndividual ,
                           osdi:includedByModel osdi:TT_P17_Model ,
                                                osdi:TT_P18_Model ,
                                                osdi:TT_P19_Model ,
-                                               osdi:TT_P21_Model ;
+                                               osdi:TT_P21_Model ,
+                                               osdi:TT_P22_Model ;
                           osdi:hasDescription "A dummy population of 1000 newborns, with a life expectancy of 80 years and a base utility of 0.85" ;
                           osdi:hasGeographicalContext "Spain" ;
                           osdi:hasMaxAge "100.0"^^xsd:double ;
@@ -159,7 +168,8 @@ osdi:TT_NewbornPopulationAge rdf:type owl:NamedIndividual ,
                              osdi:includedByModel osdi:TT_P17_Model ,
                                                   osdi:TT_P18_Model ,
                                                   osdi:TT_P19_Model ,
-                                                  osdi:TT_P21_Model ;
+                                                  osdi:TT_P21_Model ,
+                                                  osdi:TT_P22_Model ;
                              osdi:isValueOfAttribute osdi:Attribute_Age ;
                              osdi:hasExpectedValue "0.0"^^xsd:double .
 
@@ -3006,6 +3016,228 @@ osdi:TT_P21_OnsetAge rdf:type owl:NamedIndividual ,
                      osdi:hasExpectedValue "70.0"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P22_Disease
+osdi:TT_P22_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_P22_ManY ;
+                    osdi:includedByModel osdi:TT_P22_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P22_Experiment
+osdi:TT_P22_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_P22_Model ;
+                       osdi:hasDescription "Manifestation whose onset age exceeds the life expectancy (newborns, from 85 years)." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P22_ManY
+osdi:TT_P22_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_P22_ManY_Cost ,
+                              osdi:TT_P22_ManY_OnsetCost ;
+                 osdi:hasOnsetAge osdi:TT_P22_OnsetAge ;
+                 osdi:hasRiskCharacterization osdi:TT_P22_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_P22_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_P22_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P22_ManY_Cost
+osdi:TT_P22_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_P22_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "1000.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P22_ManY_Disutility
+osdi:TT_P22_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_P22_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.1"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P22_ManY_OnsetCost
+osdi:TT_P22_ManY_OnsetCost rdf:type owl:NamedIndividual ,
+                                    osdi:Cost ,
+                                    osdi:DeterministicParameter ;
+                           osdi:hasDataItemType osdi:Currency_Euro ;
+                           osdi:includedByModel osdi:TT_P22_Model ;
+                           osdi:appliesOneTime "true"^^xsd:boolean ;
+                           osdi:hasDescription "One-time cost of ManY" ;
+                           osdi:hasExpectedValue "5000.0"^^xsd:double ;
+                           osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P22_ManY_Risk
+osdi:TT_P22_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_P22_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P22_Model
+osdi:TT_P22_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_NewbornLifeExpectancy ,
+                                         osdi:TT_NewbornPopulation ,
+                                         osdi:TT_NewbornPopulationAge ,
+                                         osdi:TT_P22_Disease ,
+                                         osdi:TT_P22_ManY ,
+                                         osdi:TT_P22_ManY_Cost ,
+                                         osdi:TT_P22_ManY_Disutility ,
+                                         osdi:TT_P22_ManY_OnsetCost ,
+                                         osdi:TT_P22_ManY_Risk ,
+                                         osdi:TT_P22_OnsetAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "P22. Manifestation whose onset age exceeds the life expectancy (newborns, from 85 years). Life expectancy is 80: neither the annual payoffs nor the one-time cost of the manifestation are accounted" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P22_OnsetAge
+osdi:TT_P22_OnsetAge rdf:type owl:NamedIndividual ,
+                              osdi:DeterministicParameter ,
+                              osdi:Parameter ;
+                     osdi:hasDataItemType osdi:DI_Count ;
+                     osdi:includedByModel osdi:TT_P22_Model ;
+                     osdi:hasDescription "Age 85" ;
+                     osdi:hasExpectedValue "85.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P23_Disease
+osdi:TT_P23_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_P23_ManY ;
+                    osdi:includedByModel osdi:TT_P23_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P23_Experiment
+osdi:TT_P23_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_P23_Model ;
+                       osdi:hasDescription "Manifestation whose onset age is lower than the initial age of the population (population starting at 20 years, from 10 years)." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P23_ManY
+osdi:TT_P23_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_P23_ManY_Cost ,
+                              osdi:TT_P23_ManY_OnsetCost ;
+                 osdi:hasOnsetAge osdi:TT_P23_OnsetAge ;
+                 osdi:hasRiskCharacterization osdi:TT_P23_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_P23_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_P23_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P23_ManY_Cost
+osdi:TT_P23_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_P23_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "1000.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P23_ManY_Disutility
+osdi:TT_P23_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_P23_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.1"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P23_ManY_OnsetCost
+osdi:TT_P23_ManY_OnsetCost rdf:type owl:NamedIndividual ,
+                                    osdi:Cost ,
+                                    osdi:DeterministicParameter ;
+                           osdi:hasDataItemType osdi:Currency_Euro ;
+                           osdi:includedByModel osdi:TT_P23_Model ;
+                           osdi:appliesOneTime "true"^^xsd:boolean ;
+                           osdi:hasDescription "One-time cost of ManY" ;
+                           osdi:hasExpectedValue "5000.0"^^xsd:double ;
+                           osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P23_ManY_Risk
+osdi:TT_P23_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_P23_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P23_Model
+osdi:TT_P23_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_P23_Disease ,
+                                         osdi:TT_P23_ManY ,
+                                         osdi:TT_P23_ManY_Cost ,
+                                         osdi:TT_P23_ManY_Disutility ,
+                                         osdi:TT_P23_ManY_OnsetCost ,
+                                         osdi:TT_P23_ManY_Risk ,
+                                         osdi:TT_P23_OnsetAge ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "P23. Manifestation whose onset age is lower than the initial age of the population (population starting at 20 years, from 10 years). The annual payoffs are accounted from the start of the model, and the one-time cost, which happened before the start of the model, is not accounted" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P23_OnsetAge
+osdi:TT_P23_OnsetAge rdf:type owl:NamedIndividual ,
+                              osdi:DeterministicParameter ,
+                              osdi:Parameter ;
+                     osdi:hasDataItemType osdi:DI_Count ;
+                     osdi:includedByModel osdi:TT_P23_Model ;
+                     osdi:hasDescription "Age 10" ;
+                     osdi:hasExpectedValue "10.0"^^xsd:double .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_Population
 osdi:TT_Population rdf:type owl:NamedIndividual ,
                             osdi:Population ;
@@ -3030,7 +3262,8 @@ osdi:TT_Population rdf:type owl:NamedIndividual ,
                                         osdi:TT_P14_Model ,
                                         osdi:TT_P15_Model ,
                                         osdi:TT_P16_Model ,
-                                        osdi:TT_P20_Model ;
+                                        osdi:TT_P20_Model ,
+                                        osdi:TT_P23_Model ;
                    osdi:hasDescription "A dummy population of 1000 individuals. Everyone starts at 20 years old, with 65 remaining years of life and a base utility of 0.85" ;
                    osdi:hasGeographicalContext "Spain" ;
                    osdi:hasMaxAge "100.0"^^xsd:double ;
@@ -3059,7 +3292,8 @@ osdi:TT_PopulationAge rdf:type owl:NamedIndividual ,
                                            osdi:TT_P14_Model ,
                                            osdi:TT_P15_Model ,
                                            osdi:TT_P16_Model ,
-                                           osdi:TT_P20_Model ;
+                                           osdi:TT_P20_Model ,
+                                           osdi:TT_P23_Model ;
                       osdi:isValueOfAttribute osdi:Attribute_Age ;
                       osdi:hasExpectedValue "20.0"^^xsd:double .
 
@@ -3089,7 +3323,9 @@ osdi:TT_PopulationBaseUtility rdf:type owl:NamedIndividual ,
                                                    osdi:TT_P18_Model ,
                                                    osdi:TT_P19_Model ,
                                                    osdi:TT_P20_Model ,
-                                                   osdi:TT_P21_Model ;
+                                                   osdi:TT_P21_Model ,
+                                                   osdi:TT_P22_Model ,
+                                                   osdi:TT_P23_Model ;
                               osdi:appliesOneTime "false"^^xsd:boolean ;
                               osdi:hasDescription "Base utility for the studied population" ;
                               osdi:hasExpectedValue "0.85"^^xsd:double ;
@@ -3121,7 +3357,9 @@ osdi:TT_PopulationSex rdf:type owl:NamedIndividual ,
                                            osdi:TT_P18_Model ,
                                            osdi:TT_P19_Model ,
                                            osdi:TT_P20_Model ,
-                                           osdi:TT_P21_Model ;
+                                           osdi:TT_P21_Model ,
+                                           osdi:TT_P22_Model ,
+                                           osdi:TT_P23_Model ;
                       osdi:isValueOfAttribute osdi:Attribute_Sex ;
                       osdi:hasExpectedValue "0.5"^^xsd:double .
 
@@ -3151,7 +3389,9 @@ osdi:TT_TreatAnnualCost rdf:type owl:NamedIndividual ,
                                              osdi:TT_P18_Model ,
                                              osdi:TT_P19_Model ,
                                              osdi:TT_P20_Model ,
-                                             osdi:TT_P21_Model ;
+                                             osdi:TT_P21_Model ,
+                                             osdi:TT_P22_Model ,
+                                             osdi:TT_P23_Model ;
                         osdi:appliesOneTime "false"^^xsd:boolean ;
                         osdi:hasDescription "Annual cost of the assessed intervention" ;
                         osdi:hasExpectedValue "100.0"^^xsd:double ;
