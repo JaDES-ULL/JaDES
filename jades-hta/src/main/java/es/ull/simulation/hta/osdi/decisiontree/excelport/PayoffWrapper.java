@@ -529,9 +529,9 @@ public class PayoffWrapper {
         }
         switch (modifParam.getMagnitudeType()) {
             case DIFF:
-                return param.getShortName() + " - " + modifParam.getEffectMagnitude().getShortName();
+                return "(" + param.getShortName() + " - " + modifParam.getEffectMagnitude().getShortName() + ")";
             case FACTOR:
-                return param.getShortName() + " * " + modifParam.getEffectMagnitude().getShortName();
+                return "(" + param.getShortName() + " * " + modifParam.getEffectMagnitude().getShortName() + ")";
             case SET:
                 return modifParam.getEffectMagnitude().getShortName();
             default:

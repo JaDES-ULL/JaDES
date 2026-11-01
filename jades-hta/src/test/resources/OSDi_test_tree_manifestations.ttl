@@ -1,0 +1,2220 @@
+@prefix : <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix osdi: <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-manifestations> .
+
+<https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-manifestations> rdf:type owl:Ontology ;
+    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.1> ;
+    rdfs:comment "Individuals for OSDi ontology, version 1.1. Small models to test how decision trees are generated for different combinations of manifestations and developments."@en ;
+    rdfs:label "OSDi individuals for testing decision trees: manifestations"@en .
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_BaseAnnualCost
+osdi:TT_BaseAnnualCost rdf:type owl:NamedIndividual ,
+                                osdi:Cost ,
+                                osdi:DeterministicParameter ;
+                       osdi:hasDataItemType osdi:Currency_Euro ;
+                       osdi:includedByModel osdi:TT_S11_Model ,
+                                            osdi:TT_S12_Model ,
+                                            osdi:TT_S13_Model ,
+                                            osdi:TT_S14_Model ,
+                                            osdi:TT_S15_Model ,
+                                            osdi:TT_S16_Model ,
+                                            osdi:TT_S17_Model ,
+                                            osdi:TT_S18_Model ,
+                                            osdi:TT_S19_Model ;
+                       osdi:appliesOneTime "false"^^xsd:boolean ;
+                       osdi:hasDescription "Annual cost of the disease, whatever its progression" ;
+                       osdi:hasExpectedValue "1000.0"^^xsd:double ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_InterventionNone
+osdi:TT_InterventionNone rdf:type owl:NamedIndividual ,
+                                  osdi:TherapeuticIntervention ;
+                         osdi:includedByModel osdi:TT_S11_Model ,
+                                              osdi:TT_S12_Model ,
+                                              osdi:TT_S13_Model ,
+                                              osdi:TT_S14_Model ,
+                                              osdi:TT_S15_Model ,
+                                              osdi:TT_S16_Model ,
+                                              osdi:TT_S17_Model ,
+                                              osdi:TT_S18_Model ,
+                                              osdi:TT_S19_Model ;
+                         osdi:hasDescription "Comparator: do nothing" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_InterventionTreat
+osdi:TT_InterventionTreat rdf:type owl:NamedIndividual ,
+                                   osdi:TherapeuticIntervention ;
+                          osdi:hasCost osdi:TT_TreatAnnualCost ;
+                          osdi:includedByModel osdi:TT_S11_Model ,
+                                               osdi:TT_S12_Model ,
+                                               osdi:TT_S13_Model ,
+                                               osdi:TT_S14_Model ,
+                                               osdi:TT_S15_Model ,
+                                               osdi:TT_S16_Model ,
+                                               osdi:TT_S17_Model ,
+                                               osdi:TT_S18_Model ,
+                                               osdi:TT_S19_Model ;
+                          osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_LifeExpectancy
+osdi:TT_LifeExpectancy rdf:type owl:NamedIndividual ,
+                                osdi:AttributeValueParameter ,
+                                osdi:DeterministicParameter ;
+                       osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                       osdi:includedByModel osdi:TT_S11_Model ,
+                                            osdi:TT_S12_Model ,
+                                            osdi:TT_S13_Model ,
+                                            osdi:TT_S14_Model ,
+                                            osdi:TT_S15_Model ,
+                                            osdi:TT_S16_Model ,
+                                            osdi:TT_S17_Model ,
+                                            osdi:TT_S18_Model ,
+                                            osdi:TT_S19_Model ;
+                       osdi:isValueOfAttribute osdi:Attribute_LifeExpectancy ;
+                       osdi:hasExpectedValue "65.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_Population
+osdi:TT_Population rdf:type owl:NamedIndividual ,
+                            osdi:Population ;
+                   osdi:hasAge osdi:TT_PopulationAge ;
+                   osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+                   osdi:hasLifeExpectancy osdi:TT_LifeExpectancy ;
+                   osdi:hasSex osdi:TT_PopulationSex ;
+                   osdi:hasUtility osdi:TT_PopulationBaseUtility ;
+                   osdi:includedByModel osdi:TT_S11_Model ,
+                                        osdi:TT_S12_Model ,
+                                        osdi:TT_S13_Model ,
+                                        osdi:TT_S14_Model ,
+                                        osdi:TT_S15_Model ,
+                                        osdi:TT_S16_Model ,
+                                        osdi:TT_S17_Model ,
+                                        osdi:TT_S18_Model ,
+                                        osdi:TT_S19_Model ;
+                   osdi:hasDescription "A dummy population of 1000 individuals. Everyone starts at 20 years old, with 65 remaining years of life and a base utility of 0.85" ;
+                   osdi:hasGeographicalContext "Spain" ;
+                   osdi:hasMaxAge "100.0"^^xsd:double ;
+                   osdi:hasMinAge "18.0"^^xsd:double ;
+                   osdi:hasSize 1000 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_PopulationAge
+osdi:TT_PopulationAge rdf:type owl:NamedIndividual ,
+                               osdi:AttributeValueParameter ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Other ;
+                      osdi:includedByModel osdi:TT_S11_Model ,
+                                           osdi:TT_S12_Model ,
+                                           osdi:TT_S13_Model ,
+                                           osdi:TT_S14_Model ,
+                                           osdi:TT_S15_Model ,
+                                           osdi:TT_S16_Model ,
+                                           osdi:TT_S17_Model ,
+                                           osdi:TT_S18_Model ,
+                                           osdi:TT_S19_Model ;
+                      osdi:isValueOfAttribute osdi:Attribute_Age ;
+                      osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_PopulationBaseUtility
+osdi:TT_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ,
+                                       osdi:Utility ;
+                              osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                              osdi:includedByModel osdi:TT_S11_Model ,
+                                                   osdi:TT_S12_Model ,
+                                                   osdi:TT_S13_Model ,
+                                                   osdi:TT_S14_Model ,
+                                                   osdi:TT_S15_Model ,
+                                                   osdi:TT_S16_Model ,
+                                                   osdi:TT_S17_Model ,
+                                                   osdi:TT_S18_Model ,
+                                                   osdi:TT_S19_Model ;
+                              osdi:appliesOneTime "false"^^xsd:boolean ;
+                              osdi:hasDescription "Base utility for the studied population" ;
+                              osdi:hasExpectedValue "0.85"^^xsd:double ;
+                              osdi:isDisutility "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_PopulationSex
+osdi:TT_PopulationSex rdf:type owl:NamedIndividual ,
+                               osdi:AttributeValueParameter ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Proportion ;
+                      osdi:includedByModel osdi:TT_S11_Model ,
+                                           osdi:TT_S12_Model ,
+                                           osdi:TT_S13_Model ,
+                                           osdi:TT_S14_Model ,
+                                           osdi:TT_S15_Model ,
+                                           osdi:TT_S16_Model ,
+                                           osdi:TT_S17_Model ,
+                                           osdi:TT_S18_Model ,
+                                           osdi:TT_S19_Model ;
+                      osdi:isValueOfAttribute osdi:Attribute_Sex ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_Disease
+osdi:TT_S11_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_S11_ManX ,
+                                               osdi:TT_S11_ManY ;
+                    osdi:includedByModel osdi:TT_S11_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_Experiment
+osdi:TT_S11_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_S11_Model ;
+                       osdi:hasDescription "Two coexistent manifestations without developments." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManX
+osdi:TT_S11_ManX rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S11_ManX_Cost ;
+                 osdi:hasRiskCharacterization osdi:TT_S11_ManX_Risk ;
+                 osdi:hasUtility osdi:TT_S11_ManX_Disutility ;
+                 osdi:includedByModel osdi:TT_S11_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManX_Cost
+osdi:TT_S11_ManX_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S11_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManX" ;
+                      osdi:hasExpectedValue "150.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManX_Disutility
+osdi:TT_S11_ManX_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S11_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManX" ;
+                            osdi:hasExpectedValue "0.03"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManX_Risk
+osdi:TT_S11_ManX_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S11_Model ;
+                      osdi:hasDescription "Probability of ManX" ;
+                      osdi:hasExpectedValue "0.2"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManY
+osdi:TT_S11_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S11_ManY_Cost ;
+                 osdi:hasEffect osdi:TT_S11_ManY_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S11_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_S11_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_S11_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManY_Cost
+osdi:TT_S11_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S11_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "250.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManY_Disutility
+osdi:TT_S11_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S11_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.06"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManY_LER
+osdi:TT_S11_ManY_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S11_ManY_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S11_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManY_LERMagnitude
+osdi:TT_S11_ManY_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S11_Model ;
+                              osdi:hasDescription "Years of life lost due to ManY" ;
+                              osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_ManY_Risk
+osdi:TT_S11_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S11_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_Model
+osdi:TT_S11_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_S11_Disease ,
+                                         osdi:TT_S11_ManX ,
+                                         osdi:TT_S11_ManX_Cost ,
+                                         osdi:TT_S11_ManX_Disutility ,
+                                         osdi:TT_S11_ManX_Risk ,
+                                         osdi:TT_S11_ManY ,
+                                         osdi:TT_S11_ManY_Cost ,
+                                         osdi:TT_S11_ManY_Disutility ,
+                                         osdi:TT_S11_ManY_LER ,
+                                         osdi:TT_S11_ManY_LERMagnitude ,
+                                         osdi:TT_S11_ManY_Risk ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "S11. Two coexistent manifestations without developments. Manifestations not linked to any development and not affected by any rule are independent." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_AlternativeMans
+osdi:TT_S12_AlternativeMans rdf:type owl:NamedIndividual ,
+                                     osdi:AlternativeCombinationRule ;
+                            osdi:affectsProgressionElement osdi:TT_S12_ManY ,
+                                                           osdi:TT_S12_ManZ ;
+                            osdi:includedByModel osdi:TT_S12_Model ;
+                            osdi:hasNullProgression "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_Disease
+osdi:TT_S12_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_S12_ManY ,
+                                               osdi:TT_S12_ManZ ,
+                                               osdi:TT_S12_AlternativeMans ;
+                    osdi:includedByModel osdi:TT_S12_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_Experiment
+osdi:TT_S12_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_S12_Model ;
+                       osdi:hasDescription "Alternative manifestations with null progression, without developments." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManY
+osdi:TT_S12_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S12_ManY_Cost ;
+                 osdi:hasEffect osdi:TT_S12_ManY_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S12_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_S12_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_S12_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManY_Cost
+osdi:TT_S12_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S12_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "250.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManY_Disutility
+osdi:TT_S12_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S12_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.06"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManY_LER
+osdi:TT_S12_ManY_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S12_ManY_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S12_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManY_LERMagnitude
+osdi:TT_S12_ManY_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S12_Model ;
+                              osdi:hasDescription "Years of life lost due to ManY" ;
+                              osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManY_Risk
+osdi:TT_S12_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S12_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManZ
+osdi:TT_S12_ManZ rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S12_ManZ_Cost ;
+                 osdi:hasRiskCharacterization osdi:TT_S12_ManZ_Risk ;
+                 osdi:hasUtility osdi:TT_S12_ManZ_Disutility ;
+                 osdi:includedByModel osdi:TT_S12_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManZ_Cost
+osdi:TT_S12_ManZ_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S12_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManZ" ;
+                      osdi:hasExpectedValue "350.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManZ_Disutility
+osdi:TT_S12_ManZ_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S12_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManZ" ;
+                            osdi:hasExpectedValue "0.04"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_ManZ_Risk
+osdi:TT_S12_ManZ_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S12_Model ;
+                      osdi:hasDescription "Probability of ManZ" ;
+                      osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_Model
+osdi:TT_S12_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_S12_AlternativeMans ,
+                                         osdi:TT_S12_Disease ,
+                                         osdi:TT_S12_ManY ,
+                                         osdi:TT_S12_ManY_Cost ,
+                                         osdi:TT_S12_ManY_Disutility ,
+                                         osdi:TT_S12_ManY_LER ,
+                                         osdi:TT_S12_ManY_LERMagnitude ,
+                                         osdi:TT_S12_ManY_Risk ,
+                                         osdi:TT_S12_ManZ ,
+                                         osdi:TT_S12_ManZ_Cost ,
+                                         osdi:TT_S12_ManZ_Disutility ,
+                                         osdi:TT_S12_ManZ_Risk ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "S12. Alternative manifestations with null progression, without developments. Two mutually exclusive manifestations plus 'none of them' (0.2)." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_AlternativeMans
+osdi:TT_S13_AlternativeMans rdf:type owl:NamedIndividual ,
+                                     osdi:AlternativeCombinationRule ;
+                            osdi:affectsProgressionElement osdi:TT_S13_ManY ,
+                                                           osdi:TT_S13_ManZ ;
+                            osdi:includedByModel osdi:TT_S13_Model ;
+                            osdi:hasNullProgression "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_Disease
+osdi:TT_S13_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_S13_ManX ,
+                                               osdi:TT_S13_ManY ,
+                                               osdi:TT_S13_ManZ ,
+                                               osdi:TT_S13_AlternativeMans ;
+                    osdi:includedByModel osdi:TT_S13_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_Experiment
+osdi:TT_S13_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_S13_Model ;
+                       osdi:hasDescription "Coexistent manifestation plus alternative manifestations." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManX
+osdi:TT_S13_ManX rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S13_ManX_Cost ;
+                 osdi:hasRiskCharacterization osdi:TT_S13_ManX_Risk ;
+                 osdi:hasUtility osdi:TT_S13_ManX_Disutility ;
+                 osdi:includedByModel osdi:TT_S13_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManX_Cost
+osdi:TT_S13_ManX_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S13_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManX" ;
+                      osdi:hasExpectedValue "150.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManX_Disutility
+osdi:TT_S13_ManX_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S13_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManX" ;
+                            osdi:hasExpectedValue "0.03"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManX_Risk
+osdi:TT_S13_ManX_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S13_Model ;
+                      osdi:hasDescription "Probability of ManX" ;
+                      osdi:hasExpectedValue "0.4"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManY
+osdi:TT_S13_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S13_ManY_Cost ;
+                 osdi:hasEffect osdi:TT_S13_ManY_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S13_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_S13_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_S13_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManY_Cost
+osdi:TT_S13_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S13_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "250.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManY_Disutility
+osdi:TT_S13_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S13_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.06"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManY_LER
+osdi:TT_S13_ManY_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S13_ManY_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S13_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManY_LERMagnitude
+osdi:TT_S13_ManY_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S13_Model ;
+                              osdi:hasDescription "Years of life lost due to ManY" ;
+                              osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManY_Risk
+osdi:TT_S13_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S13_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManZ
+osdi:TT_S13_ManZ rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S13_ManZ_Cost ;
+                 osdi:hasRiskCharacterization osdi:TT_S13_ManZ_Risk ;
+                 osdi:hasUtility osdi:TT_S13_ManZ_Disutility ;
+                 osdi:includedByModel osdi:TT_S13_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManZ_Cost
+osdi:TT_S13_ManZ_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S13_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManZ" ;
+                      osdi:hasExpectedValue "350.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManZ_Disutility
+osdi:TT_S13_ManZ_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S13_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManZ" ;
+                            osdi:hasExpectedValue "0.04"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_ManZ_Risk
+osdi:TT_S13_ManZ_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S13_Model ;
+                      osdi:hasDescription "Probability of ManZ" ;
+                      osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_Model
+osdi:TT_S13_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_S13_AlternativeMans ,
+                                         osdi:TT_S13_Disease ,
+                                         osdi:TT_S13_ManX ,
+                                         osdi:TT_S13_ManX_Cost ,
+                                         osdi:TT_S13_ManX_Disutility ,
+                                         osdi:TT_S13_ManX_Risk ,
+                                         osdi:TT_S13_ManY ,
+                                         osdi:TT_S13_ManY_Cost ,
+                                         osdi:TT_S13_ManY_Disutility ,
+                                         osdi:TT_S13_ManY_LER ,
+                                         osdi:TT_S13_ManY_LERMagnitude ,
+                                         osdi:TT_S13_ManY_Risk ,
+                                         osdi:TT_S13_ManZ ,
+                                         osdi:TT_S13_ManZ_Cost ,
+                                         osdi:TT_S13_ManZ_Disutility ,
+                                         osdi:TT_S13_ManZ_Risk ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "S13. Coexistent manifestation plus alternative manifestations. ManX is independent of the set of alternatives {ManY, ManZ, none}: 6 combinations." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_DevA
+osdi:TT_S14_DevA rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S14_DevA_Cost ;
+                 osdi:hasEffect osdi:TT_S14_DevA_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S14_DevA_Risk ;
+                 osdi:hasSubProgression osdi:TT_S14_ManY ;
+                 osdi:hasUtility osdi:TT_S14_DevA_Disutility ;
+                 osdi:includedByModel osdi:TT_S14_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_DevA_Cost
+osdi:TT_S14_DevA_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S14_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevA" ;
+                      osdi:hasExpectedValue "500.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_DevA_Disutility
+osdi:TT_S14_DevA_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S14_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevA" ;
+                            osdi:hasExpectedValue "0.1"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_DevA_LER
+osdi:TT_S14_DevA_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S14_DevA_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S14_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_DevA_LERMagnitude
+osdi:TT_S14_DevA_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S14_Model ;
+                              osdi:hasDescription "Years of life lost due to DevA" ;
+                              osdi:hasExpectedValue "10.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_DevA_Risk
+osdi:TT_S14_DevA_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S14_Model ;
+                      osdi:hasDescription "Probability of DevA" ;
+                      osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_Disease
+osdi:TT_S14_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_S14_DevA ,
+                                               osdi:TT_S14_ManY ;
+                    osdi:includedByModel osdi:TT_S14_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_Experiment
+osdi:TT_S14_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_S14_Model ;
+                       osdi:hasDescription "Development with a linked manifestation." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_ManY
+osdi:TT_S14_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S14_ManY_Cost ;
+                 osdi:hasEffect osdi:TT_S14_ManY_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S14_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_S14_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_S14_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_ManY_Cost
+osdi:TT_S14_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S14_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "250.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_ManY_Disutility
+osdi:TT_S14_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S14_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.06"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_ManY_LER
+osdi:TT_S14_ManY_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S14_ManY_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S14_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_ManY_LERMagnitude
+osdi:TT_S14_ManY_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S14_Model ;
+                              osdi:hasDescription "Years of life lost due to ManY" ;
+                              osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_ManY_Risk
+osdi:TT_S14_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S14_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_Model
+osdi:TT_S14_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_S14_DevA ,
+                                         osdi:TT_S14_DevA_Cost ,
+                                         osdi:TT_S14_DevA_Disutility ,
+                                         osdi:TT_S14_DevA_LER ,
+                                         osdi:TT_S14_DevA_LERMagnitude ,
+                                         osdi:TT_S14_DevA_Risk ,
+                                         osdi:TT_S14_Disease ,
+                                         osdi:TT_S14_ManY ,
+                                         osdi:TT_S14_ManY_Cost ,
+                                         osdi:TT_S14_ManY_Disutility ,
+                                         osdi:TT_S14_ManY_LER ,
+                                         osdi:TT_S14_ManY_LERMagnitude ,
+                                         osdi:TT_S14_ManY_Risk ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "S14. Development with a linked manifestation. ManY is a sub-progression of DevA: it can only appear together with DevA." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevA
+osdi:TT_S15_DevA rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S15_DevA_Cost ;
+                 osdi:hasEffect osdi:TT_S15_DevA_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S15_DevA_Risk ;
+                 osdi:hasSubProgression osdi:TT_S15_ManY ;
+                 osdi:hasUtility osdi:TT_S15_DevA_Disutility ;
+                 osdi:includedByModel osdi:TT_S15_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevA_Cost
+osdi:TT_S15_DevA_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S15_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevA" ;
+                      osdi:hasExpectedValue "500.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevA_Disutility
+osdi:TT_S15_DevA_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S15_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevA" ;
+                            osdi:hasExpectedValue "0.1"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevA_LER
+osdi:TT_S15_DevA_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S15_DevA_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S15_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevA_LERMagnitude
+osdi:TT_S15_DevA_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S15_Model ;
+                              osdi:hasDescription "Years of life lost due to DevA" ;
+                              osdi:hasExpectedValue "10.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevA_Risk
+osdi:TT_S15_DevA_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S15_Model ;
+                      osdi:hasDescription "Probability of DevA" ;
+                      osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevB
+osdi:TT_S15_DevB rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S15_DevB_Cost ;
+                 osdi:hasEffect osdi:TT_S15_DevB_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S15_DevB_Risk ;
+                 osdi:hasSubProgression osdi:TT_S15_ManZ ;
+                 osdi:hasUtility osdi:TT_S15_DevB_Disutility ;
+                 osdi:includedByModel osdi:TT_S15_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevB_Cost
+osdi:TT_S15_DevB_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S15_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevB" ;
+                      osdi:hasExpectedValue "300.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevB_Disutility
+osdi:TT_S15_DevB_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S15_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevB" ;
+                            osdi:hasExpectedValue "0.05"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevB_LER
+osdi:TT_S15_DevB_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S15_DevB_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S15_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevB" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevB_LERMagnitude
+osdi:TT_S15_DevB_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S15_Model ;
+                              osdi:hasDescription "Years of life lost due to DevB" ;
+                              osdi:hasExpectedValue "4.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_DevB_Risk
+osdi:TT_S15_DevB_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S15_Model ;
+                      osdi:hasDescription "Probability of DevB" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_Disease
+osdi:TT_S15_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_S15_DevA ,
+                                               osdi:TT_S15_DevB ,
+                                               osdi:TT_S15_ManY ,
+                                               osdi:TT_S15_ManZ ;
+                    osdi:includedByModel osdi:TT_S15_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_Experiment
+osdi:TT_S15_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_S15_Model ;
+                       osdi:hasDescription "Two coexistent developments, each one with its own manifestation." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManY
+osdi:TT_S15_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S15_ManY_Cost ;
+                 osdi:hasEffect osdi:TT_S15_ManY_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S15_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_S15_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_S15_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManY_Cost
+osdi:TT_S15_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S15_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "250.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManY_Disutility
+osdi:TT_S15_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S15_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.06"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManY_LER
+osdi:TT_S15_ManY_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S15_ManY_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S15_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManY_LERMagnitude
+osdi:TT_S15_ManY_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S15_Model ;
+                              osdi:hasDescription "Years of life lost due to ManY" ;
+                              osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManY_Risk
+osdi:TT_S15_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S15_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManZ
+osdi:TT_S15_ManZ rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S15_ManZ_Cost ;
+                 osdi:hasRiskCharacterization osdi:TT_S15_ManZ_Risk ;
+                 osdi:hasUtility osdi:TT_S15_ManZ_Disutility ;
+                 osdi:includedByModel osdi:TT_S15_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManZ_Cost
+osdi:TT_S15_ManZ_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S15_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManZ" ;
+                      osdi:hasExpectedValue "350.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManZ_Disutility
+osdi:TT_S15_ManZ_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S15_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManZ" ;
+                            osdi:hasExpectedValue "0.04"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_ManZ_Risk
+osdi:TT_S15_ManZ_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S15_Model ;
+                      osdi:hasDescription "Probability of ManZ" ;
+                      osdi:hasExpectedValue "0.4"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_Model
+osdi:TT_S15_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_S15_DevA ,
+                                         osdi:TT_S15_DevA_Cost ,
+                                         osdi:TT_S15_DevA_Disutility ,
+                                         osdi:TT_S15_DevA_LER ,
+                                         osdi:TT_S15_DevA_LERMagnitude ,
+                                         osdi:TT_S15_DevA_Risk ,
+                                         osdi:TT_S15_DevB ,
+                                         osdi:TT_S15_DevB_Cost ,
+                                         osdi:TT_S15_DevB_Disutility ,
+                                         osdi:TT_S15_DevB_LER ,
+                                         osdi:TT_S15_DevB_LERMagnitude ,
+                                         osdi:TT_S15_DevB_Risk ,
+                                         osdi:TT_S15_Disease ,
+                                         osdi:TT_S15_ManY ,
+                                         osdi:TT_S15_ManY_Cost ,
+                                         osdi:TT_S15_ManY_Disutility ,
+                                         osdi:TT_S15_ManY_LER ,
+                                         osdi:TT_S15_ManY_LERMagnitude ,
+                                         osdi:TT_S15_ManY_Risk ,
+                                         osdi:TT_S15_ManZ ,
+                                         osdi:TT_S15_ManZ_Cost ,
+                                         osdi:TT_S15_ManZ_Disutility ,
+                                         osdi:TT_S15_ManZ_Risk ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "S15. Two coexistent developments, each one with its own manifestation. ManY only appears with DevA and ManZ only with DevB: 9 combinations." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_AlternativeDevs
+osdi:TT_S16_AlternativeDevs rdf:type owl:NamedIndividual ,
+                                     osdi:AlternativeCombinationRule ;
+                            osdi:affectsProgressionElement osdi:TT_S16_DevA ,
+                                                           osdi:TT_S16_DevB ;
+                            osdi:includedByModel osdi:TT_S16_Model ;
+                            osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevA
+osdi:TT_S16_DevA rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S16_DevA_Cost ;
+                 osdi:hasEffect osdi:TT_S16_DevA_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S16_DevA_Risk ;
+                 osdi:hasSubProgression osdi:TT_S16_ManY ;
+                 osdi:hasUtility osdi:TT_S16_DevA_Disutility ;
+                 osdi:includedByModel osdi:TT_S16_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevA_Cost
+osdi:TT_S16_DevA_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S16_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevA" ;
+                      osdi:hasExpectedValue "500.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevA_Disutility
+osdi:TT_S16_DevA_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S16_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevA" ;
+                            osdi:hasExpectedValue "0.1"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevA_LER
+osdi:TT_S16_DevA_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S16_DevA_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S16_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevA_LERMagnitude
+osdi:TT_S16_DevA_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S16_Model ;
+                              osdi:hasDescription "Years of life lost due to DevA" ;
+                              osdi:hasExpectedValue "10.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevA_Risk
+osdi:TT_S16_DevA_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S16_Model ;
+                      osdi:hasDescription "Probability of DevA" ;
+                      osdi:hasExpectedValue "0.6"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevB
+osdi:TT_S16_DevB rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S16_DevB_Cost ;
+                 osdi:hasEffect osdi:TT_S16_DevB_LER ;
+                 osdi:hasSubProgression osdi:TT_S16_ManZ ;
+                 osdi:hasUtility osdi:TT_S16_DevB_Disutility ;
+                 osdi:includedByModel osdi:TT_S16_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevB_Cost
+osdi:TT_S16_DevB_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S16_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevB" ;
+                      osdi:hasExpectedValue "300.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevB_Disutility
+osdi:TT_S16_DevB_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S16_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevB" ;
+                            osdi:hasExpectedValue "0.05"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevB_LER
+osdi:TT_S16_DevB_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S16_DevB_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S16_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevB" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_DevB_LERMagnitude
+osdi:TT_S16_DevB_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S16_Model ;
+                              osdi:hasDescription "Years of life lost due to DevB" ;
+                              osdi:hasExpectedValue "4.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_Disease
+osdi:TT_S16_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_S16_DevA ,
+                                               osdi:TT_S16_DevB ,
+                                               osdi:TT_S16_ManY ,
+                                               osdi:TT_S16_ManZ ,
+                                               osdi:TT_S16_AlternativeDevs ;
+                    osdi:includedByModel osdi:TT_S16_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_Experiment
+osdi:TT_S16_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_S16_Model ;
+                       osdi:hasDescription "Alternative developments, each one with its own manifestation." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManY
+osdi:TT_S16_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S16_ManY_Cost ;
+                 osdi:hasEffect osdi:TT_S16_ManY_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S16_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_S16_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_S16_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManY_Cost
+osdi:TT_S16_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S16_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "250.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManY_Disutility
+osdi:TT_S16_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S16_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.06"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManY_LER
+osdi:TT_S16_ManY_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S16_ManY_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S16_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManY_LERMagnitude
+osdi:TT_S16_ManY_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S16_Model ;
+                              osdi:hasDescription "Years of life lost due to ManY" ;
+                              osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManY_Risk
+osdi:TT_S16_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S16_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManZ
+osdi:TT_S16_ManZ rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S16_ManZ_Cost ;
+                 osdi:hasRiskCharacterization osdi:TT_S16_ManZ_Risk ;
+                 osdi:hasUtility osdi:TT_S16_ManZ_Disutility ;
+                 osdi:includedByModel osdi:TT_S16_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManZ_Cost
+osdi:TT_S16_ManZ_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S16_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManZ" ;
+                      osdi:hasExpectedValue "350.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManZ_Disutility
+osdi:TT_S16_ManZ_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S16_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManZ" ;
+                            osdi:hasExpectedValue "0.04"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_ManZ_Risk
+osdi:TT_S16_ManZ_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S16_Model ;
+                      osdi:hasDescription "Probability of ManZ" ;
+                      osdi:hasExpectedValue "0.4"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_Model
+osdi:TT_S16_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_S16_AlternativeDevs ,
+                                         osdi:TT_S16_DevA ,
+                                         osdi:TT_S16_DevA_Cost ,
+                                         osdi:TT_S16_DevA_Disutility ,
+                                         osdi:TT_S16_DevA_LER ,
+                                         osdi:TT_S16_DevA_LERMagnitude ,
+                                         osdi:TT_S16_DevA_Risk ,
+                                         osdi:TT_S16_DevB ,
+                                         osdi:TT_S16_DevB_Cost ,
+                                         osdi:TT_S16_DevB_Disutility ,
+                                         osdi:TT_S16_DevB_LER ,
+                                         osdi:TT_S16_DevB_LERMagnitude ,
+                                         osdi:TT_S16_Disease ,
+                                         osdi:TT_S16_ManY ,
+                                         osdi:TT_S16_ManY_Cost ,
+                                         osdi:TT_S16_ManY_Disutility ,
+                                         osdi:TT_S16_ManY_LER ,
+                                         osdi:TT_S16_ManY_LERMagnitude ,
+                                         osdi:TT_S16_ManY_Risk ,
+                                         osdi:TT_S16_ManZ ,
+                                         osdi:TT_S16_ManZ_Cost ,
+                                         osdi:TT_S16_ManZ_Disutility ,
+                                         osdi:TT_S16_ManZ_Risk ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "S16. Alternative developments, each one with its own manifestation. DevA (0.6) may lead to ManY; DevB (default, 0.4) may lead to ManZ." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_DevA
+osdi:TT_S17_DevA rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S17_DevA_Cost ;
+                 osdi:hasEffect osdi:TT_S17_DevA_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S17_DevA_Risk ;
+                 osdi:hasSubProgression osdi:TT_S17_ManY ;
+                 osdi:hasUtility osdi:TT_S17_DevA_Disutility ;
+                 osdi:includedByModel osdi:TT_S17_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_DevA_Cost
+osdi:TT_S17_DevA_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S17_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevA" ;
+                      osdi:hasExpectedValue "500.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_DevA_Disutility
+osdi:TT_S17_DevA_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S17_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevA" ;
+                            osdi:hasExpectedValue "0.1"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_DevA_LER
+osdi:TT_S17_DevA_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S17_DevA_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S17_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_DevA_LERMagnitude
+osdi:TT_S17_DevA_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S17_Model ;
+                              osdi:hasDescription "Years of life lost due to DevA" ;
+                              osdi:hasExpectedValue "10.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_DevA_Risk
+osdi:TT_S17_DevA_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S17_Model ;
+                      osdi:hasDescription "Probability of DevA" ;
+                      osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_Disease
+osdi:TT_S17_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_S17_DevA ,
+                                               osdi:TT_S17_ManX ,
+                                               osdi:TT_S17_ManY ;
+                    osdi:includedByModel osdi:TT_S17_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_Experiment
+osdi:TT_S17_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_S17_Model ;
+                       osdi:hasDescription "Development with a linked manifestation plus an independent manifestation." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManX
+osdi:TT_S17_ManX rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S17_ManX_Cost ;
+                 osdi:hasRiskCharacterization osdi:TT_S17_ManX_Risk ;
+                 osdi:hasUtility osdi:TT_S17_ManX_Disutility ;
+                 osdi:includedByModel osdi:TT_S17_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManX_Cost
+osdi:TT_S17_ManX_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S17_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManX" ;
+                      osdi:hasExpectedValue "150.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManX_Disutility
+osdi:TT_S17_ManX_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S17_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManX" ;
+                            osdi:hasExpectedValue "0.03"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManX_Risk
+osdi:TT_S17_ManX_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S17_Model ;
+                      osdi:hasDescription "Probability of ManX" ;
+                      osdi:hasExpectedValue "0.2"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManY
+osdi:TT_S17_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S17_ManY_Cost ;
+                 osdi:hasEffect osdi:TT_S17_ManY_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S17_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_S17_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_S17_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManY_Cost
+osdi:TT_S17_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S17_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "250.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManY_Disutility
+osdi:TT_S17_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S17_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.06"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManY_LER
+osdi:TT_S17_ManY_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S17_ManY_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S17_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManY_LERMagnitude
+osdi:TT_S17_ManY_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S17_Model ;
+                              osdi:hasDescription "Years of life lost due to ManY" ;
+                              osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_ManY_Risk
+osdi:TT_S17_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S17_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_Model
+osdi:TT_S17_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_S17_DevA ,
+                                         osdi:TT_S17_DevA_Cost ,
+                                         osdi:TT_S17_DevA_Disutility ,
+                                         osdi:TT_S17_DevA_LER ,
+                                         osdi:TT_S17_DevA_LERMagnitude ,
+                                         osdi:TT_S17_DevA_Risk ,
+                                         osdi:TT_S17_Disease ,
+                                         osdi:TT_S17_ManX ,
+                                         osdi:TT_S17_ManX_Cost ,
+                                         osdi:TT_S17_ManX_Disutility ,
+                                         osdi:TT_S17_ManX_Risk ,
+                                         osdi:TT_S17_ManY ,
+                                         osdi:TT_S17_ManY_Cost ,
+                                         osdi:TT_S17_ManY_Disutility ,
+                                         osdi:TT_S17_ManY_LER ,
+                                         osdi:TT_S17_ManY_LERMagnitude ,
+                                         osdi:TT_S17_ManY_Risk ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "S17. Development with a linked manifestation plus an independent manifestation. ManX appears whatever the development; ManY only with DevA: 6 combinations." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevA
+osdi:TT_S18_DevA rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S18_DevA_Cost ;
+                 osdi:hasEffect osdi:TT_S18_DevA_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S18_DevA_Risk ;
+                 osdi:hasSubProgression osdi:TT_S18_ManZ ;
+                 osdi:hasUtility osdi:TT_S18_DevA_Disutility ;
+                 osdi:includedByModel osdi:TT_S18_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevA_Cost
+osdi:TT_S18_DevA_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S18_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevA" ;
+                      osdi:hasExpectedValue "500.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevA_Disutility
+osdi:TT_S18_DevA_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S18_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevA" ;
+                            osdi:hasExpectedValue "0.1"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevA_LER
+osdi:TT_S18_DevA_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S18_DevA_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S18_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevA_LERMagnitude
+osdi:TT_S18_DevA_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S18_Model ;
+                              osdi:hasDescription "Years of life lost due to DevA" ;
+                              osdi:hasExpectedValue "10.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevA_Risk
+osdi:TT_S18_DevA_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S18_Model ;
+                      osdi:hasDescription "Probability of DevA" ;
+                      osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevB
+osdi:TT_S18_DevB rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S18_DevB_Cost ;
+                 osdi:hasEffect osdi:TT_S18_DevB_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S18_DevB_Risk ;
+                 osdi:hasSubProgression osdi:TT_S18_ManZ ;
+                 osdi:hasUtility osdi:TT_S18_DevB_Disutility ;
+                 osdi:includedByModel osdi:TT_S18_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevB_Cost
+osdi:TT_S18_DevB_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S18_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevB" ;
+                      osdi:hasExpectedValue "300.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevB_Disutility
+osdi:TT_S18_DevB_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S18_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevB" ;
+                            osdi:hasExpectedValue "0.05"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevB_LER
+osdi:TT_S18_DevB_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S18_DevB_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S18_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevB" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevB_LERMagnitude
+osdi:TT_S18_DevB_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S18_Model ;
+                              osdi:hasDescription "Years of life lost due to DevB" ;
+                              osdi:hasExpectedValue "4.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_DevB_Risk
+osdi:TT_S18_DevB_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S18_Model ;
+                      osdi:hasDescription "Probability of DevB" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_Disease
+osdi:TT_S18_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_S18_DevA ,
+                                               osdi:TT_S18_DevB ,
+                                               osdi:TT_S18_ManZ ;
+                    osdi:includedByModel osdi:TT_S18_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_Experiment
+osdi:TT_S18_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_S18_Model ;
+                       osdi:hasDescription "Manifestation shared by two coexistent developments." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_ManZ
+osdi:TT_S18_ManZ rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S18_ManZ_Cost ;
+                 osdi:hasRiskCharacterization osdi:TT_S18_ManZ_Risk ;
+                 osdi:hasUtility osdi:TT_S18_ManZ_Disutility ;
+                 osdi:includedByModel osdi:TT_S18_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_ManZ_Cost
+osdi:TT_S18_ManZ_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S18_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManZ" ;
+                      osdi:hasExpectedValue "350.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_ManZ_Disutility
+osdi:TT_S18_ManZ_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S18_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManZ" ;
+                            osdi:hasExpectedValue "0.04"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_ManZ_Risk
+osdi:TT_S18_ManZ_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S18_Model ;
+                      osdi:hasDescription "Probability of ManZ" ;
+                      osdi:hasExpectedValue "0.4"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_Model
+osdi:TT_S18_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_S18_DevA ,
+                                         osdi:TT_S18_DevA_Cost ,
+                                         osdi:TT_S18_DevA_Disutility ,
+                                         osdi:TT_S18_DevA_LER ,
+                                         osdi:TT_S18_DevA_LERMagnitude ,
+                                         osdi:TT_S18_DevA_Risk ,
+                                         osdi:TT_S18_DevB ,
+                                         osdi:TT_S18_DevB_Cost ,
+                                         osdi:TT_S18_DevB_Disutility ,
+                                         osdi:TT_S18_DevB_LER ,
+                                         osdi:TT_S18_DevB_LERMagnitude ,
+                                         osdi:TT_S18_DevB_Risk ,
+                                         osdi:TT_S18_Disease ,
+                                         osdi:TT_S18_ManZ ,
+                                         osdi:TT_S18_ManZ_Cost ,
+                                         osdi:TT_S18_ManZ_Disutility ,
+                                         osdi:TT_S18_ManZ_Risk ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "S18. Manifestation shared by two coexistent developments. ManZ may appear if DevA, DevB or both are present (once): 7 combinations." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_AlternativeDevs
+osdi:TT_S19_AlternativeDevs rdf:type owl:NamedIndividual ,
+                                     osdi:AlternativeCombinationRule ;
+                            osdi:affectsProgressionElement osdi:TT_S19_DevA ,
+                                                           osdi:TT_S19_DevB ;
+                            osdi:includedByModel osdi:TT_S19_Model ;
+                            osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_AlternativeMans
+osdi:TT_S19_AlternativeMans rdf:type owl:NamedIndividual ,
+                                     osdi:AlternativeCombinationRule ;
+                            osdi:affectsProgressionElement osdi:TT_S19_ManY ,
+                                                           osdi:TT_S19_ManZ ;
+                            osdi:includedByModel osdi:TT_S19_Model ;
+                            osdi:hasNullProgression "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevA
+osdi:TT_S19_DevA rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S19_DevA_Cost ;
+                 osdi:hasEffect osdi:TT_S19_DevA_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S19_DevA_Risk ;
+                 osdi:hasSubProgression osdi:TT_S19_ManY ,
+                                        osdi:TT_S19_ManZ ;
+                 osdi:hasUtility osdi:TT_S19_DevA_Disutility ;
+                 osdi:includedByModel osdi:TT_S19_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevA_Cost
+osdi:TT_S19_DevA_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S19_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevA" ;
+                      osdi:hasExpectedValue "500.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevA_Disutility
+osdi:TT_S19_DevA_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S19_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevA" ;
+                            osdi:hasExpectedValue "0.1"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevA_LER
+osdi:TT_S19_DevA_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S19_DevA_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S19_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevA_LERMagnitude
+osdi:TT_S19_DevA_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S19_Model ;
+                              osdi:hasDescription "Years of life lost due to DevA" ;
+                              osdi:hasExpectedValue "10.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevA_Risk
+osdi:TT_S19_DevA_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S19_Model ;
+                      osdi:hasDescription "Probability of DevA" ;
+                      osdi:hasExpectedValue "0.6"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevB
+osdi:TT_S19_DevB rdf:type owl:NamedIndividual ,
+                          osdi:Development ;
+                 osdi:hasCost osdi:TT_S19_DevB_Cost ;
+                 osdi:hasEffect osdi:TT_S19_DevB_LER ;
+                 osdi:hasUtility osdi:TT_S19_DevB_Disutility ;
+                 osdi:includedByModel osdi:TT_S19_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevB_Cost
+osdi:TT_S19_DevB_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S19_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of DevB" ;
+                      osdi:hasExpectedValue "300.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevB_Disutility
+osdi:TT_S19_DevB_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S19_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of DevB" ;
+                            osdi:hasExpectedValue "0.05"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevB_LER
+osdi:TT_S19_DevB_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S19_DevB_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S19_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to DevB" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_DevB_LERMagnitude
+osdi:TT_S19_DevB_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S19_Model ;
+                              osdi:hasDescription "Years of life lost due to DevB" ;
+                              osdi:hasExpectedValue "4.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_Disease
+osdi:TT_S19_Disease rdf:type owl:NamedIndividual ,
+                             osdi:Disease ;
+                    osdi:hasCost osdi:TT_BaseAnnualCost ;
+                    osdi:hasIntervention osdi:TT_InterventionTreat ,
+                                         osdi:TT_InterventionNone ;
+                    osdi:hasProgressionElement osdi:TT_S19_DevA ,
+                                               osdi:TT_S19_DevB ,
+                                               osdi:TT_S19_ManY ,
+                                               osdi:TT_S19_ManZ ,
+                                               osdi:TT_S19_AlternativeDevs ,
+                                               osdi:TT_S19_AlternativeMans ;
+                    osdi:includedByModel osdi:TT_S19_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_Experiment
+osdi:TT_S19_Experiment rdf:type owl:NamedIndividual ,
+                                osdi:Experiment ;
+                       osdi:usesModel osdi:TT_S19_Model ;
+                       osdi:hasDescription "Alternative developments, one of them with alternative manifestations." ;
+                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+                       osdi:hasDisutilityCombinationMethod "ADD" ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManY
+osdi:TT_S19_ManY rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S19_ManY_Cost ;
+                 osdi:hasEffect osdi:TT_S19_ManY_LER ;
+                 osdi:hasRiskCharacterization osdi:TT_S19_ManY_Risk ;
+                 osdi:hasUtility osdi:TT_S19_ManY_Disutility ;
+                 osdi:includedByModel osdi:TT_S19_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManY_Cost
+osdi:TT_S19_ManY_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S19_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManY" ;
+                      osdi:hasExpectedValue "250.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManY_Disutility
+osdi:TT_S19_ManY_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S19_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManY" ;
+                            osdi:hasExpectedValue "0.06"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManY_LER
+osdi:TT_S19_ManY_LER rdf:type owl:NamedIndividual ,
+                              osdi:LifeExpectancyReductionEffect ;
+                     osdi:affects osdi:Attribute_LifeExpectancy ;
+                     osdi:hasEffectMagnitude osdi:TT_S19_ManY_LERMagnitude ;
+                     osdi:includedByModel osdi:TT_S19_Model ;
+                     osdi:hasDescription "Life expectancy reduction due to ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManY_LERMagnitude
+osdi:TT_S19_ManY_LERMagnitude rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:includedByModel osdi:TT_S19_Model ;
+                              osdi:hasDescription "Years of life lost due to ManY" ;
+                              osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManY_Risk
+osdi:TT_S19_ManY_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S19_Model ;
+                      osdi:hasDescription "Probability of ManY" ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManZ
+osdi:TT_S19_ManZ rdf:type owl:NamedIndividual ,
+                          osdi:ChronicManifestation ;
+                 osdi:hasCost osdi:TT_S19_ManZ_Cost ;
+                 osdi:hasRiskCharacterization osdi:TT_S19_ManZ_Risk ;
+                 osdi:hasUtility osdi:TT_S19_ManZ_Disutility ;
+                 osdi:includedByModel osdi:TT_S19_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManZ_Cost
+osdi:TT_S19_ManZ_Cost rdf:type owl:NamedIndividual ,
+                               osdi:Cost ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:Currency_Euro ;
+                      osdi:includedByModel osdi:TT_S19_Model ;
+                      osdi:appliesOneTime "false"^^xsd:boolean ;
+                      osdi:hasDescription "Annual cost of ManZ" ;
+                      osdi:hasExpectedValue "350.0"^^xsd:double ;
+                      osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManZ_Disutility
+osdi:TT_S19_ManZ_Disutility rdf:type owl:NamedIndividual ,
+                                     osdi:DeterministicParameter ,
+                                     osdi:Utility ;
+                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                            osdi:includedByModel osdi:TT_S19_Model ;
+                            osdi:appliesOneTime "false"^^xsd:boolean ;
+                            osdi:hasDescription "Annual disutility of ManZ" ;
+                            osdi:hasExpectedValue "0.04"^^xsd:double ;
+                            osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_ManZ_Risk
+osdi:TT_S19_ManZ_Risk rdf:type owl:NamedIndividual ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:includedByModel osdi:TT_S19_Model ;
+                      osdi:hasDescription "Probability of ManZ" ;
+                      osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_Model
+osdi:TT_S19_Model rdf:type owl:NamedIndividual ,
+                           osdi:DecisionTreeModel ;
+                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+                                         osdi:TT_InterventionNone ,
+                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_LifeExpectancy ,
+                                         osdi:TT_Population ,
+                                         osdi:TT_PopulationAge ,
+                                         osdi:TT_PopulationBaseUtility ,
+                                         osdi:TT_PopulationSex ,
+                                         osdi:TT_S19_AlternativeDevs ,
+                                         osdi:TT_S19_AlternativeMans ,
+                                         osdi:TT_S19_DevA ,
+                                         osdi:TT_S19_DevA_Cost ,
+                                         osdi:TT_S19_DevA_Disutility ,
+                                         osdi:TT_S19_DevA_LER ,
+                                         osdi:TT_S19_DevA_LERMagnitude ,
+                                         osdi:TT_S19_DevA_Risk ,
+                                         osdi:TT_S19_DevB ,
+                                         osdi:TT_S19_DevB_Cost ,
+                                         osdi:TT_S19_DevB_Disutility ,
+                                         osdi:TT_S19_DevB_LER ,
+                                         osdi:TT_S19_DevB_LERMagnitude ,
+                                         osdi:TT_S19_Disease ,
+                                         osdi:TT_S19_ManY ,
+                                         osdi:TT_S19_ManY_Cost ,
+                                         osdi:TT_S19_ManY_Disutility ,
+                                         osdi:TT_S19_ManY_LER ,
+                                         osdi:TT_S19_ManY_LERMagnitude ,
+                                         osdi:TT_S19_ManY_Risk ,
+                                         osdi:TT_S19_ManZ ,
+                                         osdi:TT_S19_ManZ_Cost ,
+                                         osdi:TT_S19_ManZ_Disutility ,
+                                         osdi:TT_S19_ManZ_Risk ,
+                                         osdi:TT_TreatAnnualCost ;
+                  osdi:hasDescription "S19. Alternative developments, one of them with alternative manifestations. DevA (0.6) leads to ManY, ManZ or none of them; DevB (default) has no manifestations." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_TreatAnnualCost
+osdi:TT_TreatAnnualCost rdf:type owl:NamedIndividual ,
+                                 osdi:Cost ,
+                                 osdi:DeterministicParameter ;
+                        osdi:hasDataItemType osdi:Currency_Euro ;
+                        osdi:includedByModel osdi:TT_S11_Model ,
+                                             osdi:TT_S12_Model ,
+                                             osdi:TT_S13_Model ,
+                                             osdi:TT_S14_Model ,
+                                             osdi:TT_S15_Model ,
+                                             osdi:TT_S16_Model ,
+                                             osdi:TT_S17_Model ,
+                                             osdi:TT_S18_Model ,
+                                             osdi:TT_S19_Model ;
+                        osdi:appliesOneTime "false"^^xsd:boolean ;
+                        osdi:hasDescription "Annual cost of the assessed intervention" ;
+                        osdi:hasExpectedValue "100.0"^^xsd:double ;
+                        osdi:hasYear "2026"^^xsd:short .
+
+
+###  Generated from the test specification of JaDES-HTA decision trees
