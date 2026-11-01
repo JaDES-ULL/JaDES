@@ -42,7 +42,7 @@ public class TestDecisionTreeStructure {
     /**
      * Cases that are not expected to pass until the corresponding issue of the generator is fixed
      */
-    @ParameterizedTest(name = "[{index}] {0}")
+    @ParameterizedTest(name = "[{index}] {0}", allowZeroInvocations = true)
     @MethodSource("knownIssues")
     @Tag("known-issue")
     @DisplayName("Each arm has one leaf for every combination of progressions (known issues of the generator)")

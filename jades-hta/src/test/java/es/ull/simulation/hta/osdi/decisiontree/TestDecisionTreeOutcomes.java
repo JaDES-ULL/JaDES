@@ -46,7 +46,7 @@ public class TestDecisionTreeOutcomes {
     /**
      * Cases that are not expected to pass until the corresponding issue of the generator is fixed
      */
-    @ParameterizedTest(name = "[{index}] {0}")
+    @ParameterizedTest(name = "[{index}] {0}", allowZeroInvocations = true)
     @MethodSource("knownIssues")
     @Tag("known-issue")
     @DisplayName("The generated Excel produces the expected cost, life years and QALYs (known issues of the generator)")

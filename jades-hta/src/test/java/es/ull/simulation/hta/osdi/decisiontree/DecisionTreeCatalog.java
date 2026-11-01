@@ -52,10 +52,15 @@ public final class DecisionTreeCatalog {
     public static final String DEATH = "DEATH";
 
     /**
-     * Reasons why the current generator is not expected to produce the right tree for a case 
+     * Reasons why the current generator is not expected to produce the right tree for a case.
+     * <p>
+     * A case marked with a known issue (see {@link TreeCase#knownIssue} and {@link TreeCase#knownOutcomesIssue}) is not checked by the regular
+     * tests, but by the "...KnownIssues" tests, which are tagged as "known-issue" and are expected to fail until the defect is fixed. This way,
+     * a defect can be documented with a test case before fixing it. Once fixed, the mark is removed from the case and its value from this enum.
+     * </p>
+     * There are no known issues at the moment, so the enum is empty and the "...KnownIssues" tests have no cases to run.
      */
     public enum KnownIssue {
-        // No known issues at the moment
         ;
 
         private final String description;

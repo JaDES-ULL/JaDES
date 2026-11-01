@@ -23,7 +23,7 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
     <!-- Versions -->
-    <junit.jupiter.version>5.10.1</junit.jupiter.version>
+    <junit.jupiter.version>5.12.2</junit.jupiter.version>
     <surefire.version>3.5.2</surefire.version>
     <slf4j.version>2.0.17</slf4j.version>
     <log4j2.version>2.25.3</log4j2.version>
