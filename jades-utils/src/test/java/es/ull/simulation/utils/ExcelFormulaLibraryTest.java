@@ -11,6 +11,7 @@ class ExcelFormulaLibraryTest {
     void shouldFormatFormulas() {
         assertEquals("SUM(A1:A3)", ExcelFormulaLibrary.SUM.getFormula("A1:A3"));
         assertEquals("ROUND(A1,0)", ExcelFormulaLibrary.ROUND0.getFormula("A1"));
+        assertEquals("AND(A1 <= B1, B1 <= C1)", ExcelFormulaLibrary.AND.getFormula("A1 <= B1, B1 <= C1"));
     }
 
     @Test
