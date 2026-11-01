@@ -10,6 +10,7 @@ This approach has the following limitations:
 - **Single combination method.** Absolute utilities and disutilities are combined with a single method:
   - With `ADD`, an absolute utility measured in patients that already includes the effect of another condition is counted twice.
   - With `MAX`, independent disutilities are lost.
+- **`MAX` in decision trees.** The combination method only applies to annual disutilities (one-time disutilities are always added). In the decision trees, `MAX` is applied to the discounted lifetime totals of each annual disutility, not year by year. If the disutilities have different onset or end ages, the result is not the maximum in each period (it should be computed by intervals).
 
 ### Possible improvements
 

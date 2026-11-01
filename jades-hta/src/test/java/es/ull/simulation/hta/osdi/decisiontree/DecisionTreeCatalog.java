@@ -63,8 +63,6 @@ public final class DecisionTreeCatalog {
         COEX_ALT_MANIF("DiseaseSubTreeGenerator.generateCoexistentManifestationSubTree never processes the alternative manifestations that remain pending after the coexistent ones"),
         /** Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid */
         SYNTHETIC("Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid"),
-        /** PayoffWrapper.getQALEFormula includes the one-time disutilities inside MAX(), instead of always adding them */
-        ONE_TIME_MAX("PayoffWrapper.getQALEFormula includes the one-time disutilities inside MAX(), instead of always adding them"),
         /** FormulaLibrary.FUTURE_CONT_DISCOUNT multiplies by (1 + r) ^ start instead of dividing: payoffs that start in the future are compounded instead of discounted */
         FUTURE_DISCOUNT("FormulaLibrary.FUTURE_CONT_DISCOUNT multiplies by (1 + r) ^ start instead of dividing: payoffs that start in the future are compounded instead of discounted"),
         /** hasOnsetAge and hasEndAge are used as times since the start of the model, not as ages: they are only correct for populations that start at age 0 */
@@ -328,8 +326,7 @@ public final class DecisionTreeCatalog {
         // Annual disutilities take the maximum; one-time disutilities are always added
         cases.add(tc(PAYOFFS, "TT_P11_ExperimentMax", "One-time disutility of a development, with MAX combination of annual disutilities",
                 leaves("TT_P11_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
-                outcomes(89900.0, 49.0, 26.85), outcomes(85000.0, 49.0, 26.85))
-                .knownOutcomesIssue(KnownIssue.ONE_TIME_MAX));
+                outcomes(89900.0, 49.0, 26.85), outcomes(85000.0, 49.0, 26.85)));
         cases.add(tc(PAYOFFS, "TT_P12_Experiment", "Utility (instead of disutility) of a development",
                 leaves("TT_P12_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
                 outcomes(89900.0, 49.0, 32.65), outcomes(85000.0, 49.0, 32.65)));

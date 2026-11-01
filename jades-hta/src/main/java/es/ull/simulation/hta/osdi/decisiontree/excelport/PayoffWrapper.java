@@ -344,15 +344,21 @@ public class PayoffWrapper {
      * used by the discrete-event simulation (see {@link es.ull.simulation.hta.params.UsesParameters#forceUtilityParameterValue}). It assumes that the utility was
      * measured in a population with the same base utility as that of the model.
      * </p>
+     * <p>
+     * The combination method of the experiment (ADD, ADD_DISTINCT or MAX) only applies to the annual disutilities. One-time disutilities are always added,
+     * once per each item that defines them, as in the discrete-event simulation. Hence, the formula is: base utility - combination of the annual disutilities
+     * - sum of the one-time disutilities. Note that MAX is applied to the discounted lifetime totals of each annual disutility, not year by year.
+     * </p>
      * TODO: Review how absolute utilities and disutilities are combined (see docs/known-limitations.md)
      * @param cellUndiscountedLY The cell reference for the undiscounted life years.
      * @param baseUtilityParam The base utility parameter to which the disutilities will be applied.
-     * @param method The method to combine disutilities (ADD, ADD_DISTINCT or MAX).
+     * @param method The method to combine the annual disutilities (ADD, ADD_DISTINCT or MAX). One-time disutilities are always added.
      * @return The QALE formula as a string.
      * @throws UnsupportedOSDiFeatureException If the disutility parameters cannot be processed or if the combination method is unsupported.
      */
     public String getQALEFormula(CellReference cellUndiscountedLY, ParameterWrapper baseUtilityParam, DisutilityCombinationMethod method) throws UnsupportedOSDiFeatureException {
-        final ArrayList<String> disutilityTexts = new ArrayList<>();
+        final ArrayList<String> annualTexts = new ArrayList<>();
+        final ArrayList<String> oneTimeTexts = new ArrayList<>();
         final String baseUtilityText = FormulaLibrary.CONT_DISCOUNT.getFormula(HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.getName(), cellUndiscountedLY.formatAsString(), baseUtilityParam.getShortName());
         // If there are no disutility parameters, return the base utility
         if (disutilityEntries.isEmpty()) {
@@ -370,28 +376,38 @@ public class PayoffWrapper {
                 text = "(" + baseUtilityParam.getShortName() + " - " + text + ")";
             }
             text = applyDiscountToFormula(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.getName(), specificInfo.appliesOneTime(), startEnd[0], startEnd[1]);
-            disutilityTexts.add(text);
+            // The combination method only applies to annual disutilities; one-time disutilities are always added
+            if (specificInfo.appliesOneTime())
+                oneTimeTexts.add(text);
+            else
+                annualTexts.add(text);
         }
-        final String combined;
-        if (disutilityTexts.size() == 1) {
-            combined = disutilityTexts.get(0);
+        String formula = baseUtilityText;
+        if (annualTexts.size() == 1) {
+            formula += " - " + annualTexts.get(0);
         }
-        else {
+        else if (annualTexts.size() > 1) {
             switch (method) {
                 case MAX:
-                    combined = ExcelFormulaLibrary.MAX.getFormula(String.join(", ", disutilityTexts));
+                    formula += " - " + ExcelFormulaLibrary.MAX.getFormula(String.join(", ", annualTexts));
                     break;
                 case ADD:
                 case ADD_DISTINCT:
-                    combined = ExcelFormulaLibrary.SUM.getFormula(String.join(", ", disutilityTexts));
+                    formula += " - " + ExcelFormulaLibrary.SUM.getFormula(String.join(", ", annualTexts));
                     break;
                 default:
                     log.warn("The disutility combination method " + method + " is not supported in the Excel model builder. We will use the addition method instead.");
-                    combined = ExcelFormulaLibrary.SUM.getFormula(String.join(", ", disutilityTexts));
+                    formula += " - " + ExcelFormulaLibrary.SUM.getFormula(String.join(", ", annualTexts));
                     break;
             }
         }
-        return baseUtilityText + " - " + combined;
+        if (oneTimeTexts.size() == 1) {
+            formula += " - " + oneTimeTexts.get(0);
+        }
+        else if (oneTimeTexts.size() > 1) {
+            formula += " - " + ExcelFormulaLibrary.SUM.getFormula(String.join(", ", oneTimeTexts));
+        }
+        return formula;
     }
 
     /**
