@@ -63,8 +63,6 @@ public final class DecisionTreeCatalog {
         COEX_ALT_MANIF("DiseaseSubTreeGenerator.generateCoexistentManifestationSubTree never processes the alternative manifestations that remain pending after the coexistent ones"),
         /** Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid */
         SYNTHETIC("Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid"),
-        /** FormulaLibrary.FUTURE_CONT_DISCOUNT multiplies by (1 + r) ^ start instead of dividing: payoffs that start in the future are compounded instead of discounted */
-        FUTURE_DISCOUNT("FormulaLibrary.FUTURE_CONT_DISCOUNT multiplies by (1 + r) ^ start instead of dividing: payoffs that start in the future are compounded instead of discounted"),
         /** hasOnsetAge and hasEndAge are used as times since the start of the model, not as ages: they are only correct for populations that start at age 0 */
         ONSET_AGE("hasOnsetAge and hasEndAge are used as times since the start of the model, not as ages: they are only correct for populations that start at age 0"),
         /** Temporal constraints are not limited by the life expectancy of each leaf: costs and disutilities continue after death */
@@ -352,8 +350,7 @@ public final class DecisionTreeCatalog {
         // Costs and disutilities that start in the future must be discounted to the present
         cases.add(tc(PAYOFFS, "TT_P17_ExperimentDiscount", "Manifestation between two ages, with discount (3%)",
                 leaves("TT_P17_", leaf(0.5, "ManY"), leaf(0.5)),
-                outcomes(38755.959046756, 30.200763446, 25.117137003), outcomes(35735.882702173, 30.200763446, 25.117137003))
-                .knownOutcomesIssue(KnownIssue.FUTURE_DISCOUNT));
+                outcomes(38755.959046756, 30.200763446, 25.117137003), outcomes(35735.882702173, 30.200763446, 25.117137003)));
         cases.add(tc(PAYOFFS, "TT_P18_Experiment", "Manifestation from an onset age until death (newborns, from 10 years)",
                 leaves("TT_P18_", leaf(0.5, "ManY"), leaf(0.5)),
                 outcomes(123000.0, 80.0, 64.5), outcomes(115000.0, 80.0, 64.5)));

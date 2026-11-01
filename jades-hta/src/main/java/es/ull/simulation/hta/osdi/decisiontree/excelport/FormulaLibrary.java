@@ -13,8 +13,9 @@ public enum FormulaLibrary implements ExcelFormula {
                 "/ 1000"), 
     // Continuous discount. Expects three parameters: the discount rate, the time period (in years), and the (positive) value to discount
     CONT_DISCOUNT("PV(%s,%s,-%s)"), 
-    // Future value discount, expects the same parameters as CONT_DISCOUNT plus the year where the future value starts its application.
-    FUTURE_CONT_DISCOUNT(CONT_DISCOUNT.getTemplate() + " * (1 + %s) ^ %s") {
+    // Continuous discount of a value that starts in the future: the present value at the start year is discounted back to year 0.
+    // Expects the same parameters as CONT_DISCOUNT plus the year where the value starts its application.
+    FUTURE_CONT_DISCOUNT(CONT_DISCOUNT.getTemplate() + " / (1 + %s) ^ %s") {
         @Override
         public String getFormula(Object... operands) {
             // The template expects five operands, but the future value discount only requires four.
