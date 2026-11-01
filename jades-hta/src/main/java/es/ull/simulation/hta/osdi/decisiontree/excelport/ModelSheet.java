@@ -355,20 +355,26 @@ public class ModelSheet implements SheetWrapper {
     }
 
     /**
-     * Draws the default probability formula in the specified cell based on a list of rows used.
+     * Draws the default probability formula in the specified cell based on a list of rows used: 1 minus the sum of the probabilities of the
+     * rest of branches, or 1 if the default branch is the only one.
      * @param cell The cell where the probability formula will be drawn.
      * @param column The column index where the formula will be placed.
-     * @param rowsUsed The list of rows used to calculate the probability.
+     * @param rowsUsed The list of rows used to calculate the probability (may be empty).
      */
     private void drawProbabilityFormula(Row valuesRow, int column, ArrayList<Integer> rowsUsed) {
+        final Cell cell = ExcelTools.getOrCreateCell(valuesRow, column);
+        cell.setCellStyle(Styles.PROBABILITY.getStyle(workbook));
+        if (rowsUsed.isEmpty()) {
+            // The default branch is the only one (e.g., an always active progression), so its probability is 1
+            cell.setCellValue(1.0);
+            return;
+        }
         String defaultBranchFormula = "1 - SUM(" + new CellReference(rowsUsed.get(0), column, true, true).formatAsString();
         for (int i = 1; i < rowsUsed.size(); i++) {
             defaultBranchFormula += "," + new CellReference(rowsUsed.get(i), column, true, true).formatAsString();
         }
         defaultBranchFormula += ")";
-        final Cell cell = ExcelTools.getOrCreateCell(valuesRow, column);
         cell.setCellFormula(defaultBranchFormula);
-        cell.setCellStyle(Styles.PROBABILITY.getStyle(workbook));
     }
 
     /**

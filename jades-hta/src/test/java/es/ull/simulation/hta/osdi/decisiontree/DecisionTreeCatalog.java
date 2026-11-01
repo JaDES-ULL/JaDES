@@ -55,8 +55,8 @@ public final class DecisionTreeCatalog {
      * Reasons why the current generator is not expected to produce the right tree for a case 
      */
     public enum KnownIssue {
-        /** Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid */
-        SYNTHETIC("Synthetic parameters (e.g. the default risk of a development without risk) are not returned by ModelWrapper.getParameters(), so they are not written in the Parameters sheet and the formulas that use them are not valid");
+        // No known issues at the moment
+        ;
 
         private final String description;
 
@@ -193,11 +193,10 @@ public final class DecisionTreeCatalog {
         cases.add(tc(DEVELOPMENTS, "TT_S02_Experiment", "Single development with risk",
                 leaves("TT_S02_", leaf(0.3, "DevA"), leaf(0.7)),
                 outcomes(76450.0, 62.0, 51.05), outcomes(70250.0, 62.0, 51.05)));
-        // A development with no risk and no rule is assumed to always appear.
-        cases.add(tc(DEVELOPMENTS, "TT_S03_Experiment", "Single development without risk (default risk of 1)",
-                leaves("TT_S03_", leaf(1.0, "DevA"), leaf(0.0)),
-                outcomes(88000.0, 55.0, 41.25), outcomes(82500.0, 55.0, 41.25))
-                .knownOutcomesIssue(KnownIssue.SYNTHETIC));
+        // A development without risk that does not belong to a group of alternatives is always active: there is no chance node.
+        cases.add(tc(DEVELOPMENTS, "TT_S03_Experiment", "Single development without risk (always active, no chance node)",
+                leaves("TT_S03_", leaf(1.0, "DevA")),
+                outcomes(88000.0, 55.0, 41.25), outcomes(82500.0, 55.0, 41.25)));
         // Developments not affected by any rule are independent: 4 combinations.
         cases.add(tc(DEVELOPMENTS, "TT_S04_Experiment", "Two coexistent developments (no rule)",
                 leaves("TT_S04_", leaf(0.15, "DevA", "DevB"), leaf(0.15, "DevA"), leaf(0.35, "DevB"), leaf(0.35)),
@@ -227,6 +226,18 @@ public final class DecisionTreeCatalog {
         cases.add(tc(DEVELOPMENTS, "TT_S10_Experiment", "Instant death at the onset of the disease plus one development",
                 leaves("TT_S10_", death(0.1), leaf(0.27, "DevA"), leaf(0.63)),
                 outcomes(69305.0, 55.8, 45.945), outcomes(63725.0, 55.8, 45.945)));
+        // DevA has no risk and is not affected by any rule, so it is always active; DevB (0.5) either appears or not.
+        cases.add(tc(DEVELOPMENTS, "TT_S20_Experiment", "Always active development (no risk) plus a coexistent development with risk",
+                leaves("TT_S20_", leaf(0.5, "DevA", "DevB"), leaf(0.5, "DevA")),
+                outcomes(96250.0, 55.0, 39.875), outcomes(90750.0, 55.0, 39.875)));
+        // Same as S20, but with an explicit CoexistentCombinationRule: DevA is still always active.
+        cases.add(tc(DEVELOPMENTS, "TT_S21_Experiment", "Always active development (no risk) plus a development with risk (explicit coexistent rule)",
+                leaves("TT_S21_", leaf(0.5, "DevA", "DevB"), leaf(0.5, "DevA")),
+                outcomes(96250.0, 55.0, 39.875), outcomes(90750.0, 55.0, 39.875)));
+        // DevA is always active; DevC has no risk but belongs to a group of alternatives, so it takes the remaining probability.
+        cases.add(tc(DEVELOPMENTS, "TT_S24_Experiment", "Always active development (no risk) plus alternative developments, one of them without risk",
+                leaves("TT_S24_", leaf(0.5, "DevA", "DevB"), leaf(0.5, "DevA", "DevC")),
+                outcomes(101750.0, 55.0, 39.325), outcomes(96250.0, 55.0, 39.325)));
 
         // ---- Structure: manifestations and their relationship with developments ----
         // Manifestations not linked to any development and not affected by any rule are independent.
@@ -270,6 +281,14 @@ public final class DecisionTreeCatalog {
         cases.add(tc(MANIFESTATIONS, "TT_S19_Experiment", "Alternative developments, one of them with alternative manifestations",
                 leaves("TT_S19_", leaf(0.3, "DevA", "ManY"), leaf(0.18, "DevA", "ManZ"), leaf(0.12, "DevA"), leaf(0.4, "DevB")),
                 outcomes(94550.0, 57.4, 42.884), outcomes(88810.0, 57.4, 42.884)));
+        // DevA has no risk, so it is always active; ManY (0.5) is a sub-progression of DevA.
+        cases.add(tc(MANIFESTATIONS, "TT_S22_Experiment", "Always active development (no risk) with a linked manifestation",
+                leaves("TT_S22_", leaf(0.5, "DevA", "ManY"), leaf(0.5, "DevA")),
+                outcomes(94875.0, 55.0, 39.6), outcomes(89375.0, 55.0, 39.6)));
+        // ManX is a sub-progression of DevB (0.5) without risk: it is always active when DevB is active.
+        cases.add(tc(MANIFESTATIONS, "TT_S23_Experiment", "Development with a linked manifestation without risk",
+                leaves("TT_S23_", leaf(0.5, "DevB", "ManX"), leaf(0.5)),
+                outcomes(83025.0, 63.0, 51.11), outcomes(76725.0, 63.0, 51.11)));
 
         // ---- Costs, utilities, life expectancy and effects: one feature per case ----
         cases.add(tc(PAYOFFS, "TT_P01_Experiment", "Intervention effect on a risk: relative risk (x0.5)",
@@ -439,7 +458,9 @@ public final class DecisionTreeCatalog {
             // Only probabilities, proportions, incidences... can characterize a risk in a decision tree.
             new MalformedCase(MALFORMED, "TT_N04_Experiment", "Risk of a development characterized by a parameter that is not a probability", UnsupportedOSDiFeatureException.class),
             // A shared cost cannot be counted once if it applies in different periods.
-            new MalformedCase(MALFORMED, "TT_N05_Experiment", "ADD_DISTINCT with a cost shared by manifestations with different temporal constraints", UnsupportedOSDiFeatureException.class)
+            new MalformedCase(MALFORMED, "TT_N05_Experiment", "ADD_DISTINCT with a cost shared by manifestations with different temporal constraints", UnsupportedOSDiFeatureException.class),
+            // Acute manifestations are not supported yet in decision trees.
+            new MalformedCase(MALFORMED, "TT_N06_Experiment", "Acute manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class)
         );
     }
 }
