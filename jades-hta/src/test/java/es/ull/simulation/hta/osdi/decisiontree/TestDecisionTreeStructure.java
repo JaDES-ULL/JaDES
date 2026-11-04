@@ -61,7 +61,7 @@ public class TestDecisionTreeStructure {
             final Map<String, Double> leaves = DecisionTreeTestSupport.readLeaves(interventions.get(i));
             // Same combinations of progressions in both arms
             assertEquals(tc.leaves().keySet(), leaves.keySet(), "Unexpected leaves in the arm " + arm + hint);
-            final double sum = leaves.values().stream().mapToDouble(Double::doubleValue).sum();
+            final double sum = leaves.values().stream().mapToDouble(value -> value == null ? Double.NaN : value).sum();
             assertTrue(DecisionTreeTestSupport.close(1.0, sum), "The probabilities of the leaves of the arm " + arm + " sum " + sum + hint);
         }
         // The probabilities are checked only for the comparator, since the effects of the intervention are not applied when reading the tree

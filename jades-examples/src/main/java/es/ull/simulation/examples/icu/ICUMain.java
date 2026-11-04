@@ -141,13 +141,13 @@ public class ICUMain extends BaseExperiment {
         System.out.println("  │ Metric                      │   Mean   │    SD    │");
         System.out.println("  ├─────────────────────────────┼──────────┼──────────┤");
 
-        final double avgSojourn = mean(allStats, ICUStatsListener::getAverageSojournTime);
-        final double sdSojourn  = sd(allStats, ICUStatsListener::getAverageSojournTime, avgSojourn);
+        final double avgSojourn = mean(allStats, s -> s.getAverageSojournTime());
+        final double sdSojourn  = sd(allStats, s -> s.getAverageSojournTime(), avgSojourn);
         System.out.printf("  │ %-27s │ %8.2f │ %8.2f │%n",
                 "Avg sojourn (min)", avgSojourn, sdSojourn);
 
-        final double avgRounds = mean(allStats, ICUStatsListener::getAverageTreatmentRoundsPerPatient);
-        final double sdRounds  = sd(allStats, ICUStatsListener::getAverageTreatmentRoundsPerPatient, avgRounds);
+        final double avgRounds = mean(allStats, s -> s.getAverageTreatmentRoundsPerPatient());
+        final double sdRounds  = sd(allStats, s -> s.getAverageTreatmentRoundsPerPatient(), avgRounds);
         System.out.printf("  │ %-27s │ %8.2f │ %8.2f │%n",
                 "Avg treatment rounds", avgRounds, sdRounds);
 
