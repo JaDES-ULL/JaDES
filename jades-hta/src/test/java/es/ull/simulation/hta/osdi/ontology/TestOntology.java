@@ -25,7 +25,7 @@ public class TestOntology {
         return Stream.of(
         Arguments.of("/T1DM.ttl", "T1DM_ExperimentBase"),
         Arguments.of("/PBD.ttl", "PBD_ExperimentBase"),
-        Arguments.of("/OSDi_Test.ttl", "TEST_Experiment1")
+        Arguments.of("/OSDi_test.ttl", "TEST_Experiment1")
         );
     }    
 

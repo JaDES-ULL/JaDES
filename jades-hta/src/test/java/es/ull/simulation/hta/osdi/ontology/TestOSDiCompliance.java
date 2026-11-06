@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
  * Tests to check whether the local version of the OSDi ontology complies with the expected structure defined in this project.
  */
 public class TestOSDiCompliance {
-    private final static String INDIVIDUALS_ONTOLOGY = "/OSDi_Test.ttl";
+    private final static String INDIVIDUALS_ONTOLOGY = "/OSDi_test.ttl";
     private static OSDiWrapper wrapper;
     private static OWLOntology ontology;
 
