@@ -17,16 +17,13 @@ import es.ull.simulation.hta.osdi.ontology.DiseaseWrapper;
 import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
-import es.ull.simulation.hta.osdi.ontology.ModelWrapper;
-import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.PathwayWrapper;
+import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleType;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleWrapper;
 import es.ull.simulation.hta.osdi.ontology.ResourceUsageSKOSCategory;
 import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
-import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.ParameterNatureData;
-import es.ull.simulation.hta.params.StandardParameter;
 
 /**
  * A sub-tree builder for a specific disease within a decision tree model.
@@ -34,9 +31,17 @@ import es.ull.simulation.hta.params.StandardParameter;
  * The decision tree structure starts from a disease node, which may lead to various clinical progression nodes based on the disease's defined progressions. First,
  * coexistent developments are processed, followed by sets of alternative developments. Each development may lead to manifestations, which are also processed in a similar manner.
  * 
- * Developments always produce nodes. If they are part of an alternative set, the node is a probability node together with the other developments in the set. Otherwise,
- * they produce two probability nodes: one for the development occurring, and another for it not occurring.
- * 
+ * Developments always produce nodes. If they are part of an alternative set (with two or more members), the node is a probability node together with the other
+ * developments in the set; a development without risk in such a set becomes the default branch (1 - the sum of the rest). Otherwise, they produce two probability
+ * nodes: one for the development occurring, and another for it not occurring.
+ *
+ * A development or chronic manifestation without risk that does not belong to an alternative set with two or more members (i.e., not affected by any rule, affected
+ * by a coexistent rule, or by an alternative rule with a single member) is always active in its context: it produces no chance node. Its node is linked as the only
+ * (default) branch of its parent, with probability 1, so its payoffs apply to every leaf of the sub-tree that hangs from it. A manifestation without risk that
+ * depends on a development is only active in the branches where such development is active.
+ *
+ * Acute manifestations and initial proportions of progressions (hasInitialProportion) are not supported yet.
+ *
  * Manifestations declared as subprogressions of one or more developments are assumed to appear only together with such developments. Conversely, "orphan" manifestations 
  * are supposed to appear independently of any development. 
  * 
@@ -51,10 +56,6 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
      * The wrapper of the disease individual in this model.
      */
     private final DiseaseWrapper diseaseWrapper;
-    /**
-     * The wrapper of the population individual in this model. 
-     */
-    private final ModelWrapper modelWrapper;
 
     /**
      * Constructs a disease part for the given NBS tree model and part name.
@@ -66,7 +67,6 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
      * @throws MalformedOSDiModelException 
      */
     public DiseaseSubTreeGenerator(Model parentTreeModel, DiseaseWrapper diseaseWrapper) throws MalformedSimulationModelException, UnsupportedOSDiFeatureException, MalformedOSDiModelException {
-        this.modelWrapper = parentTreeModel.getExperimentWrapper().getModelWrapper();
         this.diseaseWrapper = diseaseWrapper;
         this.parentTreeModel = parentTreeModel;
     }
@@ -86,6 +86,20 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
 
     @Override
     public BranchDestinationNode generate(String name) throws MalformedOSDiModelException, MalformedSimulationModelException, UnsupportedOSDiFeatureException {
+        for (ClinicalProgressionWrapper manifestation : diseaseWrapper.getManifestations()) {
+            // TODO: Support acute manifestations in decision trees (see docs/known-limitations.md)
+            if (ClinicalProgressionType.ACUTE_MANIFESTATION.equals(manifestation.getClinicalProgressionType())) {
+                throw new UnsupportedOSDiFeatureException("The manifestation " + manifestation.getShortName() + " is an acute manifestation. Acute manifestations are not supported yet in decision trees.");
+            }
+        }
+        for (PopulationWrapper population : parentTreeModel.getExperimentWrapper().getModelWrapper().getPopulationIndividuals()) {
+            // TODO: Support initial proportions in decision trees (see docs/known-limitations.md)
+            if (!population.getInitialProportions().isEmpty()) {
+                final ClinicalProgressionWrapper progression = population.getInitialProportions().keySet().iterator().next();
+                throw new UnsupportedOSDiFeatureException("The population " + population.getShortName() + " defines an initial proportion (hasInitialProportion) for the progression " + progression.getShortName()
+                    + ". Initial proportions are not supported yet in decision trees, which assume that every patient starts without progressions.");
+            }
+        }
         final BranchDestinationNode rootNode = new BranchDestinationNode(parentTreeModel, name);
         rootNode.updateCosts(diseaseWrapper, Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
         rootNode.updateUtility(diseaseWrapper, Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
@@ -190,16 +204,6 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         // In case the original parameter was not a valid probability parameter, we need to convert it
         return AbstractModelFactory.getProbabilityParameterFromGenericParameter((ParameterWrapper) param);
     }
-    
-    public ParameterWrapper getDefaultRiskParameter(String syntheticName, String progressionName) {
-        ParameterNatureData paramData = new ParameterWrapper.DeterministicParameterData(1.0);
-        ParameterWrapper syntheticRiskParam = new ParameterWrapper.SyntheticBuilder(modelWrapper, 
-            syntheticName, paramData)
-            .withSource("Assumption")
-            .withDescription("Default risk parameter for development " + progressionName)
-            .withDataItemType(OSDiDataItemType.DI_PROBABILITY).build();
-        return syntheticRiskParam;
-    }
 
     /**
      * Generates the tree parts for a set of coexistent clinical progressions. Coexistent clinical progressions are those that can occur simultaneously.
@@ -218,28 +222,47 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         final ClinicalProgressionWrapper development = pendingDevelopments.iterator().next();
         pendingDevelopments.remove(development);
         final BranchDestinationNode progressionNode = generateNode(development);
-        ParameterWrapper riskParam = getAdaptedRiskParameter(development);
+        final ParameterWrapper riskParam = getAdaptedRiskParameter(development);
+        // The progression branch also includes the manifestations linked to the development
+        final Set<ClinicalProgressionWrapper> newPendingManifestations = updatePendingManifestations(pendingManifestations, development);
         if (riskParam == null) {
-            log.warn("Development " + development.getShortName() + " does not define a risk parameter and it is affected by a coexistence combination rule. It will be assumed to have a default risk of 1.");
-            riskParam = getDefaultRiskParameter(StandardParameter.PROBABILITY.createName(development.getShortName()), 
-                development.getShortName());
+            // A development without risk that does not belong to a group of alternatives is always active: there is no chance node.
+            // It is linked as the only (default) branch, and the rest of the sub-tree hangs from it
+            log.info("Development " + development.getShortName() + " does not define a risk parameter and it does not belong to a group of alternatives. It is assumed to be always active.");
+            rootNode.link(progressionNode);
+            continueCoexistentDevelopmentSubTree(progressionNode, pendingDevelopments, altDevelopmentCombinationRules, defaultCoexistentManifestations, newPendingManifestations);
+            return;
         }
         rootNode.link(progressionNode, riskParam);
         // Adds the no progression branch as default branch
         final BranchDestinationNode noProgressionNode = new BranchDestinationNode(parentTreeModel, "No " + development.getShortName());
         rootNode.link(noProgressionNode);
-        final Set<ClinicalProgressionWrapper> newPendingManifestations = updatePendingManifestations(pendingManifestations, development);
+        continueCoexistentDevelopmentSubTree(progressionNode, new TreeSet<>(pendingDevelopments), altDevelopmentCombinationRules, defaultCoexistentManifestations, newPendingManifestations);
+        continueCoexistentDevelopmentSubTree(noProgressionNode, pendingDevelopments, altDevelopmentCombinationRules, defaultCoexistentManifestations, new TreeSet<>(pendingManifestations));
+    }
+
+    /**
+     * Continues the generation of the sub-tree that hangs from a coexistent development: first, the rest of coexistent developments; then,
+     * the groups of alternative developments; and finally, the pending manifestations.
+     * @param node The node from which the sub-tree hangs.
+     * @param pendingDevelopments The coexistent developments that remain to be processed in this branch.
+     * @param altDevelopmentCombinationRules The groups of alternative developments.
+     * @param defaultCoexistentManifestations The manifestations that are not affected by any alternative combination rule.
+     * @param pendingManifestations The manifestations that remain to be processed in this branch.
+     * @throws MalformedSimulationModelException If the simulation model is malformed.
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered.
+     * @throws MalformedOSDiModelException If the OSDi model is malformed.
+     */
+    private void continueCoexistentDevelopmentSubTree(BranchDestinationNode node, Set<ClinicalProgressionWrapper> pendingDevelopments, ArrayList<ProgressionCombinationRuleWrapper> altDevelopmentCombinationRules, Set<ClinicalProgressionWrapper> defaultCoexistentManifestations, Set<ClinicalProgressionWrapper> pendingManifestations) throws MalformedSimulationModelException, UnsupportedOSDiFeatureException, MalformedOSDiModelException {
         if (!pendingDevelopments.isEmpty()) {
-            generateCoexistentDevelopmentSubTree(progressionNode, new TreeSet<>(pendingDevelopments), altDevelopmentCombinationRules, defaultCoexistentManifestations, newPendingManifestations);
-            generateCoexistentDevelopmentSubTree(noProgressionNode, pendingDevelopments, altDevelopmentCombinationRules, defaultCoexistentManifestations, pendingManifestations);
+            generateCoexistentDevelopmentSubTree(node, pendingDevelopments, altDevelopmentCombinationRules, defaultCoexistentManifestations, pendingManifestations);
         }
         else if (!altDevelopmentCombinationRules.isEmpty()) {
-            generateAlternativeDevelopmentSubTree(progressionNode, new ArrayList<>(altDevelopmentCombinationRules), defaultCoexistentManifestations, newPendingManifestations);
-            generateAlternativeDevelopmentSubTree(noProgressionNode, new ArrayList<>(altDevelopmentCombinationRules), defaultCoexistentManifestations, pendingManifestations);
+            generateAlternativeDevelopmentSubTree(node, new ArrayList<>(altDevelopmentCombinationRules), defaultCoexistentManifestations, pendingManifestations);
         }
+        // generateManifestationsSubTree does not accept an empty set
         else if (!pendingManifestations.isEmpty()) {
-            generateManifestationsSubTree(progressionNode, defaultCoexistentManifestations, newPendingManifestations);
-            generateManifestationsSubTree(noProgressionNode, defaultCoexistentManifestations, new TreeSet<>(pendingManifestations));
+            generateManifestationsSubTree(node, defaultCoexistentManifestations, pendingManifestations);
         }
     }
     
@@ -312,18 +335,41 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         final ClinicalProgressionWrapper manifestation = pendingCoexistentManifestations.iterator().next();
         pendingCoexistentManifestations.remove(manifestation);
         final BranchDestinationNode progressionNode = generateNode(manifestation);
-        ParameterWrapper riskParam = getAdaptedRiskParameter(manifestation);
+        final ParameterWrapper riskParam = getAdaptedRiskParameter(manifestation);
         if (riskParam == null) {
-            log.warn("Manifestation " + manifestation.getShortName() + " does not define a risk parameter and it is affected by a coexistence combination rule. It will be assumed to have a default risk of 1.");
-            riskParam = getDefaultRiskParameter(StandardParameter.PROBABILITY.createName(manifestation.getShortName()), manifestation.getShortName());
+            // A manifestation without risk that does not belong to a group of alternatives is always active in its context (e.g., in the branches
+            // where the development it depends on is active): there is no chance node. It is linked as the only (default) branch, and the rest of
+            // the sub-tree hangs from it
+            log.info("Manifestation " + manifestation.getShortName() + " does not define a risk parameter and it does not belong to a group of alternatives. It is assumed to be always active.");
+            rootNode.link(progressionNode);
+            continueCoexistentManifestationSubTree(progressionNode, pendingCoexistentManifestations, pendingManifestations);
+            return;
         }
         rootNode.link(progressionNode, riskParam);
         // Adds the no progression branch as default branch
         final BranchDestinationNode noProgressionNode = new BranchDestinationNode(parentTreeModel, "No " + manifestation.getShortName());
         rootNode.link(noProgressionNode);
+        continueCoexistentManifestationSubTree(noProgressionNode, new TreeSet<>(pendingCoexistentManifestations), new TreeSet<>(pendingManifestations));
+        continueCoexistentManifestationSubTree(progressionNode, pendingCoexistentManifestations, pendingManifestations);
+    }
+
+    /**
+     * Continues the generation of the sub-tree that hangs from a coexistent manifestation: first, the rest of coexistent manifestations; then,
+     * once all of them are processed, the alternative ones.
+     * @param node The node from which the sub-tree hangs.
+     * @param pendingCoexistentManifestations The coexistent manifestations that remain to be processed in this branch.
+     * @param pendingManifestations The alternative manifestations that remain to be processed in this branch.
+     * @throws MalformedOSDiModelException If the OSDi model is malformed.
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered.
+     * @throws MalformedSimulationModelException If the simulation model is malformed.
+     */
+    private void continueCoexistentManifestationSubTree(BranchDestinationNode node, Set<ClinicalProgressionWrapper> pendingCoexistentManifestations, Set<ClinicalProgressionWrapper> pendingManifestations) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException, MalformedSimulationModelException {
         if (!pendingCoexistentManifestations.isEmpty()) {
-            generateCoexistentManifestationSubTree(noProgressionNode, new TreeSet<>(pendingCoexistentManifestations), new TreeSet<>(pendingManifestations));
-            generateCoexistentManifestationSubTree(progressionNode, pendingCoexistentManifestations, pendingManifestations);
+            generateCoexistentManifestationSubTree(node, pendingCoexistentManifestations, pendingManifestations);
+        }
+        else if (!pendingManifestations.isEmpty()) {
+            // generateAlternativeManifestationSubTree removes elements from the set it receives
+            generateAlternativeManifestationSubTree(node, new TreeSet<>(pendingManifestations));
         }
     }
 

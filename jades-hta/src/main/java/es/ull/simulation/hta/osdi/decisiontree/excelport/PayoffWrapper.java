@@ -75,13 +75,22 @@ public class PayoffWrapper {
      * The OSDi wrapper associated with this payoff wrapper.
      */
     private final OSDiWrapper wrap;
+    /**
+     * The name of the parameter that defines the initial age of the population (or a constant). Used to translate the onset and end ages of the
+     * progressions into times since the start of the model.
+     */
+    private final String populationAgeName;
 
     /**
      * Constructor for the wrapper of the payoff for an HTA model in Excel.
      * This constructor initializes the context and the lists of costs, disutilities and lifetime reductions, if the intervention defines them.
+     * @param wrap The OSDi wrapper associated with this payoff wrapper.
+     * @param populationAgeName The name of the parameter that defines the initial age of the population, or a constant ("0") if the population
+     * does not define it.
      */
-    public PayoffWrapper(OSDiWrapper wrap) {
+    public PayoffWrapper(OSDiWrapper wrap, String populationAgeName) {
         this.wrap = wrap;
+        this.populationAgeName = populationAgeName;
         this.probabilities = new ArrayList<>();
         this.costEntries = new ArrayList<>();
         this.disutilityEntries = new ArrayList<>();
@@ -95,6 +104,7 @@ public class PayoffWrapper {
      */
     public PayoffWrapper(PayoffWrapper original) {
         this.wrap = original.wrap;
+        this.populationAgeName = original.populationAgeName;
         this.probabilities = new ArrayList<>(original.probabilities);
         this.costEntries = new ArrayList<>(original.costEntries);
         this.disutilityEntries = new ArrayList<>(original.disutilityEntries);
@@ -281,32 +291,9 @@ public class PayoffWrapper {
     }
 
     /**
-     * Returns the start and end times (as text formulas) for a parameter, according to its temporal constraint.
-     * @param constraint The temporal constraint (may be null).
-     * @param cellUndiscountedLY The cell reference for the undiscounted life years.
-     * @return An array with the start time (null if the parameter applies from the beginning) and the end time.
-     */
-    private static String[] getStartAndEnd(TemporalConstraint constraint, CellReference cellUndiscountedLY) {
-        // If no constraints are defined, we assume the parameter applies for the entire lifetime
-        String start = null;
-        String end = cellUndiscountedLY.formatAsString();
-        // The start and end times are modified by the temporal constraints
-        if (constraint != null) {
-            if (constraint.startTime().isPresent()) {
-                start = constraint.startTime().get().getShortName();
-            } else {
-                start = "0.0";
-            }
-            if (constraint.endTime().isPresent()) {
-                end = constraint.endTime().get().getShortName();
-            }
-        }
-        return new String[] {start, end};
-    }
-
-    /**
-     * Returns the cost formula for the parameters in this wrapper. Processes each cost parameter by taking into account whether they are modified or not, 
+     * Returns the cost formula for the parameters in this wrapper. Processes each cost parameter by taking into account whether they are modified or not,
      * whether they applied once or annually, and when they should start and/or end to account. With all this information, the appropriate discounting formula can be applied.
+     * The onset and end ages are interpreted as described in {@link #applyDiscountToFormula}: only what happens between the initial age of the population and death is accounted.
      * @param cellUndiscountedLY The cell reference for the undiscounted life years.
      * @param method The method to combine the annual costs of the nodes along the path.
      * @return The cost formula as a string.
@@ -321,10 +308,9 @@ public class PayoffWrapper {
 
         for (ParameterEntry entry : selectEntries(costEntries, method, "cost")) {
             final ParameterWrapper param = entry.parameter();
-            final String[] startEnd = getStartAndEnd(entry.constraint(), cellUndiscountedLY);
             // Define the base text formula for the parameter, including any modifications
             String text = getParameterTextFormula(param);
-            text = applyDiscountToFormula(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_COSTS.getName(), ((SpecificInformationForCost) param.getSpecificInformation()).appliesOneTime(), startEnd[0], startEnd[1]);
+            text = applyDiscountToFormula(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_COSTS.getName(), ((SpecificInformationForCost) param.getSpecificInformation()).appliesOneTime(), entry.constraint(), cellUndiscountedLY);
             costTexts.add(text);
         }
         if (costTexts.size() == 1) {
@@ -337,14 +323,31 @@ public class PayoffWrapper {
     /**
      * Returns the QALE formula for the parameters in this wrapper. Processes each disutility parameter by taking into account whether they are modified or not,
      * whether they applied once or annually, and when they should start and/or end to account. With all this information, the appropriate discounting formula can be applied.
+     * <p>
+     * A utility parameter (isDisutility = false) u of a progression, the disease or an intervention is equivalent to a disutility of (base utility - u), where
+     * the base utility is that of the population. Hence, if it is the only one active, the patient gets exactly the utility u. The converted value is then combined
+     * with the rest of disutilities by using the combination method of the experiment. This rule applies both to annual and one-time utilities, and it is the same
+     * used by the discrete-event simulation (see {@link es.ull.simulation.hta.params.UsesParameters#forceUtilityParameterValue}). It assumes that the utility was
+     * measured in a population with the same base utility as that of the model.
+     * </p>
+     * <p>
+     * The combination method of the experiment (ADD, ADD_DISTINCT or MAX) only applies to the annual disutilities. One-time disutilities are always added,
+     * once per each item that defines them, as in the discrete-event simulation. Hence, the formula is: base utility - combination of the annual disutilities
+     * - sum of the one-time disutilities. Note that MAX is applied to the discounted lifetime totals of each annual disutility, not year by year.
+     * </p>
+     * <p>
+     * The onset and end ages are interpreted as described in {@link #applyDiscountToFormula}: only what happens between the initial age of the population and death is accounted.
+     * </p>
+     * TODO: Review how absolute utilities and disutilities are combined (see docs/known-limitations.md)
      * @param cellUndiscountedLY The cell reference for the undiscounted life years.
      * @param baseUtilityParam The base utility parameter to which the disutilities will be applied.
-     * @param method The method to combine disutilities (ADD, ADD_DISTINCT or MAX).
+     * @param method The method to combine the annual disutilities (ADD, ADD_DISTINCT or MAX). One-time disutilities are always added.
      * @return The QALE formula as a string.
      * @throws UnsupportedOSDiFeatureException If the disutility parameters cannot be processed or if the combination method is unsupported.
      */
     public String getQALEFormula(CellReference cellUndiscountedLY, ParameterWrapper baseUtilityParam, DisutilityCombinationMethod method) throws UnsupportedOSDiFeatureException {
-        final ArrayList<String> disutilityTexts = new ArrayList<>();
+        final ArrayList<String> annualTexts = new ArrayList<>();
+        final ArrayList<String> oneTimeTexts = new ArrayList<>();
         final String baseUtilityText = FormulaLibrary.CONT_DISCOUNT.getFormula(HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.getName(), cellUndiscountedLY.formatAsString(), baseUtilityParam.getShortName());
         // If there are no disutility parameters, return the base utility
         if (disutilityEntries.isEmpty()) {
@@ -353,37 +356,46 @@ public class PayoffWrapper {
 
         for (ParameterEntry entry : selectEntries(disutilityEntries, method, "utility")) {
             final ParameterWrapper param = entry.parameter();
-            final String[] startEnd = getStartAndEnd(entry.constraint(), cellUndiscountedLY);
             // Define the base text formula for the parameter, including any modifications
             String text = getParameterTextFormula(param);
             final SpecificInformationForUtility specificInfo = (SpecificInformationForUtility)param.getSpecificInformation(); 
             if (!specificInfo.isDisutility()) {
-                // If the parameter is a utility, we need to invert the sign
-                text = "1 - " + text;
+                // A utility u is equivalent to a disutility of (base utility - u)
+                text = "(" + baseUtilityParam.getShortName() + " - " + text + ")";
             }
-            text = applyDiscountToFormula(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.getName(), specificInfo.appliesOneTime(), startEnd[0], startEnd[1]);
-            disutilityTexts.add(text);
+            text = applyDiscountToFormula(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.getName(), specificInfo.appliesOneTime(), entry.constraint(), cellUndiscountedLY);
+            // The combination method only applies to annual disutilities; one-time disutilities are always added
+            if (specificInfo.appliesOneTime())
+                oneTimeTexts.add(text);
+            else
+                annualTexts.add(text);
         }
-        final String combined;
-        if (disutilityTexts.size() == 1) {
-            combined = disutilityTexts.get(0);
+        String formula = baseUtilityText;
+        if (annualTexts.size() == 1) {
+            formula += " - " + annualTexts.get(0);
         }
-        else {
+        else if (annualTexts.size() > 1) {
             switch (method) {
                 case MAX:
-                    combined = ExcelFormulaLibrary.MAX.getFormula(String.join(", ", disutilityTexts));
+                    formula += " - " + ExcelFormulaLibrary.MAX.getFormula(String.join(", ", annualTexts));
                     break;
                 case ADD:
                 case ADD_DISTINCT:
-                    combined = ExcelFormulaLibrary.SUM.getFormula(String.join(", ", disutilityTexts));
+                    formula += " - " + ExcelFormulaLibrary.SUM.getFormula(String.join(", ", annualTexts));
                     break;
                 default:
                     log.warn("The disutility combination method " + method + " is not supported in the Excel model builder. We will use the addition method instead.");
-                    combined = ExcelFormulaLibrary.SUM.getFormula(String.join(", ", disutilityTexts));
+                    formula += " - " + ExcelFormulaLibrary.SUM.getFormula(String.join(", ", annualTexts));
                     break;
             }
         }
-        return baseUtilityText + " - " + combined;
+        if (oneTimeTexts.size() == 1) {
+            formula += " - " + oneTimeTexts.get(0);
+        }
+        else if (oneTimeTexts.size() > 1) {
+            formula += " - " + ExcelFormulaLibrary.SUM.getFormula(String.join(", ", oneTimeTexts));
+        }
+        return formula;
     }
 
     /**
@@ -483,28 +495,52 @@ public class PayoffWrapper {
     }
 
     /**
-     * Applies the discount formula to the given text formula based on whether it applies once or continuously, and the start and end times.
+     * Applies the discount formula to the given text formula based on whether it applies once or continuously, and on the temporal constraint.
+     * <p>
+     * The onset and end ages of the temporal constraint (hasOnsetAge, hasEndAge) are ages, so they are translated into times since the start of
+     * the model by subtracting the initial age of the population (Age0). Only what happens between the initial age and death, i.e., within
+     * [Age0, Age0 + LY], where LY is the undiscounted life years of the leaf, is accounted:
+     * <ul>
+     * <li>Start = MAX(0, Onset - Age0), or 0 if there is no onset age.</li>
+     * <li>End = MIN(LY, End - Age0), or LY if there is no end age.</li>
+     * <li>Duration = MAX(0, End - Start).</li>
+     * <li>Annual payoffs: PV(r, Duration, -x) / (1 + r) ^ Start; PV(r, LY, -x) if there is no temporal constraint.</li>
+     * <li>One-time payoffs: x if there is no onset age (they happen at the start of the model); x / (1 + r) ^ (Onset - Age0) if
+     * Age0 &lt;= Onset &lt;= Age0 + LY; 0 otherwise. Hence, a one-time payoff whose onset age is lower than the initial age is assumed to have
+     * happened before the start of the model, and it is not accounted.</li>
+     * </ul>
+     * </p>
      * @param text The text formula to which the discount will be applied.
      * @param discountName The name of the discount parameter to use.
-     * @param appliesOneTime Whether the discount applies once at a specific time in the future, or it is annual.
-     * @param start The start time for the discount.
-     * @param end The end time for the discount.
+     * @param appliesOneTime Whether the payoff applies once, or it is annual.
+     * @param constraint The temporal constraint of the node that contributed the payoff (may be null).
+     * @param cellUndiscountedLY The cell reference for the undiscounted life years.
      * @return The text formula with the discount applied.
      * @throws UnsupportedOSDiFeatureException If the discount formula is not supported.
      */
-    private String applyDiscountToFormula(String text, String discountName, boolean appliesOneTime, String start, String end) throws UnsupportedOSDiFeatureException {
-        if (start != null) {
-            if (appliesOneTime) {
-                // Parameters that apply once at a specific time in the future
-                return FormulaLibrary.PUNCTUAL_DISCOUNT.getFormula(text, discountName, start);
+    private String applyDiscountToFormula(String text, String discountName, boolean appliesOneTime, TemporalConstraint constraint, CellReference cellUndiscountedLY) throws UnsupportedOSDiFeatureException {
+        final String ly = cellUndiscountedLY.formatAsString();
+        final Optional<ParameterWrapper> onsetAge = (constraint == null) ? Optional.empty() : constraint.startTime();
+        final Optional<ParameterWrapper> endAge = (constraint == null) ? Optional.empty() : constraint.endTime();
+        if (appliesOneTime) {
+            // Parameters that apply once at the start of the model
+            if (onsetAge.isEmpty()) {
+                return text;
             }
-            // Parameters that apply annually, starting at a specific time in the future
-            return FormulaLibrary.FUTURE_CONT_DISCOUNT.getFormula(discountName, end + " - " + start, text, start);
-        } else if (!appliesOneTime) {
-            // Parameters that apply annually, starting from the beginning of the model
-            return FormulaLibrary.CONT_DISCOUNT.getFormula(discountName, end, text);
+            // Parameters that apply once at the onset age, only if it happens between the initial age and death
+            final String onset = onsetAge.get().getShortName();
+            final String condition = ExcelFormulaLibrary.AND.getFormula(populationAgeName + " <= " + onset + ", " + onset + " <= " + populationAgeName + " + " + ly);
+            return ExcelFormulaLibrary.IF.getFormula(condition, FormulaLibrary.PUNCTUAL_DISCOUNT.getFormula(text, discountName, "(" + onset + " - " + populationAgeName + ")"), "0");
         }
-        return text;
+        if (onsetAge.isEmpty() && endAge.isEmpty()) {
+            // Parameters that apply annually, from the start of the model until death
+            return FormulaLibrary.CONT_DISCOUNT.getFormula(discountName, ly, text);
+        }
+        // Parameters that apply annually within a time window, limited to the period between the initial age and death
+        final String start = onsetAge.isPresent() ? ExcelFormulaLibrary.MAX.getFormula("0, " + onsetAge.get().getShortName() + " - " + populationAgeName) : "0";
+        final String end = endAge.isPresent() ? ExcelFormulaLibrary.MIN.getFormula(ly + ", " + endAge.get().getShortName() + " - " + populationAgeName) : ly;
+        final String duration = ExcelFormulaLibrary.MAX.getFormula("0, " + end + " - " + start);
+        return FormulaLibrary.FUTURE_CONT_DISCOUNT.getFormula(discountName, duration, text, start);
     }
 
     /**
@@ -529,9 +565,9 @@ public class PayoffWrapper {
         }
         switch (modifParam.getMagnitudeType()) {
             case DIFF:
-                return param.getShortName() + " - " + modifParam.getEffectMagnitude().getShortName();
+                return "(" + param.getShortName() + " - " + modifParam.getEffectMagnitude().getShortName() + ")";
             case FACTOR:
-                return param.getShortName() + " * " + modifParam.getEffectMagnitude().getShortName();
+                return "(" + param.getShortName() + " * " + modifParam.getEffectMagnitude().getShortName() + ")";
             case SET:
                 return modifParam.getEffectMagnitude().getShortName();
             default:

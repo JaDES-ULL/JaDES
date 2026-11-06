@@ -1,6 +1,7 @@
 package es.ull.simulation.hta.osdi.decisiontree.excelport;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -13,9 +14,12 @@ import es.ull.simulation.hta.MalformedSimulationModelException;
 import es.ull.simulation.hta.osdi.decisiontree.ChoiceNode;
 import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode;
 import es.ull.simulation.hta.osdi.decisiontree.Model;
+import es.ull.simulation.hta.osdi.OSDiLogger;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
+import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
+import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.utils.ExcelFormulaLibrary;
 import es.ull.simulation.utils.ExcelTools;
 
@@ -24,6 +28,7 @@ import es.ull.simulation.utils.ExcelTools;
  * This class encapsulates the necessary methods and properties to interact with the model sheet.
  */
 public class ModelSheet implements SheetWrapper {
+    private final static OSDiLogger log = OSDiLogger.getLogger(ModelSheet.class);
     public static final String SHEET_NAME = "Model";
     private static final String PAYOFF_TITLE_RANGE = "payoffTitles";
     private static final String SUMMARY_TITLE_RANGE = "summaryTitles";
@@ -80,6 +85,11 @@ public class ModelSheet implements SheetWrapper {
      * The first row where the tree starts drawing
      */
     private final int firstTreeRow;
+    /**
+     * The name of the parameter that defines the initial age of the population, or "0" if the population does not define it.
+     * Used to translate the onset and end ages of the progressions into times since the start of the model.
+     */
+    private final String populationAgeName;
 
     /**
      * Constructor to initialize the ModelSheet with a given HTAExcelModelBuilder.
@@ -108,6 +118,15 @@ public class ModelSheet implements SheetWrapper {
         // Prepares the payoff area in the Excel sheet
         this.payoffColumn = modelBuilder.getTreeDepth() * 3 + CHOICE_COLUMN; // Calculate the column index for the payoff based on the tree depth
         ExcelTools.copyCellRange(PAYOFF_TITLE_RANGE, sheet, firstTreeRow - 3, payoffColumn);
+        final PopulationWrapper population = modelBuilder.getModel().getPopulationWrapper();
+        final Optional<ParameterWrapper> ageParam = population.getAgeParameter();
+        if (ageParam.isPresent()) {
+            this.populationAgeName = ageParam.get().getShortName();
+        }
+        else {
+            log.warn("The population " + population.getShortName() + " does not define an age. An initial age of 0 is assumed to interpret the onset and end ages of the progressions.");
+            this.populationAgeName = "0";
+        }
     }
     
     /**
@@ -138,19 +157,19 @@ public class ModelSheet implements SheetWrapper {
         // Apply the style also to the cell previous to the first choice node
         ExcelTools.applyStyleToRange(sheet, Styles.TREE_NODE.getStyle(workbook), row, row, column - 2, column - 2);
         int oldRow = row;
-        PayoffWrapper payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper());
-        row = continueTreeDrawing(branch, row, column, payoffWrapper);
+        PayoffWrapper payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper(), populationAgeName);
+        row = continueTreeDrawing(branch, row, column, payoffWrapper, true);
         drawSummary(0, branch.name(), oldRow, row - 3);
         for (int i = 1; i < successors.size(); i++) {
-            nodesRow = sheet.getRow(row);
+            nodesRow = ExcelTools.getOrCreateRow(sheet, row);
             branch = successors.get(i);
             // Draw the choice node in the specified row and column
             choiceCell = nodesRow.createCell(column);
             drawNodeText(choiceCell, branch.name());
             drawTreeConnection(oldRow + 1, row, column - 1);
             oldRow = row;
-            payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper());
-            row = continueTreeDrawing(branch, row, column, payoffWrapper);
+            payoffWrapper = new PayoffWrapper(modelBuilder.getModel().getOSDiWrapper(), populationAgeName);
+            row = continueTreeDrawing(branch, row, column, payoffWrapper, true);
             drawSummary(i, branch.name(), oldRow, row - 3);
         }
     }
@@ -162,16 +181,17 @@ public class ModelSheet implements SheetWrapper {
      * @param row The current row index where the node will be drawn.
      * @param column The column index where the node will be drawn.
      * @param payoffWrapper The wrapper containing payoff information for the node.
+     * @param hangsFromIntervention Whether the branch hangs directly from an intervention (i.e., there are no chance nodes before it).
      * @return The row index available to draw the next branch of the tree.
      * @throws MalformedOSDiModelException
      * @throws UnsupportedOSDiFeatureException
      * @throws MalformedSimulationModelException
      */
-    private int continueTreeDrawing(BranchDestinationNode branch, int row, int column, PayoffWrapper payoffWrapper) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException, MalformedSimulationModelException {
+    private int continueTreeDrawing(BranchDestinationNode branch, int row, int column, PayoffWrapper payoffWrapper, boolean hangsFromIntervention) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException, MalformedSimulationModelException {
         if (!branch.isPayoff()) {
             row = drawProbabilityNode(branch, row, column + COLS_BETWEEN_NODES, payoffWrapper);
         } else {
-            row = drawPayoffNode(branch, row, column, payoffWrapper);
+            row = drawPayoffNode(branch, row, column, payoffWrapper, hangsFromIntervention);
         }
         return row;
     }
@@ -223,7 +243,7 @@ public class ModelSheet implements SheetWrapper {
             rowsUsed.add(row + 1);
             PayoffWrapper newPayoffWrapper = new PayoffWrapper(payoffWrapper);
             newPayoffWrapper.addProbability(new CellReference(row + 1, column, true, true));
-            row = continueTreeDrawing(successor, row, column, newPayoffWrapper);
+            row = continueTreeDrawing(successor, row, column, newPayoffWrapper, false);
             nodesRow = ExcelTools.getOrCreateRow(sheet, row);
             valuesRow = ExcelTools.getOrCreateRow(sheet, row + 1);
         }
@@ -235,7 +255,7 @@ public class ModelSheet implements SheetWrapper {
             }
             PayoffWrapper newPayoffWrapper = new PayoffWrapper(payoffWrapper);
             newPayoffWrapper.addProbability(new CellReference(row + 1, column, true, true));
-            row = continueTreeDrawing(node.getDefaultSuccessor(), row, column, newPayoffWrapper);
+            row = continueTreeDrawing(node.getDefaultSuccessor(), row, column, newPayoffWrapper, false);
             nodesRow = ExcelTools.getOrCreateRow(sheet, row);
             valuesRow = ExcelTools.getOrCreateRow(sheet, row + 1);
         }
@@ -249,12 +269,13 @@ public class ModelSheet implements SheetWrapper {
      * @param row The row index where the payoff node will be drawn.
      * @param column The column index where the payoff node will be drawn.
      * @param payoffWrapper The wrapper containing payoff information for the node.
+     * @param hangsFromIntervention Whether the payoff hangs directly from an intervention. In such a case, there are no chance nodes along its path and its probability is 1.
      * @return The row index available to draw the next branch of the tree.
      * @throws MalformedSimulationModelException 
      * @throws MalformedOSDiModelException
      * @throws UnsupportedOSDiFeatureException
      */
-    private int drawPayoffNode(BranchDestinationNode payoff, int row, int column, PayoffWrapper payoffWrapper) throws MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+    private int drawPayoffNode(BranchDestinationNode payoff, int row, int column, PayoffWrapper payoffWrapper, boolean hangsFromIntervention) throws MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         payoffWrapper.updateWithTreeNode(payoff);
         if (column < payoffColumn) {
             ExcelTools.applyStyleToRange(sheet, Styles.TREE_NODE.getStyle(workbook), row, row, column + 2, payoffColumn - 2);
@@ -280,11 +301,15 @@ public class ModelSheet implements SheetWrapper {
         qalyDetailCell.setCellStyle(Styles.QALY.getStyle(workbook));
         
         // Set the formulas for the cells
-        final String probFormula = payoffWrapper.getProbabilityFormula();
-        if (probFormula.isEmpty()) {
-            probCell.setCellValue(0.0);
+        if (hangsFromIntervention) {
+            // A payoff that hangs directly from an intervention has no chance nodes along its path, so its probability is 1
+            probCell.setCellValue(1.0);
         }
         else {
+            final String probFormula = payoffWrapper.getProbabilityFormula();
+            if (probFormula.isEmpty()) {
+                throw new IllegalStateException("The application logic should prevent this from happening: the payoff " + payoff.name() + " does not hang from an intervention, but its path has no probabilities.");
+            }
             probCell.setCellFormula(probFormula);
         }
 
@@ -330,20 +355,26 @@ public class ModelSheet implements SheetWrapper {
     }
 
     /**
-     * Draws the default probability formula in the specified cell based on a list of rows used.
+     * Draws the default probability formula in the specified cell based on a list of rows used: 1 minus the sum of the probabilities of the
+     * rest of branches, or 1 if the default branch is the only one.
      * @param cell The cell where the probability formula will be drawn.
      * @param column The column index where the formula will be placed.
-     * @param rowsUsed The list of rows used to calculate the probability.
+     * @param rowsUsed The list of rows used to calculate the probability (may be empty).
      */
     private void drawProbabilityFormula(Row valuesRow, int column, ArrayList<Integer> rowsUsed) {
+        final Cell cell = ExcelTools.getOrCreateCell(valuesRow, column);
+        cell.setCellStyle(Styles.PROBABILITY.getStyle(workbook));
+        if (rowsUsed.isEmpty()) {
+            // The default branch is the only one (e.g., an always active progression), so its probability is 1
+            cell.setCellValue(1.0);
+            return;
+        }
         String defaultBranchFormula = "1 - SUM(" + new CellReference(rowsUsed.get(0), column, true, true).formatAsString();
         for (int i = 1; i < rowsUsed.size(); i++) {
             defaultBranchFormula += "," + new CellReference(rowsUsed.get(i), column, true, true).formatAsString();
         }
         defaultBranchFormula += ")";
-        final Cell cell = ExcelTools.getOrCreateCell(valuesRow, column);
         cell.setCellFormula(defaultBranchFormula);
-        cell.setCellStyle(Styles.PROBABILITY.getStyle(workbook));
     }
 
     /**

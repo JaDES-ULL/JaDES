@@ -84,7 +84,7 @@ public class TestHTAExcelGeneration {
             // Regression values for the PBD model
             new DecisionTreeExcelCase("/PBD.ttl", "PBD_ExperimentBase", "testPBD.xlsm", NBSModel.class, new ToCheckExcel[] {
                 new ToCheckExcel("Process", 10, 6, 1.5512269701985133),
-                new ToCheckExcel("Process", 10, 9, 0.7638404417187111)
+                new ToCheckExcel("Process", 10, 9, 0.7636187637821464)
             })
         );
     }

@@ -42,6 +42,7 @@ public enum ExcelFormulaLibrary implements ExcelFormula {
     VLOOKUP_EXACT("VLOOKUP(%s,%s,%s,FALSE)"),
     HLOOKUP_EXACT("HLOOKUP(%s,%s,%s,FALSE)"),
     IF("IF(%s,%s,%s)"),
+    AND("AND(%s)"),
     ROUND("ROUND(%s,%s)"),
     ROUND0("ROUND(%s,0)");
 

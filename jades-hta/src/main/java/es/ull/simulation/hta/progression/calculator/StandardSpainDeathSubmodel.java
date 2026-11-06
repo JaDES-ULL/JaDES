@@ -9,7 +9,6 @@ import es.ull.simulation.hta.Patient;
 import es.ull.simulation.hta.PatientCommonRandomNumbers;
 import es.ull.simulation.hta.params.modifiers.ParameterModifier;
 import es.ull.simulation.hta.populations.Population;
-import es.ull.simulation.hta.progression.DiseaseProgression;
 import es.ull.simulation.model.TimeUnit;
 import simkit.random.GompertzVariate;
 import simkit.random.RandomNumber;
