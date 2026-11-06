@@ -8,26 +8,14 @@
 @base <https://w3id.org/ontologies-ULL/OSDi#> .
 
 <https://w3id.org/ontologies-ULL/OSDi/individuals/PBD> rdf:type owl:Ontology ;
-                                                        owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.1> ;
-                                                        rdfs:comment "Individuals for OSDi ontology, version 1.1"@en ;
+                                                        owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.2> ;
+                                                        rdfs:comment "Individuals for OSDi ontology, version 1.2"@en ;
                                                         rdfs:label "OSDi individuals for Profound Biotinidase Deficiency"@en .
 
 
 #################################################################
 #    Individuals
 #################################################################
-
-###  https://w3id.org/ontologies-ULL/OSDi#ConstantProbability1
-osdi:ConstantProbability1 rdf:type owl:NamedIndividual .
-
-
-###  https://w3id.org/ontologies-ULL/OSDi#ConstantSensitivity1
-osdi:ConstantSensitivity1 rdf:type owl:NamedIndividual .
-
-
-###  https://w3id.org/ontologies-ULL/OSDi#ConstantSpecificity1
-osdi:ConstantSpecificity1 rdf:type owl:NamedIndividual .
-
 
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_BasePopulation
 osdi:PBD_BasePopulation rdf:type owl:NamedIndividual ,
@@ -386,8 +374,8 @@ osdi:PBD_InterventionNoScreening rdf:type owl:NamedIndividual ,
                                           osdi:DiagnosisIntervention ;
                                  osdi:detects osdi:PBD_ProfoundBiotinidaseDeficiency ;
                                  osdi:hasCost osdi:PBD_CostDiagnosis ;
-                                 osdi:hasSensitivity osdi:ConstantSensitivity1 ;
-                                 osdi:hasSpecificity osdi:ConstantSpecificity1 ;
+                                 osdi:hasSensitivity osdi:Constant_Sensitivity1 ;
+                                 osdi:hasSpecificity osdi:Constant_Specificity1 ;
                                  osdi:includedByModel osdi:PBD_ModelTree ;
                                  osdi:hasDescription "No screening, i.e., clinical detection, of PBD. Uses quantitative enzymatic determination of biotinidase activity in serum and plasma,and analysis of mutations of the biotinidase gene."  .
 
@@ -397,7 +385,7 @@ osdi:PBD_InterventionScreening rdf:type owl:NamedIndividual ,
                                         osdi:ScreeningIntervention ;
                                osdi:hasCost osdi:PBD_CostDiagnosis ,
                                             osdi:PBD_CostScreening ;
-                               osdi:hasSensitivity osdi:ConstantSensitivity1 ;
+                               osdi:hasSensitivity osdi:Constant_Sensitivity1 ;
                                osdi:hasSpecificity osdi:PBD_ScreeningSpecificity ;
                                osdi:includedByModel osdi:PBD_ModelTree ;
                                osdi:hasDescription "Basic screening intervention for PBD" ;

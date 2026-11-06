@@ -8,8 +8,8 @@
 @base <https://w3id.org/ontologies-ULL/OSDi#> .
 
 <https://w3id.org/ontologies-ULL//individuals/T1DM> rdf:type owl:Ontology ;
-                                                     owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.1> ;
-                                                     rdfs:comment "Individuals for OSDi ontology, version 1.1"@en ;
+                                                     owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.2> ;
+                                                     rdfs:comment "Individuals for OSDi ontology, version 1.2"@en ;
                                                      rdfs:label "OSDi individuals for Type 1 Diabetes Mellitus"@en .
 
 #################################################################
@@ -157,8 +157,7 @@ osdi:T1DM_Intervention_DCCTIntensive rdf:type owl:NamedIndividual ,
                                               osdi:TherapeuticIntervention ;
                                      osdi:hasEffect osdi:T1DM_Intervention_DCCTIntensive_HbA1c_Effect ;
                                      osdi:includedByModel osdi:T1DM_StdModelDES ;
-                                     osdi:hasDescription "DCCT intensive arm" ;
-                                     osdi:isAssessedIntervention "true"^^xsd:boolean .
+                                     osdi:hasDescription "DCCT intensive arm" .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Intervention_DCCTIntensive_HbA1c_Effect
@@ -443,7 +442,7 @@ osdi:T1DM_Manif_ALB2_U_U95CI rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_ANGINA
 osdi:T1DM_Manif_ANGINA rdf:type owl:NamedIndividual ,
                                 osdi:ChronicManifestation ;
-                       osdi:belongsToGroup osdi:T1DM_Group_Manif_CHD ;
+                       osdi:isGroupItemOf osdi:T1DM_Group_Manif_CHD ;
                        osdi:hasCost osdi:T1DM_Manif_ANGINA_AC ,
                                     osdi:T1DM_Manif_ANGINA_TC ;
                        osdi:hasRiskCharacterization osdi:T1DM_Manif_Pathway_ANGINA ;
@@ -471,7 +470,7 @@ osdi:T1DM_Manif_ANGINA_AC rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_ANGINA_Proportion
 osdi:T1DM_Manif_ANGINA_Proportion rdf:type owl:NamedIndividual ,
                                            osdi:SecondOrderUncertaintyParameter ;
-                                  osdi:belongsToGroup osdi:T1DM_Group_Manif_CHD ;
+                                  osdi:isGroupItemOf osdi:T1DM_Group_Manif_CHD ;
                                   osdi:hasDataItemType osdi:DI_Proportion ;
                                   osdi:hasUncertaintyCharacterization osdi:T1DM_Manif_ANGINA_Proportion_ParamUncertainty ;
                                   osdi:includedByModel osdi:T1DM_StdModelDES ;
@@ -669,7 +668,7 @@ osdi:T1DM_Manif_ESRD_U_U95CI rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_HF
 osdi:T1DM_Manif_HF rdf:type owl:NamedIndividual ,
                             osdi:ChronicManifestation ;
-                   osdi:belongsToGroup osdi:T1DM_Group_Manif_CHD ;
+                   osdi:isGroupItemOf osdi:T1DM_Group_Manif_CHD ;
                    osdi:hasCost osdi:T1DM_Manif_HF_AC ,
                                 osdi:T1DM_Manif_HF_TC ;
                    osdi:hasRiskCharacterization osdi:T1DM_Manif_Pathway_HF ;
@@ -697,7 +696,7 @@ osdi:T1DM_Manif_HF_AC rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_HF_Proportion
 osdi:T1DM_Manif_HF_Proportion rdf:type owl:NamedIndividual ,
                                        osdi:SecondOrderUncertaintyParameter ;
-                              osdi:belongsToGroup osdi:T1DM_Group_Manif_CHD ;
+                              osdi:isGroupItemOf osdi:T1DM_Group_Manif_CHD ;
                               osdi:hasDataItemType osdi:DI_Proportion ;
                               osdi:hasUncertaintyCharacterization osdi:T1DM_Manif_HF_Proportion_ParamUncertainty ;
                               osdi:includedByModel osdi:T1DM_StdModelDES ;
@@ -770,7 +769,7 @@ osdi:T1DM_Manif_HF_U_U95CI rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_LEA
 osdi:T1DM_Manif_LEA rdf:type owl:NamedIndividual ,
                              osdi:ChronicManifestation ;
-                    osdi:belongsToGroup osdi:T1DM_Group_Manif_NEU ;
+                    osdi:isGroupItemOf osdi:T1DM_Group_Manif_NEU ;
                     osdi:hasCost osdi:T1DM_Manif_LEA_AC ,
                                  osdi:T1DM_Manif_LEA_TC ;
                     osdi:hasEffect osdi:T1DM_Manif_LEA_IMR ;
@@ -927,7 +926,7 @@ osdi:T1DM_Manif_LEA_U_U95CI rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_MI
 osdi:T1DM_Manif_MI rdf:type owl:NamedIndividual ,
                             osdi:ChronicManifestation ;
-                   osdi:belongsToGroup osdi:T1DM_Group_Manif_CHD ;
+                   osdi:isGroupItemOf osdi:T1DM_Group_Manif_CHD ;
                    osdi:hasCost osdi:T1DM_Manif_MI_AC ,
                                 osdi:T1DM_Manif_MI_TC ;
                    osdi:hasEffect osdi:T1DM_Manif_MI_ProbDeath ;
@@ -975,7 +974,7 @@ osdi:T1DM_Manif_MI_ProbDeath_Magnitude rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_MI_Proportion
 osdi:T1DM_Manif_MI_Proportion rdf:type owl:NamedIndividual ,
                                        osdi:SecondOrderUncertaintyParameter ;
-                              osdi:belongsToGroup osdi:T1DM_Group_Manif_CHD ;
+                              osdi:isGroupItemOf osdi:T1DM_Group_Manif_CHD ;
                               osdi:hasDataItemType osdi:DI_Proportion ;
                               osdi:hasUncertaintyCharacterization osdi:T1DM_Manif_MI_Proportion_ParamUncertainty ;
                               osdi:includedByModel osdi:T1DM_StdModelDES ;
@@ -1048,7 +1047,7 @@ osdi:T1DM_Manif_MI_U_U95CI rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_NEU
 osdi:T1DM_Manif_NEU rdf:type owl:NamedIndividual ,
                              osdi:ChronicManifestation ;
-                    osdi:belongsToGroup osdi:T1DM_Group_Manif_NEU ;
+                    osdi:isGroupItemOf osdi:T1DM_Group_Manif_NEU ;
                     osdi:hasCost osdi:T1DM_Manif_NEU_AC ;
                     osdi:hasEffect osdi:T1DM_Manif_NEU_IMR ;
                     osdi:hasRiskCharacterization osdi:T1DM_Manif_NEU_Incidence ,
@@ -1434,7 +1433,7 @@ osdi:T1DM_Manif_Pathway_STROKE rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_STROKE
 osdi:T1DM_Manif_STROKE rdf:type owl:NamedIndividual ,
                                 osdi:ChronicManifestation ;
-                       osdi:belongsToGroup osdi:T1DM_Group_Manif_CHD ;
+                       osdi:isGroupItemOf osdi:T1DM_Group_Manif_CHD ;
                        osdi:hasCost osdi:T1DM_Manif_STROKE_AC ,
                                     osdi:T1DM_Manif_STROKE_TC ;
                        osdi:hasEffect osdi:T1DM_Manif_STROKE_ProbDeath ;
@@ -1482,7 +1481,7 @@ osdi:T1DM_Manif_STROKE_ProbDeath_Magnitude rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_STROKE_Proportion
 osdi:T1DM_Manif_STROKE_Proportion rdf:type owl:NamedIndividual ,
                                            osdi:SecondOrderUncertaintyParameter ;
-                                  osdi:belongsToGroup osdi:T1DM_Group_Manif_CHD ;
+                                  osdi:isGroupItemOf osdi:T1DM_Group_Manif_CHD ;
                                   osdi:hasDataItemType osdi:DI_Proportion ;
                                   osdi:hasUncertaintyCharacterization osdi:T1DM_Manif_STROKE_Proportion_ParamUncertainty ;
                                   osdi:includedByModel osdi:T1DM_StdModelDES ;
@@ -1813,6 +1812,7 @@ osdi:T1DM_Stage_ESRD_Incidence_U95CI rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_StdModelDES
 osdi:T1DM_StdModelDES rdf:type owl:NamedIndividual ,
                                osdi:DiscreteEventSimulationModel ;
+                      osdi:hasAssessedIntervention osdi:T1DM_Intervention_DCCTIntensive ;
                       osdi:includesModelItem osdi:T1DM_BETA_Manif_ALB1 ,
                                              osdi:T1DM_BETA_Manif_ALB2 ,
                                              osdi:T1DM_BETA_Manif_NEU ,
