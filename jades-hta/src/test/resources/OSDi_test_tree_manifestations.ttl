@@ -8,8 +8,8 @@
 @base <https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-manifestations> .
 
 <https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-manifestations> rdf:type owl:Ontology ;
-    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.1> ;
-    rdfs:comment "Individuals for OSDi ontology, version 1.1. Small models to test how decision trees are generated for different combinations of manifestations and developments."@en ;
+    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.2> ;
+    rdfs:comment "Individuals for OSDi ontology, version 1.2. Small models to test how decision trees are generated for different combinations of manifestations and developments."@en ;
     rdfs:label "OSDi individuals for testing decision trees: manifestations"@en .
 
 #################################################################

@@ -8,8 +8,8 @@
 @base <https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-scenarios> .
 
 <https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-scenarios> rdf:type owl:Ontology ;
-    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.1> ;
-    rdfs:comment "Individuals for OSDi ontology, version 1.1. Models that combine several features (structure, shared costs, effects, temporal constraints, discount) to test their interactions. Every feature is also tested separately in the other test ontologies."@en ;
+    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.2> ;
+    rdfs:comment "Individuals for OSDi ontology, version 1.2. Models that combine several features (structure, shared costs, effects, temporal constraints, discount) to test their interactions. Every feature is also tested separately in the other test ontologies."@en ;
     rdfs:label "OSDi individuals for testing decision trees: scenarios"@en .
 
 #################################################################

@@ -8,8 +8,8 @@
 @base <https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-payoffs> .
 
 <https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-payoffs> rdf:type owl:Ontology ;
-    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.1> ;
-    rdfs:comment "Individuals for OSDi ontology, version 1.1. Small models to test how costs, utilities, life expectancy and intervention effects are computed in decision trees. Each model tests one feature."@en ;
+    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.2> ;
+    rdfs:comment "Individuals for OSDi ontology, version 1.2. Small models to test how costs, utilities, life expectancy and intervention effects are computed in decision trees. Each model tests one feature."@en ;
     rdfs:label "OSDi individuals for testing decision trees: costs, utilities and effects"@en .
 
 #################################################################
