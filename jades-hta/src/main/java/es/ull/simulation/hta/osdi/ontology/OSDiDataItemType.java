@@ -16,6 +16,7 @@ public enum OSDiDataItemType implements IOSDiComponentWrapper {
 	DI_BIRTH_PREVALENCE("DI_BirthPrevalence", 1.0),
 	DI_CONTINUOUS_VARIABLE("DI_Continuous_Variable", 0.0),
 	DI_COUNT("DI_Count", 0.0),
+	DI_EQ5D_UTILITY("DI_EQ5D_Utility", 1.0),
 	DI_FACTOR("DI_Factor", 1.0),
 	DI_GENERIC_UTILITY("DI_Generic_Utility", 1.0),
 	DI_INCIDENCE("DI_Incidence", 1.0),
