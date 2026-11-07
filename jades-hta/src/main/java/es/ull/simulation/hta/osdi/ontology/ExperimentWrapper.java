@@ -2,6 +2,7 @@ package es.ull.simulation.hta.osdi.ontology;
 
 import java.time.Year;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.IRI;
@@ -141,7 +142,7 @@ public class ExperimentWrapper implements IIndividualWrapper {
 		// Initializes the study year
 		this.studyYear = wrap.getIntegerValue(this.individualIRI, OSDiDataProperty.HAS_YEAR).orElse(DEF_STUDY_YEAR);
         // Initializes the time horizon
-		this.timeHorizon = wrap.getIntegerValue(this.individualIRI, OSDiDataProperty.HAS_TIME_HORIZON).orElse(DEF_TIME_HORIZON);
+		this.timeHorizon = readTimeHorizon();
 		// Initializes the default discount rates
 		this.defaultDiscountRateForCosts = wrap.getDoubleValue(this.individualIRI, OSDiDataProperty.HAS_DISCOUNT_FOR_COSTS).orElse(DEF_DEFAULT_DISCOUNT_RATE);
 		this.defaultDiscountRateForEffects = wrap.getDoubleValue(this.individualIRI, OSDiDataProperty.HAS_DISCOUNT_FOR_EFFECTS).orElse(DEF_DEFAULT_DISCOUNT_RATE);
@@ -157,6 +158,24 @@ public class ExperimentWrapper implements IIndividualWrapper {
 		this.imrCombinationMethod = readCombinationMethod(OSDiDataProperty.HAS_MORTALITY_RATE_COMBINATION_METHOD, MortalityRateCombinationMethod.class, DEF_MORTALITY_RATE_COMBINATION_METHOD, false);
 		this.modelWrapper = new ModelWrapper(this, this.workingModelIRI);
     }
+
+	/**
+	 * Reads the time horizon defined for the experiment. OSDi defines hasTimeHorizon as a double, but the models work with whole years,
+	 * so a value that is not a whole number is rounded to the nearest year (and a warning is logged). If the property is not defined, or
+	 * its value is not a valid number, returns the default time horizon.
+	 * @return The time horizon, in whole years
+	 */
+	private int readTimeHorizon() {
+		final OptionalDouble value = wrap.getDoubleValue(this.individualIRI, OSDiDataProperty.HAS_TIME_HORIZON);
+		if (value.isEmpty()) {
+			return DEF_TIME_HORIZON;
+		}
+		final int years = (int) Math.round(value.getAsDouble());
+		if (years != value.getAsDouble()) {
+			log.warn(this.individualIRI, OSDiDataProperty.HAS_TIME_HORIZON, "The time horizon (" + value.getAsDouble() + ") is not a whole number of years. It is rounded to " + years + ".");
+		}
+		return years;
+	}
 
 	/**
 	 * Reads a combination method defined for the experiment. If the property is not defined, or its value is not valid, returns the default method.
@@ -392,7 +411,8 @@ public class ExperimentWrapper implements IIndividualWrapper {
 		double discountRateForCosts, double discountRateForEffects, int nPSARuns, int nSimulatedIndividuals) {
 		wrap.createIndividual(OSDiClass.EXPERIMENT, individualIRI);
 		wrap.assertObjectProperty(individualIRI, OSDiObjectProperty.USES_MODEL, workingModelIRI);
-		wrap.assertDataProperty(individualIRI, OSDiDataProperty.HAS_TIME_HORIZON, "" + timeHorizon, OWL2Datatype.XSD_INTEGER);
+		// hasTimeHorizon is defined as a double in OSDi
+		wrap.assertDataProperty(individualIRI, OSDiDataProperty.HAS_TIME_HORIZON, "" + (double) timeHorizon, OWL2Datatype.XSD_DOUBLE);
 		wrap.assertDataProperty(individualIRI, OSDiDataProperty.HAS_DISCOUNT_FOR_COSTS, "" + discountRateForCosts, OWL2Datatype.XSD_DOUBLE);
 		wrap.assertDataProperty(individualIRI, OSDiDataProperty.HAS_DISCOUNT_FOR_EFFECTS, "" + discountRateForEffects, OWL2Datatype.XSD_DOUBLE);
 		wrap.assertDataProperty(individualIRI, OSDiDataProperty.HAS_YEAR, "" + studyYear, OWL2Datatype.XSD_INTEGER);		
