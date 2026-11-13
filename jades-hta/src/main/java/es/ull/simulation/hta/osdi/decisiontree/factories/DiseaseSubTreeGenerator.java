@@ -17,6 +17,8 @@ import es.ull.simulation.hta.osdi.ontology.DiseaseWrapper;
 import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
+import es.ull.simulation.hta.osdi.ontology.OSDiClass;
+import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.PathwayWrapper;
 import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
@@ -200,6 +202,16 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         }
         if (!(param instanceof ParameterWrapper)) {
             throw new MalformedOSDiModelException("The risk characterization " + param.getShortName() + " for the clinical progression " + progression.getShortName() + " is not a parameter.");
+        }
+        // TODO: Support effects on times to event in decision trees (see docs/known-limitations.md). The probability derived from the time is a
+        // synthetic parameter, so an effect on the time would be silently lost
+        if (OSDiDataItemType.DI_TIME_TO_EVENT.equals(((ParameterWrapper) param).getDataItemType())) {
+            for (EffectWrapper effect : parentTreeModel.getExperimentWrapper().getModelWrapper().getAndInitializeModelItemsByClassAs(OSDiClass.EFFECT, EffectWrapper.class, false)) {
+                if (effect.getOperation(param) != null) {
+                    throw new UnsupportedOSDiFeatureException("The effect " + effect.getShortName() + " modifies the time to event " + param.getShortName()
+                        + " of the clinical progression " + progression.getShortName() + ". Effects on times to event are not supported yet in decision trees.");
+                }
+            }
         }
         // In case the original parameter was not a valid probability parameter, we need to convert it
         return AbstractModelFactory.getProbabilityParameterFromGenericParameter((ParameterWrapper) param);

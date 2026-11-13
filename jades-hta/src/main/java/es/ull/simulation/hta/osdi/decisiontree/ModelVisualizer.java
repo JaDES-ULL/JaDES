@@ -84,7 +84,7 @@ public class ModelVisualizer {
      * @param indentationString The string used for indentation in the output.
      * @return true if the default branch requires a fix, false otherwise. This happends when any of the branches is not deterministic.
      */
-    private void printProbabilityNode(BranchDestinationNode node, String indentationString, Set<EffectWrapper> parentEffects) {
+    private void printProbabilityNode(BranchDestinationNode node, String indentationString, Set<EffectWrapper> parentEffects) throws MalformedOSDiModelException {
         final ArrayList<BranchDestinationNode> successors = node.getSuccessors();
         printCostParameters(node.getCostParameters(), indentationString);
         printDisutilityParameters(node.getDisutilityParameters(), indentationString);

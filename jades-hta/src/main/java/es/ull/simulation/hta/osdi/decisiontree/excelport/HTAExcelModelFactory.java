@@ -18,7 +18,6 @@ import es.ull.simulation.hta.osdi.decisiontree.SingleDiseaseAndPopulationModel;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
-import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.utils.ExcelTools;
 
@@ -184,35 +183,50 @@ public class HTAExcelModelFactory {
     }
 
     /**
-     * Builds an string formula for a parameter in the decision tree. It takes into account the modifications made to the parameter in the decision tree.
-     * @param paramIRI The IRI of the parameter to be modified.
-     * @param node The decision tree node where the parameter is located.
-     * @return The string formula for the parameter.
+     * Builds the Excel formula of a parameter, modified by all the effects of a path of the decision tree that affect it. The effects are
+     * applied in the order defined by {@link EffectWrapper#sortForParameter(es.ull.simulation.hta.osdi.ontology.IModelItemWrapper, java.util.Collection)}
+     * (replace, multiply, subtract), each one with the operation defined by {@link EffectWrapper#getOperation(es.ull.simulation.hta.osdi.ontology.IModelItemWrapper)}:
+     * <ul>
+     * <li>replace: m;</li>
+     * <li>multiply: (x * m);</li>
+     * <li>rate ratio (relative risk or hazard ratio on a probability): (1 - (1 - x) ^ m);</li>
+     * <li>hazard ratio on an exponential time to event: (x / m);</li>
+     * <li>odds ratio: (x * m / (1 - x + x * m));</li>
+     * <li>subtract: (x - m).</li>
+     * </ul>
+     * @param param The parameter
+     * @param effects The effects of the path of the decision tree (only those that affect the parameter are used)
+     * @return The Excel formula for the parameter
+     * @throws MalformedOSDiModelException If more than one effect replaces the parameter
      */
-    public static String getParameterTextFormula(ParameterWrapper param, Set<EffectWrapper> effects) {
-        EffectWrapper modifParam = null;
-        for (EffectWrapper effect : effects) {
-            for (IModelItemWrapper modifiedParam : effect.getModifiedItems()) {
-                if (modifiedParam.compareTo(param) == 0) {
-                    modifParam = effect;
+    public static String getParameterTextFormula(ParameterWrapper param, Set<EffectWrapper> effects) throws MalformedOSDiModelException {
+        String formula = param.getShortName();
+        for (EffectWrapper effect : EffectWrapper.sortForParameter(param, effects)) {
+            final String magnitude = effect.getEffectMagnitude().getShortName();
+            switch (effect.getOperation(param)) {
+                case REPLACE:
+                    formula = magnitude;
                     break;
-                }
+                case MULTIPLY:
+                    formula = "(" + formula + " * " + magnitude + ")";
+                    break;
+                case RATE_RATIO:
+                    formula = "(1 - (1 - " + formula + ") ^ " + magnitude + ")";
+                    break;
+                case TIME_HAZARD_RATIO:
+                    formula = "(" + formula + " / " + magnitude + ")";
+                    break;
+                case ODDS_RATIO:
+                    formula = "(" + formula + " * " + magnitude + " / (1 - " + formula + " + " + formula + " * " + magnitude + "))";
+                    break;
+                case SUBTRACT:
+                    formula = "(" + formula + " - " + magnitude + ")";
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown parameter modification type: " + effect.getOperation(param));
             }
         }
-        // If the successor is a parameterized component, we need to get the modified probability
-        if (modifParam == null) {
-            return param.getShortName(); // No modification, return the original IRI
-        }
-        switch (modifParam.getMagnitudeType()) {
-            case DIFF:
-                return "(" + param.getShortName() + " - " + modifParam.getEffectMagnitude().getShortName() + ")";
-            case FACTOR:
-                return "(" + param.getShortName() + " * " + modifParam.getEffectMagnitude().getShortName() + ")";
-            case SET:
-                return modifParam.getEffectMagnitude().getShortName();
-            default:
-                throw new IllegalStateException("Unknown parameter modification type: " + modifParam.getMagnitudeType());
-        }
+        return formula;
     }
 
     /**

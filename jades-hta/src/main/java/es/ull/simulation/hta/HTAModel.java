@@ -373,6 +373,17 @@ public class HTAModel {
 	}
 
 	/**
+	 * Returns the parameter modifier associated to certain intervention and parameter
+	 * @param paramName The name of the modified parameter
+	 * @param interv The intervention associated to the modifier
+	 * @return The modifier, or null if the intervention does not modify the parameter
+	 */
+	public ParameterModifier getParameterModifier(String paramName, Intervention interv) {
+		final TreeMap<Intervention, ParameterModifier> map = interventionModifiers.get(paramName);
+		return (map == null) ? null : map.get(interv);
+	}
+
+	/**
 	 * Returns a value for a parameter
 	 * @param name String identifier of the parameter
 	 * @return A value for the specified parameter; {@link Double#NaN} in case the parameter is not defined

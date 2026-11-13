@@ -1167,4 +1167,949 @@ osdi:TT_TreatAnnualCost rdf:type owl:NamedIndividual ,
                         osdi:hasYear "2026"^^xsd:short .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Developments
+osdi:TT_N08_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_N08_Severe ,
+        osdi:TT_N08_Normal ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Disease
+osdi:TT_N08_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_N08_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_N08_Severe ,
+        osdi:TT_N08_Normal ,
+        osdi:TT_N08_Developments ;
+    osdi:includedByModel osdi:TT_N08_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Experiment
+osdi:TT_N08_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N08_Model ;
+    osdi:hasDescription "Two intervention effects replace the same risk." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_InterventionTreat
+osdi:TT_N08_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_N08_TreatEffectSet1 ,
+        osdi:TT_N08_TreatEffectSet2 ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:hasDescription "Two intervention effects replace the same risk" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Model
+osdi:TT_N08_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N08_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N08_Developments ,
+        osdi:TT_N08_Disease ,
+        osdi:TT_N08_InterventionTreat ,
+        osdi:TT_N08_Normal ,
+        osdi:TT_N08_Severe ,
+        osdi:TT_N08_Severe_Cost ,
+        osdi:TT_N08_Severe_Disutility ,
+        osdi:TT_N08_Severe_LER ,
+        osdi:TT_N08_Severe_LERMagnitude ,
+        osdi:TT_N08_Severe_Risk ,
+        osdi:TT_N08_TreatEffectSet1 ,
+        osdi:TT_N08_TreatEffectSet1Magnitude ,
+        osdi:TT_N08_TreatEffectSet2 ,
+        osdi:TT_N08_TreatEffectSet2Magnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N08. Two intervention effects replace the same risk." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Normal
+osdi:TT_N08_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_N08_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Severe
+osdi:TT_N08_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_N08_Severe_Cost ;
+    osdi:hasEffect osdi:TT_N08_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_N08_Severe_Risk ;
+    osdi:hasUtility osdi:TT_N08_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_N08_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Severe_Cost
+osdi:TT_N08_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Severe_Disutility
+osdi:TT_N08_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Severe_LER
+osdi:TT_N08_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_N08_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Severe_LERMagnitude
+osdi:TT_N08_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_Severe_Risk
+osdi:TT_N08_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "0.8"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_TreatEffectSet1
+osdi:TT_N08_TreatEffectSet1 rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_N08_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_N08_TreatEffectSet1Magnitude ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:hasDescription "First new risk of Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_TreatEffectSet1Magnitude
+osdi:TT_N08_TreatEffectSet1Magnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:hasDescription "First new risk of Severe" ;
+    osdi:hasExpectedValue "0.6"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_TreatEffectSet2
+osdi:TT_N08_TreatEffectSet2 rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_N08_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_N08_TreatEffectSet2Magnitude ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:hasDescription "Second new risk of Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N08_TreatEffectSet2Magnitude
+osdi:TT_N08_TreatEffectSet2Magnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_N08_Model ;
+    osdi:hasDescription "Second new risk of Severe" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Developments
+osdi:TT_N09_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_N09_Severe ,
+        osdi:TT_N09_Normal ;
+    osdi:includedByModel osdi:TT_N09_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Disease
+osdi:TT_N09_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_N09_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_N09_Severe ,
+        osdi:TT_N09_Normal ,
+        osdi:TT_N09_Developments ;
+    osdi:includedByModel osdi:TT_N09_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Experiment
+osdi:TT_N09_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N09_Model ;
+    osdi:hasDescription "Odds ratio applied to a cost." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_InterventionTreat
+osdi:TT_N09_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_N09_TreatEffect ;
+    osdi:includedByModel osdi:TT_N09_Model ;
+    osdi:hasDescription "Odds ratio applied to a cost" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Model
+osdi:TT_N09_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N09_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N09_Developments ,
+        osdi:TT_N09_Disease ,
+        osdi:TT_N09_InterventionTreat ,
+        osdi:TT_N09_Normal ,
+        osdi:TT_N09_Severe ,
+        osdi:TT_N09_Severe_Cost ,
+        osdi:TT_N09_Severe_Disutility ,
+        osdi:TT_N09_Severe_LER ,
+        osdi:TT_N09_Severe_LERMagnitude ,
+        osdi:TT_N09_Severe_Risk ,
+        osdi:TT_N09_TreatEffect ,
+        osdi:TT_N09_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N09. Odds ratio applied to a cost." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Normal
+osdi:TT_N09_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_N09_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Severe
+osdi:TT_N09_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_N09_Severe_Cost ;
+    osdi:hasEffect osdi:TT_N09_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_N09_Severe_Risk ;
+    osdi:hasUtility osdi:TT_N09_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_N09_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Severe_Cost
+osdi:TT_N09_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_N09_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Severe_Disutility
+osdi:TT_N09_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_N09_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Severe_LER
+osdi:TT_N09_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_N09_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_N09_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Severe_LERMagnitude
+osdi:TT_N09_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_N09_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_Severe_Risk
+osdi:TT_N09_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_N09_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "0.8"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_TreatEffect
+osdi:TT_N09_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_N09_Severe_Cost ;
+    osdi:hasEffectMagnitude osdi:TT_N09_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_N09_Model ;
+    osdi:hasDescription "Odds ratio applied to the cost of Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N09_TreatEffectMagnitude
+osdi:TT_N09_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_OddsRatio ;
+    osdi:includedByModel osdi:TT_N09_Model ;
+    osdi:hasDescription "Odds ratio applied to the cost of Severe" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Developments
+osdi:TT_N10_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_N10_Severe ,
+        osdi:TT_N10_Normal ;
+    osdi:includedByModel osdi:TT_N10_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Disease
+osdi:TT_N10_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_N10_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_N10_Severe ,
+        osdi:TT_N10_Normal ,
+        osdi:TT_N10_Developments ;
+    osdi:includedByModel osdi:TT_N10_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Experiment
+osdi:TT_N10_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N10_Model ;
+    osdi:hasDescription "Hazard ratio applied to a cost." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_InterventionTreat
+osdi:TT_N10_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_N10_TreatEffect ;
+    osdi:includedByModel osdi:TT_N10_Model ;
+    osdi:hasDescription "Hazard ratio applied to a cost" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Model
+osdi:TT_N10_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N10_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N10_Developments ,
+        osdi:TT_N10_Disease ,
+        osdi:TT_N10_InterventionTreat ,
+        osdi:TT_N10_Normal ,
+        osdi:TT_N10_Severe ,
+        osdi:TT_N10_Severe_Cost ,
+        osdi:TT_N10_Severe_Disutility ,
+        osdi:TT_N10_Severe_LER ,
+        osdi:TT_N10_Severe_LERMagnitude ,
+        osdi:TT_N10_Severe_Risk ,
+        osdi:TT_N10_TreatEffect ,
+        osdi:TT_N10_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N10. Hazard ratio applied to a cost." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Normal
+osdi:TT_N10_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_N10_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Severe
+osdi:TT_N10_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_N10_Severe_Cost ;
+    osdi:hasEffect osdi:TT_N10_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_N10_Severe_Risk ;
+    osdi:hasUtility osdi:TT_N10_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_N10_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Severe_Cost
+osdi:TT_N10_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_N10_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Severe_Disutility
+osdi:TT_N10_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_N10_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Severe_LER
+osdi:TT_N10_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_N10_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_N10_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Severe_LERMagnitude
+osdi:TT_N10_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_N10_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_Severe_Risk
+osdi:TT_N10_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_N10_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "0.8"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_TreatEffect
+osdi:TT_N10_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_N10_Severe_Cost ;
+    osdi:hasEffectMagnitude osdi:TT_N10_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_N10_Model ;
+    osdi:hasDescription "Hazard ratio applied to the cost of Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N10_TreatEffectMagnitude
+osdi:TT_N10_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_HazardRatio ;
+    osdi:includedByModel osdi:TT_N10_Model ;
+    osdi:hasDescription "Hazard ratio applied to the cost of Severe" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Developments
+osdi:TT_N11_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_N11_Severe ,
+        osdi:TT_N11_Normal ;
+    osdi:includedByModel osdi:TT_N11_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Disease
+osdi:TT_N11_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_N11_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_N11_Severe ,
+        osdi:TT_N11_Normal ,
+        osdi:TT_N11_Developments ;
+    osdi:includedByModel osdi:TT_N11_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Experiment
+osdi:TT_N11_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N11_Model ;
+    osdi:hasDescription "Effect magnitude defined as a standard deviation." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_InterventionTreat
+osdi:TT_N11_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_N11_TreatEffect ;
+    osdi:includedByModel osdi:TT_N11_Model ;
+    osdi:hasDescription "Effect magnitude defined as a standard deviation" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Model
+osdi:TT_N11_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N11_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N11_Developments ,
+        osdi:TT_N11_Disease ,
+        osdi:TT_N11_InterventionTreat ,
+        osdi:TT_N11_Normal ,
+        osdi:TT_N11_Severe ,
+        osdi:TT_N11_Severe_Cost ,
+        osdi:TT_N11_Severe_Disutility ,
+        osdi:TT_N11_Severe_LER ,
+        osdi:TT_N11_Severe_LERMagnitude ,
+        osdi:TT_N11_Severe_Risk ,
+        osdi:TT_N11_TreatEffect ,
+        osdi:TT_N11_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N11. Effect magnitude defined as a standard deviation." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Normal
+osdi:TT_N11_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_N11_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Severe
+osdi:TT_N11_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_N11_Severe_Cost ;
+    osdi:hasEffect osdi:TT_N11_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_N11_Severe_Risk ;
+    osdi:hasUtility osdi:TT_N11_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_N11_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Severe_Cost
+osdi:TT_N11_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_N11_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Severe_Disutility
+osdi:TT_N11_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_N11_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Severe_LER
+osdi:TT_N11_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_N11_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_N11_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Severe_LERMagnitude
+osdi:TT_N11_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_N11_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_Severe_Risk
+osdi:TT_N11_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_N11_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "0.8"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_TreatEffect
+osdi:TT_N11_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_N11_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_N11_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_N11_Model ;
+    osdi:hasDescription "Standard deviation used as an effect magnitude" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N11_TreatEffectMagnitude
+osdi:TT_N11_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_StandardDeviation ;
+    osdi:includedByModel osdi:TT_N11_Model ;
+    osdi:hasDescription "Standard deviation used as an effect magnitude" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Developments
+osdi:TT_N12_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_N12_Severe ,
+        osdi:TT_N12_Normal ;
+    osdi:includedByModel osdi:TT_N12_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Disease
+osdi:TT_N12_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_N12_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_N12_Severe ,
+        osdi:TT_N12_Normal ,
+        osdi:TT_N12_Developments ;
+    osdi:includedByModel osdi:TT_N12_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Experiment
+osdi:TT_N12_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N12_Model ;
+    osdi:hasDescription "Relative risk applied to a time to event." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_InterventionTreat
+osdi:TT_N12_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_N12_TreatEffect ;
+    osdi:includedByModel osdi:TT_N12_Model ;
+    osdi:hasDescription "Relative risk applied to a time to event" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Model
+osdi:TT_N12_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N12_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N12_Developments ,
+        osdi:TT_N12_Disease ,
+        osdi:TT_N12_InterventionTreat ,
+        osdi:TT_N12_Normal ,
+        osdi:TT_N12_Severe ,
+        osdi:TT_N12_Severe_Cost ,
+        osdi:TT_N12_Severe_Disutility ,
+        osdi:TT_N12_Severe_LER ,
+        osdi:TT_N12_Severe_LERMagnitude ,
+        osdi:TT_N12_Severe_Risk ,
+        osdi:TT_N12_TreatEffect ,
+        osdi:TT_N12_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N12. Relative risk applied to a time to event." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Normal
+osdi:TT_N12_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_N12_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Severe
+osdi:TT_N12_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_N12_Severe_Cost ;
+    osdi:hasEffect osdi:TT_N12_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_N12_Severe_Risk ;
+    osdi:hasUtility osdi:TT_N12_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_N12_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Severe_Cost
+osdi:TT_N12_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_N12_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Severe_Disutility
+osdi:TT_N12_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_N12_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Severe_LER
+osdi:TT_N12_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_N12_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_N12_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Severe_LERMagnitude
+osdi:TT_N12_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_N12_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_Severe_Risk
+osdi:TT_N12_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_TimeToEvent ;
+    osdi:includedByModel osdi:TT_N12_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_TreatEffect
+osdi:TT_N12_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_N12_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_N12_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_N12_Model ;
+    osdi:hasDescription "Relative risk applied to the time to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N12_TreatEffectMagnitude
+osdi:TT_N12_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_RelativeRisk ;
+    osdi:includedByModel osdi:TT_N12_Model ;
+    osdi:hasDescription "Relative risk applied to the time to Severe" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Developments
+osdi:TT_N13_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_N13_Severe ,
+        osdi:TT_N13_Normal ;
+    osdi:includedByModel osdi:TT_N13_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Disease
+osdi:TT_N13_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_N13_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_N13_Severe ,
+        osdi:TT_N13_Normal ,
+        osdi:TT_N13_Developments ;
+    osdi:includedByModel osdi:TT_N13_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Experiment
+osdi:TT_N13_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N13_Model ;
+    osdi:hasDescription "Hazard ratio applied to a time to event (not supported yet in decision trees)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_InterventionTreat
+osdi:TT_N13_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_N13_TreatEffect ;
+    osdi:includedByModel osdi:TT_N13_Model ;
+    osdi:hasDescription "Hazard ratio applied to a time to event (not supported yet in decision trees)" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Model
+osdi:TT_N13_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N13_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N13_Developments ,
+        osdi:TT_N13_Disease ,
+        osdi:TT_N13_InterventionTreat ,
+        osdi:TT_N13_Normal ,
+        osdi:TT_N13_Severe ,
+        osdi:TT_N13_Severe_Cost ,
+        osdi:TT_N13_Severe_Disutility ,
+        osdi:TT_N13_Severe_LER ,
+        osdi:TT_N13_Severe_LERMagnitude ,
+        osdi:TT_N13_Severe_Risk ,
+        osdi:TT_N13_TreatEffect ,
+        osdi:TT_N13_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N13. Hazard ratio applied to a time to event (not supported yet in decision trees)." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Normal
+osdi:TT_N13_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_N13_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Severe
+osdi:TT_N13_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_N13_Severe_Cost ;
+    osdi:hasEffect osdi:TT_N13_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_N13_Severe_Risk ;
+    osdi:hasUtility osdi:TT_N13_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_N13_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Severe_Cost
+osdi:TT_N13_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_N13_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Severe_Disutility
+osdi:TT_N13_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_N13_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Severe_LER
+osdi:TT_N13_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_N13_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_N13_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Severe_LERMagnitude
+osdi:TT_N13_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_N13_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_Severe_Risk
+osdi:TT_N13_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_TimeToEvent ;
+    osdi:includedByModel osdi:TT_N13_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_TreatEffect
+osdi:TT_N13_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_N13_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_N13_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_N13_Model ;
+    osdi:hasDescription "Hazard ratio of Severe with the intervention" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N13_TreatEffectMagnitude
+osdi:TT_N13_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_HazardRatio ;
+    osdi:includedByModel osdi:TT_N13_Model ;
+    osdi:hasDescription "Hazard ratio of Severe with the intervention" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

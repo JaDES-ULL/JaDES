@@ -44,9 +44,9 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P23 |
+| `OSDi_test_tree_payoffs.ttl` | P01–P25, P27 (P26 pasó a ser N13) |
 | `OSDi_test_tree_scenarios.ttl` | I01, I02 |
-| `OSDi_test_tree_malformed.ttl` | N01–N07 (casos que deben lanzar excepción) |
+| `OSDi_test_tree_malformed.ttl` | N01–N13 (casos que deben lanzar excepción) |
 
 Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
 
@@ -79,6 +79,8 @@ Convenciones:
 - `hasMortalityRateCombinationMethod`: MAX, MULT (por defecto MAX).
 - Los pagos de una vez se suman siempre; MAX solo se aplica a los pagos anuales.
 - Esperanza de vida de una hoja: MAX(0, LE / IMR − LER).
+**Magnitud de los efectos (D3):** en un `Effect` genérico la operación depende del `DataItemType` de la magnitud y del parámetro afectado (`EffectWrapper.resolveOperation`; tabla completa en `docs/known-limitations.md`). Factor y Ratio multiplican; RelativeRisk y HazardRatio sobre una probabilidad actúan sobre la tasa equivalente, `1 − (1 − p)^m`; HazardRatio sobre un tiempo hasta el evento divide la media (exponencial, con aviso); OddsRatio multiplica las odds; MeanDifference resta; Continuous_Variable y cualquier tipo absoluto sustituyen (con aviso si el tipo no coincide). Un tipo relativo siempre opera, aunque coincida con el del parámetro. Se rechazan: OR fuera de probabilidades, HR fuera de probabilidades y tiempos, estadísticos de incertidumbre como magnitud (Malformed) y RR sobre un tiempo (Unsupported). Para multiplicar una probabilidad linealmente se usa `DI_Factor`. Varios efectos sobre un parámetro se aplican en el orden sustituir → multiplicar (factores, tasas, odds) → restar; dos sustituciones son un error. Las subclases de `Effect` mantienen su operación.
+
 **Utilidades:** una utilidad con `isDisutility = false` es un valor absoluto y se convierte en desutilidad: utilidad basal − u, igual que en el DES. Limitación documentada: se asume que la utilidad absoluta y la basal tienen la misma referencia.
  
 **Ventanas temporales:**
@@ -111,14 +113,15 @@ Convenciones:
 - Estrategias (`hasStrategy` en intervenciones, enfermedad y progresiones): el árbol solo usa los costes y utilidades de estrategias FOLLOW_UP o TREATMENT, y solo si el elemento no tiene costes o utilidades propios. Se ignoran `followedByStrategy` (con aviso), `hasConditionExpression`, `hasGuideline` (con aviso) y `failsIf`.
 - No se leen `hasIntervention` ni `isInterventionOf`: las intervenciones se obtienen por pertenencia al modelo y `hasAssessedIntervention`.
 - `Group` no tiene wrapper; no se leen `hasGroupItem` ni `hasProportionWithinGroup`.
-- Efectos: en el `Effect` genérico la operación depende del `DataItemType` de la magnitud (ContinuousVariable → SET; Factor o RelativeRisk → FACTOR; MeanDifference → DIFF; otro → SET con aviso). Las subclases fijan la operación (InstantDeath SET, LifeExpectancyReduction DIFF, IncreasedMortalityRate FACTOR).
-- Varios efectos sobre el mismo parámetro: gana el último por IRI (sin test).
+- Efectos sobre un tiempo hasta el evento: el árbol los rechaza (N12, N13), porque un riesgo `DI_TimeToEvent` no funciona todavía en árboles (el parámetro sintético `P_…` no se escribe en el Excel).
+- Las operaciones lineales (Factor, Ratio, MeanDifference) sobre una probabilidad no se recortan a [0, 1]; solo se avisa si los dos valores son deterministas.
 - MAX aplicado a totales de toda la vida: no es correcto si los elementos tienen ventanas temporales distintas.
 - El horizonte temporal del experimento no se transfiere al Excel (la plantilla usa 150).
 - Huecos de cobertura: estrategias (ningún test las ejercita), guías, etapas y reglas secuenciales, rechazo de `Pathway` en árboles, aserciones sobre vías y manifestaciones agudas en el DES, parámetros probabilísticos o calculados.
 - Los recursos `/OSDi.ttl`, `/skos.rdf` y `/time.owl` están en la raíz del jar; conviene moverlos a una ruta de paquete para evitar colisiones en el classpath.
 ## Notas técnicas
  
+- El proyecto compila con `release 25`: si Maven usa otro JDK, ejecutar con `JAVA_HOME` apuntando a un JDK 25.
 - OWL API 5.5.0 con `StructuralReasoner`; Apache POI 5.4.1 para el Excel.
 - `OSDiWrapper` resuelve las importaciones de SKOS y OWL-Time con copias locales (`SimpleIRIMapper`) para no depender de w3.org (error HTTP 429).
 - `OSDiWrapper.Builder.build` mapea la `owl:versionIRI` declarada en la copia local de `OSDi.ttl` al núcleo ya cargado. Si se cambia esa versión, hay que actualizar a la vez los `owl:imports` de las ontologías de prueba, o se intentará descargar la versión antigua.

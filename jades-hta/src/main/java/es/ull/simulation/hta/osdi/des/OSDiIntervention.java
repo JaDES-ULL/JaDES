@@ -13,6 +13,7 @@ import es.ull.simulation.hta.osdi.des.factories.UtilityParametersHandler;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
+import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
 import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.SpecificInformationForUtility;
@@ -33,6 +34,12 @@ public class OSDiIntervention extends Intervention {
 		super(model, interventionWrapper.getShortName(), interventionWrapper.getDescription().orElse(interventionWrapper.getShortName()));
 		this.interventionWrapper = interventionWrapper;
 		this.effects = interventionWrapper.getEffects();
+		// Checks that the effects of the intervention can be combined (e.g., at most one of them replaces each parameter)
+		for (EffectWrapper effect : effects) {
+			for (IModelItemWrapper modifiedItem : effect.getModifiedItems()) {
+				EffectWrapper.sortForParameter(modifiedItem, effects);
+			}
+		}
 		this.paramMapping = new TreeMap<>();
 
 		this.costParametersHandler = new CostParametersHandler(interventionWrapper.getCosts());

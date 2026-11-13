@@ -35,6 +35,31 @@ The onset and end ages of a progression (`hasOnsetAge`, `hasEndAge`) are ages, n
 - Annual costs and disutilities are accounted from `MAX(0, onset age - initial age)` to `MIN(life years, end age - initial age)`. If the window starts after death, nothing is accounted.
 - A one-time cost or disutility with an onset age is accounted at that age only if it happens between the initial age and death. A one-time payoff whose onset age is lower than the initial age is assumed to have happened before the start of the model, and it is not accounted.
 
+## jades-hta: Effect magnitudes
+
+The magnitude of a generic `Effect` is applied to each affected parameter or attribute according to the data item types of the magnitude and of the affected item (`EffectWrapper.resolveOperation`, decision D3 of `docs/osdi-1.3-diseno.md`):
+
+| Magnitude | Operation | Rejected or warned |
+|---|---|---|
+| `DI_Factor`, `DI_Ratio` | `x * m` | — |
+| `DI_RelativeRisk` | On a probability (probability, proportion, incidence, prevalence, birth prevalence, sensitivity, specificity): `1 - (1 - x)^m` (the rate equivalent to the probability is multiplied). On anything else: `x * m` | Warning if the item is not a probability (`DI_Factor` should be used). `UnsupportedOSDiFeatureException` on a time to event (a hazard ratio must be used) |
+| `DI_HazardRatio` | On a probability: `1 - (1 - x)^m`. On a time to event: `x / m` (exponential time) | Warning on a time to event; `UnsupportedOSDiFeatureException` if the time has a distribution (first-order parameter); `MalformedOSDiModelException` on anything else |
+| `DI_OddsRatio` | On a probability: `x * m / (1 - x + x * m)` | `MalformedOSDiModelException` on anything else |
+| `DI_MeanDifference` | `x - m` | — |
+| `DI_Continuous_Variable` and any other absolute type | `m` (replaces) | Warning if the type does not match that of the item, or if it is undefined (`DI_Undefined`, `DI_Other`) |
+| `DI_StandardDeviation`, `DI_Lower95ConfidenceLimit`, `DI_Upper95ConfidenceLimit` | — | `MalformedOSDiModelException` |
+
+A relative magnitude always modifies the item, even if both have the same type (e.g., a relative risk that modifies an increased mortality rate). The subclasses of `Effect` keep their own operation: instant death replaces, life expectancy reduction subtracts and increased mortality rate multiplies.
+
+When several effects modify the same parameter (in a path of the decision tree, or in an intervention of the DES), they are applied in the order: replace, multiply (linear factors, then rate ratios, then odds ratios) and subtract (`EffectWrapper.sortForParameter`). More than one replacement of the same parameter is rejected with a `MalformedOSDiModelException`. A warning is logged if the multiplications use different scales.
+
+Limitations:
+
+- The rate conversion assumes a constant rate within the period of the probability. A relative risk is treated as a ratio of rates; to multiply a probability linearly (e.g., when the relative risk and the probability come from the same source and period), the magnitude must be a `DI_Factor`.
+- Linear operations (`DI_Factor`, `DI_Ratio`, `DI_MeanDifference`) on a probability may produce values out of [0, 1]. They are not truncated; a warning is logged when both the probability and the magnitude are deterministic.
+- TODO: Effects on a time to event are rejected in decision trees (`UnsupportedOSDiFeatureException`), because the generator does not support times to event yet: the probability derived from the time (`P_<time>`) is not written in the Excel file.
+- The DES only applies the effects whose cause is an intervention, and it does not support times to event as risks yet.
+
 ## jades-hta: Conformance between the decision tree and the DES
 
 OSDi defines the semantics of a model; the decision tree generator (`osdi.decisiontree`) and the discrete-event simulation (`osdi.des`) implement it to a different extent. The table describes what each one does today. When a feature is not supported, the generator either rejects the model (`UnsupportedOSDiFeatureException`), logs a warning, or ignores it silently.
@@ -52,6 +77,7 @@ OSDi defines the semantics of a model; the decision tree generator (`osdi.decisi
 | Acute manifestations | Not supported: `DiseaseSubTreeGenerator` throws an `UnsupportedOSDiFeatureException`. | Simulated as events: they are not added to the state of the patient (so they have no annual payoffs), their one-time payoffs apply at each occurrence, and they can happen again, since their next occurrence is scheduled after each event. They never get an initial proportion, and their probability of death is not loaded from OSDi. |
 | Time horizon of the experiment (`hasTimeHorizon`) | Not used: the undiscounted life years of each leaf are limited by the `timeHorizon` named range of the Excel template (150), which the generator does not set. | Used to limit the simulation (100 years if not defined), and it can be overridden from the command line. |
 | Combination methods (`hasCostCombinationMethod`, `hasDisutilityCombinationMethod`, `hasLifeExpectancyReductionCombinationMethod`, `hasMortalityRateCombinationMethod`) | Costs: `ADD`, `ADD_DISTINCT`. Disutilities: `ADD`, `ADD_DISTINCT`, `MAX`, only among annual disutilities (one-time disutilities are always added), and `MAX` is applied to the discounted lifetime totals. Life expectancy reductions: `ADD`, `ADD_DISTINCT`, `MAX`. Mortality rates: `MAX`, `MULT`. The life expectancy of a leaf is the base life expectancy divided by the combined increased mortality rate, minus the combined reduction. | The same four methods and values, applied to the progressions active at each moment of the simulation (`Disease.getCostWithinPeriod`, `Patient.getUtilityValue`, death submodels), so `MAX` is applied period by period. |
+| Effect magnitudes (`hasEffectMagnitude`) | Applied in the Excel formula of each parameter, with the operation given by the data item types (see "Effect magnitudes"); all the effects of the path, in the order replace, multiply, subtract. Effects on a time to event are rejected. | Applied by a `CompositeParameterModifier` per parameter and intervention, with the same operations and order. Only effects caused by an intervention. |
 
 ## jades-hta: Future work: developments in the DES
 

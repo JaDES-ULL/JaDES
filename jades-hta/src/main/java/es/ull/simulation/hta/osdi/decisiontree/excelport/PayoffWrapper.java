@@ -12,12 +12,12 @@ import java.util.TreeSet;
 import org.apache.poi.ss.util.CellReference;
 import es.ull.simulation.hta.osdi.OSDiLogger;
 import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode;
+import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.SpecificInformationForCost;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.SpecificInformationForUtility;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
-import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
 import es.ull.simulation.hta.osdi.ontology.OSDiWrapper;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.outcomes.CombinationMethod;
@@ -298,8 +298,9 @@ public class PayoffWrapper {
      * @param method The method to combine the annual costs of the nodes along the path.
      * @return The cost formula as a string.
      * @throws UnsupportedOSDiFeatureException If the cost parameters cannot be processed.
+     * @throws MalformedOSDiModelException If more than one effect of the path replaces the same parameter.
      */
-    public String getCostFormula(CellReference cellUndiscountedLY, CostCombinationMethod method) throws UnsupportedOSDiFeatureException {
+    public String getCostFormula(CellReference cellUndiscountedLY, CostCombinationMethod method) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
         final ArrayList<String> costTexts = new ArrayList<>();
         // If there are no cost parameters, return an empty string
         if (costEntries.isEmpty()) {
@@ -344,8 +345,9 @@ public class PayoffWrapper {
      * @param method The method to combine the annual disutilities (ADD, ADD_DISTINCT or MAX). One-time disutilities are always added.
      * @return The QALE formula as a string.
      * @throws UnsupportedOSDiFeatureException If the disutility parameters cannot be processed or if the combination method is unsupported.
+     * @throws MalformedOSDiModelException If more than one effect of the path replaces the same parameter.
      */
-    public String getQALEFormula(CellReference cellUndiscountedLY, ParameterWrapper baseUtilityParam, DisutilityCombinationMethod method) throws UnsupportedOSDiFeatureException {
+    public String getQALEFormula(CellReference cellUndiscountedLY, ParameterWrapper baseUtilityParam, DisutilityCombinationMethod method) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
         final ArrayList<String> annualTexts = new ArrayList<>();
         final ArrayList<String> oneTimeTexts = new ArrayList<>();
         final String baseUtilityText = FormulaLibrary.CONT_DISCOUNT.getFormula(HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.getName(), cellUndiscountedLY.formatAsString(), baseUtilityParam.getShortName());
@@ -407,8 +409,9 @@ public class PayoffWrapper {
      * @param imrMethod The method to combine the increased mortality rates of the nodes along the path.
      * @return The undiscounted life expectancy formula as a string.
      * @throws UnsupportedOSDiFeatureException If the lifetime reduction parameters cannot be processed.
+     * @throws MalformedOSDiModelException If more than one effect of the path replaces the same parameter.
      */
-    public String getUndiscountedLEFormula(ParameterWrapper baseLifeExpectancyParam, LifeExpectancyReductionCombinationMethod lerMethod, MortalityRateCombinationMethod imrMethod) throws UnsupportedOSDiFeatureException {
+    public String getUndiscountedLEFormula(ParameterWrapper baseLifeExpectancyParam, LifeExpectancyReductionCombinationMethod lerMethod, MortalityRateCombinationMethod imrMethod) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
         final ArrayList<String> lifetimeReductionTexts = new ArrayList<>();
         final ArrayList<String> mortalityRateTexts = new ArrayList<>();
         final Set<String> lerKeys = new TreeSet<>();
@@ -544,34 +547,13 @@ public class PayoffWrapper {
     }
 
     /**
-     * Returns the text formula for a parameter in the decision tree. It takes into account the modifications made to the parameter in the decision tree.
-     * @param param The IRI of the parameter
+     * Returns the text formula for a parameter in the decision tree, modified by all the effects of the path that affect it
+     * (see {@link HTAExcelModelFactory#getParameterTextFormula(ParameterWrapper, Set)}).
+     * @param param The parameter
      * @return The string formula for the parameter.
-     * @throws UnsupportedOSDiFeatureException If the parameter has a modification whose type is unsupported.
+     * @throws MalformedOSDiModelException If more than one effect of the path replaces the parameter
      */
-    private String getParameterTextFormula(ParameterWrapper param) throws UnsupportedOSDiFeatureException {
-        EffectWrapper modifParam = null;
-        for (EffectWrapper effect : effects) {
-            for (IModelItemWrapper modifiedParamIRI : effect.getModifiedItems()) {
-                if (modifiedParamIRI.compareTo(param) == 0) {
-                    modifParam = effect;
-                    break;
-                }
-            }
-        }
-        // If the successor is a parameterized component, we need to get the modified probability
-        if (modifParam == null) {
-            return param.getShortName(); // No modification, return the original IRI
-        }
-        switch (modifParam.getMagnitudeType()) {
-            case DIFF:
-                return "(" + param.getShortName() + " - " + modifParam.getEffectMagnitude().getShortName() + ")";
-            case FACTOR:
-                return "(" + param.getShortName() + " * " + modifParam.getEffectMagnitude().getShortName() + ")";
-            case SET:
-                return modifParam.getEffectMagnitude().getShortName();
-            default:
-                throw new UnsupportedOSDiFeatureException("Unsupported parameter modification type: " + modifParam.getMagnitudeType());
-        }
+    private String getParameterTextFormula(ParameterWrapper param) throws MalformedOSDiModelException {
+        return HTAExcelModelFactory.getParameterTextFormula(param, effects);
     }
 }
