@@ -1,6 +1,6 @@
 # JaDES — guía para Claude Code
  
-JaDES es una librería Java de simulación para evaluación económica de tecnologías sanitarias. El módulo `jades-hta` genera modelos a partir de la ontología **OSDi** (OWL, Turtle, versión 1.1, IRI `https://w3id.org/ontologies-ULL/OSDi`): árboles de decisión exportados a Excel y modelos de simulación de eventos discretos (DES). La misma ontología debe servir para ambos tipos de modelo.
+JaDES es una librería Java de simulación para evaluación económica de tecnologías sanitarias. El módulo `jades-hta` genera modelos a partir de la ontología **OSDi** (OWL, Turtle, versión 1.2, IRI `https://w3id.org/ontologies-ULL/OSDi`; copia local en `jades-hta/src/main/resources/OSDi.ttl`): árboles de decisión exportados a Excel y modelos de simulación de eventos discretos (DES). La misma ontología debe servir para ambos tipos de modelo.
  
 Responde en español pero toda la codificación y comentarios deben estar en inglés.
  
@@ -42,7 +42,18 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
 | `OSDi_test_tree_payoffs.ttl` | P01–P23 |
 | `OSDi_test_tree_scenarios.ttl` | I01, I02 |
-| `OSDi_test_tree_malformed.ttl` | N01… (casos que deben lanzar excepción) |
+| `OSDi_test_tree_malformed.ttl` | N01–N07 (casos que deben lanzar excepción) |
+
+Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
+
+| Fichero | Tests |
+|---|---|
+| `OSDi_test.ttl` | `TestOSDiCompliance`, `TestOntology`, `TestHTAExcelGeneration`, `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration` |
+| `PBD.ttl` | `TestOntology`, `TestHTAExcelGeneration` (árbol de cribado neonatal), `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration` |
+| `T1DM.ttl` | `TestOntology`, `TestLoadOntology` (DES; único modelo de prueba con `Pathway`, `requires` y `Group`) |
+| `BD.ttl` | Ningún test la carga; importa OSDi 1.0 y es la única que usa `hasStrategy`, `LineOfTherapy` y `followedByStrategy` |
+
+`TestOSDiCompliance` exige que cada constante "core" de `OSDiClass`, `OSDiObjectProperty` y `OSDiDataProperty` exista en `OSDi.ttl`: renombrar o eliminar un término de la ontología obliga a actualizar esos enums.
  
 Convenciones:
  
@@ -83,20 +94,28 @@ Convenciones:
  
 - El DES no simula desarrollos (sin riesgo, sin pagos, sin estado) e ignora las reglas de combinación de progresiones; las manifestaciones solo se excluyen entre sí mediante `supersedesClinicalProgression`.
 - En el DES, una manifestación sin riesgo solo ocurre a través de `hasInitialProportion`; en el árbol está siempre activa.
-- El árbol no lee `hasInitialProportion`.
+- El árbol rechaza `hasInitialProportion` con `UnsupportedOSDiFeatureException` (N07).
+- El DES ignora las estrategias y los efectos cuya causa no es una intervención; en el árbol se aplican los efectos de intervenciones, enfermedad y progresiones.
+- `Pathway` (con `requires`) solo se admite en el DES; el árbol lo rechaza.
 - Trabajo futuro (DES con desarrollos): grupo de alternativas = sorteo categórico al inicio; coexistente con riesgo p = sorteo independiente; desarrollo sin riesgo = siempre presente; pagos del desarrollo = anuales mientras lo tenga; manifestación propia = riesgo solo para pacientes con ese desarrollo; manifestación sin riesgo = proporción inicial 1 en su contexto.
 ## Limitaciones y TODO pendientes
  
-- Manifestaciones agudas en árboles: TODO; deben rechazarse explícitamente hasta que se soporten.
+- Manifestaciones agudas en árboles: TODO; hoy se rechazan con `UnsupportedOSDiFeatureException` (N06).
+- El árbol rechaza un `Pathway` como caracterización del riesgo (sin test) y un riesgo cuyo `DataItemType` no sea una probabilidad (N04); `DI_TimeToEvent` se convierte en un parámetro sintético `P_…`.
 - El árbol ignora `supersedesClinicalProgression`, `hasDuration` y `hasFrequency`.
-- El horizonte temporal del experimento no se transfiere al Excel (la plantilla usa 150).
-- `ModelSheet.drawProbabilityFormula` puede dar `IndexOutOfBoundsException` si un nodo solo tiene sucesor por defecto (sin test).
+- `SequentialCombinationRule` se trata como coexistente sin aviso en el árbol; no se leen `hasFirst` ni `hasNext`. El DES ignora todas las reglas con aviso.
+- Estrategias (`hasStrategy` en intervenciones, enfermedad y progresiones): el árbol solo usa los costes y utilidades de estrategias FOLLOW_UP o TREATMENT, y solo si el elemento no tiene costes o utilidades propios. Se ignoran `followedByStrategy` (con aviso), `hasConditionExpression`, `hasGuideline` (con aviso) y `failsIf`.
+- No se leen `hasIntervention` ni `isInterventionOf`: las intervenciones se obtienen por pertenencia al modelo y `hasAssessedIntervention`.
+- `Group` no tiene wrapper; no se leen `hasGroupItem` ni `hasProportionWithinGroup`.
+- Efectos: en el `Effect` genérico la operación depende del `DataItemType` de la magnitud (ContinuousVariable → SET; Factor o RelativeRisk → FACTOR; MeanDifference → DIFF; otro → SET con aviso). Las subclases fijan la operación (InstantDeath SET, LifeExpectancyReduction DIFF, IncreasedMortalityRate FACTOR).
 - Varios efectos sobre el mismo parámetro: gana el último por IRI (sin test).
 - MAX aplicado a totales de toda la vida: no es correcto si los elementos tienen ventanas temporales distintas.
-- Huecos de cobertura: costes de estrategias y guías, etapas y reglas secuenciales, parámetros probabilísticos o calculados.
+- El horizonte temporal del experimento no se transfiere al Excel (la plantilla usa 150).
+- Huecos de cobertura: estrategias (ningún test las ejercita), guías, etapas y reglas secuenciales, rechazo de `Pathway` en árboles, aserciones sobre vías y manifestaciones agudas en el DES, parámetros probabilísticos o calculados.
 - Los recursos `/OSDi.ttl`, `/skos.rdf` y `/time.owl` están en la raíz del jar; conviene moverlos a una ruta de paquete para evitar colisiones en el classpath.
 ## Notas técnicas
  
 - OWL API 5.5.0 con `StructuralReasoner`; Apache POI 5.4.1 para el Excel.
 - `OSDiWrapper` resuelve las importaciones de SKOS y OWL-Time con copias locales (`SimpleIRIMapper`) para no depender de w3.org (error HTTP 429).
+- `OSDiWrapper.Builder.build` mapea la `owl:versionIRI` declarada en la copia local de `OSDi.ttl` al núcleo ya cargado. Si se cambia esa versión, hay que actualizar a la vez los `owl:imports` de las ontologías de prueba, o se intentará descargar la versión antigua.
 - Convención de descuento del Excel: anualidad vencida; actualización de costes con IPC: `ROUND(1000*CPI(estudio)/CPI(año), 0)/1000`.
