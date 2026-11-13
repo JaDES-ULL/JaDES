@@ -27,6 +27,10 @@ mvn -pl jades-hta -am test -DexcludedGroups=known-issue
 6. Si investigas sin cambiar nada, dilo explícitamente y no edites ficheros.
 7. Documenta cada decisión de semántica en el Javadoc del método afectado, en el comentario de la propiedad en `OSDi.ttl` si procede (sin cambiar el número de versión) y en la nota de limitaciones de `docs/`.
 8. No hagas push salvo que te lo pida.
+## Evolución de OSDi 1.3
+
+La copia de OSDi de `jades-hta` y el código que la lee evolucionan por fases hacia OSDi 1.3. Las decisiones, los puntos pendientes y el registro de cada fase están en [docs/osdi-1.3-diseno.md](docs/osdi-1.3-diseno.md). Las fases se aplican una a una: al terminar cada una, anota en su «Registro» qué se hizo, qué se decidió y qué quedó pendiente. El número de versión de `OSDi.ttl` no cambia hasta trasladar los cambios a OSDi.
+
 ## Tests de árboles de decisión
  
 Paquete `jades-hta/src/test/java/es/ull/simulation/hta/osdi/decisiontree/`:
