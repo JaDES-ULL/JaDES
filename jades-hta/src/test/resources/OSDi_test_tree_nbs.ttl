@@ -71,7 +71,10 @@ osdi:TT_NbsPopulation rdf:type owl:NamedIndividual ,
     osdi:hasAge osdi:TT_NewbornPopulationAge ;
     osdi:hasEpidemiologicalParameter osdi:TT_B01_BirthPrevalence ,
         osdi:TT_B02_BirthPrevalence ,
-        osdi:TT_B03_BirthPrevalence ;
+        osdi:TT_B03_BirthPrevalence ,
+        osdi:TT_B04_BirthPrevalence ,
+        osdi:TT_B05_BirthPrevalence ,
+        osdi:TT_B06_BirthPrevalence ;
     osdi:hasLifeExpectancy osdi:TT_NewbornLifeExpectancy ;
     osdi:hasSex osdi:TT_PopulationSex ;
     osdi:hasUtility osdi:TT_PopulationBaseUtility ;
@@ -630,6 +633,693 @@ osdi:TT_B03_Model rdf:type owl:NamedIndividual ,
         osdi:TT_B03_NewFollowUp ,
         osdi:TT_B03_NewFollowUpCost ;
     osdi:hasDescription "B03. Newborn screening that also replaces the follow-up strategy of the disease." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_S1
+osdi:TT_B04_S1 rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:hasCost osdi:TT_B04_S1_Cost ;
+    osdi:hasStrategyOutcome 
+        osdi:TT_B04_S1_Positive ,
+        osdi:TT_B04_S1_Negative ;
+    osdi:detects osdi:TT_B04_Disease ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Screening test" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_S1_Cost
+osdi:TT_B04_S1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of S1" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_S1_Positive
+osdi:TT_B04_S1_Positive rdf:type owl:NamedIndividual ,
+        osdi:PositiveDetectionOutcome ;
+    osdi:hasRiskIfDiseased osdi:TT_B04_S1_Positive_RiskD ;
+    osdi:hasRiskIfNotDiseased osdi:TT_B04_S1_Positive_RiskH ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Positive result of S1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_S1_Positive_RiskD
+osdi:TT_B04_S1_Positive_RiskD rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Probability of S1_Positive if diseased" ;
+    osdi:hasExpectedValue "0.9"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_S1_Positive_RiskH
+osdi:TT_B04_S1_Positive_RiskH rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Probability of S1_Positive if not diseased" ;
+    osdi:hasExpectedValue "0.05"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_S1_Negative
+osdi:TT_B04_S1_Negative rdf:type owl:NamedIndividual ,
+        osdi:NegativeDetectionOutcome ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Negative result of S1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_BirthPrevalence
+osdi:TT_B04_BirthPrevalence rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:EpidemiologicalParameter ;
+    osdi:hasDataItemType osdi:DI_BirthPrevalence ;
+    osdi:isParameterOf osdi:TT_NbsPopulation ,
+        osdi:TT_B04_Disease ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Birth prevalence of the disease" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_Diagnosis
+osdi:TT_B04_Diagnosis rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisStrategy ;
+    osdi:detects osdi:TT_B04_Disease ;
+    osdi:hasCategory osdi:DiagnosisCat ;
+    osdi:hasCost osdi:TT_B04_DiagnosisCost ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Diagnosis of the disease: clinical detection without screening, and confirmation of the positive results of the screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_DiagnosisCost
+osdi:TT_B04_DiagnosisCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the diagnosis" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_ArmStrategies
+osdi:TT_B04_ArmStrategies rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TT_B04_S1 ,
+        osdi:TT_B04_Diagnosis ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Detection strategies of the disease in the screening arm" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_Replacement
+osdi:TT_B04_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_B04_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_B04_ArmStrategies ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "In the screening arm, the detection strategies of the disease are the screening test and the confirmatory diagnosis" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_Screening
+osdi:TT_B04_Screening rdf:type owl:NamedIndividual ,
+        osdi:ScreeningIntervention ;
+    osdi:hasEffect osdi:TT_B04_Replacement ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_NoScreening
+osdi:TT_B04_NoScreening rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisIntervention ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "No screening: clinical detection" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_Disease
+osdi:TT_B04_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_B04_Screening ,
+        osdi:TT_B04_NoScreening ;
+    osdi:hasStrategy osdi:TT_B04_Diagnosis ;
+    osdi:includedByModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Disease detected by newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_Experiment
+osdi:TT_B04_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_B04_Model ;
+    osdi:hasDescription "Screening test with explicit positive and negative outcomes, equivalent to B01." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B04_Model
+osdi:TT_B04_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_B04_Screening ;
+    osdi:hasComparatorIntervention osdi:TT_B04_NoScreening ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_NbsPopulation ,
+        osdi:TT_NewbornPopulationAge ,
+        osdi:TT_NewbornLifeExpectancy ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_B04_S1 ,
+        osdi:TT_B04_S1_Cost ,
+        osdi:TT_B04_S1_Positive ,
+        osdi:TT_B04_S1_Positive_RiskD ,
+        osdi:TT_B04_S1_Positive_RiskH ,
+        osdi:TT_B04_S1_Negative ,
+        osdi:TT_B04_BirthPrevalence ,
+        osdi:TT_B04_Diagnosis ,
+        osdi:TT_B04_DiagnosisCost ,
+        osdi:TT_B04_ArmStrategies ,
+        osdi:TT_B04_Replacement ,
+        osdi:TT_B04_Screening ,
+        osdi:TT_B04_NoScreening ,
+        osdi:TT_B04_Disease ;
+    osdi:hasDescription "B04. Screening test with explicit positive and negative outcomes, equivalent to B01." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1
+osdi:TT_B05_S1 rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:hasCost osdi:TT_B05_S1_Cost ;
+    osdi:hasStrategyOutcome 
+        osdi:TT_B05_S1_Positive ,
+        osdi:TT_B05_S1_Inconclusive ,
+        osdi:TT_B05_S1_Negative ;
+    osdi:detects osdi:TT_B05_Disease ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Screening test with inconclusive results" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1_Cost
+osdi:TT_B05_S1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of S1" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1_Positive
+osdi:TT_B05_S1_Positive rdf:type owl:NamedIndividual ,
+        osdi:PositiveDetectionOutcome ;
+    osdi:hasRiskIfDiseased osdi:TT_B05_S1_Positive_RiskD ;
+    osdi:hasRiskIfNotDiseased osdi:TT_B05_S1_Positive_RiskH ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Positive result of S1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1_Positive_RiskD
+osdi:TT_B05_S1_Positive_RiskD rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Probability of S1_Positive if diseased" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1_Positive_RiskH
+osdi:TT_B05_S1_Positive_RiskH rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Probability of S1_Positive if not diseased" ;
+    osdi:hasExpectedValue "0.04"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1_Inconclusive
+osdi:TT_B05_S1_Inconclusive rdf:type owl:NamedIndividual ,
+        osdi:InconclusiveDetectionOutcome ;
+    osdi:hasRiskIfDiseased osdi:TT_B05_S1_Inconclusive_RiskD ;
+    osdi:hasRiskIfNotDiseased osdi:TT_B05_S1_Inconclusive_RiskH ;
+    osdi:followedByStrategy osdi:TT_B05_S2 ;
+    osdi:hasUtility osdi:TT_B05_S1_InconclusiveLoss ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Inconclusive result of S1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1_Inconclusive_RiskD
+osdi:TT_B05_S1_Inconclusive_RiskD rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Probability of S1_Inconclusive if diseased" ;
+    osdi:hasExpectedValue "0.10"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1_Inconclusive_RiskH
+osdi:TT_B05_S1_Inconclusive_RiskH rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Probability of S1_Inconclusive if not diseased" ;
+    osdi:hasExpectedValue "0.05"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1_InconclusiveLoss
+osdi:TT_B05_S1_InconclusiveLoss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of an inconclusive result (anxiety)" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S1_Negative
+osdi:TT_B05_S1_Negative rdf:type owl:NamedIndividual ,
+        osdi:NegativeDetectionOutcome ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Negative result of S1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S2
+osdi:TT_B05_S2 rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:hasCost osdi:TT_B05_S2_Cost ;
+    osdi:hasStrategyOutcome 
+        osdi:TT_B05_S2_Positive ,
+        osdi:TT_B05_S2_Negative ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Second screening test, for the inconclusive results of S1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S2_Cost
+osdi:TT_B05_S2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of S2" ;
+    osdi:hasExpectedValue "15.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S2_Positive
+osdi:TT_B05_S2_Positive rdf:type owl:NamedIndividual ,
+        osdi:PositiveDetectionOutcome ;
+    osdi:hasRiskIfDiseased osdi:TT_B05_S2_Positive_RiskD ;
+    osdi:hasRiskIfNotDiseased osdi:TT_B05_S2_Positive_RiskH ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Positive result of S2" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S2_Positive_RiskD
+osdi:TT_B05_S2_Positive_RiskD rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Probability of S2_Positive if diseased" ;
+    osdi:hasExpectedValue "0.95"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S2_Positive_RiskH
+osdi:TT_B05_S2_Positive_RiskH rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Probability of S2_Positive if not diseased" ;
+    osdi:hasExpectedValue "0.02"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_S2_Negative
+osdi:TT_B05_S2_Negative rdf:type owl:NamedIndividual ,
+        osdi:NegativeDetectionOutcome ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Negative result of S2" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_BirthPrevalence
+osdi:TT_B05_BirthPrevalence rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:EpidemiologicalParameter ;
+    osdi:hasDataItemType osdi:DI_BirthPrevalence ;
+    osdi:isParameterOf osdi:TT_NbsPopulation ,
+        osdi:TT_B05_Disease ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Birth prevalence of the disease" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_Diagnosis
+osdi:TT_B05_Diagnosis rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisStrategy ;
+    osdi:detects osdi:TT_B05_Disease ;
+    osdi:hasCategory osdi:DiagnosisCat ;
+    osdi:hasCost osdi:TT_B05_DiagnosisCost ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Diagnosis of the disease: clinical detection without screening, and confirmation of the positive results of the screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_DiagnosisCost
+osdi:TT_B05_DiagnosisCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the diagnosis" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_ArmStrategies
+osdi:TT_B05_ArmStrategies rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TT_B05_S1 ,
+        osdi:TT_B05_Diagnosis ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Detection strategies of the disease in the screening arm" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_Replacement
+osdi:TT_B05_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_B05_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_B05_ArmStrategies ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "In the screening arm, the detection strategies of the disease are the screening test and the confirmatory diagnosis" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_Screening
+osdi:TT_B05_Screening rdf:type owl:NamedIndividual ,
+        osdi:ScreeningIntervention ;
+    osdi:hasEffect osdi:TT_B05_Replacement ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_NoScreening
+osdi:TT_B05_NoScreening rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisIntervention ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "No screening: clinical detection" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_Disease
+osdi:TT_B05_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_B05_Screening ,
+        osdi:TT_B05_NoScreening ;
+    osdi:hasStrategy osdi:TT_B05_Diagnosis ;
+    osdi:includedByModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Disease detected by newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_Experiment
+osdi:TT_B05_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_B05_Model ;
+    osdi:hasDescription "Screening test whose inconclusive results are repeated with a second test." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B05_Model
+osdi:TT_B05_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_B05_Screening ;
+    osdi:hasComparatorIntervention osdi:TT_B05_NoScreening ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_NbsPopulation ,
+        osdi:TT_NewbornPopulationAge ,
+        osdi:TT_NewbornLifeExpectancy ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_B05_S1 ,
+        osdi:TT_B05_S1_Cost ,
+        osdi:TT_B05_S1_Positive ,
+        osdi:TT_B05_S1_Positive_RiskD ,
+        osdi:TT_B05_S1_Positive_RiskH ,
+        osdi:TT_B05_S1_Inconclusive ,
+        osdi:TT_B05_S1_Inconclusive_RiskD ,
+        osdi:TT_B05_S1_Inconclusive_RiskH ,
+        osdi:TT_B05_S1_InconclusiveLoss ,
+        osdi:TT_B05_S1_Negative ,
+        osdi:TT_B05_S2 ,
+        osdi:TT_B05_S2_Cost ,
+        osdi:TT_B05_S2_Positive ,
+        osdi:TT_B05_S2_Positive_RiskD ,
+        osdi:TT_B05_S2_Positive_RiskH ,
+        osdi:TT_B05_S2_Negative ,
+        osdi:TT_B05_BirthPrevalence ,
+        osdi:TT_B05_Diagnosis ,
+        osdi:TT_B05_DiagnosisCost ,
+        osdi:TT_B05_ArmStrategies ,
+        osdi:TT_B05_Replacement ,
+        osdi:TT_B05_Screening ,
+        osdi:TT_B05_NoScreening ,
+        osdi:TT_B05_Disease ;
+    osdi:hasDescription "B05. Screening test whose inconclusive results are repeated with a second test." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1
+osdi:TT_B06_S1 rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:hasCost osdi:TT_B06_S1_Cost ;
+    osdi:hasStrategyOutcome 
+        osdi:TT_B06_S1_Positive ,
+        osdi:TT_B06_S1_Inconclusive ,
+        osdi:TT_B06_S1_Negative ;
+    osdi:detects osdi:TT_B06_Disease ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Screening test with inconclusive results" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1_Cost
+osdi:TT_B06_S1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of S1" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1_Positive
+osdi:TT_B06_S1_Positive rdf:type owl:NamedIndividual ,
+        osdi:PositiveDetectionOutcome ;
+    osdi:hasRiskIfDiseased osdi:TT_B06_S1_Positive_RiskD ;
+    osdi:hasRiskIfNotDiseased osdi:TT_B06_S1_Positive_RiskH ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Positive result of S1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1_Positive_RiskD
+osdi:TT_B06_S1_Positive_RiskD rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Probability of S1_Positive if diseased" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1_Positive_RiskH
+osdi:TT_B06_S1_Positive_RiskH rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Probability of S1_Positive if not diseased" ;
+    osdi:hasExpectedValue "0.04"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1_Inconclusive
+osdi:TT_B06_S1_Inconclusive rdf:type owl:NamedIndividual ,
+        osdi:InconclusiveDetectionOutcome ;
+    osdi:hasRiskIfDiseased osdi:TT_B06_S1_Inconclusive_RiskD ;
+    osdi:hasRiskIfNotDiseased osdi:TT_B06_S1_Inconclusive_RiskH ;
+    osdi:followedByStrategy osdi:TT_B06_Diagnosis ;
+    osdi:hasUtility osdi:TT_B06_S1_InconclusiveLoss ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Inconclusive result of S1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1_Inconclusive_RiskD
+osdi:TT_B06_S1_Inconclusive_RiskD rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Probability of S1_Inconclusive if diseased" ;
+    osdi:hasExpectedValue "0.10"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1_Inconclusive_RiskH
+osdi:TT_B06_S1_Inconclusive_RiskH rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Probability of S1_Inconclusive if not diseased" ;
+    osdi:hasExpectedValue "0.05"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1_InconclusiveLoss
+osdi:TT_B06_S1_InconclusiveLoss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of an inconclusive result (anxiety)" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_S1_Negative
+osdi:TT_B06_S1_Negative rdf:type owl:NamedIndividual ,
+        osdi:NegativeDetectionOutcome ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Negative result of S1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_BirthPrevalence
+osdi:TT_B06_BirthPrevalence rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:EpidemiologicalParameter ;
+    osdi:hasDataItemType osdi:DI_BirthPrevalence ;
+    osdi:isParameterOf osdi:TT_NbsPopulation ,
+        osdi:TT_B06_Disease ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Birth prevalence of the disease" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_Diagnosis
+osdi:TT_B06_Diagnosis rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisStrategy ;
+    osdi:detects osdi:TT_B06_Disease ;
+    osdi:hasCategory osdi:DiagnosisCat ;
+    osdi:hasCost osdi:TT_B06_DiagnosisCost ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Diagnosis of the disease: clinical detection without screening, and confirmation of the positive results of the screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_DiagnosisCost
+osdi:TT_B06_DiagnosisCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the diagnosis" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_ArmStrategies
+osdi:TT_B06_ArmStrategies rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TT_B06_S1 ,
+        osdi:TT_B06_Diagnosis ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Detection strategies of the disease in the screening arm" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_Replacement
+osdi:TT_B06_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_B06_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_B06_ArmStrategies ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "In the screening arm, the detection strategies of the disease are the screening test and the confirmatory diagnosis" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_Screening
+osdi:TT_B06_Screening rdf:type owl:NamedIndividual ,
+        osdi:ScreeningIntervention ;
+    osdi:hasEffect osdi:TT_B06_Replacement ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_NoScreening
+osdi:TT_B06_NoScreening rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisIntervention ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "No screening: clinical detection" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_Disease
+osdi:TT_B06_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_B06_Screening ,
+        osdi:TT_B06_NoScreening ;
+    osdi:hasStrategy osdi:TT_B06_Diagnosis ;
+    osdi:includedByModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Disease detected by newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_Experiment
+osdi:TT_B06_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_B06_Model ;
+    osdi:hasDescription "Screening test whose inconclusive results go directly to the diagnosis." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B06_Model
+osdi:TT_B06_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_B06_Screening ;
+    osdi:hasComparatorIntervention osdi:TT_B06_NoScreening ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_NbsPopulation ,
+        osdi:TT_NewbornPopulationAge ,
+        osdi:TT_NewbornLifeExpectancy ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_B06_S1 ,
+        osdi:TT_B06_S1_Cost ,
+        osdi:TT_B06_S1_Positive ,
+        osdi:TT_B06_S1_Positive_RiskD ,
+        osdi:TT_B06_S1_Positive_RiskH ,
+        osdi:TT_B06_S1_Inconclusive ,
+        osdi:TT_B06_S1_Inconclusive_RiskD ,
+        osdi:TT_B06_S1_Inconclusive_RiskH ,
+        osdi:TT_B06_S1_InconclusiveLoss ,
+        osdi:TT_B06_S1_Negative ,
+        osdi:TT_B06_BirthPrevalence ,
+        osdi:TT_B06_Diagnosis ,
+        osdi:TT_B06_DiagnosisCost ,
+        osdi:TT_B06_ArmStrategies ,
+        osdi:TT_B06_Replacement ,
+        osdi:TT_B06_Screening ,
+        osdi:TT_B06_NoScreening ,
+        osdi:TT_B06_Disease ;
+    osdi:hasDescription "B06. Screening test whose inconclusive results go directly to the diagnosis." .
 
 
 ###  Generated from the test specification of JaDES-HTA decision trees

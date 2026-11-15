@@ -33,8 +33,8 @@ public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemW
             throw new MalformedOSDiModelException("The strategy " + individualIRI + " does not have a valid type in the OSDi model.");
         }
         log.warn(!modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.HAS_CONDITION_EXPRESSION).isEmpty(), individualIRI, OSDiObjectProperty.HAS_CONDITION_EXPRESSION, "Conditional strategies are not supported yet. They will be ignored");
-        // The next strategy is only used by the outcomes of the strategy (see getOutcomes)
-        log.warn(!modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.FOLLOWED_BY_STRATEGY).isEmpty() && !hasOutcomes(), individualIRI, OSDiObjectProperty.FOLLOWED_BY_STRATEGY, "Chained strategies without outcomes are not supported yet. They will be ignored");
+        // The next strategy is only used by the outcomes of the strategy (see getOutcomes), or to confirm the positive results of a detection strategy
+        log.warn(!modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.FOLLOWED_BY_STRATEGY).isEmpty() && !hasOutcomes() && !(this instanceof DetectionStrategyWrapper),individualIRI, OSDiObjectProperty.FOLLOWED_BY_STRATEGY, "Chained strategies without outcomes are not supported yet. They will be ignored");
         log.warn(!modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.HAS_GUIDELINE).isEmpty(), individualIRI, OSDiObjectProperty.HAS_GUIDELINE, "Guideline-based strategies are not supported yet. They will be ignored");    
     }
 
@@ -80,7 +80,8 @@ public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemW
      * @return The outcomes of this strategy (empty if it has none).
      * @throws MalformedOSDiModelException If the short form is combined with explicit outcomes, an outcome is not a treatment outcome, more than one
      * outcome has no risk, or failsIf does not point to a parameter or a health condition.
-     * @throws UnsupportedOSDiFeatureException If the strategy is a detection strategy with outcomes (not supported yet).
+     * @throws UnsupportedOSDiFeatureException If the strategy is a detection strategy with outcomes, which are only supported in the detection
+     * arms of newborn screening models (see {@link DetectionStrategyWrapper#getDetectionOutcomes()}).
      */
     public List<Outcome> getOutcomes() throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         final ModelWrapper modelWrapper = getModelWrapper();
@@ -89,9 +90,9 @@ public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemW
         if (!hasOutcomes()) {
             return outcomes;
         }
-        // TODO: Support the outcomes of detection strategies (phase 7b, see docs/osdi-1.3-diseno.md)
+        // The outcomes of detection strategies are only supported in newborn screening models (see DetectionStrategyWrapper.getDetectionOutcomes)
         if (this instanceof DetectionStrategyWrapper) {
-            throw new UnsupportedOSDiFeatureException("The detection strategy " + getShortName() + " defines outcomes, which are not supported yet.");
+            throw new UnsupportedOSDiFeatureException("The detection strategy " + getShortName() + " defines outcomes. The outcomes of detection strategies are only supported in the detection arms of newborn screening models.");
         }
         final Optional<StrategyWrapper> strategyNext = modelWrapper.getAndInitializeWrapperForPropertyAs(iri, OSDiObjectProperty.FOLLOWED_BY_STRATEGY, StrategyWrapper.class);
         final Set<IModelItemWrapper> failsIf = modelWrapper.getWrappersForProperty(iri, OSDiObjectProperty.FAILS_IF);

@@ -33,6 +33,11 @@ public class OSDiDetectionIntervention extends OSDiIntervention {
 	public OSDiDetectionIntervention(OSDiDESModel model, DetectionInterventionWrapper interventionWrapper) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
 		super(model, interventionWrapper);
 		this.detectionStrategy = findDetectionStrategy(interventionWrapper);
+		// TODO: Support explicit detection outcomes in the DES (see docs/known-limitations.md)
+		if (detectionStrategy.isPresent() && detectionStrategy.get().hasExplicitOutcomes()) {
+			throw new UnsupportedOSDiFeatureException("The detection strategy " + detectionStrategy.get().getShortName() + " of the arm of " + interventionWrapper.getShortName()
+				+ " defines explicit outcomes, which are not supported yet in discrete event simulation models. Use the short form (sensitivity and specificity).");
+		}
 	}
 
 	/**

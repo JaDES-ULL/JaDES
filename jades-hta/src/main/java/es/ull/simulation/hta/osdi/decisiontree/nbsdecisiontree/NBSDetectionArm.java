@@ -39,8 +39,11 @@ import es.ull.simulation.hta.osdi.ontology.StrategyWrapper;
  * <li>Diagnosis costs (paid by the patients diagnosed): the own costs of the disease with the diagnosis category, plus the costs of the diagnosis
  * strategy of the arm.</li>
  * </ul>
- * The sensitivity and specificity of the screening are those of the screening strategy. The sensitivity and specificity of the diagnosis strategy
- * are not used: the diagnosis is assumed to be perfect.
+ * The results of the screening are those of the screening strategy: its sensitivity and specificity, or its explicit detection outcomes (see
+ * {@link NBSScreeningInterventionBuilder}). The diagnosis confirms the positive results and is assumed to be perfect: the sensitivity and
+ * specificity of the diagnosis strategy are not used, and a diagnosis strategy with explicit outcomes is not supported yet. A positive result may
+ * be confirmed by another diagnosis strategy (the strategy that follows it); the confirmation costs are then the own costs of the disease with the
+ * diagnosis category plus the costs of such strategy (see {@link #addConfirmationCosts(BranchDestinationNode, Optional)}).
  */
 public final class NBSDetectionArm {
     /** The strategies that replace those of each health condition in this arm, indexed by the IRI of the health condition */
@@ -51,6 +54,10 @@ public final class NBSDetectionArm {
     private final List<ParameterWrapper> screeningCosts = new ArrayList<>();
     /** The costs paid by the whole population of the arm because of the screening, which apply according to a guideline */
     private final List<GuidelineCost> screeningGuidelineCosts = new ArrayList<>();
+    /** The diagnosis strategy of this arm, if any */
+    private final Optional<DetectionStrategyWrapper> diagnosisStrategy;
+    /** The own costs of the disease with the diagnosis category */
+    private final Set<ParameterWrapper> ownDiagnosisCosts;
     /** The costs paid by each patient diagnosed */
     private final List<ParameterWrapper> diagnosisCosts = new ArrayList<>();
     /** The costs paid by each patient diagnosed, which apply according to a guideline */
@@ -69,7 +76,13 @@ public final class NBSDetectionArm {
         this.replacements = SimpleInterventionGenerator.getStrategyReplacements(intervention);
         final Set<StrategyWrapper> strategies = DiseaseSubTreeGenerator.replaceByType(disease.getStrategies(), replacements.get(disease.getIndividualIRI()));
         this.screeningStrategy = getDetectionStrategy(intervention, disease, strategies, StrategyType.SCREENING_STRATEGY);
-        final Optional<DetectionStrategyWrapper> diagnosisStrategy = getDetectionStrategy(intervention, disease, strategies, StrategyType.DIAGNOSIS_STRATEGY);
+        this.diagnosisStrategy = getDetectionStrategy(intervention, disease, strategies, StrategyType.DIAGNOSIS_STRATEGY);
+        this.ownDiagnosisCosts = ownDiagnosisCosts;
+        // TODO: Support diagnosis strategies with explicit outcomes (see docs/known-limitations.md)
+        if (diagnosisStrategy.isPresent() && diagnosisStrategy.get().hasExplicitOutcomes()) {
+            throw new UnsupportedOSDiFeatureException("The diagnosis strategy " + diagnosisStrategy.get().getShortName() + " of the arm of the intervention " + intervention.getShortName()
+                + " defines explicit outcomes. The diagnosis is assumed to be perfect in newborn screening models, so diagnosis strategies with outcomes are not supported yet.");
+        }
         if (screeningStrategy.isPresent() && !InterventionType.SCREENING.equals(intervention.getInterventionType())) {
             throw new MalformedOSDiModelException("The arm of the intervention " + intervention.getShortName() + " uses the screening strategy " + screeningStrategy.get().getShortName()
                 + ", but it is not a screening intervention.");
@@ -145,5 +158,31 @@ public final class NBSDetectionArm {
     public void addDiagnosisCosts(BranchDestinationNode node) {
         node.addCostParameters(diagnosisCosts);
         node.addGuidelineCosts(diagnosisGuidelineCosts);
+    }
+
+    /**
+     * Adds to a node the costs of the confirmation of a result with a diagnosis strategy: the diagnosis costs of this arm if the confirmation uses
+     * its diagnosis strategy (or no specific strategy), or the own costs of the disease with the diagnosis category plus the costs of the
+     * confirmation strategy otherwise.
+     * @param node The node
+     * @param confirmation The strategy that confirms the result, if not the diagnosis strategy of this arm
+     * @throws MalformedOSDiModelException If the costs of the confirmation strategy are malformed
+     * @throws UnsupportedOSDiFeatureException If the confirmation strategy has explicit outcomes, or its costs use features not supported yet
+     */
+    public void addConfirmationCosts(BranchDestinationNode node, Optional<StrategyWrapper> confirmation) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        if (confirmation.isEmpty() || (diagnosisStrategy.isPresent() && diagnosisStrategy.get().getIndividualIRI().equals(confirmation.get().getIndividualIRI()))) {
+            addDiagnosisCosts(node);
+            return;
+        }
+        // TODO: Support diagnosis strategies with explicit outcomes (see docs/known-limitations.md)
+        if (confirmation.get() instanceof DetectionStrategyWrapper detection && detection.hasExplicitOutcomes()) {
+            throw new UnsupportedOSDiFeatureException("The diagnosis strategy " + detection.getShortName() + " defines explicit outcomes. The diagnosis is assumed to be perfect "
+                + "in newborn screening models, so diagnosis strategies with outcomes are not supported yet.");
+        }
+        final List<ParameterWrapper> costs = new ArrayList<>(ownDiagnosisCosts);
+        final List<GuidelineCost> guidelineCosts = new ArrayList<>();
+        StrategyCosts.collect(confirmation.get(), costs, guidelineCosts);
+        node.addCostParameters(costs);
+        node.addGuidelineCosts(guidelineCosts);
     }
 }

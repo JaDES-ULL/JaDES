@@ -3720,7 +3720,7 @@ osdi:DetectionOutcome rdf:type owl:Class ;
 ###  https://w3id.org/ontologies-ULL/OSDi#PositiveDetectionOutcome
 osdi:PositiveDetectionOutcome rdf:type owl:Class ;
                               rdfs:subClassOf osdi:DetectionOutcome ;
-                              rdfs:comment "A positive result of a detection strategy: the individual is detected (true positive if diseased, false positive otherwise). It is usually followed by a confirmatory diagnosis."@en ;
+                              rdfs:comment "A positive result of a detection strategy: the individual is detected (true positive if diseased, false positive otherwise). It is usually followed by a confirmatory diagnosis. When it is followed by a diagnosis strategy, the diagnosis confirms the result; when it is followed by another detection strategy (e.g., a second-tier test), the individual is tested again. Without its own followedByStrategy, it is followed by the followedByStrategy of its detection strategy, if any."@en ;
                               rdfs:label "Positive detection outcome"@en ,
                                          "Resultado positivo de una detección"@es .
 

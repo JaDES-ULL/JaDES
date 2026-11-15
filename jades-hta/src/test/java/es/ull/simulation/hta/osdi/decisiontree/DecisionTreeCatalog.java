@@ -614,7 +614,11 @@ public final class DecisionTreeCatalog {
             new MalformedCase(MALFORMED, "TT_N23_Experiment", "Cycle in the chain of strategies", UnsupportedOSDiFeatureException.class),
             new MalformedCase(MALFORMED, "TT_N24_Experiment", "Strategy outcome whose risk is a time to event (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
             new MalformedCase(MALFORMED, "TT_N25_Experiment", "Two strategy outcomes without risk", MalformedOSDiModelException.class),
-            new MalformedCase(MALFORMED, "TT_N26_Experiment", "Short form (failsIf) combined with explicit strategy outcomes", MalformedOSDiModelException.class)
+            new MalformedCase(MALFORMED, "TT_N26_Experiment", "Short form (failsIf) combined with explicit strategy outcomes", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N27_Experiment", "Two detection outcomes without risk for the patients with the disease", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N28_Experiment", "Inconclusive detection outcome followed by a strategy that is not a detection strategy", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N29_Experiment", "Cycle in the chain of detection strategies", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N30_Experiment", "Confirmation of the positive results with a diagnosis strategy with explicit outcomes (not supported yet)", UnsupportedOSDiFeatureException.class)
         );
     }
 }

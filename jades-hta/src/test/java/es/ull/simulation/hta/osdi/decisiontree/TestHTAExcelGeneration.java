@@ -70,10 +70,22 @@ public class TestHTAExcelGeneration {
      * @return The values to check in the Excel file.
      */
     private static ToCheckExcel[] nbsArms(double screeningCost, double noScreeningCost) {
+        return nbsArms(screeningCost, 68.0, noScreeningCost);
+    }
+
+    /**
+     * Expected outcomes of the newborn screening cases: the costs of both arms and the QALYs of the screening arm, with 80 life years in both and
+     * 68 QALYs in the arm without screening.
+     * @param screeningCost The cost of the screening arm.
+     * @param screeningQALY The QALYs of the screening arm.
+     * @param noScreeningCost The cost of the arm without screening.
+     * @return The values to check in the Excel file.
+     */
+    private static ToCheckExcel[] nbsArms(double screeningCost, double screeningQALY, double noScreeningCost) {
         return new ToCheckExcel[] {
             new ToCheckExcel("Process", 10, 6, screeningCost),
             new ToCheckExcel("Process", 10, 7, 80.0),
-            new ToCheckExcel("Process", 10, 8, 68.0),
+            new ToCheckExcel("Process", 10, 8, screeningQALY),
             new ToCheckExcel("Process", 10, 9, noScreeningCost),
             new ToCheckExcel("Process", 10, 10, 80.0),
             new ToCheckExcel("Process", 10, 11, 68.0)
@@ -111,7 +123,16 @@ public class TestHTAExcelGeneration {
             // The screening test costs 4 per application, applied twice according to its guideline: 8 instead of 10
             new DecisionTreeExcelCase("/OSDi_test_tree_nbs.ttl", "TT_B02_Experiment", "testB02.xlsm", NBSModel.class, nbsArms(837.25, 805.0)),
             // The disease has a follow-up of 200 per year, replaced by 50 per year in the screening arm: + 0.01 * 80 * 50 = 40 (screening); + 0.01 * 80 * 200 = 160 (no screening)
-            new DecisionTreeExcelCase("/OSDi_test_tree_nbs.ttl", "TT_B03_Experiment", "testB03.xlsm", NBSModel.class, nbsArms(879.25, 965.0))
+            new DecisionTreeExcelCase("/OSDi_test_tree_nbs.ttl", "TT_B03_Experiment", "testB03.xlsm", NBSModel.class, nbsArms(879.25, 965.0)),
+            // Explicit detection outcomes of the screening test (positive: 0.9 if diseased, 0.05 if not; negative by default), equivalent to B01
+            new DecisionTreeExcelCase("/OSDi_test_tree_nbs.ttl", "TT_B04_Experiment", "testB04.xlsm", NBSModel.class, nbsArms(839.25, 805.0)),
+            // S1 (10): positive 0.85 / 0.04; inconclusive 0.10 / 0.05, with a QALY loss of 0.01, followed by S2 (15): positive 0.95 / 0.02; negative by default.
+            // Inconclusive: 0.01 * 0.10 + 0.99 * 0.05 = 0.0505. Screening: 10 + 0.0505 * 15 + 0.01 * (0.85 + 0.10 * 0.95) * 500 + 0.99 * (0.04 + 0.05 * 0.02) * 500
+            // + 800 = 10 + 0.7575 + 4.725 + 20.295 + 800 = 835.7775. QALYs: 68 - 0.0505 * 0.01 = 67.999495
+            new DecisionTreeExcelCase("/OSDi_test_tree_nbs.ttl", "TT_B05_Experiment", "testB05.xlsm", NBSModel.class, nbsArms(835.7775, 67.999495, 805.0)),
+            // S1 as in B05, but its inconclusive results go directly to the (perfect) diagnosis.
+            // Screening: 10 + 0.01 * (0.85 + 0.10) * 500 + 0.99 * (0.04 + 0.05) * 500 + 800 = 10 + 4.75 + 44.55 + 800 = 859.3. QALYs: 68 - 0.0505 * 0.01 = 67.999495
+            new DecisionTreeExcelCase("/OSDi_test_tree_nbs.ttl", "TT_B06_Experiment", "testB06.xlsm", NBSModel.class, nbsArms(859.3, 67.999495, 805.0))
         );
     }
 

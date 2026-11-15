@@ -46,8 +46,8 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
 | `OSDi_test_tree_payoffs.ttl` | P01–P25, P27–P46 (P26 pasó a ser N13; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
-| `OSDi_test_tree_nbs.ttl` | B01–B03 (cribado neonatal con estrategias; se comprueban en `TestHTAExcelGeneration`) |
-| `OSDi_test_tree_malformed.ttl` | N01–N26 (casos que deben lanzar excepción) |
+| `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
+| `OSDi_test_tree_malformed.ttl` | N01–N30 (casos que deben lanzar excepción) |
 
 Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
 
@@ -112,7 +112,7 @@ Convenciones:
 - Costes y utilidades de las estrategias (seguimiento y tratamiento) se suman a los propios del elemento (P33): el modelador elige qué incluye en cada modelo, porque solo se lee lo que el modelo incluye.
 - Coste de una estrategia: sus costes propios más los de las tecnologías que usa. La pauta de la tecnología (o, si no tiene, la de la estrategia) hace que su coste sea por aplicación (c): con r = `hasFrequency` × 8760 / `hasPeriod` (sin periodo, la frecuencia es anual), inicio = inicio del nodo + `hasStartOffset` y L = MIN(`hasDuration`, `hasCount` / r), pago anual r·c durante [inicio, inicio + L] recortado al nodo y a la vida (P36, P38, P39); sin frecuencia, N·c de una vez en el inicio, con N = `hasCount` o 1 (P37, P40). Sin pauta, los costes de la tecnología son pagos normales.
 
-**Resultados de estrategias (D4–D7, árbol):** jerarquía `StrategyOutcome` → `TreatmentOutcome` (`SuccessOutcome`, `FailureOutcome`) y `DetectionOutcome` (positivo, negativo, no concluyente; fase 7b). `failsIf` (parámetro o condición de salud, D5) es la forma abreviada de fracaso y éxito.
+**Resultados de estrategias (D4–D7, árbol):** jerarquía `StrategyOutcome` → `TreatmentOutcome` (`SuccessOutcome`, `FailureOutcome`) y `DetectionOutcome` (positivo, negativo, no concluyente; solo en el NBS, ver abajo). `failsIf` (parámetro o condición de salud, D5) es la forma abreviada de fracaso y éxito.
 - Los resultados se expanden bajo cada hoja (`StrategyOutcomeExpander`): una rama por resultado con su riesgo (el que no tiene riesgo se lleva el resto). Con `failsIf` hacia una condición, fracasa donde la condición está activa y tiene éxito donde no.
 - Momento T = inicio de la estrategia + `hasEvaluationTime` (inicio, con aviso, si falta). Los pagos anuales de la estrategia van hasta T si el resultado tiene estrategia siguiente o resuelve; si no, hasta el final del nodo. La siguiente empieza en T. Pagos del resultado: una vez en T (anuales ignorados con aviso). «Resuelve»: los pagos anuales de la condición paran en T; sus efectos sobre la LE se mantienen, con aviso.
 - Rechazos: ciclos (N23) y riesgo de tiempo hasta el evento (N24), `Unsupported`; dos resultados sin riesgo (N25) y `failsIf` con resultados explícitos (N26), `Malformed`. Estrategias con resultados cuyos costes siguen una pauta: `Unsupported`.
@@ -120,6 +120,8 @@ Convenciones:
 **Cribado neonatal (NBS):** las intervenciones de detección no declaran `hasSensitivity`, `hasSpecificity`, `detects` ni `hasTemporaryThreshold` (`MalformedOSDiModelException`, N20 y N22): la enfermedad que detectan es su objetivo, y lo demás es de sus estrategias de detección.
 - Estrategias de detección de un brazo: las de la enfermedad tras la sustitución de la intervención (por tipo). La intervención de cribado suele sustituirlas por un grupo {cribado, diagnóstico}. Como mucho una de cribado y una de diagnóstico por brazo (`Unsupported`); cribado en el brazo sin cribado (N21) o `detects` hacia otra enfermedad: `Malformed`.
 - Brazo con cribado: toda la población paga los costes propios de la intervención con `ScreeningCat` más los de la estrategia de cribado; sensibilidad y especificidad de la estrategia de cribado (1 con aviso si faltan); verdaderos y falsos positivos pagan el diagnóstico (costes propios de la enfermedad con `DiagnosisCat` más la estrategia de diagnóstico del brazo). Brazo sin cribado: los enfermos pagan el diagnóstico. La sensibilidad y especificidad de la estrategia de diagnóstico no se usan. Las sustituciones del brazo llegan también al subárbol de la enfermedad (B03).
+- Resultados de detección (D6, `NBSScreeningInterventionBuilder`): enfermos y sanos se ramifican en los resultados de la estrategia de cribado con `hasRiskIfDiseased` / `hasRiskIfNotDiseased` (el que no tiene riesgo para un estado se lleva el resto). Sensibilidad y especificidad se expanden a positivo y negativo (mismo árbol que antes; B04 ≡ B01). Un positivo sin estrategia propia sigue el `followedByStrategy` de la estrategia de cribado o, si no, el diagnóstico del brazo. Resultado seguido de una estrategia de diagnóstico: confirmación perfecta (costes propios con `DiagnosisCat` + coste de esa estrategia; enfermos = verdaderos positivos con los efectos de la intervención, sanos descartados; B06). Seguido de otra estrategia de detección (prueba repetida o de segundo nivel): paga su coste y se vuelve a ramificar en el mismo estado (B05). Negativo: fin (su estrategia siguiente se ignora con aviso). Pagos del resultado una vez y sus efectos en su rama; anuales y `hasEvaluationTime` ignorados con aviso.
+- Rechazos: dos resultados sin riesgo para un estado (N27), positivo o no concluyente seguido de una estrategia que no es de detección (N28), no concluyente sin estrategia siguiente, forma abreviada con resultados explícitos: `Malformed`. Ciclos en la cadena de pruebas (N29) y estrategia de diagnóstico con resultados explícitos, en el brazo (N30) o como confirmación: `Unsupported`. Fuera del NBS, una estrategia de detección con resultados explícitos: `Unsupported`.
  
 ## Divergencias conocidas entre árbol y DES
  
@@ -127,7 +129,7 @@ Convenciones:
 - En el DES, una manifestación sin riesgo solo ocurre a través de `hasInitialProportion`; en el árbol está siempre activa.
 - El árbol rechaza `hasInitialProportion` con `UnsupportedOSDiFeatureException` (N07).
 - El DES ignora las estrategias (y las sustituciones de estrategia, con aviso) y los efectos cuya causa no es una intervención; en el árbol se aplican los efectos de intervenciones, enfermedad y progresiones.
-- Detección en el DES: la sensibilidad y la especificidad de una intervención de detección salen de la estrategia de detección de su brazo (sus sustituciones o, si no, la de la enfermedad); sus costes no se aplican.
+- Detección en el DES: la sensibilidad y la especificidad de una intervención de detección salen de la estrategia de detección de su brazo (sus sustituciones o, si no, la de la enfermedad); sus costes no se aplican. Una estrategia de detección con resultados explícitos se rechaza (`Unsupported`).
 - `Pathway` (con `requires`) solo se admite en el DES; el árbol lo rechaza.
 - Manifestaciones agudas: el árbol cuenta un episodio y el DES todos los que ocurran; con varios pagos de una vez, el árbol los suma y el DES usa el primero (con aviso).
 - El DES no lee el objetivo de las intervenciones: siempre se aplican desde el inicio de la simulación.

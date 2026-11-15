@@ -210,9 +210,36 @@ Pendientes de decidir:
 - Se dividió la fase en 7a (tratamiento) y 7b (detección en el NBS).
 
 **Pendiente:**
-- Fase 7b: resultados de detección en el NBS (riesgos por estado, resultados no concluyentes encadenados a otra prueba, confirmación con el `followedByStrategy` de los positivos).
+- Fase 7b: resultados de detección en el NBS (riesgos por estado, resultados no concluyentes encadenados a otra prueba, confirmación con el `followedByStrategy` de los positivos). Hecho en la Fase 7b.
 - Pautas en estrategias con resultados (hoy `Unsupported`).
 - El fracaso por una condición de salud ocurre al inicio de la estrategia: no se tiene en cuenta la edad de inicio de la condición.
 - Efectos adversos que pueden coincidir con el éxito o el fracaso: habría que modelarlos como manifestaciones agudas cuyo riesgo depende de la estrategia.
 - El DES no simula estrategias ni sus resultados.
 - El aviso de `StrategyWrapper` sobre las estrategias con pauta («Guideline-based strategies are not supported yet») ha quedado desfasado desde la Fase 5. No lo he cambiado porque queda fuera del alcance de esta fase.
+
+### Fase 7b: resultados de detección en el cribado neonatal (D6) (2026-11-15)
+
+**Hecho:**
+- `OSDi.ttl` (sin cambiar la versión): el comentario de `PositiveDetectionOutcome` explica la confirmación con una estrategia de diagnóstico, la prueba de segundo nivel y el uso por defecto del `followedByStrategy` de la estrategia.
+- Código:
+  - `StrategyOutcomeWrapper` lee los riesgos por estado (`hasRiskIfDiseased`, `hasRiskIfNotDiseased`) y el tipo de resultado de detección.
+  - `DetectionStrategyWrapper.getDetectionOutcomes` valida los resultados explícitos y los ordena (positivo, no concluyente, negativo). Un positivo sin estrategia propia toma el `followedByStrategy` de la estrategia.
+  - `NBSScreeningInterventionBuilder` ramifica enfermos y sanos en los resultados de la estrategia de cribado. La forma abreviada se expande a positivo y negativo, con el mismo árbol que antes. Un resultado seguido de una estrategia de diagnóstico es una confirmación perfecta; seguido de otra estrategia de detección, paga su coste y se vuelve a ramificar en el mismo estado.
+  - `NBSDetectionArm.addConfirmationCosts` compone el coste de la confirmación con otra estrategia de diagnóstico, y el brazo rechaza una estrategia de diagnóstico con resultados explícitos.
+  - `StrategyWrapper.getOutcomes` sigue rechazando los resultados de detección fuera del NBS, con un mensaje nuevo. El aviso de `followedByStrategy` ya no salta en las estrategias de detección.
+  - `OSDiDetectionIntervention` (DES) rechaza las estrategias de detección con resultados explícitos.
+- Tests: B04–B06 en `OSDi_test_tree_nbs.ttl` (comprobados en `TestHTAExcelGeneration`) y N27–N30, con valores calculados a mano. Los mensajes de N27–N30 se comprobaron a mano. `PBD.ttl` y B01–B03 dan los mismos resultados.
+- Documentación: `docs/known-limitations.md` (secciones «Newborn screening» y «Strategy outcomes in decision trees», y tabla de conformidad) y Claude.MD.
+
+**Decidido:**
+- Las estrategias de diagnóstico son confirmaciones perfectas. Las demás estrategias de detección (cribado o pruebas de segundo nivel) son pruebas que se ramifican en sus resultados. Esto vale igual para un positivo que para un no concluyente.
+- Un no concluyente sin estrategia siguiente, o un positivo o no concluyente seguido de una estrategia que no es de detección, es `Malformed`. Un negativo termina la detección: su estrategia siguiente se ignora con aviso.
+- Los pagos de un resultado de detección son de una vez y sus efectos se aplican en su rama. `hasEvaluationTime` y los pagos anuales se ignoran con aviso, porque el cribado ocurre en el momento 0.
+- `hasOutcomeRisk` no se usa en los resultados de detección.
+- En la propuesta, el AVAC del brazo con cribado de B06 era 68 por un error de cálculo. Como S1 es el de B05, también tiene la pérdida de 0,01 AVAC del no concluyente, así que el valor correcto es 67,999495. Se corrigió antes de implementar.
+
+**Pendiente:**
+- Estrategias de diagnóstico con resultados explícitos, es decir, una confirmación imperfecta (hoy `Unsupported`, N30).
+- Resultados de detección explícitos en el DES (hoy `Unsupported`).
+- Los falsos negativos (ya pendiente desde la Fase 6).
+- Los demás puntos pendientes de la Fase 7a.
