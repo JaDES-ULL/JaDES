@@ -858,7 +858,7 @@ osdi:TT_N06_Disease rdf:type owl:NamedIndividual ,
 osdi:TT_N06_Experiment rdf:type owl:NamedIndividual ,
                                 osdi:Experiment ;
                        osdi:usesModel osdi:TT_N06_Model ;
-                       osdi:hasDescription "Acute manifestation (not supported yet in decision trees)." ;
+                       osdi:hasDescription "Acute manifestation characterized only by a frequency (not supported in decision trees)." ;
                        osdi:hasDiscountForCosts "0.0"^^xsd:double ;
                        osdi:hasDiscountForEffects "0.0"^^xsd:double ;
                        osdi:hasDisutilityCombinationMethod "ADD" ;
@@ -869,7 +869,7 @@ osdi:TT_N06_Experiment rdf:type owl:NamedIndividual ,
 osdi:TT_N06_ManX rdf:type owl:NamedIndividual ,
                           osdi:AcuteManifestation ;
                  osdi:hasCost osdi:TT_N06_ManX_Cost ;
-                 osdi:hasRiskCharacterization osdi:TT_N06_ManX_Risk ;
+                 osdi:hasFrequency osdi:TT_N06_ManX_Frequency ;
                  osdi:hasUtility osdi:TT_N06_ManX_Disutility ;
                  osdi:includedByModel osdi:TT_N06_Model .
 
@@ -898,13 +898,13 @@ osdi:TT_N06_ManX_Disutility rdf:type owl:NamedIndividual ,
                             osdi:isDisutility "true"^^xsd:boolean .
 
 
-###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_ManX_Risk
-osdi:TT_N06_ManX_Risk rdf:type owl:NamedIndividual ,
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_ManX_Frequency
+osdi:TT_N06_ManX_Frequency rdf:type owl:NamedIndividual ,
                                osdi:DeterministicParameter ;
-                      osdi:hasDataItemType osdi:DI_Incidence ;
+                      osdi:hasDataItemType osdi:DI_Count ;
                       osdi:includedByModel osdi:TT_N06_Model ;
-                      osdi:hasDescription "Probability of ManX" ;
-                      osdi:hasExpectedValue "0.2"^^xsd:double .
+                      osdi:hasDescription "Episodes of ManX per year" ;
+                      osdi:hasExpectedValue "12.0"^^xsd:double .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_Model
@@ -920,13 +920,13 @@ osdi:TT_N06_Model rdf:type owl:NamedIndividual ,
                                          osdi:TT_N06_ManX ,
                                          osdi:TT_N06_ManX_Cost ,
                                          osdi:TT_N06_ManX_Disutility ,
-                                         osdi:TT_N06_ManX_Risk ,
+                                         osdi:TT_N06_ManX_Frequency ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
                                          osdi:TT_PopulationBaseUtility ,
                                          osdi:TT_PopulationSex ,
                                          osdi:TT_TreatAnnualCost ;
-                  osdi:hasDescription "N06. Acute manifestation (not supported yet in decision trees). Acute manifestations are not supported yet in decision trees, so the generation of the tree must fail." .
+                  osdi:hasDescription "N06. Acute manifestation characterized only by a frequency (not supported in decision trees). A decision tree represents a single episode, whose probability must be declared as a risk: the frequency cannot be converted into such probability, so the generation of the tree must fail." .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_N07_Disease

@@ -399,6 +399,28 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P27_Experiment", "Several intervention effects on the same risk: new value (0.6), factor (x0.5) and difference (-0.1)",
                 leaves("TT_P27_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
                 outcomes(76100.0, 61.0, 48.25), outcomes(85000.0, 49.0, 27.25)));
+        // Acute manifestations (P28-P32): ManA is a single episode within the lifetime, with a one-time cost (2000) and a one-time QALY loss (0.5). No discount.
+        // Comparator arm with a risk p: cost = 65 * 1000 + 2000 p; life years = 65; QALYs = 0.85 * 65 - 0.5 p. Assessed arm: + 65 * 100 = 6500 of cost.
+        // p = 0.2: cost = 65400 (71900); QALYs = 55.15
+        cases.add(tc(PAYOFFS, "TT_P28_Experiment", "Acute manifestation with a risk, a one-time cost and a one-time QALY loss: one episode within the lifetime",
+                leaves("TT_P28_", leaf(0.2, "ManA"), leaf(0.8)),
+                outcomes(71900.0, 65.0, 55.15), outcomes(65400.0, 65.0, 55.15)));
+        // Same as P28: the annual cost (500) and the annual disutility (0.1) of an acute manifestation are ignored
+        cases.add(tc(PAYOFFS, "TT_P29_Experiment", "Acute manifestation with annual payoffs, which are ignored with a warning",
+                leaves("TT_P29_", leaf(0.2, "ManA"), leaf(0.8)),
+                outcomes(71900.0, 65.0, 55.15), outcomes(65400.0, 65.0, 55.15)));
+        // Same as P28: the frequency (12 episodes per year) is ignored, since the acute manifestation also defines a risk
+        cases.add(tc(PAYOFFS, "TT_P30_Experiment", "Acute manifestation with a risk and a frequency: the frequency is ignored with a warning",
+                leaves("TT_P30_", leaf(0.2, "ManA"), leaf(0.8)),
+                outcomes(71900.0, 65.0, 55.15), outcomes(65400.0, 65.0, 55.15)));
+        // p = 1: cost = 65000 + 2000 = 67000 (73500); QALYs = 55.25 - 0.5 = 54.75
+        cases.add(tc(PAYOFFS, "TT_P31_Experiment", "Acute manifestation without risk: the episode always happens",
+                leaves("TT_P31_", leaf(1.0, "ManA")),
+                outcomes(73500.0, 65.0, 54.75), outcomes(67000.0, 65.0, 54.75)));
+        // p' = 0.2 * 0.5 = 0.1: cost = 65000 + 6500 + 200 = 71700; QALYs = 55.25 - 0.05 = 55.2
+        cases.add(tc(PAYOFFS, "TT_P32_Experiment", "Intervention effect on the risk of an acute manifestation: factor (x0.5)",
+                leaves("TT_P32_", leaf(0.2, "ManA"), leaf(0.8)),
+                outcomes(71700.0, 65.0, 55.2), outcomes(65400.0, 65.0, 55.15)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
@@ -481,8 +503,8 @@ public final class DecisionTreeCatalog {
             new MalformedCase(MALFORMED, "TT_N04_Experiment", "Risk of a development characterized by a parameter that is not a probability", UnsupportedOSDiFeatureException.class),
             // A shared cost cannot be counted once if it applies in different periods.
             new MalformedCase(MALFORMED, "TT_N05_Experiment", "ADD_DISTINCT with a cost shared by manifestations with different temporal constraints", UnsupportedOSDiFeatureException.class),
-            // Acute manifestations are not supported yet in decision trees.
-            new MalformedCase(MALFORMED, "TT_N06_Experiment", "Acute manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
+            // A decision tree represents a single episode of an acute manifestation, whose probability must be declared as a risk: a frequency alone is not enough.
+            new MalformedCase(MALFORMED, "TT_N06_Experiment", "Acute manifestation characterized only by a frequency (not supported in decision trees)", UnsupportedOSDiFeatureException.class),
             // Decision trees assume that every patient starts without progressions.
             new MalformedCase(MALFORMED, "TT_N07_Experiment", "Initial proportion of a manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
             // Two replacements of the same parameter are ambiguous.

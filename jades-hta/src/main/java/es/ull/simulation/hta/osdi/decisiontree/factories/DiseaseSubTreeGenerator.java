@@ -1,6 +1,8 @@
 package es.ull.simulation.hta.osdi.decisiontree.factories;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -19,7 +21,10 @@ import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
 import es.ull.simulation.hta.osdi.ontology.OSDiClass;
 import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
+import es.ull.simulation.hta.osdi.ontology.OSDiObjectProperty;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
+import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.SpecificInformationForCost;
+import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.SpecificInformationForUtility;
 import es.ull.simulation.hta.osdi.ontology.PathwayWrapper;
 import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleType;
@@ -42,7 +47,9 @@ import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
  * (default) branch of its parent, with probability 1, so its payoffs apply to every leaf of the sub-tree that hangs from it. A manifestation without risk that
  * depends on a development is only active in the branches where such development is active.
  *
- * Acute manifestations and initial proportions of progressions (hasInitialProportion) are not supported yet.
+ * An acute manifestation represents a single episode between the initial age of the population and death (see {@link #checkAcuteManifestation} and
+ * {@link #generateNode}). It produces the same nodes as a chronic manifestation: its risk is the probability that the episode happens, and an acute
+ * manifestation without risk always happens in its context. Initial proportions of progressions (hasInitialProportion) are not supported yet.
  *
  * Manifestations declared as subprogressions of one or more developments are assumed to appear only together with such developments. Conversely, "orphan" manifestations 
  * are supposed to appear independently of any development. 
@@ -89,9 +96,8 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
     @Override
     public BranchDestinationNode generate(String name) throws MalformedOSDiModelException, MalformedSimulationModelException, UnsupportedOSDiFeatureException {
         for (ClinicalProgressionWrapper manifestation : diseaseWrapper.getManifestations()) {
-            // TODO: Support acute manifestations in decision trees (see docs/known-limitations.md)
             if (ClinicalProgressionType.ACUTE_MANIFESTATION.equals(manifestation.getClinicalProgressionType())) {
-                throw new UnsupportedOSDiFeatureException("The manifestation " + manifestation.getShortName() + " is an acute manifestation. Acute manifestations are not supported yet in decision trees.");
+                checkAcuteManifestation(manifestation);
             }
         }
         for (PopulationWrapper population : parentTreeModel.getExperimentWrapper().getModelWrapper().getPopulationIndividuals()) {
@@ -186,6 +192,33 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             generateManifestationsSubTree(diseaseNode, defaultCoexistentManifestations, new TreeSet<>(pendingManifestations));
         }
         return rootNode;
+    }
+
+    /**
+     * Checks how the frequency of an acute manifestation (hasFrequency) is used in a decision tree. A decision tree represents a single episode
+     * of the acute manifestation, whose probability is its risk:
+     * <ul>
+     * <li>If the acute manifestation defines both a risk and a frequency, the frequency is ignored with a warning.</li>
+     * <li>If it only defines a frequency, the tree cannot be built. The frequency cannot be converted into the probability of the episode:
+     * such conversion (1 - e^(-frequency * horizon)) requires a time horizon, which the tree does not have (each leaf accounts for its own
+     * life years), and counting a single episode would discard the expected number of episodes. Without this check, the acute manifestation
+     * would be treated as a manifestation without risk, i.e., an episode that always happens.</li>
+     * </ul>
+     * @param manifestation An acute manifestation
+     * @throws UnsupportedOSDiFeatureException If the acute manifestation defines a frequency but no risk
+     * @throws MalformedOSDiModelException If the frequency of the acute manifestation is not a valid parameter
+     */
+    private void checkAcuteManifestation(ClinicalProgressionWrapper manifestation) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
+        final Optional<ParameterWrapper> frequency = manifestation.getModelWrapper().getWrapperForPropertyAs(manifestation.getIndividualIRI(), OSDiObjectProperty.HAS_FREQUENCY, ParameterWrapper.class);
+        if (frequency.isEmpty()) {
+            return;
+        }
+        if (manifestation.isDefaultProgression()) {
+            throw new UnsupportedOSDiFeatureException("The acute manifestation " + manifestation.getShortName() + " defines a frequency (" + frequency.get().getShortName()
+                + ") but no risk. Decision trees represent a single episode of an acute manifestation, whose probability must be defined as a risk (hasRiskCharacterization).");
+        }
+        log.warn("The acute manifestation " + manifestation.getShortName() + " defines a frequency (" + frequency.get().getShortName()
+            + "), which is ignored in decision trees: they represent a single episode, whose probability is the risk of the acute manifestation.");
     }
 
     public ParameterWrapper getAdaptedRiskParameter(ClinicalProgressionWrapper progression) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
@@ -431,6 +464,14 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
 
     /**
      * Generates a BranchDestinationNode for this clinical progression.
+     * <p>
+     * The node of an acute manifestation represents a single episode between the initial age of the population and death. Its one-time costs and
+     * utilities apply once, when the episode happens: at the start of the model, or at the onset age, if defined (see
+     * {@link es.ull.simulation.hta.osdi.decisiontree.excelport.PayoffWrapper}). A one-time utility is a QALY loss. Annual costs and utilities
+     * of an acute manifestation are ignored with a warning, as in the discrete-event simulation: an episode has no annual payoffs, and charging
+     * them until death would treat the acute manifestation as a chronic one.
+     * </p>
+     * @param progression The clinical progression.
      * @return The generated BranchDestinationNode representing this clinical progression.
      * @throws MalformedOSDiModelException If the OSDi model is malformed, such as if the progression IRI does not correspond to a valid instance.
      * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered, such as if the progression defines unsupported parameters.
@@ -445,7 +486,40 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         node.updateCosts(progression, Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
         node.updateUtility(progression, Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
         node.updateEffects(progression);
+        if (ClinicalProgressionType.ACUTE_MANIFESTATION.equals(progression.getClinicalProgressionType())) {
+            removeAnnualPayoffs(progression, node.getCostParameters());
+            removeAnnualPayoffs(progression, node.getDisutilityParameters());
+        }
         return node;
+    }
+
+    /**
+     * Removes, with a warning, the annual costs or utilities of an acute manifestation (see {@link #generateNode}).
+     * @param manifestation The acute manifestation.
+     * @param parameters The cost or utility parameters of the node of the acute manifestation.
+     */
+    private static void removeAnnualPayoffs(ClinicalProgressionWrapper manifestation, Collection<ParameterWrapper> parameters) {
+        final List<ParameterWrapper> annual = parameters.stream().filter(param -> !appliesOneTime(param)).toList();
+        if (!annual.isEmpty()) {
+            log.warn("The acute manifestation " + manifestation.getShortName() + " defines annual costs or utilities (" + annual
+                + "), which are ignored in decision trees: an acute manifestation is a single episode, so only one-time costs and utilities apply.");
+            parameters.removeAll(annual);
+        }
+    }
+
+    /**
+     * Returns true if the parameter is a cost or utility that applies only once.
+     * @param param The parameter.
+     * @return true if the parameter is a cost or utility that applies only once.
+     */
+    private static boolean appliesOneTime(ParameterWrapper param) {
+        if (param.getSpecificInformation() instanceof SpecificInformationForCost info) {
+            return info.appliesOneTime();
+        }
+        if (param.getSpecificInformation() instanceof SpecificInformationForUtility info) {
+            return info.appliesOneTime();
+        }
+        return false;
     }
 
 }

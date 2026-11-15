@@ -58,3 +58,21 @@ Pendientes de decidir:
 - DES: `Statistics.getAnnualBasedTimeToEvent` usa la probabilidad modificada como si fuera la tasa (`−ln(U)/p'`); la tasa exacta es `−ln(1 − p')`.
 - DES: solo se aplican los efectos causados por una intervención; no hay ningún test que compruebe valores de efectos en el DES.
 - Añadir `hasRefToSTATO` a `DI_HazardRatio` y `DI_OddsRatio` cuando se confirmen sus códigos.
+
+### Fase 3: manifestaciones agudas en árboles (2026-11-15)
+
+**Hecho:**
+- El árbol ya no rechaza las manifestaciones agudas, porque serán objetivo de intervenciones (D1), como la crisis de migraña. `DiseaseSubTreeGenerator` construye su nodo igual que el de una crónica (reglas de combinación, dependencia de un desarrollo y efectos sobre la hoja). Además, comprueba la frecuencia (`checkAcuteManifestation`) y quita los pagos anuales (`removeAnnualPayoffs`).
+- Tests nuevos: P28 (riesgo y pagos de una vez), P29 (pagos anuales ignorados), P30 (frecuencia ignorada), P31 (sin riesgo), P32 (`DI_Factor` de la intervención sobre el riesgo). N06 pasa a ser «aguda con solo `hasFrequency`». Los valores esperados se calcularon a mano antes de implementar.
+- Documentación: Javadoc de la clase y de `generateNode`, comentario de `AcuteManifestation` en `OSDi.ttl` (sin cambiar la versión), `docs/known-limitations.md` (sección y tabla de conformidad) y Claude.MD (semántica, divergencias; se quita la limitación).
+
+**Decidido:**
+- Una manifestación aguda es un único episodio entre la edad inicial y la muerte de la hoja. Su riesgo es la probabilidad de que ocurra. Sin riesgo, ocurre siempre en su contexto: es el árbol que empieza en la crisis.
+- `hasFrequency` se ignora con aviso si hay riesgo; si solo hay frecuencia, se rechaza (`UnsupportedOSDiFeatureException`). No se convierte en 1 − e^(−f·H): el árbol no tiene horizonte (cada hoja cuenta sus años de vida y `hasTimeHorizon` no llega al Excel), y contar un episodio perdería el número esperado de episodios, f·H.
+- Pagos de una vez: una vez por episodio, en el momento 0 o en la edad de inicio, con las reglas de las ventanas temporales; una utilidad de una vez es una pérdida de AVAC (D7); varios se suman. Pagos anuales: se ignoran con aviso, como en el DES.
+
+**Pendiente:**
+- Episodios repetidos en el árbol: se modelarán con la recurrencia (D9). Hasta entonces, el árbol cuenta un episodio y el DES todos.
+- Divergencia: con varios pagos de una vez en una aguda, el DES solo usa el primero (`OSDiDiseaseProgression`), mientras que el árbol los suma.
+- El DES no lee `hasFrequency`: el tiempo hasta el siguiente episodio sale solo del riesgo.
+- N06 comprueba el tipo de excepción, no el mensaje (como todos los casos N).

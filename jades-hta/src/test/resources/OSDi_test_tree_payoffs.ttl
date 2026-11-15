@@ -3902,4 +3902,486 @@ osdi:TT_P27_TreatEffectDiffMagnitude rdf:type owl:NamedIndividual ,
     osdi:hasExpectedValue "0.1"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P28_Disease
+osdi:TT_P28_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P28_ManA ;
+    osdi:includedByModel osdi:TT_P28_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P28_Experiment
+osdi:TT_P28_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P28_Model ;
+    osdi:hasDescription "Acute manifestation with a risk, a one-time cost and a one-time QALY loss: one episode within the lifetime." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P28_ManA
+osdi:TT_P28_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_P28_ManA_Cost ;
+    osdi:hasRiskCharacterization osdi:TT_P28_ManA_Risk ;
+    osdi:hasUtility osdi:TT_P28_ManA_Disutility ;
+    osdi:includedByModel osdi:TT_P28_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P28_ManA_Cost
+osdi:TT_P28_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P28_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each episode of ManA" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P28_ManA_Disutility
+osdi:TT_P28_ManA_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P28_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of each episode of ManA" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P28_ManA_Risk
+osdi:TT_P28_ManA_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P28_Model ;
+    osdi:hasDescription "Probability of an episode of ManA" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P28_Model
+osdi:TT_P28_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P28_Disease ,
+        osdi:TT_P28_ManA ,
+        osdi:TT_P28_ManA_Cost ,
+        osdi:TT_P28_ManA_Disutility ,
+        osdi:TT_P28_ManA_Risk ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P28. Acute manifestation with a risk, a one-time cost and a one-time QALY loss: one episode within the lifetime." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P29_Disease
+osdi:TT_P29_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P29_ManA ;
+    osdi:includedByModel osdi:TT_P29_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P29_Experiment
+osdi:TT_P29_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P29_Model ;
+    osdi:hasDescription "Acute manifestation with annual payoffs, which are ignored with a warning." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P29_ManA
+osdi:TT_P29_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_P29_ManA_Cost ,
+        osdi:TT_P29_ManA_AnnualCost ;
+    osdi:hasRiskCharacterization osdi:TT_P29_ManA_Risk ;
+    osdi:hasUtility osdi:TT_P29_ManA_Disutility ,
+        osdi:TT_P29_ManA_AnnualDisutility ;
+    osdi:includedByModel osdi:TT_P29_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P29_ManA_Cost
+osdi:TT_P29_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P29_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each episode of ManA" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P29_ManA_Disutility
+osdi:TT_P29_ManA_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P29_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of each episode of ManA" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P29_ManA_AnnualCost
+osdi:TT_P29_ManA_AnnualCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P29_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of ManA (ignored in decision trees, since ManA is acute)" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P29_ManA_AnnualDisutility
+osdi:TT_P29_ManA_AnnualDisutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P29_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of ManA (ignored in decision trees, since ManA is acute)" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P29_ManA_Risk
+osdi:TT_P29_ManA_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P29_Model ;
+    osdi:hasDescription "Probability of an episode of ManA" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P29_Model
+osdi:TT_P29_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P29_Disease ,
+        osdi:TT_P29_ManA ,
+        osdi:TT_P29_ManA_Cost ,
+        osdi:TT_P29_ManA_Disutility ,
+        osdi:TT_P29_ManA_AnnualCost ,
+        osdi:TT_P29_ManA_AnnualDisutility ,
+        osdi:TT_P29_ManA_Risk ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P29. Acute manifestation with annual payoffs, which are ignored with a warning." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P30_Disease
+osdi:TT_P30_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P30_ManA ;
+    osdi:includedByModel osdi:TT_P30_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P30_Experiment
+osdi:TT_P30_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P30_Model ;
+    osdi:hasDescription "Acute manifestation with a risk and a frequency: the frequency is ignored with a warning." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P30_ManA
+osdi:TT_P30_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_P30_ManA_Cost ;
+    osdi:hasFrequency osdi:TT_P30_ManA_Frequency ;
+    osdi:hasRiskCharacterization osdi:TT_P30_ManA_Risk ;
+    osdi:hasUtility osdi:TT_P30_ManA_Disutility ;
+    osdi:includedByModel osdi:TT_P30_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P30_ManA_Cost
+osdi:TT_P30_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P30_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each episode of ManA" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P30_ManA_Disutility
+osdi:TT_P30_ManA_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P30_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of each episode of ManA" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P30_ManA_Frequency
+osdi:TT_P30_ManA_Frequency rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TT_P30_Model ;
+    osdi:hasDescription "Episodes of ManA per year (ignored in decision trees, since ManA also defines a risk)" ;
+    osdi:hasExpectedValue "12.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P30_ManA_Risk
+osdi:TT_P30_ManA_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P30_Model ;
+    osdi:hasDescription "Probability of an episode of ManA" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P30_Model
+osdi:TT_P30_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P30_Disease ,
+        osdi:TT_P30_ManA ,
+        osdi:TT_P30_ManA_Cost ,
+        osdi:TT_P30_ManA_Disutility ,
+        osdi:TT_P30_ManA_Frequency ,
+        osdi:TT_P30_ManA_Risk ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P30. Acute manifestation with a risk and a frequency: the frequency is ignored with a warning." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P31_Disease
+osdi:TT_P31_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P31_ManA ;
+    osdi:includedByModel osdi:TT_P31_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P31_Experiment
+osdi:TT_P31_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P31_Model ;
+    osdi:hasDescription "Acute manifestation without risk: the episode always happens." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P31_ManA
+osdi:TT_P31_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_P31_ManA_Cost ;
+    osdi:hasUtility osdi:TT_P31_ManA_Disutility ;
+    osdi:includedByModel osdi:TT_P31_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P31_ManA_Cost
+osdi:TT_P31_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P31_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each episode of ManA" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P31_ManA_Disutility
+osdi:TT_P31_ManA_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P31_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of each episode of ManA" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P31_Model
+osdi:TT_P31_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P31_Disease ,
+        osdi:TT_P31_ManA ,
+        osdi:TT_P31_ManA_Cost ,
+        osdi:TT_P31_ManA_Disutility ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P31. Acute manifestation without risk: the episode always happens." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_Disease
+osdi:TT_P32_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P32_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P32_ManA ;
+    osdi:includedByModel osdi:TT_P32_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_Experiment
+osdi:TT_P32_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P32_Model ;
+    osdi:hasDescription "Intervention effect on the risk of an acute manifestation: factor (x0.5)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_ManA
+osdi:TT_P32_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_P32_ManA_Cost ;
+    osdi:hasRiskCharacterization osdi:TT_P32_ManA_Risk ;
+    osdi:hasUtility osdi:TT_P32_ManA_Disutility ;
+    osdi:includedByModel osdi:TT_P32_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_ManA_Cost
+osdi:TT_P32_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P32_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each episode of ManA" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_ManA_Disutility
+osdi:TT_P32_ManA_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P32_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of each episode of ManA" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_ManA_Risk
+osdi:TT_P32_ManA_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P32_Model ;
+    osdi:hasDescription "Probability of an episode of ManA" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_InterventionTreat
+osdi:TT_P32_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P32_TreatEffect ;
+    osdi:includedByModel osdi:TT_P32_Model ;
+    osdi:hasDescription "Halves the risk of an episode of ManA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_TreatEffect
+osdi:TT_P32_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_P32_ManA_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_P32_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_P32_Model ;
+    osdi:hasDescription "Factor applied to the risk of ManA with the intervention" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_TreatEffectMagnitude
+osdi:TT_P32_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Factor ;
+    osdi:includedByModel osdi:TT_P32_Model ;
+    osdi:hasDescription "Factor applied to the risk of ManA with the intervention" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P32_Model
+osdi:TT_P32_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P32_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P32_Disease ,
+        osdi:TT_P32_ManA ,
+        osdi:TT_P32_ManA_Cost ,
+        osdi:TT_P32_ManA_Disutility ,
+        osdi:TT_P32_ManA_Risk ,
+        osdi:TT_P32_InterventionTreat ,
+        osdi:TT_P32_TreatEffect ,
+        osdi:TT_P32_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P32. Intervention effect on the risk of an acute manifestation: factor (x0.5)." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

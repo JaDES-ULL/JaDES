@@ -1675,7 +1675,7 @@ osdi:AcuteManifestation rdf:type owl:Class ;
                                           owl:allValuesFrom osdi:Parameter
                                         ] ;
                         owl:disjointWith osdi:ClinicalProgressionWithInitialProportion ;
-                        rdfs:comment "Sudden or rapid appearance of clinical signs or symtoms, in general with a short and intense course"@en ;
+                        rdfs:comment "Sudden or rapid appearance of clinical signs or symtoms, in general with a short and intense course. Its costs and utilities apply per episode, so they should be one-time (appliesOneTime = true); a one-time utility is a loss of QALYs. In a decision tree, an acute manifestation represents a single episode between the initial age of the population and death: its risk characterization is the probability that the episode happens, and, as for any other progression, an acute manifestation without risk always happens in its context. A decision tree ignores the frequency (hasFrequency) of an acute manifestation that defines a risk, and cannot represent one that only defines a frequency. Annual costs and utilities of an acute manifestation are ignored both in decision trees and in discrete-event simulations."@en ;
                         rdfs:label "Acute manifestation"@en ,
                                    "Manifestación aguda"@es .
 

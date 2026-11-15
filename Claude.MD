@@ -44,7 +44,7 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P25, P27 (P26 pasó a ser N13) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P25, P27–P32 (P26 pasó a ser N13; P28–P32: manifestaciones agudas) |
 | `OSDi_test_tree_scenarios.ttl` | I01, I02 |
 | `OSDi_test_tree_malformed.ttl` | N01–N13 (casos que deben lanzar excepción) |
 
@@ -95,6 +95,11 @@ Convenciones:
 - Si no pertenecen a un grupo de alternativas de dos o más miembros, están siempre activas en su contexto y no generan nodo. Una manifestación propia de un desarrollo solo está activa donde ese desarrollo lo está.
 - En un grupo de alternativas, el miembro sin riesgo es la rama por defecto (1 − suma del resto). Solo se admite uno por grupo, y no es compatible con `hasNullProgression = true`.
 **Árbol trivial:** una hoja que cuelga directamente de una intervención tiene probabilidad 1.
+
+**Manifestaciones agudas (árbol):** un único episodio entre la edad inicial y la muerte, con el mismo nodo que una crónica (reglas, dependencia de un desarrollo y efectos sobre la hoja).
+- El riesgo es la probabilidad de que ocurra el episodio; una aguda sin riesgo ocurre siempre en su contexto (D1: el árbol empieza en la crisis).
+- `hasFrequency`: se ignora con aviso si hay riesgo; si solo hay frecuencia, `UnsupportedOSDiFeatureException` (N06). No se convierte en 1 − e^(−f·H): el árbol no tiene horizonte y se perdería el número esperado de episodios.
+- Pagos de una vez: una vez por episodio, en el momento 0 o en la edad de inicio (reglas de las ventanas temporales); una utilidad de una vez es una pérdida de AVAC. Pagos anuales: se ignoran con aviso, como en el DES.
  
 ## Divergencias conocidas entre árbol y DES
  
@@ -103,12 +108,12 @@ Convenciones:
 - El árbol rechaza `hasInitialProportion` con `UnsupportedOSDiFeatureException` (N07).
 - El DES ignora las estrategias y los efectos cuya causa no es una intervención; en el árbol se aplican los efectos de intervenciones, enfermedad y progresiones.
 - `Pathway` (con `requires`) solo se admite en el DES; el árbol lo rechaza.
+- Manifestaciones agudas: el árbol cuenta un episodio y el DES todos los que ocurran; con varios pagos de una vez, el árbol los suma y el DES usa el primero (con aviso).
 - Trabajo futuro (DES con desarrollos): grupo de alternativas = sorteo categórico al inicio; coexistente con riesgo p = sorteo independiente; desarrollo sin riesgo = siempre presente; pagos del desarrollo = anuales mientras lo tenga; manifestación propia = riesgo solo para pacientes con ese desarrollo; manifestación sin riesgo = proporción inicial 1 en su contexto.
 ## Limitaciones y TODO pendientes
  
-- Manifestaciones agudas en árboles: TODO; hoy se rechazan con `UnsupportedOSDiFeatureException` (N06).
 - El árbol rechaza un `Pathway` como caracterización del riesgo (sin test) y un riesgo cuyo `DataItemType` no sea una probabilidad (N04); `DI_TimeToEvent` se convierte en un parámetro sintético `P_…`.
-- El árbol ignora `supersedesClinicalProgression`, `hasDuration` y `hasFrequency`.
+- El árbol ignora `supersedesClinicalProgression` y `hasDuration`; `hasFrequency` solo se lee en las manifestaciones agudas (véase «Manifestaciones agudas»).
 - `SequentialCombinationRule` se trata como coexistente sin aviso en el árbol; no se leen `hasFirst` ni `hasNext`. El DES ignora todas las reglas con aviso.
 - Estrategias (`hasStrategy` en intervenciones, enfermedad y progresiones): el árbol solo usa los costes y utilidades de estrategias FOLLOW_UP o TREATMENT, y solo si el elemento no tiene costes o utilidades propios. Se ignoran `followedByStrategy` (con aviso), `hasConditionExpression`, `hasGuideline` (con aviso) y `failsIf`.
 - No se leen `hasIntervention` ni `isInterventionOf`: las intervenciones se obtienen por pertenencia al modelo y `hasAssessedIntervention`.
