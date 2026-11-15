@@ -2112,4 +2112,241 @@ osdi:TT_N13_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
     osdi:hasExpectedValue "0.5"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N14_Disease
+osdi:TT_N14_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasProgressionElement osdi:TT_N14_ManX ;
+    osdi:includedByModel osdi:TT_N14_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N14_Experiment
+osdi:TT_N14_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N14_Model ;
+    osdi:hasDescription "Compared interventions with different targets." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N14_InterventionNone
+osdi:TT_N14_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:isInterventionOf osdi:TT_N14_Disease ;
+    osdi:includedByModel osdi:TT_N14_Model ;
+    osdi:hasDescription "Comparator, whose target is the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N14_InterventionTreat
+osdi:TT_N14_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:isInterventionOf osdi:TT_N14_ManX ;
+    osdi:includedByModel osdi:TT_N14_Model ;
+    osdi:hasDescription "Assessed intervention, whose target is ManX" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N14_ManX
+osdi:TT_N14_ManX rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasRiskCharacterization osdi:TT_N14_ManX_Risk ;
+    osdi:includedByModel osdi:TT_N14_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N14_ManX_Risk
+osdi:TT_N14_ManX_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_N14_Model ;
+    osdi:hasDescription "Probability of ManX" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N14_Model
+osdi:TT_N14_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N14_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_N14_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N14_Disease ,
+        osdi:TT_N14_InterventionNone ,
+        osdi:TT_N14_InterventionTreat ,
+        osdi:TT_N14_ManX ,
+        osdi:TT_N14_ManX_Risk ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N14. Compared interventions with different targets. The assessed intervention targets ManX and the comparator targets the disease, so they cannot be compared and the generation of the tree must fail." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N15_Disease
+osdi:TT_N15_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasProgressionElement osdi:TT_N15_ManX ;
+    osdi:includedByModel osdi:TT_N15_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N15_Experiment
+osdi:TT_N15_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N15_Model ;
+    osdi:hasDescription "Intervention with two targets." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N15_InterventionNone
+osdi:TT_N15_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:isInterventionOf osdi:TT_N15_Disease ;
+    osdi:includedByModel osdi:TT_N15_Model ;
+    osdi:hasDescription "Comparator, whose target is the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N15_InterventionTreat
+osdi:TT_N15_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:isInterventionOf osdi:TT_N15_Disease ,
+        osdi:TT_N15_ManX ;
+    osdi:includedByModel osdi:TT_N15_Model ;
+    osdi:hasDescription "Assessed intervention, with two targets: the disease and ManX" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N15_ManX
+osdi:TT_N15_ManX rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasRiskCharacterization osdi:TT_N15_ManX_Risk ;
+    osdi:includedByModel osdi:TT_N15_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N15_ManX_Risk
+osdi:TT_N15_ManX_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_N15_Model ;
+    osdi:hasDescription "Probability of ManX" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N15_Model
+osdi:TT_N15_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N15_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_N15_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N15_Disease ,
+        osdi:TT_N15_InterventionNone ,
+        osdi:TT_N15_InterventionTreat ,
+        osdi:TT_N15_ManX ,
+        osdi:TT_N15_ManX_Risk ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N15. Intervention with two targets. Every intervention has exactly one target, so the generation of the tree must fail." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N16_DevA
+osdi:TT_N16_DevA rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasRiskCharacterization osdi:TT_N16_DevA_Risk ;
+    osdi:hasSubProgression osdi:TT_N16_ManY ;
+    osdi:includedByModel osdi:TT_N16_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N16_DevA_Risk
+osdi:TT_N16_DevA_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_N16_Model ;
+    osdi:hasDescription "Probability of DevA" ;
+    osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N16_Disease
+osdi:TT_N16_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasProgressionElement osdi:TT_N16_DevA ,
+        osdi:TT_N16_ManY ;
+    osdi:includedByModel osdi:TT_N16_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N16_Experiment
+osdi:TT_N16_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N16_Model ;
+    osdi:hasDescription "Interventions whose target is a manifestation that depends on a development (not supported in decision trees)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N16_InterventionNone
+osdi:TT_N16_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:isInterventionOf osdi:TT_N16_ManY ;
+    osdi:includedByModel osdi:TT_N16_Model ;
+    osdi:hasDescription "Comparator, whose target is ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N16_InterventionTreat
+osdi:TT_N16_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:isInterventionOf osdi:TT_N16_ManY ;
+    osdi:includedByModel osdi:TT_N16_Model ;
+    osdi:hasDescription "Assessed intervention, whose target is ManY" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N16_ManY
+osdi:TT_N16_ManY rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasRiskCharacterization osdi:TT_N16_ManY_Risk ;
+    osdi:includedByModel osdi:TT_N16_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N16_ManY_Risk
+osdi:TT_N16_ManY_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_N16_Model ;
+    osdi:hasDescription "Probability of ManY" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N16_Model
+osdi:TT_N16_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N16_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_N16_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N16_DevA ,
+        osdi:TT_N16_DevA_Risk ,
+        osdi:TT_N16_Disease ,
+        osdi:TT_N16_InterventionNone ,
+        osdi:TT_N16_InterventionTreat ,
+        osdi:TT_N16_ManY ,
+        osdi:TT_N16_ManY_Risk ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N16. Interventions whose target is a manifestation that depends on a development (ManY, sub-progression of DevA). A patient that presents ManY also presents DevA, but a manifestation may depend on several developments, so this is not supported yet in decision trees and the generation of the tree must fail." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

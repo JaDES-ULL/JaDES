@@ -38,6 +38,26 @@ Tests: P28 (risk and one-time payoffs), P29 (annual payoffs ignored), P30 (frequ
 
 Divergences with the discrete-event simulation: the simulation counts every episode (an acute manifestation can happen again), whereas the tree counts one; and, if an acute manifestation defines several one-time costs or utilities, the simulation only uses the first one (with a warning), whereas the tree adds all of them. Repeated episodes will be modeled through recurrence (D9 in `docs/osdi-1.3-diseno.md`).
 
+## jades-hta: Target of the interventions
+
+Every intervention declares its target (decision D1 of `docs/osdi-1.3-diseno.md`): the health condition to which it is applied, either the disease or an element of its progression (`isInterventionOf`, or its inverse `hasIntervention`). The intervention applies at each appearance of its target: if the target is the disease, from the start of the model.
+
+`DiseaseSubTreeGenerator.resolveInterventionTarget` reads the target of each intervention of the model in both directions, since the reasoner does not infer inverse properties. The ontology states that every intervention has exactly one target, but the same intervention individual may be shared by several models (as in the test ontologies), so only the targets included in the model are considered:
+
+- An intervention without target in the model is assumed to target the disease, with a warning.
+- An intervention with more than one target in the model (N15), a target that is neither the disease of the model nor one of its progressions, and compared interventions with different targets (N14) are rejected with a `MalformedOSDiModelException`.
+- Stages and manifestations that depend on a development (N16) are rejected as targets with an `UnsupportedOSDiFeatureException`: a patient that presents a manifestation of a development also presents the development, but the manifestation may depend on several developments.
+
+If the target is the disease, the tree is the same as before. If it is a clinical progression element T, the tree starts with the patients that present T (`DiseaseSubTreeGenerator.generateTargetSubTree`):
+
+- The node of T is the only branch of the disease node, with probability 1. The risk of T and the combination rules that affect it are ignored.
+- The payoffs and effects of the disease still apply, except for its instant death, which happens at the onset of the disease.
+- Only the progressions that depend on T are included: the own manifestations of a development (I04), with their combination rules; nothing else for a manifestation (I03).
+- The payoffs of the intervention are computed as before, from the start of the tree. If T is an acute manifestation, the annual costs and utilities of the intervention are ignored with a warning (`SimpleInterventionGenerator.generate`), as those of the acute manifestation itself.
+- The onset and end ages of T keep the usual rules.
+
+Newborn screening models (`NBSModel`) only support the disease as target. The DES does not read the target: interventions always apply from the start of the simulation.
+
 ## jades-hta: Onset and end ages in decision trees
 
 The onset and end ages of a progression (`hasOnsetAge`, `hasEndAge`) are ages, not times since the start of the model. The decision tree generator (`PayoffWrapper.applyDiscountToFormula`) translates them into times by subtracting the initial age of the population (`hasAge`; 0 if the population does not define it, with a warning). Only what happens between the initial age of the population and death (the undiscounted life years of each leaf) is accounted:
@@ -82,6 +102,7 @@ OSDi defines the semantics of a model; the decision tree generator (`osdi.decisi
 | Progression without risk (outside a group of two or more alternatives) | Always active in its context: no chance node, its node is the only branch of its parent (probability 1). A manifestation without risk that depends on a development is active whenever such development is active. | No pathway is created, so it never happens unless the population assigns it an initial proportion. `DiseaseFactory` logs a warning ("will never occur in the DES") for each manifestation with neither risk nor initial proportion. |
 | `hasInitialProportion` | Not supported: `DiseaseSubTreeGenerator` throws an `UnsupportedOSDiFeatureException` (trees assume that every patient starts without progressions). | Only for non-acute manifestations. At the start, each patient starts with the manifestation with such probability (`Disease.getInitialStage`), removing those superseded by others. A patient that starts with it does not go through its risk; the rest can still develop it through its risk. |
 | `supersedesClinicalProgression` | Ignored silently: never read by the decision tree generator. | When a chronic progression happens, the progressions it supersedes are removed from the state of the patient; events of progressions superseded by the current state are cancelled; and the initial state does not include superseded progressions. |
+| Target of the interventions (`hasIntervention`, `isInterventionOf`) | Read in both directions. The compared interventions must have the same target; if it is a clinical progression element, the tree starts with the patients that present it and only includes what depends on it (see "Target of the interventions"). | Ignored silently: interventions apply from the start of the simulation. |
 | `hasDuration` | Ignored silently (the property is never read). | Ignored silently (the property is never read). |
 | `hasFrequency` | Only read for acute manifestations: ignored with a warning if they define a risk; rejected (`UnsupportedOSDiFeatureException`) if they do not. | Ignored silently (the property is never read). |
 | Acute manifestations | A single episode within the lifetime, whose probability is the risk (see "Acute manifestations in decision trees"). One-time payoffs apply once; annual payoffs are ignored with a warning. | Simulated as events: they are not added to the state of the patient (so they have no annual payoffs), their one-time payoffs apply at each occurrence, and they can happen again, since their next occurrence is scheduled after each event. They never get an initial proportion, and their probability of death is not loaded from OSDi. |

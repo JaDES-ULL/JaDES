@@ -2,10 +2,15 @@ package es.ull.simulation.hta.osdi.decisiontree.factories;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.semanticweb.owlapi.model.IRI;
 
 import es.ull.simulation.hta.MalformedSimulationModelException;
 import es.ull.simulation.hta.osdi.OSDiLogger;
@@ -19,6 +24,8 @@ import es.ull.simulation.hta.osdi.ontology.DiseaseWrapper;
 import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
+import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
+import es.ull.simulation.hta.osdi.ontology.ModelWrapper;
 import es.ull.simulation.hta.osdi.ontology.OSDiClass;
 import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
 import es.ull.simulation.hta.osdi.ontology.OSDiObjectProperty;
@@ -65,6 +72,11 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
      * The wrapper of the disease individual in this model.
      */
     private final DiseaseWrapper diseaseWrapper;
+    /**
+     * The clinical progression element that the interventions of the model target, or an empty optional if they target the disease (see
+     * {@link #resolveInterventionTarget()}).
+     */
+    private final Optional<ClinicalProgressionWrapper> targetProgression;
 
     /**
      * Constructs a disease part for the given NBS tree model and part name.
@@ -78,6 +90,115 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
     public DiseaseSubTreeGenerator(Model parentTreeModel, DiseaseWrapper diseaseWrapper) throws MalformedSimulationModelException, UnsupportedOSDiFeatureException, MalformedOSDiModelException {
         this.diseaseWrapper = diseaseWrapper;
         this.parentTreeModel = parentTreeModel;
+        this.targetProgression = resolveInterventionTarget();
+    }
+
+    /**
+     * Returns the clinical progression element that the interventions of the model target, or an empty optional if they target the disease.
+     * @return The clinical progression element that the interventions of the model target, or an empty optional if they target the disease.
+     */
+    public Optional<ClinicalProgressionWrapper> getTargetProgression() {
+        return targetProgression;
+    }
+
+    /**
+     * Returns true if the interventions of the model target an acute manifestation.
+     * @return true if the interventions of the model target an acute manifestation.
+     */
+    public boolean hasAcuteTarget() {
+        return targetProgression.isPresent() && ClinicalProgressionType.ACUTE_MANIFESTATION.equals(targetProgression.get().getClinicalProgressionType());
+    }
+
+    /**
+     * Resolves the common target of the interventions of the model (D1 in docs/osdi-1.3-diseno.md): the health condition to which they are applied.
+     * <p>
+     * The target of an intervention is read from isInterventionOf and from its inverse, hasIntervention, since the reasoner does not infer inverse
+     * properties. Only the targets included in the model are considered: the ontology states that every intervention has exactly one target, but
+     * the same intervention individual may be shared by several models. Hence:
+     * <ul>
+     * <li>An intervention without target in the model is assumed to target the disease of the model, with a warning.</li>
+     * <li>An intervention with more than one target in the model is malformed.</li>
+     * <li>The target must be the disease of the model or one of its progressions; otherwise, the model is malformed.</li>
+     * <li>The compared interventions must have the same target; otherwise, the model is malformed.</li>
+     * </ul>
+     * Stages and manifestations that depend on a development are not supported as targets in decision trees: a patient that presents a manifestation
+     * of a development also presents the development, but the manifestation may depend on several developments.
+     * </p>
+     * @return The clinical progression element that the interventions target, or an empty optional if they target the disease.
+     * @throws MalformedOSDiModelException If an intervention has more than one target, its target does not belong to the disease of the model, or the
+     * interventions have different targets.
+     * @throws UnsupportedOSDiFeatureException If the target is a stage or a manifestation that depends on a development.
+     */
+    private Optional<ClinicalProgressionWrapper> resolveInterventionTarget() throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        final ModelWrapper modelWrapper = parentTreeModel.getExperimentWrapper().getModelWrapper();
+        final IRI diseaseIRI = diseaseWrapper.getIndividualIRI();
+        // The health conditions that may be targeted: the disease and its progressions
+        final Map<IRI, ClinicalProgressionWrapper> progressions = new LinkedHashMap<>();
+        for (ClinicalProgressionWrapper progression : diseaseWrapper.getDevelopments()) {
+            progressions.put(progression.getIndividualIRI(), progression);
+        }
+        for (ClinicalProgressionWrapper progression : diseaseWrapper.getManifestations()) {
+            progressions.put(progression.getIndividualIRI(), progression);
+        }
+        for (ClinicalProgressionWrapper progression : diseaseWrapper.getStages()) {
+            progressions.put(progression.getIndividualIRI(), progression);
+        }
+        final List<IRI> healthConditions = new ArrayList<>();
+        healthConditions.add(diseaseIRI);
+        healthConditions.addAll(progressions.keySet());
+
+        IRI commonTarget = null;
+        InterventionWrapper firstIntervention = null;
+        for (InterventionWrapper intervention : new TreeSet<>(modelWrapper.getInterventionIndividuals())) {
+            final IRI interventionIRI = intervention.getIndividualIRI();
+            final Set<IRI> targets = new LinkedHashSet<>();
+            for (IModelItemWrapper target : modelWrapper.getWrappersForProperty(interventionIRI, OSDiObjectProperty.IS_INTERVENTION_OF)) {
+                targets.add(target.getIndividualIRI());
+            }
+            for (IRI healthCondition : healthConditions) {
+                for (IModelItemWrapper item : modelWrapper.getWrappersForProperty(healthCondition, OSDiObjectProperty.HAS_INTERVENTION)) {
+                    if (item.getIndividualIRI().equals(interventionIRI)) {
+                        targets.add(healthCondition);
+                    }
+                }
+            }
+            final IRI target;
+            if (targets.isEmpty()) {
+                log.warn("The intervention " + intervention.getShortName() + " does not define its target (isInterventionOf or hasIntervention) in the model. It is assumed to target the disease " + diseaseWrapper.getShortName() + ".");
+                target = diseaseIRI;
+            }
+            else if (targets.size() > 1) {
+                throw new MalformedOSDiModelException("The intervention " + intervention.getShortName() + " defines more than one target in the model: " + targets + ". Every intervention must have exactly one target.");
+            }
+            else {
+                target = targets.iterator().next();
+            }
+            if (!target.equals(diseaseIRI) && !progressions.containsKey(target)) {
+                throw new MalformedOSDiModelException("The target " + target + " of the intervention " + intervention.getShortName() + " is neither the disease " + diseaseWrapper.getShortName() + " nor one of its progressions.");
+            }
+            if (commonTarget == null) {
+                commonTarget = target;
+                firstIntervention = intervention;
+            }
+            else if (!commonTarget.equals(target)) {
+                throw new MalformedOSDiModelException("The compared interventions must have the same target, but " + firstIntervention.getShortName() + " targets " + commonTarget
+                    + " and " + intervention.getShortName() + " targets " + target + ".");
+            }
+        }
+        if (commonTarget == null || commonTarget.equals(diseaseIRI)) {
+            return Optional.empty();
+        }
+        final ClinicalProgressionWrapper target = progressions.get(commonTarget);
+        if (ClinicalProgressionType.STAGE.equals(target.getClinicalProgressionType())) {
+            throw new UnsupportedOSDiFeatureException("The interventions of the model target the stage " + target.getShortName() + ". Stages are not supported in decision trees.");
+        }
+        for (ClinicalProgressionWrapper development : diseaseWrapper.getDevelopments()) {
+            if (diseaseWrapper.getManifestationsLinkedToDevelopment(development).contains(target)) {
+                throw new UnsupportedOSDiFeatureException("The interventions of the model target the manifestation " + target.getShortName() + ", which depends on the development " + development.getShortName()
+                    + ". A manifestation that depends on a development is not supported as the target of the interventions in decision trees.");
+            }
+        }
+        return Optional.of(target);
     }
 
     @Override
@@ -115,10 +236,11 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         rootNode.updateEffects(diseaseWrapper, EffectType.MORTALITY_RATE_EFFECT);
         rootNode.updateEffects(diseaseWrapper, EffectType.LIFE_EXPECTANCY_REDUCTION_EFFECT);
 
-        // If the disease has a probability of death, we need to create a death node
+        // If the disease has a probability of death, we need to create a death node. Such death happens at the onset of the disease, so it does not
+        // apply when the interventions target a progression of the disease: the patients that present it have survived the onset
         boolean hasInstantDeathEffect = false;
         for (EffectWrapper effect : diseaseWrapper.getEffects()) {
-            if (EffectType.INSTANT_DEATH_EFFECT.equals(effect.getEffectType())) {
+            if (targetProgression.isEmpty() && EffectType.INSTANT_DEATH_EFFECT.equals(effect.getEffectType())) {
                 final BranchDestinationNode deathNode = new BranchDestinationNode(parentTreeModel, "Death from " + diseaseWrapper.getShortName());
                 deathNode.updateEffects(diseaseWrapper, EffectType.INSTANT_DEATH_EFFECT);
                 rootNode.link(deathNode, effect.getEffectMagnitude());
@@ -182,7 +304,10 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
                 throw new MalformedOSDiModelException("The combination rule " + combinationRule + " does not have a valid type for the combined elements.");
             }
         }
-        if (!defaultCoexistentDevelopments.isEmpty()) {
+        if (targetProgression.isPresent()) {
+            generateTargetSubTree(diseaseNode, defaultCoexistentManifestations);
+        }
+        else if (!defaultCoexistentDevelopments.isEmpty()) {
             generateCoexistentDevelopmentSubTree(diseaseNode, defaultCoexistentDevelopments, altDevelopmentCombinationRules, defaultCoexistentManifestations, pendingManifestations);
         }
         else if (!altDevelopmentCombinationRules.isEmpty()) {
@@ -192,6 +317,38 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             generateManifestationsSubTree(diseaseNode, defaultCoexistentManifestations, new TreeSet<>(pendingManifestations));
         }
         return rootNode;
+    }
+
+    /**
+     * Generates the sub-tree when the interventions of the model target a clinical progression element T instead of the disease (D1 in
+     * docs/osdi-1.3-diseno.md). The tree starts with the patients that present T:
+     * <ul>
+     * <li>The node of T is the only (default) branch of the disease node, with probability 1, and it contributes its payoffs and effects. The risk of
+     * T and the combination rules that affect it are ignored.</li>
+     * <li>The payoffs and effects of the disease still apply, since the patients have the disease, except for its instant death, which happens at
+     * the onset of the disease (see {@link #generate(String)}).</li>
+     * <li>Only the progressions that depend on T are included: if T is a development, its own manifestations (hasSubProgression), with their
+     * combination rules; if T is a manifestation, nothing else.</li>
+     * </ul>
+     * @param diseaseNode The node of the disease.
+     * @param defaultCoexistentManifestations The manifestations that are not affected by any alternative combination rule.
+     * @throws MalformedOSDiModelException If the OSDi model is malformed.
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered.
+     * @throws MalformedSimulationModelException If the simulation model is malformed.
+     */
+    private void generateTargetSubTree(BranchDestinationNode diseaseNode, Set<ClinicalProgressionWrapper> defaultCoexistentManifestations) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException, MalformedSimulationModelException {
+        final ClinicalProgressionWrapper target = targetProgression.get();
+        if (!target.isDefaultProgression() || diseaseWrapper.getCombinationRuleForClinicalProgression(target).isPresent()) {
+            log.info("The interventions of the model target " + target.getShortName() + ", so the tree starts with the patients that present it: its risk and the combination rules that affect it are ignored.");
+        }
+        final BranchDestinationNode targetNode = generateNode(target);
+        diseaseNode.link(targetNode);
+        if (ClinicalProgressionType.DEVELOPMENT.equals(target.getClinicalProgressionType())) {
+            final Set<ClinicalProgressionWrapper> pendingManifestations = new TreeSet<>(diseaseWrapper.getManifestationsLinkedToDevelopment(target));
+            if (!pendingManifestations.isEmpty()) {
+                generateManifestationsSubTree(targetNode, defaultCoexistentManifestations, pendingManifestations);
+            }
+        }
     }
 
     /**
@@ -487,21 +644,24 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         node.updateUtility(progression, Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
         node.updateEffects(progression);
         if (ClinicalProgressionType.ACUTE_MANIFESTATION.equals(progression.getClinicalProgressionType())) {
-            removeAnnualPayoffs(progression, node.getCostParameters());
-            removeAnnualPayoffs(progression, node.getDisutilityParameters());
+            final String owner = "The acute manifestation " + progression.getShortName();
+            removeAnnualPayoffs(owner, node.getCostParameters());
+            removeAnnualPayoffs(owner, node.getDisutilityParameters());
         }
         return node;
     }
 
     /**
-     * Removes, with a warning, the annual costs or utilities of an acute manifestation (see {@link #generateNode}).
-     * @param manifestation The acute manifestation.
-     * @param parameters The cost or utility parameters of the node of the acute manifestation.
+     * Removes, with a warning, the annual costs or utilities that apply to a single episode of an acute manifestation: those of the acute
+     * manifestation itself (see {@link #generateNode}) and those of an intervention whose target is an acute manifestation (see
+     * {@link SimpleInterventionGenerator#generate(String)}).
+     * @param owner A description of the item that defines the parameters, used in the warning (e.g., "The acute manifestation X").
+     * @param parameters The cost or utility parameters, from which the annual ones are removed.
      */
-    private static void removeAnnualPayoffs(ClinicalProgressionWrapper manifestation, Collection<ParameterWrapper> parameters) {
+    static void removeAnnualPayoffs(String owner, Collection<ParameterWrapper> parameters) {
         final List<ParameterWrapper> annual = parameters.stream().filter(param -> !appliesOneTime(param)).toList();
         if (!annual.isEmpty()) {
-            log.warn("The acute manifestation " + manifestation.getShortName() + " defines annual costs or utilities (" + annual
+            log.warn(owner + " defines annual costs or utilities (" + annual
                 + "), which are ignored in decision trees: an acute manifestation is a single episode, so only one-time costs and utilities apply.");
             parameters.removeAll(annual);
         }

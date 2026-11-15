@@ -45,8 +45,8 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
 | `OSDi_test_tree_payoffs.ttl` | P01–P25, P27–P32 (P26 pasó a ser N13; P28–P32: manifestaciones agudas) |
-| `OSDi_test_tree_scenarios.ttl` | I01, I02 |
-| `OSDi_test_tree_malformed.ttl` | N01–N13 (casos que deben lanzar excepción) |
+| `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
+| `OSDi_test_tree_malformed.ttl` | N01–N16 (casos que deben lanzar excepción) |
 
 Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
 
@@ -100,6 +100,11 @@ Convenciones:
 - El riesgo es la probabilidad de que ocurra el episodio; una aguda sin riesgo ocurre siempre en su contexto (D1: el árbol empieza en la crisis).
 - `hasFrequency`: se ignora con aviso si hay riesgo; si solo hay frecuencia, `UnsupportedOSDiFeatureException` (N06). No se convierte en 1 − e^(−f·H): el árbol no tiene horizonte y se perdería el número esperado de episodios.
 - Pagos de una vez: una vez por episodio, en el momento 0 o en la edad de inicio (reglas de las ventanas temporales); una utilidad de una vez es una pérdida de AVAC. Pagos anuales: se ignoran con aviso, como en el DES.
+
+**Objetivo de las intervenciones (D1):** cada intervención declara su objetivo, la enfermedad o un elemento de su progresión (`isInterventionOf` o su inversa `hasIntervention`, que se leen en las dos direcciones). Se aplica en cada aparición del objetivo; si es la enfermedad, desde el inicio.
+- Solo cuentan los objetivos incluidos en el modelo (las ontologías de prueba comparten intervenciones entre modelos). Sin objetivo: la enfermedad, con aviso. Más de un objetivo (N15), un objetivo ajeno a la enfermedad o intervenciones comparadas con objetivos distintos (N14): `MalformedOSDiModelException`. Etapas y manifestaciones propias de un desarrollo como objetivo (N16): `UnsupportedOSDiFeatureException`.
+- Objetivo en la enfermedad: el árbol no cambia. Objetivo en un elemento T: el árbol empieza en los pacientes que presentan T (rama única con probabilidad 1; se ignoran su riesgo y sus reglas). Se mantienen los pagos y efectos de la enfermedad salvo su muerte inmediata (ocurre al inicio de la enfermedad). Solo se incluye lo que depende de T: las manifestaciones propias de un desarrollo (I04); nada más si T es una manifestación (I03).
+- Si T es aguda, los pagos anuales de la intervención se ignoran con aviso. El modelo de cribado neonatal solo admite la enfermedad como objetivo.
  
 ## Divergencias conocidas entre árbol y DES
  
@@ -109,6 +114,7 @@ Convenciones:
 - El DES ignora las estrategias y los efectos cuya causa no es una intervención; en el árbol se aplican los efectos de intervenciones, enfermedad y progresiones.
 - `Pathway` (con `requires`) solo se admite en el DES; el árbol lo rechaza.
 - Manifestaciones agudas: el árbol cuenta un episodio y el DES todos los que ocurran; con varios pagos de una vez, el árbol los suma y el DES usa el primero (con aviso).
+- El DES no lee el objetivo de las intervenciones: siempre se aplican desde el inicio de la simulación.
 - Trabajo futuro (DES con desarrollos): grupo de alternativas = sorteo categórico al inicio; coexistente con riesgo p = sorteo independiente; desarrollo sin riesgo = siempre presente; pagos del desarrollo = anuales mientras lo tenga; manifestación propia = riesgo solo para pacientes con ese desarrollo; manifestación sin riesgo = proporción inicial 1 en su contexto.
 ## Limitaciones y TODO pendientes
  
@@ -116,7 +122,6 @@ Convenciones:
 - El árbol ignora `supersedesClinicalProgression` y `hasDuration`; `hasFrequency` solo se lee en las manifestaciones agudas (véase «Manifestaciones agudas»).
 - `SequentialCombinationRule` se trata como coexistente sin aviso en el árbol; no se leen `hasFirst` ni `hasNext`. El DES ignora todas las reglas con aviso.
 - Estrategias (`hasStrategy` en intervenciones, enfermedad y progresiones): el árbol solo usa los costes y utilidades de estrategias FOLLOW_UP o TREATMENT, y solo si el elemento no tiene costes o utilidades propios. Se ignoran `followedByStrategy` (con aviso), `hasConditionExpression`, `hasGuideline` (con aviso) y `failsIf`.
-- No se leen `hasIntervention` ni `isInterventionOf`: las intervenciones se obtienen por pertenencia al modelo y `hasAssessedIntervention`.
 - `Group` no tiene wrapper; no se leen `hasGroupItem` ni `hasProportionWithinGroup`.
 - Efectos sobre un tiempo hasta el evento: el árbol los rechaza (N12, N13), porque un riesgo `DI_TimeToEvent` no funciona todavía en árboles (el parámetro sintético `P_…` no se escribe en el Excel).
 - Las operaciones lineales (Factor, Ratio, MeanDifference) sobre una probabilidad no se recortan a [0, 1]; solo se avisa si los dos valores son deterministas.

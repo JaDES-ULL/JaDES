@@ -95,6 +95,11 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
         
         diseaseWrapper = modelWrapper.getDiseaseIndividuals().iterator().next();
         diseaseGenerator = new DiseaseSubTreeGenerator(this, diseaseWrapper);
+        // Newborn screening is applied to the whole population, so the target of its interventions must be the disease
+        if (diseaseGenerator.getTargetProgression().isPresent()) {
+            throw new UnsupportedOSDiFeatureException("The interventions of the newborn screening model target " + diseaseGenerator.getTargetProgression().get().getShortName()
+                + ". Newborn screening models only support interventions whose target is the disease.");
+        }
         if (modelWrapper.getDiseaseIndividuals().size() > 1)
             log.warn("This type of model requires exactly one disease. Found " + modelWrapper.getDiseaseIndividuals().size() + ". Using " + diseaseWrapper.getShortName() + " as the disease for the model and ignoring the rest.");
 

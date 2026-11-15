@@ -432,6 +432,17 @@ public final class DecisionTreeCatalog {
         cases.add(tc(SCENARIOS, "TT_I02_Experiment", "Newborns: sudden death, coexistent manifestations with temporal constraints and intervention effects",
                 leaves("TT_I02_", death(0.05), leaf(0.057, "ManX", "ManY"), leaf(0.228, "ManX"), leaf(0.133, "ManY"), leaf(0.532)),
                 outcomes(92929.131474625, 77.22, 62.901293426), outcomes(84765.0, 74.1, 60.23)));
+        // Target: the acute manifestation ManC. The tree starts with an episode (probability 1, its risk is ignored), and DevA and ManX are excluded. No discount.
+        // Comparator: cost = 65 * 1000 + 2000 = 67000; QALYs = 0.85 * 65 - 0.5 = 54.75. Assessed: + 300 (one-time); the QALY loss is halved: 55.25 - 0.25 = 55
+        cases.add(tc(SCENARIOS, "TT_I03_Experiment", "Interventions whose target is an acute manifestation: the tree starts with an episode and excludes the rest of the progressions",
+                leaves("TT_I03_", leaf(1.0, "ManC")),
+                outcomes(67300.0, 65.0, 55.0), outcomes(67000.0, 65.0, 54.75)));
+        // Target: the development DevA (its risk is ignored). Its own manifestation ManY (0.5) is included; the independent ManX is excluded. No discount.
+        // Life years = 65 - MAX(10, 2) = 55 in both leaves. DevA + ManY: cost = 55 * 1750 = 96250; QALYs = 55 * 0.69 = 37.95. DevA: cost = 55 * 1500 = 82500; QALYs = 55 * 0.75 = 41.25.
+        // Comparator: cost = 89375; QALYs = 39.6. Assessed: + 55 * 100 = 5500 of cost
+        cases.add(tc(SCENARIOS, "TT_I04_Experiment", "Interventions whose target is a development: the tree starts with the patients that present it and only includes its own manifestations",
+                leaves("TT_I04_", leaf(0.5, "DevA", "ManY"), leaf(0.5, "DevA")),
+                outcomes(94875.0, 55.0, 39.6), outcomes(89375.0, 55.0, 39.6)));
 
         // ---- Models of OSDi_test.ttl (their outcomes are checked in TestHTAExcelGeneration) ----
         cases.add(tc(BASIC, "TEST_Experiment1", "Test model 1: alternative developments",
@@ -517,7 +528,13 @@ public final class DecisionTreeCatalog {
             // A relative risk is not defined on a time to event (a hazard ratio must be used instead).
             new MalformedCase(MALFORMED, "TT_N12_Experiment", "Relative risk applied to a time to event", UnsupportedOSDiFeatureException.class),
             // Decision trees do not support effects on a time to event yet (the probability derived from the time is not written in the Excel file).
-            new MalformedCase(MALFORMED, "TT_N13_Experiment", "Hazard ratio applied to a time to event (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class)
+            new MalformedCase(MALFORMED, "TT_N13_Experiment", "Hazard ratio applied to a time to event (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
+            // The compared interventions must have the same target (D1).
+            new MalformedCase(MALFORMED, "TT_N14_Experiment", "Compared interventions with different targets", MalformedOSDiModelException.class),
+            // Every intervention has exactly one target.
+            new MalformedCase(MALFORMED, "TT_N15_Experiment", "Intervention with two targets", MalformedOSDiModelException.class),
+            // A patient that presents a manifestation of a development also presents the development, but the manifestation may depend on several developments.
+            new MalformedCase(MALFORMED, "TT_N16_Experiment", "Interventions whose target is a manifestation that depends on a development (not supported in decision trees)", UnsupportedOSDiFeatureException.class)
         );
     }
 }

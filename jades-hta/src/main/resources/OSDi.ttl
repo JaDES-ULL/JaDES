@@ -486,9 +486,10 @@ osdi:hasInitialProportion rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#hasIntervention
 osdi:hasIntervention rdf:type owl:ObjectProperty ;
                      owl:inverseOf osdi:isInterventionOf ;
-                     rdfs:domain osdi:Disease ;
+                     rdfs:domain osdi:HealthCondition ;
                      rdfs:range osdi:Intervention ;
-                     rdfs:comment "Defines a relationship between a disease and an intervention, indicating that the intervention is applied to the disease."@en ;
+                     rdfs:comment "Defines the target of an intervention: the health condition (the disease or an element of its progression) to which the intervention is applied. The intervention applies at each appearance of its target: if the target is the disease, from the start of the model; if it is a clinical progression element (a development, a manifestation or a stage), each time the patient presents it (e.g., each migraine attack). Every intervention has exactly one target (see isInterventionOf). The interventions compared in a model must have the same target, and a decision tree starts with the patients that present it."@en ,
+                                  "Define el objetivo de una intervención: la condición de salud (la enfermedad o un elemento de su progresión) a la que se aplica. La intervención se aplica en cada aparición de su objetivo: si es la enfermedad, desde el inicio del modelo; si es un elemento de progresión clínica (un desarrollo, una manifestación o una etapa), cada vez que el paciente lo presenta (p. ej., cada crisis de migraña). Cada intervención tiene exactamente un objetivo (ver isInterventionOf). Las intervenciones comparadas en un modelo deben tener el mismo objetivo, y un árbol de decisión empieza en los pacientes que lo presentan."@es ;
                      rdfs:label "has intervention"@en ,
                                 "tiene la intervención"@es .
 
@@ -924,8 +925,9 @@ osdi:isGuidelineOf rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#isInterventionOf
 osdi:isInterventionOf rdf:type owl:ObjectProperty ;
                       rdfs:domain osdi:Intervention ;
-                      rdfs:range osdi:Disease ;
-                      rdfs:comment "Defines a relationship between an intervention and a disease, indicating that the intervention is used to treat the disease."@en ;
+                      rdfs:range osdi:HealthCondition ;
+                      rdfs:comment "Defines the target of an intervention, i.e., the health condition (the disease or an element of its progression) to which it is applied. Inverse of hasIntervention, which describes its semantics. Every intervention has exactly one target."@en ,
+                                   "Define el objetivo de una intervención, es decir, la condición de salud (la enfermedad o un elemento de su progresión) a la que se aplica. Inversa de hasIntervention, que describe su semántica. Cada intervención tiene exactamente un objetivo."@es ;
                       rdfs:label "es intervención de"@es ,
                                  "is intervention of"@en .
 
@@ -2193,10 +2195,6 @@ osdi:Disease rdf:type owl:Class ;
                                                  ]
                              ] ,
                              [ rdf:type owl:Restriction ;
-                               owl:onProperty osdi:hasIntervention ;
-                               owl:allValuesFrom osdi:Intervention
-                             ] ,
-                             [ rdf:type owl:Restriction ;
                                owl:onProperty osdi:hasProgressionElement ;
                                owl:allValuesFrom osdi:DiseaseProgressionElement
                              ] ,
@@ -2623,6 +2621,10 @@ osdi:HealthCondition rdf:type owl:Class ;
                                        owl:allValuesFrom osdi:Effect
                                      ] ,
                                      [ rdf:type owl:Restriction ;
+                                       owl:onProperty osdi:hasIntervention ;
+                                       owl:allValuesFrom osdi:Intervention
+                                     ] ,
+                                     [ rdf:type owl:Restriction ;
                                        owl:onProperty osdi:hasStrategy ;
                                        owl:allValuesFrom osdi:Strategy
                                      ] ,
@@ -2716,10 +2718,15 @@ osdi:Intervention rdf:type owl:Class ;
                                   [ rdf:type owl:Restriction ;
                                     owl:onProperty osdi:hasUtility ;
                                     owl:allValuesFrom osdi:Utility
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty osdi:isInterventionOf ;
+                                    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                    owl:onClass osdi:HealthCondition
                                   ] ;
                   owl:disjointWith osdi:ModelItemDefiningDiseaseProgression ,
                                    osdi:ModelItemWithRiskCharacterization ;
-                  rdfs:comment "Some kind of treatment, drug, surgical procedure... used to modify the development of a Disease. In the context of this ontology, interventions are the comparing options in the decision-making process"@en ;
+                  rdfs:comment "Some kind of treatment, drug, surgical procedure... used to modify the development of a Disease. In the context of this ontology, interventions are the comparing options in the decision-making process. Each intervention has exactly one target (isInterventionOf): the disease or an element of its progression."@en ;
                   rdfs:label "Intervención"@es ,
                              "Intervention"@en .
 

@@ -76,3 +76,37 @@ Pendientes de decidir:
 - Divergencia: con varios pagos de una vez en una aguda, el DES solo usa el primero (`OSDiDiseaseProgression`), mientras que el árbol los suma.
 - El DES no lee `hasFrequency`: el tiempo hasta el siguiente episodio sale solo del riesgo.
 - N06 comprueba el tipo de excepción, no el mensaje (como todos los casos N).
+
+### Fase 4: objetivo de las intervenciones (D1) (2026-11-15)
+
+**Hecho:**
+- `OSDi.ttl` (sin cambiar la versión):
+  - `hasIntervention` va de `HealthCondition` a `Intervention`, e `isInterventionOf`, de `Intervention` a `HealthCondition`. Las dos tienen comentarios en inglés y en español con la semántica.
+  - `Intervention` tiene un objetivo exacto (`isInterventionOf`, cardinalidad cualificada 1 sobre `HealthCondition`).
+  - La restricción `hasIntervention allValuesFrom Intervention` pasa de `Disease` a `HealthCondition`.
+- Árbol:
+  - `DiseaseSubTreeGenerator.resolveInterventionTarget` obtiene el objetivo común de las intervenciones del modelo.
+  - `generateTargetSubTree` construye el árbol que empieza en un elemento de progresión.
+  - `SimpleInterventionGenerator` reúne aparte los pagos de la intervención, para poder quitar los anuales cuando el objetivo es agudo.
+  - `NBSModel` rechaza cualquier objetivo que no sea la enfermedad.
+- Tests:
+  - I03 (objetivo en una aguda, declarado con `isInterventionOf`) e I04 (objetivo en un desarrollo, declarado con `hasIntervention`), con valores calculados a mano.
+  - N14 (objetivos distintos), N15 (dos objetivos) y N16 (manifestación propia de un desarrollo). Sus mensajes se comprobaron a mano con un test temporal, igual que el de N06.
+  - Los resultados de los modelos existentes no cambian.
+- Documentación: Javadoc, `docs/known-limitations.md` (sección «Target of the interventions» y fila de la tabla de conformidad) y Claude.MD (semántica, tablas de tests y divergencia; se quita la limitación de que `hasIntervention` e `isInterventionOf` no se leían).
+
+**Decidido:**
+- La cardinalidad «exactamente un objetivo» se comprueba dentro de cada modelo, porque las ontologías de prueba comparten intervenciones entre modelos. Una intervención sin objetivo en el modelo apunta a la enfermedad, con aviso.
+- El objetivo se lee en las dos direcciones, porque `StructuralReasoner` no infiere inversas.
+- Con objetivo en un elemento T: el árbol empieza en T con probabilidad 1 (se ignoran su riesgo y sus reglas).
+  - Los pagos y efectos de la enfermedad se mantienen, salvo su muerte inmediata.
+  - Solo se incluye lo que depende de T.
+  - Si T es agudo, los pagos anuales de la intervención se ignoran con aviso.
+- Se rechazan como objetivo las etapas y las manifestaciones propias de un desarrollo (`Unsupported`).
+
+**Pendiente:**
+- Objetivo en una manifestación propia de uno o varios desarrollos: decidir qué desarrollos presenta el paciente.
+- DES: no lee el objetivo; las intervenciones se aplican desde el inicio. Habría que aplicarlas en cada aparición del objetivo.
+- Las intervenciones compartidas de las ontologías de prueba (`TT_InterventionTreat`, `TT_InterventionNone`) incumplen la cardinalidad global de la ontología. No falla porque `StructuralReasoner` no la comprueba, pero un razonador completo inferiría que las enfermedades son el mismo individuo.
+- No hay un test del aviso de una intervención sin objetivo (todas las ontologías de prueba lo declaran).
+- D2 (estrategias de una intervención como efectos) quitará `hasStrategy` de `Intervention`.

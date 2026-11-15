@@ -28,18 +28,37 @@ public class SimpleInterventionGenerator extends InterventionGenerator {
         super(parentTreeModel, interventionWrapper);
     }
 
+    /**
+     * Generates the sub-tree of the intervention: the sub-tree of the disease (see {@link DiseaseSubTreeGenerator}), whose root node also gets the
+     * payoffs and effects of the intervention. The intervention applies from the start of the tree, i.e., from the appearance of its target (D1).
+     * If the target is an acute manifestation, the annual costs and utilities of the intervention are ignored with a warning, as those of the
+     * acute manifestation itself: the tree represents a single episode, so an annual payoff would be charged until death because of one episode.
+     */
     @Override
     public BranchDestinationNode generate(String interventionName) throws MalformedOSDiModelException, MalformedSimulationModelException, UnsupportedOSDiFeatureException {
         final BranchDestinationNode interventionNode;
+        boolean hasAcuteTarget = false;
         if (getParentTreeModel() instanceof SingleDiseaseModel) {
-            interventionNode = ((SingleDiseaseModel)getParentTreeModel()).getDiseaseGenerator().generate(interventionName);
+            final DiseaseSubTreeGenerator diseaseGenerator = ((SingleDiseaseModel)getParentTreeModel()).getDiseaseGenerator();
+            interventionNode = diseaseGenerator.generate(interventionName);
+            hasAcuteTarget = diseaseGenerator.hasAcuteTarget();
         }
         else {
             interventionNode = new BranchDestinationNode(getParentTreeModel(), interventionName);
         }
-        interventionNode.updateCosts(this.getInterventionWrapper(), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
-        interventionNode.updateUtility(this.getInterventionWrapper(), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
-        interventionNode.updateEffects(this.getInterventionWrapper());
+        // The payoffs of the intervention are collected apart, so that they can be filtered without affecting those of the disease
+        final BranchDestinationNode interventionPayoffs = new BranchDestinationNode(getParentTreeModel(), interventionName);
+        interventionPayoffs.updateCosts(this.getInterventionWrapper(), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
+        interventionPayoffs.updateUtility(this.getInterventionWrapper(), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
+        interventionPayoffs.updateEffects(this.getInterventionWrapper());
+        if (hasAcuteTarget) {
+            final String owner = "The intervention " + getInterventionWrapper().getShortName() + ", whose target is an acute manifestation,";
+            DiseaseSubTreeGenerator.removeAnnualPayoffs(owner, interventionPayoffs.getCostParameters());
+            DiseaseSubTreeGenerator.removeAnnualPayoffs(owner, interventionPayoffs.getDisutilityParameters());
+        }
+        interventionNode.addCostParameters(interventionPayoffs.getCostParameters());
+        interventionNode.addDisutilityParameters(interventionPayoffs.getDisutilityParameters());
+        interventionNode.addEffects(interventionPayoffs.getEffects());
         return interventionNode;
     }
 }
