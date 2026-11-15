@@ -44,10 +44,10 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P25, P27–P41 (P26 pasó a ser N13; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P25, P27–P46 (P26 pasó a ser N13; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
 | `OSDi_test_tree_nbs.ttl` | B01–B03 (cribado neonatal con estrategias; se comprueban en `TestHTAExcelGeneration`) |
-| `OSDi_test_tree_malformed.ttl` | N01–N22 (casos que deben lanzar excepción) |
+| `OSDi_test_tree_malformed.ttl` | N01–N26 (casos que deben lanzar excepción) |
 
 Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
 
@@ -112,6 +112,11 @@ Convenciones:
 - Costes y utilidades de las estrategias (seguimiento y tratamiento) se suman a los propios del elemento (P33): el modelador elige qué incluye en cada modelo, porque solo se lee lo que el modelo incluye.
 - Coste de una estrategia: sus costes propios más los de las tecnologías que usa. La pauta de la tecnología (o, si no tiene, la de la estrategia) hace que su coste sea por aplicación (c): con r = `hasFrequency` × 8760 / `hasPeriod` (sin periodo, la frecuencia es anual), inicio = inicio del nodo + `hasStartOffset` y L = MIN(`hasDuration`, `hasCount` / r), pago anual r·c durante [inicio, inicio + L] recortado al nodo y a la vida (P36, P38, P39); sin frecuencia, N·c de una vez en el inicio, con N = `hasCount` o 1 (P37, P40). Sin pauta, los costes de la tecnología son pagos normales.
 
+**Resultados de estrategias (D4–D7, árbol):** jerarquía `StrategyOutcome` → `TreatmentOutcome` (`SuccessOutcome`, `FailureOutcome`) y `DetectionOutcome` (positivo, negativo, no concluyente; fase 7b). `failsIf` (parámetro o condición de salud, D5) es la forma abreviada de fracaso y éxito.
+- Los resultados se expanden bajo cada hoja (`StrategyOutcomeExpander`): una rama por resultado con su riesgo (el que no tiene riesgo se lleva el resto). Con `failsIf` hacia una condición, fracasa donde la condición está activa y tiene éxito donde no.
+- Momento T = inicio de la estrategia + `hasEvaluationTime` (inicio, con aviso, si falta). Los pagos anuales de la estrategia van hasta T si el resultado tiene estrategia siguiente o resuelve; si no, hasta el final del nodo. La siguiente empieza en T. Pagos del resultado: una vez en T (anuales ignorados con aviso). «Resuelve»: los pagos anuales de la condición paran en T; sus efectos sobre la LE se mantienen, con aviso.
+- Rechazos: ciclos (N23) y riesgo de tiempo hasta el evento (N24), `Unsupported`; dos resultados sin riesgo (N25) y `failsIf` con resultados explícitos (N26), `Malformed`. Estrategias con resultados cuyos costes siguen una pauta: `Unsupported`.
+
 **Cribado neonatal (NBS):** las intervenciones de detección no declaran `hasSensitivity`, `hasSpecificity`, `detects` ni `hasTemporaryThreshold` (`MalformedOSDiModelException`, N20 y N22): la enfermedad que detectan es su objetivo, y lo demás es de sus estrategias de detección.
 - Estrategias de detección de un brazo: las de la enfermedad tras la sustitución de la intervención (por tipo). La intervención de cribado suele sustituirlas por un grupo {cribado, diagnóstico}. Como mucho una de cribado y una de diagnóstico por brazo (`Unsupported`); cribado en el brazo sin cribado (N21) o `detects` hacia otra enfermedad: `Malformed`.
 - Brazo con cribado: toda la población paga los costes propios de la intervención con `ScreeningCat` más los de la estrategia de cribado; sensibilidad y especificidad de la estrategia de cribado (1 con aviso si faltan); verdaderos y falsos positivos pagan el diagnóstico (costes propios de la enfermedad con `DiagnosisCat` más la estrategia de diagnóstico del brazo). Brazo sin cribado: los enfermos pagan el diagnóstico. La sensibilidad y especificidad de la estrategia de diagnóstico no se usan. Las sustituciones del brazo llegan también al subárbol de la enfermedad (B03).
@@ -132,7 +137,7 @@ Convenciones:
 - El árbol rechaza un `Pathway` como caracterización del riesgo (sin test) y un riesgo cuyo `DataItemType` no sea una probabilidad (N04); `DI_TimeToEvent` se convierte en un parámetro sintético `P_…`.
 - El árbol ignora `supersedesClinicalProgression` y `hasDuration`; `hasFrequency` solo se lee en las manifestaciones agudas (véase «Manifestaciones agudas»).
 - `SequentialCombinationRule` se trata como coexistente sin aviso en el árbol; no se leen `hasFirst` ni `hasNext`. El DES ignora todas las reglas con aviso.
-- Estrategias en el árbol: no se leen `followedByStrategy` (con aviso), `hasConditionExpression` de la estrategia ni `failsIf`. Las pautas con subpautas, `hasConditionExpression` o edades de aplicación se rechazan (`UnsupportedOSDiFeatureException`, N19); TODO: soportarlas. `hasDose` no se usa. Falsos negativos del cribado: no pagan diagnóstico; pendiente de decidir (según la enfermedad, diagnóstico clínico tardío o muerte sin diagnóstico).
+- Estrategias en el árbol: no se leen `followedByStrategy` de estrategias sin resultados (con aviso), `hasConditionExpression` de la estrategia ni `failsIf`. Las pautas con subpautas, `hasConditionExpression` o edades de aplicación se rechazan (`UnsupportedOSDiFeatureException`, N19); TODO: soportarlas. `hasDose` no se usa. Falsos negativos del cribado: no pagan diagnóstico; pendiente de decidir (según la enfermedad, diagnóstico clínico tardío o muerte sin diagnóstico).
 - `Group` no tiene wrapper; no se leen `hasGroupItem` ni `hasProportionWithinGroup`.
 - Efectos sobre un tiempo hasta el evento: el árbol los rechaza (N12, N13), porque un riesgo `DI_TimeToEvent` no funciona todavía en árboles (el parámetro sintético `P_…` no se escribe en el Excel).
 - Las operaciones lineales (Factor, Ratio, MeanDifference) sobre una probabilidad no se recortan a [0, 1]; solo se avisa si los dos valores son deterministas.

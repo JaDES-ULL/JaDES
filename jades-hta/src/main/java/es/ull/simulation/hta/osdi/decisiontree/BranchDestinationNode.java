@@ -15,6 +15,7 @@ import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
 import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
+import es.ull.simulation.hta.osdi.ontology.HealthConditionWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWithEffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWithStrategyWrapper;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
@@ -147,6 +148,68 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
      */
     public Set<EffectWrapper> getEffects() {
         return effects;
+    }
+
+    /**
+     * A period, relative to the start of the node of a health condition (owner), during which some payoffs apply (decision D4): from the sum of the
+     * "from" times to the sum of the "to" times (or until the end of the owner, if there is no "to"). One-time payoffs apply at the start of the period.
+     * @param owner The node of the health condition that applies the strategy
+     * @param from The times (evaluation times of the previous outcomes) whose sum gives the start of the period, since the start of the owner
+     * @param to The times whose sum gives the end of the period, since the start of the owner; empty if the period lasts until the end of the owner
+     */
+    public record PayoffWindow(BranchDestinationNode owner, List<ParameterWrapper> from, Optional<List<ParameterWrapper>> to) {}
+    /**
+     * A cost or utility that applies within a period (see {@link PayoffWindow}).
+     * @param parameter The cost or utility
+     * @param window The period
+     */
+    public record WindowedPayoff(ParameterWrapper parameter, PayoffWindow window) {}
+    /**
+     * The resolution of a health condition by an outcome of a strategy: the annual payoffs of the health condition (those of its node when the
+     * outcomes were expanded) stop at the given time since the start of its node.
+     * @param owner The node of the health condition
+     * @param time The times whose sum gives the moment of the resolution, since the start of the owner
+     * @param parameters The payoffs of the health condition that stop
+     */
+    public record Resolution(BranchDestinationNode owner, List<ParameterWrapper> time, Set<ParameterWrapper> parameters) {}
+
+    /** The health condition represented by this node, if any */
+    private Optional<HealthConditionWrapper> healthCondition = Optional.empty();
+    /** The strategies with outcomes of the health condition of this node, whose outcomes are expanded below the leaves (see StrategyOutcomeExpander) */
+    private final List<StrategyWrapper> outcomeStrategies = new ArrayList<>();
+    /** The costs of this node that apply within a period */
+    private final List<WindowedPayoff> windowedCosts = new ArrayList<>();
+    /** The disutilities of this node that apply within a period */
+    private final List<WindowedPayoff> windowedDisutilities = new ArrayList<>();
+    /** The resolution of a health condition produced by this node, if any */
+    private Optional<Resolution> resolution = Optional.empty();
+
+    public Optional<HealthConditionWrapper> getHealthCondition() {
+        return healthCondition;
+    }
+
+    public void setHealthCondition(HealthConditionWrapper healthCondition) {
+        this.healthCondition = Optional.of(healthCondition);
+    }
+
+    public List<StrategyWrapper> getOutcomeStrategies() {
+        return outcomeStrategies;
+    }
+
+    public List<WindowedPayoff> getWindowedCosts() {
+        return windowedCosts;
+    }
+
+    public List<WindowedPayoff> getWindowedDisutilities() {
+        return windowedDisutilities;
+    }
+
+    public Optional<Resolution> getResolution() {
+        return resolution;
+    }
+
+    public void setResolution(Resolution resolution) {
+        this.resolution = Optional.of(resolution);
     }
 
     /**
@@ -310,6 +373,13 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
         }
         addCostParameters(costParameters);
         for (StrategyWrapper strategy : selectedStrategies) {
+            // The payoffs of a strategy with outcomes depend on its outcomes: they are added when the outcomes are expanded (see StrategyOutcomeExpander)
+            if (strategy.hasOutcomes()) {
+                if (!outcomeStrategies.contains(strategy)) {
+                    outcomeStrategies.add(strategy);
+                }
+                continue;
+            }
             final ArrayList<ParameterWrapper> strategyCosts = new ArrayList<>();
             StrategyCosts.collect(strategy, strategyCosts, guidelineCosts);
             addCostParameters(strategyCosts);
@@ -345,7 +415,10 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
             selectedStrategies.addAll(osdiElement.getOSDiWrapper().<StrategyWrapper>filterModelItemsWithSKOSCategory(strategies, category));
         }
         for (StrategyWrapper strategy : selectedStrategies) {
-            addDisutilityParameters(strategy.getUtilities());
+            // The utilities of a strategy with outcomes are added when the outcomes are expanded (see StrategyOutcomeExpander)
+            if (!strategy.hasOutcomes()) {
+                addDisutilityParameters(strategy.getUtilities());
+            }
         }
     }
 

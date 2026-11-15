@@ -173,9 +173,13 @@ osdi:detects rdf:type owl:ObjectProperty ;
 
 ###  https://w3id.org/ontologies-ULL/OSDi#failsIf
 osdi:failsIf rdf:type owl:ObjectProperty ;
-             rdfs:domain osdi:LineOfTherapy ;
-             rdfs:range osdi:Parameter ;
-             rdfs:comment "Defines the condition (expressed as any type of parameter) upon which certain strategy fails and must progress to the next step"@en ;
+             rdfs:domain osdi:Strategy ;
+             rdfs:range [ rdf:type owl:Class ;
+                           owl:unionOf ( osdi:HealthCondition
+                                         osdi:Parameter
+                                       )
+                         ] ;
+             rdfs:comment "Short form of two outcomes of a strategy: a FailureOutcome and a SuccessOutcome (see StrategyOutcome). The failure happens with the probability per episode or the time to event of the parameter (according to its data item type), or when the health condition appears (e.g., the progression of the disease). The success is the default outcome (in a simulation, it arrives with the duration of the health condition, modified by the effects). The next strategies are given by followedOnFailureBy and followedOnSuccessBy, and resolvesOnSuccess says whether the success resolves the health condition. It cannot be combined with hasStrategyOutcome."@en ;
              rdfs:label "fails if"@en ,
                         "falla si"@es .
 
@@ -183,9 +187,13 @@ osdi:failsIf rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#followedByStrategy
 osdi:followedByStrategy rdf:type owl:ObjectProperty ;
                         owl:inverseOf osdi:followsStrategy ;
-                        rdfs:domain osdi:Strategy ;
+                        rdfs:domain [ rdf:type owl:Class ;
+                                      owl:unionOf ( osdi:Strategy
+                                                    osdi:StrategyOutcome
+                                                  )
+                                    ] ;
                         rdfs:range osdi:Strategy ;
-                        rdfs:comment "Defines the relationship between two strategies, where one is followed by the other."@en ;
+                        rdfs:comment "For a strategy: the strategy scheduled after it ends, whatever its outcome, unless the outcome declares its own next strategy. For a detection strategy that only declares its sensitivity and specificity, the next strategy is applied to the positive results (e.g., a confirmatory diagnosis). For an outcome of a strategy (StrategyOutcome): the strategy that follows such outcome."@en ;
                         rdfs:label "followed by strategy"@en ,
                                    "seguido por la estrategia"@es .
 
@@ -193,10 +201,91 @@ osdi:followedByStrategy rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#followsStrategy
 osdi:followsStrategy rdf:type owl:ObjectProperty ;
                      rdfs:domain osdi:Strategy ;
-                     rdfs:range osdi:Strategy ;
+                     rdfs:range [ rdf:type owl:Class ;
+                                  owl:unionOf ( osdi:Strategy
+                                                osdi:StrategyOutcome
+                                              )
+                                ] ;
                      rdfs:comment "Defines the relationship between two strategies, where one follows the other."@en ;
                      rdfs:label "follows strategy"@en ,
                                 "sigue la estrategia"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#followedOnFailureBy
+osdi:followedOnFailureBy rdf:type owl:ObjectProperty ;
+                         rdfs:domain osdi:Strategy ;
+                         rdfs:range osdi:Strategy ;
+                         rdfs:comment "Short form (see failsIf): the strategy that follows the failure of a strategy."@en ;
+                         rdfs:label "followed on failure by"@en ,
+                                    "seguida en caso de fracaso por"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#followedOnSuccessBy
+osdi:followedOnSuccessBy rdf:type owl:ObjectProperty ;
+                         rdfs:domain osdi:Strategy ;
+                         rdfs:range osdi:Strategy ;
+                         rdfs:comment "Short form (see failsIf): the strategy that follows the success of a strategy."@en ;
+                         rdfs:label "followed on success by"@en ,
+                                    "seguida en caso de éxito por"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasEvaluationTime
+osdi:hasEvaluationTime rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf osdi:hasParameter ;
+                       rdfs:domain osdi:StrategyOutcome ;
+                       rdfs:range osdi:Parameter ;
+                       rdfs:comment "Time, in years since the start of the strategy, when the outcome is evaluated (e.g., a stopping rule that assesses the response at 12 weeks). The strategy and the health condition (if the outcome resolves it) stop at such time, and the next strategy starts. Without an evaluation time, a decision tree assumes that the outcome happens at the start of the strategy."@en ;
+                       rdfs:label "has evaluation time"@en ,
+                                  "tiene el momento de evaluación"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasOutcomeRisk
+osdi:hasOutcomeRisk rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf osdi:hasParameter ;
+                    rdfs:domain osdi:StrategyOutcome ;
+                    rdfs:range osdi:Parameter ;
+                    rdfs:comment "How likely an outcome of a strategy is. Its data item type expresses it: a probability per episode (used by decision trees) or a time to event (used by simulations); the application converts one into the other when it can, and warns when it cannot. The outcome without risk of a strategy (at most one) is the default outcome: it takes the remaining probability (1 minus the sum of the rest)."@en ;
+                    rdfs:label "has outcome risk"@en ,
+                               "tiene el riesgo del resultado"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasRiskIfDiseased
+osdi:hasRiskIfDiseased rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf osdi:hasOutcomeRisk ;
+                       rdfs:domain osdi:DetectionOutcome ;
+                       rdfs:range osdi:Parameter ;
+                       rdfs:comment "How likely an outcome of a detection strategy is for an individual that has the detected disease (e.g., the sensitivity, for a positive result without inconclusive results). The outcome without this risk takes the remaining probability."@en ;
+                       rdfs:label "has risk if diseased"@en ,
+                                  "tiene el riesgo si está enfermo"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasRiskIfNotDiseased
+osdi:hasRiskIfNotDiseased rdf:type owl:ObjectProperty ;
+                          rdfs:subPropertyOf osdi:hasOutcomeRisk ;
+                          rdfs:domain osdi:DetectionOutcome ;
+                          rdfs:range osdi:Parameter ;
+                          rdfs:comment "How likely an outcome of a detection strategy is for an individual that does not have the detected disease (e.g., 1 minus the specificity, for a positive result without inconclusive results). The outcome without this risk takes the remaining probability."@en ;
+                          rdfs:label "has risk if not diseased"@en ,
+                                     "tiene el riesgo si no está enfermo"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasStrategyOutcome
+osdi:hasStrategyOutcome rdf:type owl:ObjectProperty ;
+                        owl:inverseOf osdi:isStrategyOutcomeOf ;
+                        rdfs:domain osdi:Strategy ;
+                        rdfs:range osdi:StrategyOutcome ;
+                        rdfs:comment "Defines the mutually exclusive outcomes of a strategy (see StrategyOutcome). It cannot be combined with the short forms failsIf (for any strategy) or hasSensitivity and hasSpecificity (for a detection strategy)."@en ;
+                        rdfs:label "has strategy outcome"@en ,
+                                   "tiene el resultado de la estrategia"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#isStrategyOutcomeOf
+osdi:isStrategyOutcomeOf rdf:type owl:ObjectProperty ;
+                         rdfs:domain osdi:StrategyOutcome ;
+                         rdfs:range osdi:Strategy ;
+                         rdfs:comment "Inverse of hasStrategyOutcome."@en ;
+                         rdfs:label "is strategy outcome of"@en ,
+                                    "es resultado de la estrategia"@es .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#hasAge
@@ -285,6 +374,7 @@ osdi:hasCost rdf:type owl:ObjectProperty ;
                                          osdi:Intervention
                                          osdi:Pathway
                                          osdi:Strategy
+                                         osdi:StrategyOutcome
                                        )
                          ] ;
              rdfs:range osdi:Cost ;
@@ -349,7 +439,7 @@ osdi:hasDuration rdf:type owl:ObjectProperty ;
                              ] ;
                  rdfs:range osdi:Parameter ;
                  rdfs:comment "Duración de un elemento de progresión clínica o de la aplicación de una pauta. Se expresa en años. En una combinación secuencial, un paso termina cuando se agota su duración."@es ,
-                              "Duration of a clinical progression element or of the application of a guideline. Expressed in years. In a sequential combination, a step ends when its duration expires."@en ;
+                              "Duration of a clinical progression element or of the application of a guideline. Expressed in years. In a sequential combination, a step ends when its duration expires. In a simulation, the success of a strategy (SuccessOutcome) without its own risk arrives with the duration of the health condition to which the strategy is applied, modified by the effects."@en ;
                  rdfs:label "has duration"@en ,
                             "tiene la duración"@es .
 
@@ -363,6 +453,7 @@ osdi:hasEffect rdf:type owl:ObjectProperty ;
                                            osdi:Pathway
                                            osdi:Population
                                            osdi:ResourceUsageItem
+                                           osdi:StrategyOutcome
                                          )
                            ] ;
                rdfs:range osdi:Effect ;
@@ -638,7 +729,7 @@ osdi:hasSensitivity rdf:type owl:ObjectProperty ;
                     rdfs:subPropertyOf osdi:hasParameter ;
                     rdfs:domain osdi:DetectionStrategy ;
                     rdfs:range osdi:Parameter ;
-                    rdfs:comment "The Sensitivity in epidemiology is the Probability of correctly classifying a sick individual, that is, the Probability that a positive result will be obtained in a diagnostic test for a sick subject. The Sensitivity is, therefore, the ability of the complementary test to detect the disease. Sensitivity is the percentage of true positives or the Probability that the test is positive if the disease is present; False negatives are sick subjects diagnosed as healthy." ;
+                    rdfs:comment "The Sensitivity in epidemiology is the Probability of correctly classifying a sick individual, that is, the Probability that a positive result will be obtained in a diagnostic test for a sick subject. The Sensitivity is, therefore, the ability of the complementary test to detect the disease. Sensitivity is the percentage of true positives or the Probability that the test is positive if the disease is present; False negatives are sick subjects diagnosed as healthy. In a detection strategy, hasSensitivity and hasSpecificity are the short form of two outcomes: a PositiveDetectionOutcome (followed by the followedByStrategy of the strategy, if any) and a NegativeDetectionOutcome. They cannot be combined with hasStrategyOutcome." ;
                     rdfs:label "has sensitivity"@en ,
                                "tiene la sensibilidad"@es .
 
@@ -661,7 +752,7 @@ osdi:hasSpecificity rdf:type owl:ObjectProperty ;
                     rdfs:subPropertyOf osdi:hasParameter ;
                     rdfs:domain osdi:DetectionStrategy ;
                     rdfs:range osdi:Parameter ;
-                    rdfs:comment "The Specificity of a test is the Probability that a healthy subject will have a negative test result. Specificity is the percentage of true negatives or the Probability that the test will be negative if the disease is not present. False positives are healthy subjects diagnosed as sick." ;
+                    rdfs:comment "The Specificity of a test is the Probability that a healthy subject will have a negative test result. Specificity is the percentage of true negatives or the Probability that the test will be negative if the disease is not present. False positives are healthy subjects diagnosed as sick. In a detection strategy, hasSensitivity and hasSpecificity are the short form of two outcomes (see hasSensitivity)." ;
                     rdfs:label "has specificity"@en ,
                                "tiene la especificidad"@es .
 
@@ -784,6 +875,7 @@ osdi:hasUtility rdf:type owl:ObjectProperty ;
                                             osdi:Pathway
                                             osdi:Population
                                             osdi:ResourceUsageItem
+                                            osdi:StrategyOutcome
                                           )
                             ] ;
                 rdfs:range osdi:Utility ;
@@ -1166,7 +1258,7 @@ osdi:appliesOneTime rdf:type owl:DatatypeProperty ,
                                               )
                                 ] ;
                     rdfs:range xsd:boolean ;
-                    rdfs:comment "Defines the temporal behavior of a parameter (generally a cost or utility): if true, applies upon onset of some model item (disease, disease progression...); otherwise, it is assumed to apply annually."@en ;
+                    rdfs:comment "Defines the temporal behavior of a parameter (generally a cost or utility): if true, applies upon onset of some model item (disease, disease progression...); otherwise, it is assumed to apply annually. Per-episode utilities are one-time QALY losses, which are added when a strategy or an outcome of a strategy (StrategyOutcome) is applied, or when a manifestation appears. The costs and utilities of an outcome of a strategy apply once."@en ;
                     rdfs:label "applies one time"@en ,
                                "se aplica una única vez"@es .
 
@@ -1284,6 +1376,26 @@ osdi:hasDisutilityCombinationMethod rdf:type owl:DatatypeProperty ;
                                     rdfs:comment "Defines the method used to combine the annual disutilities of all the model items that are active at the same time. Combination methods are applied, at any moment, to the set of model items (disease, clinical progressions, interventions) that are simultaneously active for an individual: in a decision tree, the items along the path to each leaf; in a discrete-event simulation, the state of the patient between two consecutive events. Methods suffixed with _DISTINCT count only once a parameter individual that is shared by several simultaneously active items (e.g., the same follow-up visit required by two manifestations). ADD sums every disutility; ADD_DISTINCT sums them, but counts only once each utility parameter; MAX applies only the largest disutility. One-time disutilities are always added, once per triggering event. If not defined, ADD is assumed."@en ;
                                     rdfs:label "has disutility combination method"@en ,
                                                "tiene el método de combinación de disutilidades"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#resolvesHealthCondition
+osdi:resolvesHealthCondition rdf:type owl:DatatypeProperty ,
+                                      owl:FunctionalProperty ;
+                             rdfs:domain osdi:TreatmentOutcome ;
+                             rdfs:range xsd:boolean ;
+                             rdfs:comment "Whether an outcome of a strategy resolves the health condition in whose context the strategy is applied (false if not defined). For an acute manifestation, it ends the episode. For a chronic health condition, it is a cure: its annual payoffs and effects stop when the outcome happens (see hasEvaluationTime)."@en ;
+                             rdfs:label "resolves health condition"@en ,
+                                        "resuelve la condición de salud"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#resolvesOnSuccess
+osdi:resolvesOnSuccess rdf:type owl:DatatypeProperty ,
+                                owl:FunctionalProperty ;
+                       rdfs:domain osdi:Strategy ;
+                       rdfs:range xsd:boolean ;
+                       rdfs:comment "Short form (see failsIf): whether the success of a strategy resolves the health condition (see resolvesHealthCondition)."@en ;
+                       rdfs:label "resolves on success"@en ,
+                                  "resuelve en caso de éxito"@es .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#hasExpectedValue
@@ -1652,7 +1764,7 @@ osdi:isDisutility rdf:type owl:DatatypeProperty ,
                            owl:FunctionalProperty ;
                   rdfs:domain osdi:Utility ;
                   rdfs:range xsd:boolean ;
-                  rdfs:comment "Indicates whether a utility parameter represents a disutility or a utility. A utility u (isDisutility = false) of a progression, the disease or an intervention is equivalent to a disutility of (base utility of the population - u), so the patient gets exactly u if it is the only one active. The converted value is combined with the rest of disutilities by using the disutility combination method of the experiment (hasDisutilityCombinationMethod). This applies both to annual and one-time utilities, and assumes that the utility was measured in a population with the same base utility as that of the model."@en ;
+                  rdfs:comment "Indicates whether a utility parameter represents a disutility or a utility. A utility u (isDisutility = false) of a progression, the disease or an intervention is equivalent to a disutility of (base utility of the population - u), so the patient gets exactly u if it is the only one active. The converted value is combined with the rest of disutilities by using the disutility combination method of the experiment (hasDisutilityCombinationMethod). This applies both to annual and one-time utilities, and assumes that the utility was measured in a population with the same base utility as that of the model. A one-time disutility is a loss of QALYs per episode, added when a strategy or an outcome of a strategy is applied, or when a manifestation appears."@en ;
                   rdfs:label "es una desutilidad"@es ,
                              "is disutility"@en .
 
@@ -2040,6 +2152,10 @@ osdi:DetectionIntervention rdf:type owl:Class ;
 osdi:DetectionStrategy rdf:type owl:Class ;
                        rdfs:subClassOf osdi:Strategy ,
                                        [ rdf:type owl:Restriction ;
+                                         owl:onProperty osdi:hasStrategyOutcome ;
+                                         owl:allValuesFrom osdi:DetectionOutcome
+                                       ] ,
+                                       [ rdf:type owl:Restriction ;
                                          owl:onProperty osdi:detects ;
                                          owl:allValuesFrom osdi:Disease
                                        ] ,
@@ -2423,7 +2539,11 @@ osdi:FollowUpStrategy rdf:type owl:Class ;
                                                                ) ;
                                             rdf:type owl:Class
                                           ] ;
-                      rdfs:subClassOf osdi:Strategy ;
+                      rdfs:subClassOf osdi:Strategy ,
+                                       [ rdf:type owl:Restriction ;
+                                         owl:onProperty osdi:hasStrategyOutcome ;
+                                         owl:allValuesFrom osdi:TreatmentOutcome
+                                       ] ;
                       rdfs:comment "A strategy related to the follow-up of a disease or condition"@es ;
                       rdfs:label "Estrategia de seguimiento"@es ,
                                  "Follow-up strategy"@en .
@@ -2732,9 +2852,9 @@ osdi:LineOfTherapy rdf:type owl:Class ;
                                        ] ;
                    rdfs:subClassOf osdi:Strategy ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty osdi:failsIf ;
-                                     owl:allValuesFrom osdi:Parameter
-                                   ] ,
+                                         owl:onProperty osdi:hasStrategyOutcome ;
+                                         owl:allValuesFrom osdi:TreatmentOutcome
+                                       ] ,
                                    [ rdf:type owl:Restriction ;
                                      owl:onProperty osdi:hasStrategy ;
                                      owl:allValuesFrom osdi:FollowUpStrategy
@@ -3523,6 +3643,106 @@ osdi:StrategyReplacementEffect rdf:type owl:Class ;
                                             "Efecto de una intervención que sustituye las estrategias de una condición de salud (affects: la enfermedad o un elemento de su progresión) por una nueva estrategia o grupo de estrategias (hasReplacementStrategy). Se aplica en el brazo de la intervención y por tipo de estrategia (detección, es decir, cribado o diagnóstico; seguimiento; o tratamiento, es decir, línea de terapia): la nueva estrategia sustituye a las estrategias de su mismo tipo que declara la condición de salud (hasStrategy), o se le asigna si no tenía ninguna de ese tipo; las estrategias de otros tipos se mantienen. Si la sustitución es un grupo, cada miembro sustituye a las de su tipo. No usa magnitud (hasEffectMagnitude). Dos sustituciones de estrategia sobre la misma condición de salud en un mismo brazo son un error. Es la única forma de que una intervención declare estrategias."@es ;
                                rdfs:label "Efecto de sustitución de estrategia"@es ,
                                           "Strategy replacement effect"@en .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#StrategyOutcome
+osdi:StrategyOutcome rdf:type owl:Class ;
+                     rdfs:subClassOf osdi:ModelItem ,
+                                     [ rdf:type owl:Restriction ;
+                                       owl:onProperty osdi:followedByStrategy ;
+                                       owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                       owl:onClass osdi:Strategy
+                                     ] ,
+                                     [ rdf:type owl:Restriction ;
+                                       owl:onProperty osdi:hasEvaluationTime ;
+                                       owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                       owl:onClass osdi:Parameter
+                                     ] ;
+                     rdfs:comment "One of the mutually exclusive outcomes of a strategy (hasStrategyOutcome). An outcome declares how likely it is (hasOutcomeRisk and its subproperties), the strategy that follows it (followedByStrategy), when it is evaluated (hasEvaluationTime), and its own effects, costs and utilities, which apply once, when the outcome happens (annual ones are not meaningful for an outcome: the payoffs after an outcome belong to the next strategy). An outcome must belong to one of the concrete subclasses. The chain of strategies that follow an outcome cannot go back to a strategy already applied (decision trees reject cycles): a repetition is modeled as another strategy."@en ,
+                                  "Uno de los resultados mutuamente excluyentes de una estrategia (hasStrategyOutcome). Un resultado declara su probabilidad (hasOutcomeRisk y sus subpropiedades), la estrategia que lo sigue (followedByStrategy), cuándo se evalúa (hasEvaluationTime) y sus efectos, costes y utilidades, que se aplican una vez, al producirse el resultado. Un resultado debe pertenecer a una de las subclases concretas. La cadena de estrategias que siguen a un resultado no puede volver a una estrategia ya aplicada: una repetición se modela como otra estrategia."@es ;
+                     rdfs:label "Resultado de una estrategia"@es ,
+                                "Strategy outcome"@en .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TreatmentOutcome
+osdi:TreatmentOutcome rdf:type owl:Class ;
+                      rdfs:subClassOf osdi:StrategyOutcome ,
+                                      [ rdf:type owl:Restriction ;
+                                        owl:onProperty osdi:hasOutcomeRisk ;
+                                        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                        owl:onClass osdi:Parameter
+                                      ] ;
+                      owl:disjointWith osdi:DetectionOutcome ;
+                      rdfs:comment "An outcome of a strategy that is not a detection strategy (e.g., a partial response, a discontinuation or a death caused by the treatment). Its risk (hasOutcomeRisk) is a probability per episode or a time to event; resolvesHealthCondition says whether it resolves the health condition. Categories without effect on the computations (e.g., complete or partial response) should be expressed with hasCategory."@en ;
+                      rdfs:label "Resultado de un tratamiento"@es ,
+                                 "Treatment outcome"@en .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#SuccessOutcome
+osdi:SuccessOutcome rdf:type owl:Class ;
+                    rdfs:subClassOf osdi:TreatmentOutcome ;
+                    owl:disjointWith osdi:FailureOutcome ;
+                    rdfs:comment "The success of a strategy. In a simulation, if it does not define its own risk, it arrives with the duration of the health condition (hasDuration), modified by the effects. It is the outcome followed by followedOnSuccessBy in the short form (see failsIf)."@en ;
+                    rdfs:label "Éxito"@es ,
+                               "Success outcome"@en .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#FailureOutcome
+osdi:FailureOutcome rdf:type owl:Class ;
+                    rdfs:subClassOf osdi:TreatmentOutcome ;
+                    rdfs:comment "The failure of a strategy. It is the outcome generated by failsIf (with the risk of the parameter, or when the health condition appears) and followed by followedOnFailureBy in the short form."@en ;
+                    rdfs:label "Fracaso"@es ,
+                               "Failure outcome"@en .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#DetectionOutcome
+osdi:DetectionOutcome rdf:type owl:Class ;
+                      rdfs:subClassOf osdi:StrategyOutcome ,
+                                      [ rdf:type owl:Restriction ;
+                                        owl:onProperty osdi:hasRiskIfDiseased ;
+                                        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                        owl:onClass osdi:Parameter
+                                      ] ,
+                                      [ rdf:type owl:Restriction ;
+                                        owl:onProperty osdi:hasRiskIfNotDiseased ;
+                                        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                        owl:onClass osdi:Parameter
+                                      ] ;
+                      owl:disjointUnionOf ( osdi:InconclusiveDetectionOutcome
+                                            osdi:NegativeDetectionOutcome
+                                            osdi:PositiveDetectionOutcome
+                                          ) ;
+                      rdfs:comment "An outcome of a detection strategy. Its probability depends on whether the individual has the detected disease, so it declares a risk for each case (hasRiskIfDiseased, hasRiskIfNotDiseased). In each case, the outcome without risk (at most one) takes the remaining probability."@en ;
+                      rdfs:label "Detection outcome"@en ,
+                                 "Resultado de una detección"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#PositiveDetectionOutcome
+osdi:PositiveDetectionOutcome rdf:type owl:Class ;
+                              rdfs:subClassOf osdi:DetectionOutcome ;
+                              rdfs:comment "A positive result of a detection strategy: the individual is detected (true positive if diseased, false positive otherwise). It is usually followed by a confirmatory diagnosis."@en ;
+                              rdfs:label "Positive detection outcome"@en ,
+                                         "Resultado positivo de una detección"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#NegativeDetectionOutcome
+osdi:NegativeDetectionOutcome rdf:type owl:Class ;
+                              rdfs:subClassOf osdi:DetectionOutcome ;
+                              rdfs:comment "A negative result of a detection strategy: the individual is not detected (false negative if diseased, true negative otherwise)."@en ;
+                              rdfs:label "Negative detection outcome"@en ,
+                                         "Resultado negativo de una detección"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#InconclusiveDetectionOutcome
+osdi:InconclusiveDetectionOutcome rdf:type owl:Class ;
+                                  rdfs:subClassOf osdi:DetectionOutcome ,
+                                                  [ rdf:type owl:Restriction ;
+                                                    owl:onProperty osdi:followedByStrategy ;
+                                                    owl:someValuesFrom osdi:Strategy
+                                                  ] ;
+                                  rdfs:comment "An inconclusive result of a detection strategy: the individual is not classified, so the outcome must be followed by another strategy (a repetition of the test, modeled as another strategy, or a different test)."@en ;
+                                  rdfs:label "Inconclusive detection outcome"@en ,
+                                             "Resultado no concluyente de una detección"@es .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#TherapeuticIntervention

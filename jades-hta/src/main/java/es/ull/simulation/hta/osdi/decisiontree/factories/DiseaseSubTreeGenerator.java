@@ -341,6 +341,7 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             }
         }
         final BranchDestinationNode rootNode = new BranchDestinationNode(parentTreeModel, name);
+        rootNode.setHealthCondition(diseaseWrapper);
         rootNode.updateCosts(diseaseWrapper, getArmStrategies(diseaseWrapper), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
         rootNode.updateUtility(diseaseWrapper, getArmStrategies(diseaseWrapper), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
         rootNode.updateEffects(diseaseWrapper, EffectType.GENERAL_EFFECT);
@@ -427,6 +428,8 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         else if (!pendingManifestations.isEmpty()) {
             generateManifestationsSubTree(diseaseNode, defaultCoexistentManifestations, new TreeSet<>(pendingManifestations));
         }
+        // The outcomes of the strategies are expanded below the leaves (decision D4)
+        StrategyOutcomeExpander.expand(parentTreeModel, rootNode);
         return rootNode;
     }
 
@@ -748,6 +751,7 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
     public BranchDestinationNode generateNode(ClinicalProgressionWrapper progression) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException, MalformedSimulationModelException {
         final Optional<TemporalConstraint> temporalConstraint = progression.getTemporalConstraintForProgression();
         final BranchDestinationNode node = new BranchDestinationNode(parentTreeModel, progression.getClinicalProgressionType() + ": " + progression.getShortName());
+        node.setHealthCondition(progression);
         if (temporalConstraint.isPresent()) {
             node.setTemporalConstraint(temporalConstraint.get());
         }

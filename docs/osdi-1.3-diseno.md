@@ -183,3 +183,36 @@ Pendientes de decidir:
 - Cribados de varias enfermedades (paneles): D1 limita cada intervención a un objetivo y cada sustitución a una condición, así que no caben. El NBS solo admite una enfermedad.
 - `followedByStrategy` (de cribado a confirmación) sigue ignorándose, a la espera de D4.
 - El DES no aplica los costes de las estrategias de detección.
+
+### Fase 7a: resultados de las estrategias de tratamiento (D4–D7) (2026-11-15)
+
+**Hecho:**
+- `OSDi.ttl` (sin cambiar la versión):
+  - Jerarquía `StrategyOutcome`: `TreatmentOutcome` (con `SuccessOutcome` y `FailureOutcome`) y `DetectionOutcome` (con los resultados positivo, negativo y no concluyente; este último exige una estrategia siguiente).
+  - Propiedades nuevas: `hasStrategyOutcome`/`isStrategyOutcomeOf`, `hasOutcomeRisk` con sus subpropiedades `hasRiskIfDiseased` y `hasRiskIfNotDiseased`, `hasEvaluationTime`, `followedOnSuccessBy`, `followedOnFailureBy`, `resolvesHealthCondition` y `resolvesOnSuccess`.
+  - `failsIf` pasa a admitir cualquier estrategia y apunta a un parámetro o a una condición de salud (D5). `followedByStrategy` también vale en resultados. `hasCost`, `hasUtility` y `hasEffect` admiten resultados.
+  - Comentarios de D6 y D7. La sensibilidad y la especificidad pasan a ser la forma abreviada de dos resultados de detección.
+  - Restricciones `hasStrategyOutcome only …` en las estrategias de detección, seguimiento y tratamiento.
+- Código:
+  - `StrategyOutcomeWrapper` y `StrategyWrapper.getOutcomes` (expande la forma abreviada y valida).
+  - `StrategyOutcomeExpander` expande los resultados bajo las hojas.
+  - `BranchDestinationNode` guarda los pagos con ventana y las resoluciones, y `PayoffWrapper.applyDiscount` los aplica en el Excel.
+  - El soporte de tests añade los resultados a la clave de las hojas (prefijo `OUTCOME: `).
+- Tests: P42–P46 y N23–N26, con valores calculados a mano. Los mensajes de N23–N26 se comprobaron a mano.
+- Documentación: `docs/known-limitations.md` (sección «Strategy outcomes in decision trees» y fila de la tabla de conformidad) y Claude.MD.
+
+**Decidido:**
+- Se usa una jerarquía de clases para los resultados. El riesgo es un parámetro, unido por `hasOutcomeRisk` (o, en detección, uno por estado del paciente). Las distinciones sin efecto en el cálculo van como categorías SKOS.
+- Los resultados se expanden bajo las hojas, porque son independientes de las demás ramas. El momento de cada resultado es el inicio de la estrategia más `hasEvaluationTime`; sin él, el inicio, con aviso.
+- Los pagos anuales de la estrategia van hasta el resultado si este tiene estrategia siguiente o resuelve la condición. Los pagos de un resultado son de una vez.
+- «Resuelve» detiene los pagos anuales de la condición en ese momento; sus efectos sobre la LE se mantienen, con aviso.
+- Se rechazan los ciclos: una repetición se modela como otra estrategia. Se rechazan los riesgos de tiempo hasta el evento en árboles.
+- Se dividió la fase en 7a (tratamiento) y 7b (detección en el NBS).
+
+**Pendiente:**
+- Fase 7b: resultados de detección en el NBS (riesgos por estado, resultados no concluyentes encadenados a otra prueba, confirmación con el `followedByStrategy` de los positivos).
+- Pautas en estrategias con resultados (hoy `Unsupported`).
+- El fracaso por una condición de salud ocurre al inicio de la estrategia: no se tiene en cuenta la edad de inicio de la condición.
+- Efectos adversos que pueden coincidir con el éxito o el fracaso: habría que modelarlos como manifestaciones agudas cuyo riesgo depende de la estrategia.
+- El DES no simula estrategias ni sus resultados.
+- El aviso de `StrategyWrapper` sobre las estrategias con pauta («Guideline-based strategies are not supported yet») ha quedado desfasado desde la Fase 5. No lo he cambiado porque queda fuera del alcance de esta fase.

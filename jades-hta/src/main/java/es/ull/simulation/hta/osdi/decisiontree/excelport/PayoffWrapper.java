@@ -12,6 +12,9 @@ import java.util.TreeSet;
 import org.apache.poi.ss.util.CellReference;
 import es.ull.simulation.hta.osdi.OSDiLogger;
 import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode;
+import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode.PayoffWindow;
+import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode.Resolution;
+import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode.WindowedPayoff;
 import es.ull.simulation.hta.osdi.decisiontree.StrategyCosts.GuidelineCost;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
@@ -50,7 +53,7 @@ public class PayoffWrapper {
      * @param parameter The parameter
      * @param constraint The temporal constraint of the node that contributed the parameter (may be null)
      */
-    private record ParameterEntry(ParameterWrapper parameter, TemporalConstraint constraint) {}
+    private record ParameterEntry(ParameterWrapper parameter, TemporalConstraint constraint, BranchDestinationNode owner, PayoffWindow window) {}
     /**
      * A cost that applies according to a guideline, contributed by a node of the tree, together with the temporal constraint of such node.
      * @param cost The cost that applies according to a guideline
@@ -65,6 +68,10 @@ public class PayoffWrapper {
      * The costs that apply according to a guideline, contributed by the nodes along the path, in order of appearance.
      */
     private final ArrayList<GuidelineEntry> guidelineEntries;
+    /**
+     * The resolutions of health conditions produced by the outcomes of strategies along the path (decision D4).
+     */
+    private final ArrayList<Resolution> resolutions;
     /**
      * The list of probabilities associated with this node, which is used to calculate the expected value of the decision represented by this node.
      */
@@ -109,6 +116,7 @@ public class PayoffWrapper {
         this.probabilities = new ArrayList<>();
         this.costEntries = new ArrayList<>();
         this.guidelineEntries = new ArrayList<>();
+        this.resolutions = new ArrayList<>();
         this.disutilityEntries = new ArrayList<>();
         this.effects = new TreeSet<>();
         this.effectEntries = new ArrayList<>();
@@ -124,6 +132,7 @@ public class PayoffWrapper {
         this.probabilities = new ArrayList<>(original.probabilities);
         this.costEntries = new ArrayList<>(original.costEntries);
         this.guidelineEntries = new ArrayList<>(original.guidelineEntries);
+        this.resolutions = new ArrayList<>(original.resolutions);
         this.disutilityEntries = new ArrayList<>(original.disutilityEntries);
         this.effects = new TreeSet<>(original.effects);
         this.effectEntries = new ArrayList<>(original.effectEntries);
@@ -178,7 +187,7 @@ public class PayoffWrapper {
      * @param parameter The cost parameter to add.
      */
     public void addCostParameter(ParameterWrapper parameter) {
-        this.costEntries.add(new ParameterEntry(parameter, null));
+        this.costEntries.add(new ParameterEntry(parameter, null, null, null));
     }
 
     /**
@@ -186,7 +195,7 @@ public class PayoffWrapper {
      * @param parameter The disutility parameter to add.
      */
     public void addDisutilityParameter(ParameterWrapper parameter) {
-        this.disutilityEntries.add(new ParameterEntry(parameter, null));
+        this.disutilityEntries.add(new ParameterEntry(parameter, null, null, null));
     }
 
     /**
@@ -224,15 +233,23 @@ public class PayoffWrapper {
         final TemporalConstraint constraint = node.getTemporalConstraint();
         // Add cost parameters from the node
         for (ParameterWrapper param : node.getCostParameters()) {
-            this.costEntries.add(new ParameterEntry(param, constraint));
+            this.costEntries.add(new ParameterEntry(param, constraint, node, null));
         }
+        // Add the costs and disutilities that apply within a period (strategies with outcomes), relative to the node of their health condition
+        for (WindowedPayoff payoff : node.getWindowedCosts()) {
+            this.costEntries.add(new ParameterEntry(payoff.parameter(), payoff.window().owner().getTemporalConstraint(), payoff.window().owner(), payoff.window()));
+        }
+        for (WindowedPayoff payoff : node.getWindowedDisutilities()) {
+            this.disutilityEntries.add(new ParameterEntry(payoff.parameter(), payoff.window().owner().getTemporalConstraint(), payoff.window().owner(), payoff.window()));
+        }
+        node.getResolution().ifPresent(resolutions::add);
         // Add the costs that apply according to a guideline
         for (GuidelineCost cost : node.getGuidelineCosts()) {
             this.guidelineEntries.add(new GuidelineEntry(cost, constraint));
         }
         // Add disutility parameters from the node
         for (ParameterWrapper param : node.getDisutilityParameters()) {
-            this.disutilityEntries.add(new ParameterEntry(param, constraint));
+            this.disutilityEntries.add(new ParameterEntry(param, constraint, node, null));
         }
         // Add effects (e.g. lifetime reductions) from the node
         this.addEffects(node.getEffects());
@@ -404,7 +421,7 @@ public class PayoffWrapper {
             final ParameterWrapper param = entry.parameter();
             // Define the base text formula for the parameter, including any modifications
             String text = getParameterTextFormula(param);
-            text = applyDiscountToFormula(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_COSTS.getName(), ((SpecificInformationForCost) param.getSpecificInformation()).appliesOneTime(), entry.constraint(), cellUndiscountedLY);
+            text = applyDiscount(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_COSTS.getName(), ((SpecificInformationForCost) param.getSpecificInformation()).appliesOneTime(), entry, cellUndiscountedLY);
             costTexts.add(text);
         }
         for (GuidelineEntry entry : selectGuidelineEntries(method)) {
@@ -461,7 +478,7 @@ public class PayoffWrapper {
                 // A utility u is equivalent to a disutility of (base utility - u)
                 text = "(" + baseUtilityParam.getShortName() + " - " + text + ")";
             }
-            text = applyDiscountToFormula(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.getName(), specificInfo.appliesOneTime(), entry.constraint(), cellUndiscountedLY);
+            text = applyDiscount(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.getName(), specificInfo.appliesOneTime(), entry, cellUndiscountedLY);
             // The combination method only applies to annual disutilities; one-time disutilities are always added
             if (specificInfo.appliesOneTime())
                 oneTimeTexts.add(text);
@@ -591,6 +608,78 @@ public class PayoffWrapper {
             return probabilities.get(0).formatAsString();
         }
         return ExcelFormulaLibrary.PRODUCT.getFormula(String.join(", ", probabilities.stream().map(celRef -> celRef.formatAsString()).toList()));
+    }
+
+    /**
+     * Applies the discount formula to the payoff of an entry. If the entry applies within a period (a strategy with outcomes, see
+     * {@link PayoffWindow}) or belongs to a health condition resolved along the path (see {@link Resolution}), with Start0 = MAX(0, Onset - Age0)
+     * (or 0) and End0 = MIN(LY, End - Age0) (or LY) for the node of the health condition:
+     * <ul>
+     * <li>Start = Start0 + the sum of the "from" times of the period (Start0 if there is no period).</li>
+     * <li>End = MIN(End0, Start0 + the sum of the "to" times of the period, Start0 + the time of the resolution), ignoring the missing terms.</li>
+     * <li>Annual payoffs: PV(r, MAX(0, End - Start), -x) / (1 + r) ^ Start.</li>
+     * <li>One-time payoffs of a period: x / (1 + r) ^ Start, only if Start &lt;= End0. A resolution does not change one-time payoffs.</li>
+     * </ul>
+     * Otherwise, see {@link #applyDiscountToFormula(String, String, boolean, TemporalConstraint, CellReference)}.
+     * @param text The text formula of the payoff.
+     * @param discountName The name of the discount parameter to use.
+     * @param appliesOneTime Whether the payoff applies once, or it is annual.
+     * @param entry The entry of the payoff.
+     * @param cellUndiscountedLY The cell reference for the undiscounted life years.
+     * @return The text formula with the discount applied.
+     * @throws UnsupportedOSDiFeatureException If the discount formula is not supported.
+     * @throws MalformedOSDiModelException If more than one effect of the path replaces the same parameter.
+     */
+    private String applyDiscount(String text, String discountName, boolean appliesOneTime, ParameterEntry entry, CellReference cellUndiscountedLY) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
+        Optional<Resolution> resolution = Optional.empty();
+        for (Resolution candidate : resolutions) {
+            if (entry.owner() != null && candidate.owner() == entry.owner() && candidate.parameters().contains(entry.parameter())) {
+                resolution = Optional.of(candidate);
+            }
+        }
+        final PayoffWindow window = entry.window();
+        if (window == null && (resolution.isEmpty() || appliesOneTime)) {
+            return applyDiscountToFormula(text, discountName, appliesOneTime, entry.constraint(), cellUndiscountedLY);
+        }
+        final String ly = cellUndiscountedLY.formatAsString();
+        final Optional<ParameterWrapper> onsetAge = (entry.constraint() == null) ? Optional.empty() : entry.constraint().startTime();
+        final Optional<ParameterWrapper> endAge = (entry.constraint() == null) ? Optional.empty() : entry.constraint().endTime();
+        final String start0 = onsetAge.isPresent() ? ExcelFormulaLibrary.MAX.getFormula("0, " + onsetAge.get().getShortName() + " - " + populationAgeName) : "0";
+        final String end0 = endAge.isPresent() ? ExcelFormulaLibrary.MIN.getFormula(ly + ", " + endAge.get().getShortName() + " - " + populationAgeName) : ly;
+        final String start = (window == null) ? start0 : addTimes(start0, window.from());
+        if (appliesOneTime) {
+            return ExcelFormulaLibrary.IF.getFormula(start + " <= " + end0, FormulaLibrary.PUNCTUAL_DISCOUNT.getFormula(text, discountName, start), "0");
+        }
+        final ArrayList<String> ends = new ArrayList<>();
+        ends.add(end0);
+        if (window != null && window.to().isPresent()) {
+            ends.add(addTimes(start0, window.to().get()));
+        }
+        if (resolution.isPresent()) {
+            ends.add(addTimes(start0, resolution.get().time()));
+        }
+        final String end = (ends.size() == 1) ? end0 : ExcelFormulaLibrary.MIN.getFormula(String.join(", ", ends));
+        final String duration = ExcelFormulaLibrary.MAX.getFormula("0, " + end + " - " + start);
+        return FormulaLibrary.FUTURE_CONT_DISCOUNT.getFormula(discountName, duration, text, start);
+    }
+
+    /**
+     * Returns a formula that adds some times to a base time.
+     * @param base The base time.
+     * @param times The parameters to add.
+     * @return The formula.
+     * @throws MalformedOSDiModelException If more than one effect of the path replaces the same parameter.
+     */
+    private String addTimes(String base, List<ParameterWrapper> times) throws MalformedOSDiModelException {
+        if (times.isEmpty()) {
+            return base;
+        }
+        final ArrayList<String> terms = new ArrayList<>();
+        terms.add(base);
+        for (ParameterWrapper time : times) {
+            terms.add(getParameterTextFormula(time));
+        }
+        return "(" + String.join(" + ", terms) + ")";
     }
 
     /**

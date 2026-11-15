@@ -5504,4 +5504,747 @@ osdi:TT_P41_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P41. Strategy replacement by a group: each member replaces the strategies of its type." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_L1
+osdi:TT_P42_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P42_L1_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_P42_L1_Success ,
+        osdi:TT_P42_L1_Failure ;
+    osdi:includedByModel osdi:TT_P42_Model ;
+    osdi:hasDescription "First line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_L1_Cost
+osdi:TT_P42_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P42_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_L1_Success
+osdi:TT_P42_L1_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasEvaluationTime osdi:TT_P42_EvaluationTime ;
+    osdi:hasOutcomeRisk osdi:TT_P42_SuccessRisk ;
+    osdi:includedByModel osdi:TT_P42_Model ;
+    osdi:hasDescription "Success of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_SuccessRisk
+osdi:TT_P42_SuccessRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P42_Model ;
+    osdi:hasDescription "Probability of success of L1" ;
+    osdi:hasExpectedValue "0.6"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_L1_Failure
+osdi:TT_P42_L1_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_P42_L2 ;
+    osdi:hasEvaluationTime osdi:TT_P42_EvaluationTime ;
+    osdi:includedByModel osdi:TT_P42_Model ;
+    osdi:hasDescription "Failure of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_EvaluationTime
+osdi:TT_P42_EvaluationTime rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P42_Model ;
+    osdi:hasDescription "The response to L1 is evaluated at 2 years" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_L2
+osdi:TT_P42_L2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P42_L2_Cost ;
+    osdi:includedByModel osdi:TT_P42_Model ;
+    osdi:hasDescription "Second line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_L2_Cost
+osdi:TT_P42_L2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P42_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L2" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_Disease
+osdi:TT_P42_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P42_L1 ;
+    osdi:includedByModel osdi:TT_P42_Model ;
+    osdi:hasDescription "Disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_Experiment
+osdi:TT_P42_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P42_Model ;
+    osdi:hasDescription "Strategy with a success that continues the treatment and a failure followed by another strategy, evaluated at 2 years." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P42_Model
+osdi:TT_P42_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P42_L1 ,
+        osdi:TT_P42_L1_Cost ,
+        osdi:TT_P42_L1_Success ,
+        osdi:TT_P42_SuccessRisk ,
+        osdi:TT_P42_L1_Failure ,
+        osdi:TT_P42_EvaluationTime ,
+        osdi:TT_P42_L2 ,
+        osdi:TT_P42_L2_Cost ,
+        osdi:TT_P42_Disease ;
+    osdi:hasDescription "P42. Strategy with a success that continues the treatment and a failure followed by another strategy, evaluated at 2 years." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_L1
+osdi:TT_P43_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P43_L1_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_P43_L1_Success ,
+        osdi:TT_P43_L1_Failure ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:hasDescription "First line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_L1_Cost
+osdi:TT_P43_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_L1_Success
+osdi:TT_P43_L1_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasEvaluationTime osdi:TT_P43_EvaluationTime ;
+    osdi:hasOutcomeRisk osdi:TT_P43_SuccessRisk ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:hasDescription "Success of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_SuccessRisk
+osdi:TT_P43_SuccessRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:hasDescription "Probability of success of L1" ;
+    osdi:hasExpectedValue "0.6"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_L1_Failure
+osdi:TT_P43_L1_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_P43_L2 ;
+    osdi:hasEvaluationTime osdi:TT_P43_EvaluationTime ;
+    osdi:hasCost osdi:TT_P43_FailureCost ;
+    osdi:hasUtility osdi:TT_P43_FailureLoss ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:hasDescription "Failure of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_EvaluationTime
+osdi:TT_P43_EvaluationTime rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:hasDescription "The response to L1 is evaluated at 2 years" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_L2
+osdi:TT_P43_L2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P43_L2_Cost ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:hasDescription "Second line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_L2_Cost
+osdi:TT_P43_L2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L2" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_FailureCost
+osdi:TT_P43_FailureCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "One-time cost of the failure of L1" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_FailureLoss
+osdi:TT_P43_FailureLoss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the failure of L1" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_Disease
+osdi:TT_P43_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P43_L1 ;
+    osdi:includedByModel osdi:TT_P43_Model ;
+    osdi:hasDescription "Disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_Experiment
+osdi:TT_P43_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P43_Model ;
+    osdi:hasDescription "Strategy outcome with a one-time cost and a one-time QALY loss." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P43_Model
+osdi:TT_P43_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P43_L1 ,
+        osdi:TT_P43_L1_Cost ,
+        osdi:TT_P43_L1_Success ,
+        osdi:TT_P43_SuccessRisk ,
+        osdi:TT_P43_L1_Failure ,
+        osdi:TT_P43_EvaluationTime ,
+        osdi:TT_P43_L2 ,
+        osdi:TT_P43_L2_Cost ,
+        osdi:TT_P43_FailureCost ,
+        osdi:TT_P43_FailureLoss ,
+        osdi:TT_P43_Disease ;
+    osdi:hasDescription "P43. Strategy outcome with a one-time cost and a one-time QALY loss." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_L1
+osdi:TT_P44_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P44_L1_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_P44_L1_Success ,
+        osdi:TT_P44_L1_Failure ;
+    osdi:includedByModel osdi:TT_P44_Model ;
+    osdi:hasDescription "First line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_L1_Cost
+osdi:TT_P44_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P44_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_L1_Success
+osdi:TT_P44_L1_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasEvaluationTime osdi:TT_P44_EvaluationTime ;
+    osdi:hasOutcomeRisk osdi:TT_P44_SuccessRisk ;
+    osdi:resolvesHealthCondition "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P44_Model ;
+    osdi:hasDescription "Success of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_SuccessRisk
+osdi:TT_P44_SuccessRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P44_Model ;
+    osdi:hasDescription "Probability of success of L1" ;
+    osdi:hasExpectedValue "0.6"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_L1_Failure
+osdi:TT_P44_L1_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_P44_L2 ;
+    osdi:hasEvaluationTime osdi:TT_P44_EvaluationTime ;
+    osdi:includedByModel osdi:TT_P44_Model ;
+    osdi:hasDescription "Failure of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_EvaluationTime
+osdi:TT_P44_EvaluationTime rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P44_Model ;
+    osdi:hasDescription "The response to L1 is evaluated at 2 years" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_L2
+osdi:TT_P44_L2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P44_L2_Cost ;
+    osdi:includedByModel osdi:TT_P44_Model ;
+    osdi:hasDescription "Second line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_L2_Cost
+osdi:TT_P44_L2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P44_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L2" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_Disease
+osdi:TT_P44_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P44_L1 ;
+    osdi:includedByModel osdi:TT_P44_Model ;
+    osdi:hasDescription "Disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_Experiment
+osdi:TT_P44_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P44_Model ;
+    osdi:hasDescription "Strategy outcome that resolves (cures) a chronic disease at the evaluation time." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P44_Model
+osdi:TT_P44_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P44_L1 ,
+        osdi:TT_P44_L1_Cost ,
+        osdi:TT_P44_L1_Success ,
+        osdi:TT_P44_SuccessRisk ,
+        osdi:TT_P44_L1_Failure ,
+        osdi:TT_P44_EvaluationTime ,
+        osdi:TT_P44_L2 ,
+        osdi:TT_P44_L2_Cost ,
+        osdi:TT_P44_Disease ;
+    osdi:hasDescription "P44. Strategy outcome that resolves (cures) a chronic disease at the evaluation time." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_L1
+osdi:TT_P45_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P45_L1_Cost ;
+    osdi:failsIf osdi:TT_P45_DevA ;
+    osdi:followedOnFailureBy osdi:TT_P45_L2 ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:hasDescription "First line of therapy, which fails if DevA appears" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_L1_Cost
+osdi:TT_P45_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_L2
+osdi:TT_P45_L2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P45_L2_Cost ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:hasDescription "Second line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_L2_Cost
+osdi:TT_P45_L2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L2" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_DevA
+osdi:TT_P45_DevA rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_P45_DevA_Cost ;
+    osdi:hasEffect osdi:TT_P45_DevA_LER ;
+    osdi:hasRiskCharacterization osdi:TT_P45_DevA_Risk ;
+    osdi:hasUtility osdi:TT_P45_DevA_Disutility ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:hasDescription "DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_DevA_Cost
+osdi:TT_P45_DevA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of DevA" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_DevA_Risk
+osdi:TT_P45_DevA_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:hasDescription "Probability of DevA" ;
+    osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_DevA_Disutility
+osdi:TT_P45_DevA_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of DevA" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_DevA_LER
+osdi:TT_P45_DevA_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P45_DevA_LERMagnitude ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:hasDescription "Life expectancy reduction due to DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_DevA_LERMagnitude
+osdi:TT_P45_DevA_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:hasDescription "Years of life lost due to DevA" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_Disease
+osdi:TT_P45_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P45_DevA ;
+    osdi:hasStrategy osdi:TT_P45_L1 ;
+    osdi:includedByModel osdi:TT_P45_Model ;
+    osdi:hasDescription "Disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_Experiment
+osdi:TT_P45_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P45_Model ;
+    osdi:hasDescription "Short form of the outcomes: the strategy fails when a development appears (failsIf a health condition)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P45_Model
+osdi:TT_P45_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P45_L1 ,
+        osdi:TT_P45_L1_Cost ,
+        osdi:TT_P45_L2 ,
+        osdi:TT_P45_L2_Cost ,
+        osdi:TT_P45_DevA ,
+        osdi:TT_P45_DevA_Cost ,
+        osdi:TT_P45_DevA_Risk ,
+        osdi:TT_P45_DevA_Disutility ,
+        osdi:TT_P45_DevA_LER ,
+        osdi:TT_P45_DevA_LERMagnitude ,
+        osdi:TT_P45_Disease ;
+    osdi:hasDescription "P45. Short form of the outcomes: the strategy fails when a development appears (failsIf a health condition)." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_ManA
+osdi:TT_P46_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_P46_ManA_Cost ;
+    osdi:hasStrategy osdi:TT_P46_T ;
+    osdi:hasUtility osdi:TT_P46_ManA_Loss ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:hasDescription "Acute episode, always present" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_ManA_Cost
+osdi:TT_P46_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the episode" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_ManA_Loss
+osdi:TT_P46_ManA_Loss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the episode" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_T
+osdi:TT_P46_T rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P46_T_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_P46_T_Success ,
+        osdi:TT_P46_T_Failure ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:hasDescription "Treatment of the episode" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_T_Cost
+osdi:TT_P46_T_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of T" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_T_Success
+osdi:TT_P46_T_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasOutcomeRisk osdi:TT_P46_SuccessRisk ;
+    osdi:resolvesHealthCondition "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:hasDescription "The episode is resolved" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_SuccessRisk
+osdi:TT_P46_SuccessRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:hasDescription "Probability of success of the treatment" ;
+    osdi:hasExpectedValue "0.7"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_T_Failure
+osdi:TT_P46_T_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_P46_R ;
+    osdi:hasUtility osdi:TT_P46_FailureLoss ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:hasDescription "The treatment fails: rescue treatment" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_FailureLoss
+osdi:TT_P46_FailureLoss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the failure of the treatment" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_R
+osdi:TT_P46_R rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P46_R_Cost ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:hasDescription "Rescue treatment" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_R_Cost
+osdi:TT_P46_R_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of R" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_Disease
+osdi:TT_P46_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P46_ManA ;
+    osdi:includedByModel osdi:TT_P46_Model ;
+    osdi:hasDescription "Disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_Experiment
+osdi:TT_P46_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P46_Model ;
+    osdi:hasDescription "Treatment of an acute episode: the success resolves it and the failure is followed by a rescue treatment." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P46_Model
+osdi:TT_P46_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P46_ManA ,
+        osdi:TT_P46_ManA_Cost ,
+        osdi:TT_P46_ManA_Loss ,
+        osdi:TT_P46_T ,
+        osdi:TT_P46_T_Cost ,
+        osdi:TT_P46_T_Success ,
+        osdi:TT_P46_SuccessRisk ,
+        osdi:TT_P46_T_Failure ,
+        osdi:TT_P46_FailureLoss ,
+        osdi:TT_P46_R ,
+        osdi:TT_P46_R_Cost ,
+        osdi:TT_P46_Disease ;
+    osdi:hasDescription "P46. Treatment of an acute episode: the success resolves it and the failure is followed by a rescue treatment." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

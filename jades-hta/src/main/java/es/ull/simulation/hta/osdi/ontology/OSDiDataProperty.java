@@ -17,6 +17,8 @@ public enum OSDiDataProperty implements IOSDiComponentWrapper {
 	HAS_DISCOUNT_FOR_EFFECTS("hasDiscountForEffects"),
 	HAS_DISUTILITY_COMBINATION_METHOD("hasDisutilityCombinationMethod"),
 	HAS_EXPECTED_VALUE("hasExpectedValue"),
+	RESOLVES_HEALTH_CONDITION("resolvesHealthCondition"),
+	RESOLVES_ON_SUCCESS("resolvesOnSuccess"),
 	HAS_EXPRESSION_VALUE("hasExpressionValue"),
 	HAS_GEOGRAPHICAL_CONTEXT("hasGeographicalContext"),
 	HAS_LAMBDA_PARAMETER("hasLambdaParameter"),

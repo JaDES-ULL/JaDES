@@ -460,6 +460,32 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P41_Experiment", "Strategy replacement by a group: each member replaces the strategies of its type",
                 leaves("TT_P41_", leaf(1.0)),
                 outcomes(76050.0, 65.0, 55.25), outcomes(97500.0, 65.0, 55.25)));
+        // Strategy outcomes (P42-P46). No discount. L1: 300 per year; success 0.6 (continues L1) or failure 0.4 (followed by L2, 500 per year), evaluated at 2 years.
+        // Success: L1 during 65 years = 19500. Failure: L1 during 2 years (600) + L2 during 63 years (31500) = 32100.
+        // Comparator: 65000 + 0.6 * 19500 + 0.4 * 32100 = 89540. Assessed: + 6500
+        cases.add(tc(PAYOFFS, "TT_P42_Experiment", "Strategy with a success that continues the treatment and a failure followed by another strategy, evaluated at 2 years",
+                leaves("TT_P42_", leaf(0.6, "L1_Success"), leaf(0.4, "L1_Failure")),
+                outcomes(96040.0, 65.0, 55.25), outcomes(89540.0, 65.0, 55.25)));
+        // The failure also costs 1000 and loses 0.5 QALYs, once: + 0.4 * 1000 = 400; QALYs = 55.25 - 0.4 * 0.5 = 55.05
+        cases.add(tc(PAYOFFS, "TT_P43_Experiment", "Strategy outcome with a one-time cost and a one-time QALY loss",
+                leaves("TT_P43_", leaf(0.6, "L1_Success"), leaf(0.4, "L1_Failure")),
+                outcomes(96440.0, 65.0, 55.05), outcomes(89940.0, 65.0, 55.05)));
+        // The success cures the disease at 2 years: its annual cost and L1 stop. Success: 2 * 1000 + 2 * 300 = 2600. Failure: 65000 + 32100 = 97100.
+        // Comparator: 0.6 * 2600 + 0.4 * 97100 = 40400. Assessed: + 6500 (the intervention applies during the whole life)
+        cases.add(tc(PAYOFFS, "TT_P44_Experiment", "Strategy outcome that resolves (cures) a chronic disease at the evaluation time",
+                leaves("TT_P44_", leaf(0.6, "L1_Success"), leaf(0.4, "L1_Failure")),
+                outcomes(46900.0, 65.0, 55.25), outcomes(40400.0, 65.0, 55.25)));
+        // L1 fails if DevA (0.3) appears, at time 0 (no evaluation time), and is followed by L2. DevA: LE 55; costs 55 * (1000 + 500 + 500) = 110000;
+        // QALYs 55 * 0.75 = 41.25. No DevA: L1 during the whole life: 65000 + 19500 = 84500; QALYs 55.25.
+        // Comparator: 92150; LE 0.3 * 55 + 0.7 * 65 = 62; QALYs 51.05. Assessed: + 0.3 * 5500 + 0.7 * 6500 = 6200
+        cases.add(tc(PAYOFFS, "TT_P45_Experiment", "Short form of the outcomes: the strategy fails when a development appears (failsIf a health condition)",
+                leaves("TT_P45_", leaf(0.3, "DevA", "L1_Failure"), leaf(0.7, "L1_Success")),
+                outcomes(98350.0, 62.0, 51.05), outcomes(92150.0, 62.0, 51.05)));
+        // Acute episode (2000, 0.5 QALYs), always present, treated with T (20): success 0.7 (resolves) or failure 0.3, followed by a rescue R (50) and losing 0.2 QALYs.
+        // Comparator: 65000 + 2000 + 20 + 0.3 * 50 = 67035; QALYs 55.25 - 0.5 - 0.3 * 0.2 = 54.69. Assessed: + 6500
+        cases.add(tc(PAYOFFS, "TT_P46_Experiment", "Treatment of an acute episode: the success resolves it and the failure is followed by a rescue treatment",
+                leaves("TT_P46_", leaf(0.7, "ManA", "T_Success"), leaf(0.3, "ManA", "T_Failure")),
+                outcomes(73535.0, 65.0, 54.69), outcomes(67035.0, 65.0, 54.69)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
@@ -583,7 +609,12 @@ public final class DecisionTreeCatalog {
             // Detection properties are declared by the detection strategies, and the disease detected by an intervention is its target.
             new MalformedCase(MALFORMED, "TT_N20_Experiment", "Screening intervention with a sensitivity", MalformedOSDiModelException.class),
             new MalformedCase(MALFORMED, "TT_N21_Experiment", "Screening strategy in the arm without screening", MalformedOSDiModelException.class),
-            new MalformedCase(MALFORMED, "TT_N22_Experiment", "Detection intervention that declares the disease it detects", MalformedOSDiModelException.class)
+            new MalformedCase(MALFORMED, "TT_N22_Experiment", "Detection intervention that declares the disease it detects", MalformedOSDiModelException.class),
+            // Strategy outcomes (phase 7a): decision trees cannot expand cycles nor times to event, and outcomes must be well defined.
+            new MalformedCase(MALFORMED, "TT_N23_Experiment", "Cycle in the chain of strategies", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N24_Experiment", "Strategy outcome whose risk is a time to event (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N25_Experiment", "Two strategy outcomes without risk", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N26_Experiment", "Short form (failsIf) combined with explicit strategy outcomes", MalformedOSDiModelException.class)
         );
     }
 }

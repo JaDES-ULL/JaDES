@@ -80,6 +80,24 @@ Limitations:
 - Only follow-up and treatment strategies contribute costs and utilities to the nodes of the tree; detection strategies are used by the newborn screening model (see "Newborn screening").
 - The DES does not simulate strategies: it ignores strategy replacement effects with a warning (`OSDiIntervention`).
 
+## jades-hta: Strategy outcomes in decision trees
+
+A strategy has mutually exclusive outcomes (decision D4 of `docs/osdi-1.3-diseno.md`): `StrategyOutcome`, with the subclasses `TreatmentOutcome` (`SuccessOutcome`, `FailureOutcome`) and `DetectionOutcome` (positive, negative and inconclusive results, which declare a risk for diseased and non-diseased individuals; not supported yet, phase 7b). `failsIf`, with `followedOnFailureBy`, `followedOnSuccessBy` and `resolvesOnSuccess`, is the short form of a failure and a default success; its failure condition is a parameter or a health condition (D5). The risk of an outcome (`hasOutcomeRisk`) is a probability per episode or a time to event (D6). The payoffs of an outcome are one-time (D7).
+
+`StrategyOutcomeExpander` expands the outcomes below each leaf of the sub-tree of the disease, for every strategy with outcomes of the health conditions of the path (the outcomes are independent of the rest of branches):
+
+- Each outcome is a branch with its risk; the outcome without risk takes the remaining probability. With `failsIf` a health condition, the failure is the only branch where the health condition is active, and the success, where it is not (P45).
+- The outcome happens at T = start of the strategy + `hasEvaluationTime` (the start, with a warning, if missing). The annual payoffs of the strategy apply until T if the outcome is followed by another strategy or resolves the health condition, and until the end of the node otherwise (P42). The next strategy starts at T, and its own outcomes are expanded in turn.
+- The payoffs of the outcome apply once, at T (annual ones are ignored with a warning); its effects apply to the leaf (P43, P46).
+- An outcome that resolves the health condition stops its annual payoffs at T (P44); for an acute manifestation, nothing changes. Its effects on the life expectancy cannot stop in a decision tree, so they are kept, with a warning.
+- The windows are relative to the node of the health condition (`PayoffWrapper.applyDiscount`).
+
+Limitations:
+
+- Rejected with an `UnsupportedOSDiFeatureException`: cycles in the chain of strategies (N23; a repetition is another strategy), outcomes whose risk is a time to event (N24), and strategies with outcomes whose costs follow a guideline. Rejected with a `MalformedOSDiModelException`: more than one outcome without risk (N25), and the short form combined with explicit outcomes (N26).
+- A failure produced by a health condition happens at the start of the strategy: the onset age of the health condition is not considered.
+- The DES does not simulate strategies nor their outcomes.
+
 ## jades-hta: Newborn screening
 
 Detection interventions do not declare `hasSensitivity`, `hasSpecificity`, `detects` or `hasTemporaryThreshold` (`DetectionInterventionWrapper` rejects them with a `MalformedOSDiModelException`, N20 and N22): the disease they detect is their target (`isInterventionOf`), and the rest are properties of their detection strategies. For a detection intervention, the target applies to the population at risk, not only to those who present it.
@@ -140,6 +158,7 @@ OSDi defines the semantics of a model; the decision tree generator (`osdi.decisi
 | Target of the interventions (`hasIntervention`, `isInterventionOf`) | Read in both directions. The compared interventions must have the same target; if it is a clinical progression element, the tree starts with the patients that present it and only includes what depends on it (see "Target of the interventions"). | Ignored silently: interventions apply from the start of the simulation. |
 | Strategies and guidelines (`hasStrategy`, `StrategyReplacementEffect`, `usesHealthTechnology`, `hasGuideline`) | Follow-up and treatment strategies add their costs (own costs plus those of their health technologies, per application according to a guideline) and utilities to those of their element. Interventions replace strategies by type in their arm (see "Strategies and guidelines in decision trees"). Guidelines with sub-guidelines, condition expressions or application ages are rejected. | Strategies are not simulated; strategy replacement effects are ignored with a warning. |
 | Detection (newborn screening) | Sensitivity, specificity and costs of the screening and diagnosis strategies of each arm (see "Newborn screening"). Detection properties of interventions are rejected. False negatives do not pay a diagnosis. | Sensitivity and specificity of the detection strategy of the arm of each detection intervention. Detection properties of interventions are rejected. |
+| Strategy outcomes (`StrategyOutcome`, `failsIf`) | Treatment outcomes expanded below the leaves, with windows for the payoffs of the strategies and resolutions (see "Strategy outcomes in decision trees"). Detection outcomes are not supported yet. | Not simulated. |
 | `hasDuration` | Ignored silently (the property is never read). | Ignored silently (the property is never read). |
 | `hasFrequency` | Only read for acute manifestations: ignored with a warning if they define a risk; rejected (`UnsupportedOSDiFeatureException`) if they do not. | Ignored silently (the property is never read). |
 | Acute manifestations | A single episode within the lifetime, whose probability is the risk (see "Acute manifestations in decision trees"). One-time payoffs apply once; annual payoffs are ignored with a warning. | Simulated as events: they are not added to the state of the patient (so they have no annual payoffs), their one-time payoffs apply at each occurrence, and they can happen again, since their next occurrence is scheduled after each event. They never get an initial proportion, and their probability of death is not loaded from OSDi. |
