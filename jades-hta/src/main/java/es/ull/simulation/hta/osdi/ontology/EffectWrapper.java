@@ -58,6 +58,10 @@ public class EffectWrapper extends BaseModelItemWrapper {
 	 * The cost parameter associated with this effect, if any.
 	 */
     private Optional<ParameterWrapper> cost = null;
+	/**
+	 * The strategies that replace those of the affected health condition, if this is a strategy replacement effect.
+	 */
+	private final Set<StrategyWrapper> replacementStrategies = new TreeSet<>();
 
 	/**
 	 *
@@ -78,6 +82,18 @@ public class EffectWrapper extends BaseModelItemWrapper {
 		this.causes.addAll(modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.IS_EFFECT_OF));
 		this.modifiedItems.addAll(modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.AFFECTS));
 		this.effectType = EffectType.fromIRI(individualIRI, wrap);
+        this.cost = modelWrapper.getWrapperForPropertyAs(individualIRI, OSDiObjectProperty.HAS_COST, ParameterWrapper.class);
+		if (EffectType.STRATEGY_REPLACEMENT_EFFECT.equals(effectType)) {
+			initializeStrategyReplacement();
+			return;
+		}
+		// Only a strategy replacement effect can affect a health condition
+		for (IModelItemWrapper modifiedItem : modifiedItems) {
+			if (modifiedItem instanceof HealthConditionWrapper) {
+				throw new MalformedOSDiModelException(OSDiClass.EFFECT, individualIRI, OSDiObjectProperty.AFFECTS, "The effect affects the health condition " + modifiedItem.getShortName()
+					+ ". Only a strategy replacement effect (" + OSDiClass.STRATEGY_REPLACEMENT_EFFECT.getShortName() + ") can affect a health condition.");
+			}
+		}
 		final Optional<ParameterWrapper> optionalEffectMagnitude = modelWrapper.getAndInitializeWrapperForPropertyAs(individualIRI, OSDiObjectProperty.HAS_EFFECT_MAGNITUDE, ParameterWrapper.class);
 		if (!optionalEffectMagnitude.isPresent()) {
 			throw new MalformedOSDiModelException(OSDiClass.EFFECT, individualIRI, OSDiObjectProperty.HAS_EFFECT_MAGNITUDE, "Effect magnitude is required for effect definitions");
@@ -86,7 +102,70 @@ public class EffectWrapper extends BaseModelItemWrapper {
 		for (IModelItemWrapper modifiedItem : modifiedItems) {
 			operations.put(modifiedItem, computeOperation(wrap, modifiedItem));
 		}
-        this.cost = modelWrapper.getWrapperForPropertyAs(individualIRI, OSDiObjectProperty.HAS_COST, ParameterWrapper.class);
+	}
+
+	/**
+	 * Initializes a strategy replacement effect (decision D2 of docs/osdi-1.3-diseno.md): it affects exactly one health condition, and it replaces
+	 * its strategies with exactly one strategy or group of strategies (hasReplacementStrategy). It does not use a magnitude: if it defines one,
+	 * it is ignored with a warning. It modifies no parameter, so it defines no operation.
+	 * @throws MalformedOSDiModelException If the effect does not affect exactly one health condition, or does not define exactly one replacement
+	 * that is a strategy or a group of strategies.
+	 * @throws UnsupportedOSDiFeatureException If the strategies cannot be initialized.
+	 */
+	private void initializeStrategyReplacement() throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+		final IRI individualIRI = getIndividualIRI();
+		final ModelWrapper modelWrapper = getModelWrapper();
+		if (modifiedItems.size() != 1 || !(modifiedItems.iterator().next() instanceof HealthConditionWrapper)) {
+			throw new MalformedOSDiModelException(OSDiClass.STRATEGY_REPLACEMENT_EFFECT, individualIRI, OSDiObjectProperty.AFFECTS, "A strategy replacement effect must affect exactly one health condition (the disease or an element of its progression). Found: " + modifiedItems);
+		}
+		if (!modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.HAS_EFFECT_MAGNITUDE).isEmpty()) {
+			log.warn("The strategy replacement effect " + getShortName() + " defines a magnitude, which is ignored.");
+		}
+		final Set<IModelItemWrapper> replacements = modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.HAS_REPLACEMENT_STRATEGY);
+		if (replacements.size() != 1) {
+			throw new MalformedOSDiModelException(OSDiClass.STRATEGY_REPLACEMENT_EFFECT, individualIRI, OSDiObjectProperty.HAS_REPLACEMENT_STRATEGY, "A strategy replacement effect must define exactly one replacement strategy or group of strategies. Found: " + replacements);
+		}
+		final IModelItemWrapper replacement = replacements.iterator().next();
+		final Set<IModelItemWrapper> strategies = new TreeSet<>();
+		if (replacement instanceof StrategyWrapper) {
+			strategies.add(replacement);
+		}
+		else if (getOSDiWrapper().isInstanceOf(replacement.getIndividualIRI(), OSDiClass.GROUP)) {
+			strategies.addAll(modelWrapper.getWrappersForProperty(replacement.getIndividualIRI(), OSDiObjectProperty.HAS_GROUP_ITEM));
+			if (strategies.isEmpty()) {
+				throw new MalformedOSDiModelException(OSDiClass.STRATEGY_REPLACEMENT_EFFECT, individualIRI, OSDiObjectProperty.HAS_REPLACEMENT_STRATEGY, "The group of strategies " + replacement.getShortName() + " has no items in the model.");
+			}
+		}
+		else {
+			throw new MalformedOSDiModelException(OSDiClass.STRATEGY_REPLACEMENT_EFFECT, individualIRI, OSDiObjectProperty.HAS_REPLACEMENT_STRATEGY, "The replacement " + replacement.getShortName() + " is neither a strategy nor a group of strategies.");
+		}
+		for (IModelItemWrapper strategy : strategies) {
+			if (!(strategy instanceof StrategyWrapper)) {
+				throw new MalformedOSDiModelException(OSDiClass.STRATEGY_REPLACEMENT_EFFECT, individualIRI, OSDiObjectProperty.HAS_REPLACEMENT_STRATEGY, "The group of strategies " + replacement.getShortName() + " includes " + strategy.getShortName() + ", which is not a strategy.");
+			}
+			strategy.initialize();
+			replacementStrategies.add((StrategyWrapper) strategy);
+		}
+	}
+
+	/**
+	 * Returns the health condition affected by this effect, if it is a strategy replacement effect.
+	 * @return The health condition whose strategies this effect replaces, or an empty optional if this is not a strategy replacement effect.
+	 */
+	public Optional<IModelItemWrapper> getAffectedHealthCondition() {
+		if (!EffectType.STRATEGY_REPLACEMENT_EFFECT.equals(effectType)) {
+			return Optional.empty();
+		}
+		return Optional.of(modifiedItems.iterator().next());
+	}
+
+	/**
+	 * Returns the strategies that replace those of the affected health condition, if this is a strategy replacement effect: the replacement strategy
+	 * or the items of the replacement group.
+	 * @return The strategies that replace those of the affected health condition; an empty set if this is not a strategy replacement effect.
+	 */
+	public Set<StrategyWrapper> getReplacementStrategies() {
+		return replacementStrategies;
 	}
 
 	/**

@@ -8,6 +8,8 @@ public enum EffectType implements WrapsOSDiClass {
     INSTANT_DEATH_EFFECT(OSDiClass.INSTANT_DEATH_EFFECT),
     MORTALITY_RATE_EFFECT(OSDiClass.INCREASED_MORTALITY_RATE_EFFECT),
     LIFE_EXPECTANCY_REDUCTION_EFFECT(OSDiClass.LIFE_EXPECTANCY_REDUCTION_EFFECT),
+    STRATEGY_REPLACEMENT_EFFECT(OSDiClass.STRATEGY_REPLACEMENT_EFFECT),
+    // Must be the last one, since every effect is an instance of the generic class (see fromIRI)
     GENERAL_EFFECT(OSDiClass.EFFECT);
 
 	private final static TreeMap<OSDiClass, EffectType> reverseEffect = new TreeMap<>();

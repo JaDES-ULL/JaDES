@@ -49,6 +49,7 @@ public enum OSDiObjectProperty implements IOSDiComponentWrapper {
 	HAS_PREVIOUS("hasPrevious"),
 	HAS_PROGRESSION_ELEMENT("hasProgressionElement"),
 	HAS_PROPORTION_WITHIN_GROUP("hasProportionWithinGroup"),
+	HAS_REPLACEMENT_STRATEGY("hasReplacementStrategy"),
 	HAS_RISK_CHARACTERIZATION("hasRiskCharacterization"),
 	HAS_SENSITIVITY("hasSensitivity"),
 	HAS_SEX("hasSex"),

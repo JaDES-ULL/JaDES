@@ -119,9 +119,10 @@ osdi:affects rdf:type owl:ObjectProperty ;
              rdfs:range [ rdf:type owl:Class ;
                           owl:unionOf ( osdi:Attribute
                                         osdi:Parameter
+                                        osdi:HealthCondition
                                       )
                         ] ;
-             rdfs:comment "Defines a relationship between an effect and an attribute or parameter, indicating that the effect affects the attribute or parameter."@en ;
+             rdfs:comment "Defines a relationship between an effect and an attribute, parameter or health condition, indicating that the effect affects it. A health condition can only be affected by a StrategyReplacementEffect; the rest of effects affect attributes or parameters."@en ;
              rdfs:label "afecta"@es ,
                         "affects"@en .
 
@@ -600,6 +601,27 @@ osdi:hasProportionWithinGroup rdf:type owl:ObjectProperty ;
                                          "tiene la proporción dentro del grupo"@es .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#hasReplacementStrategy
+osdi:hasReplacementStrategy rdf:type owl:ObjectProperty ;
+                            rdfs:domain osdi:StrategyReplacementEffect ;
+                            rdfs:range [ rdf:type owl:Class ;
+                                         owl:unionOf ( osdi:Strategy
+                                                       [ owl:intersectionOf ( osdi:Group
+                                                                              [ rdf:type owl:Restriction ;
+                                                                                owl:onProperty osdi:hasGroupItem ;
+                                                                                owl:allValuesFrom osdi:Strategy
+                                                                              ]
+                                                                            ) ;
+                                                         rdf:type owl:Class
+                                                       ]
+                                                     )
+                                       ] ;
+                            rdfs:comment "The strategy, or group of strategies, that replaces the strategies of the health condition affected by a strategy replacement effect."@en ,
+                                         "La estrategia, o grupo de estrategias, que sustituye a las estrategias de la condición de salud afectada por un efecto de sustitución de estrategia."@es ;
+                            rdfs:label "has replacement strategy"@en ,
+                                       "tiene la estrategia de sustitución"@es .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#hasRiskCharacterization
 osdi:hasRiskCharacterization rdf:type owl:ObjectProperty ;
                              owl:inverseOf osdi:isRiskCharacterizationOf ;
@@ -672,7 +694,6 @@ osdi:hasStrategy rdf:type owl:ObjectProperty ;
                  owl:inverseOf osdi:isStrategyOf ;
                  rdfs:domain [ rdf:type owl:Class ;
                                owl:unionOf ( osdi:HealthCondition
-                                             osdi:Intervention
                                              osdi:Strategy
                                            )
                              ] ;
@@ -688,7 +709,7 @@ osdi:hasStrategy rdf:type owl:ObjectProperty ;
                                             ]
                                           )
                             ] ;
-                 rdfs:comment "Defines a relationship between a health condition, intervention or strategy and a strategy, which can be either a simple strategy or a group of strategies. This property allows us to define the strategies that are applied to a health condition, intervention or strategy, as well as the strategies that are part of a group of strategies."@en ;
+                 rdfs:comment "Defines a relationship between a health condition or strategy and a strategy, which can be either a simple strategy or a group of strategies. This property allows us to define the strategies that are applied to a health condition or strategy, as well as the strategies that are part of a group of strategies. Interventions do not declare strategies directly: they replace the strategies of a health condition through a StrategyReplacementEffect."@en ;
                  rdfs:label "has strategy"@en ,
                             "tiene la estrategia"@es .
 
@@ -813,10 +834,11 @@ osdi:isAffectedBy rdf:type owl:ObjectProperty ;
                   rdfs:domain [ rdf:type owl:Class ;
                                 owl:unionOf ( osdi:Attribute
                                               osdi:Parameter
+                                              osdi:HealthCondition
                                             )
                               ] ;
                   rdfs:range osdi:Effect ;
-                  rdfs:comment "Defines a relationship between an attribute or parameter and an effect, indicating that the attribute or parameter is affected by that effect."@en ;
+                  rdfs:comment "Defines a relationship between an attribute, parameter or health condition and an effect, indicating that it is affected by that effect. A health condition can only be affected by a StrategyReplacementEffect."@en ;
                   rdfs:label "es modificado por"@es ,
                              "is modified by"@en .
 
@@ -2247,6 +2269,7 @@ osdi:Effect rdf:type owl:Class ;
                               owl:allValuesFrom [ rdf:type owl:Class ;
                                                   owl:unionOf ( osdi:Attribute
                                                                 osdi:Parameter
+                                                                osdi:HealthCondition
                                                               )
                                                 ]
                             ] ,
@@ -2262,7 +2285,7 @@ osdi:Effect rdf:type owl:Class ;
                               owl:onProperty osdi:hasUtility ;
                               owl:allValuesFrom osdi:Utility
                             ] ;
-            rdfs:comment "An effect of a treatment or intervention. It applies its magnitude (hasEffectMagnitude) to the parameters or attributes it affects (affects). The subclasses define how the magnitude is applied (an instant death effect sets a probability of death, a life expectancy reduction effect subtracts years of life and an increased mortality rate effect multiplies the mortality rate); for a generic effect, the data item type of the magnitude defines the operation (see hasEffectMagnitude). When several effects modify the same parameter, the order is decided by the application; the suggested order is: first replace, then multiply (linear factors, then ratios of rates, then odds ratios) and finally subtract. At most one effect should replace the same parameter."@en ;
+            rdfs:comment "An effect of a treatment or intervention. It applies its magnitude (hasEffectMagnitude) to the parameters or attributes it affects (affects). The subclasses define how the magnitude is applied (an instant death effect sets a probability of death, a life expectancy reduction effect subtracts years of life and an increased mortality rate effect multiplies the mortality rate), and a strategy replacement effect replaces the strategies of a health condition (see StrategyReplacementEffect); for a generic effect, the data item type of the magnitude defines the operation (see hasEffectMagnitude). When several effects modify the same parameter, the order is decided by the application; the suggested order is: first replace, then multiply (linear factors, then ratios of rates, then odds ratios) and finally subtract. At most one effect should replace the same parameter."@en ;
             rdfs:label "Efecto"@es ,
                        "Effect"@en .
 
@@ -2710,10 +2733,6 @@ osdi:Intervention rdf:type owl:Class ;
                                   [ rdf:type owl:Restriction ;
                                     owl:onProperty osdi:hasEffect ;
                                     owl:allValuesFrom osdi:Effect
-                                  ] ,
-                                  [ rdf:type owl:Restriction ;
-                                    owl:onProperty osdi:hasStrategy ;
-                                    owl:allValuesFrom osdi:Strategy
                                   ] ,
                                   [ rdf:type owl:Restriction ;
                                     owl:onProperty osdi:hasUtility ;
@@ -3525,6 +3544,36 @@ osdi:Strategy rdf:type owl:Class ;
                          "Strategy"@en .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#StrategyReplacementEffect
+osdi:StrategyReplacementEffect rdf:type owl:Class ;
+                               rdfs:subClassOf osdi:Effect ,
+                                               [ rdf:type owl:Restriction ;
+                                                 owl:onProperty osdi:affects ;
+                                                 owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                                 owl:onClass osdi:HealthCondition
+                                               ] ,
+                                               [ rdf:type owl:Restriction ;
+                                                 owl:onProperty osdi:hasReplacementStrategy ;
+                                                 owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                                 owl:onClass [ rdf:type owl:Class ;
+                                                               owl:unionOf ( osdi:Strategy
+                                                                             [ owl:intersectionOf ( osdi:Group
+                                                                                                    [ rdf:type owl:Restriction ;
+                                                                                                      owl:onProperty osdi:hasGroupItem ;
+                                                                                                      owl:allValuesFrom osdi:Strategy
+                                                                                                    ]
+                                                                                                  ) ;
+                                                                               rdf:type owl:Class
+                                                                             ]
+                                                                           )
+                                                             ]
+                                               ] ;
+                               rdfs:comment "An effect of an intervention that replaces the strategies of a health condition (affects: the disease or an element of its progression) with a new strategy or group of strategies (hasReplacementStrategy). It applies in the arm of the intervention and by type of strategy (detection, i.e. screening or diagnosis; follow-up; or treatment, i.e. line of therapy): the new strategy replaces the strategies of its same type that the health condition declares (hasStrategy), or it is assigned to the health condition if it had none of that type; the strategies of other types are kept. If the replacement is a group, each member replaces the strategies of its type. It does not use a magnitude (hasEffectMagnitude). Two strategy replacements of the same health condition in the same arm are an error. This is the only way for an intervention to declare strategies."@en ,
+                                            "Efecto de una intervención que sustituye las estrategias de una condición de salud (affects: la enfermedad o un elemento de su progresión) por una nueva estrategia o grupo de estrategias (hasReplacementStrategy). Se aplica en el brazo de la intervención y por tipo de estrategia (detección, es decir, cribado o diagnóstico; seguimiento; o tratamiento, es decir, línea de terapia): la nueva estrategia sustituye a las estrategias de su mismo tipo que declara la condición de salud (hasStrategy), o se le asigna si no tenía ninguna de ese tipo; las estrategias de otros tipos se mantienen. Si la sustitución es un grupo, cada miembro sustituye a las de su tipo. No usa magnitud (hasEffectMagnitude). Dos sustituciones de estrategia sobre la misma condición de salud en un mismo brazo son un error. Es la única forma de que una intervención declare estrategias."@es ;
+                               rdfs:label "Efecto de sustitución de estrategia"@es ,
+                                          "Strategy replacement effect"@en .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TherapeuticIntervention
 osdi:TherapeuticIntervention rdf:type owl:Class ;
                              owl:equivalentClass [ owl:intersectionOf ( osdi:Intervention
@@ -3535,15 +3584,7 @@ osdi:TherapeuticIntervention rdf:type owl:Class ;
                                                                       ) ;
                                                    rdf:type owl:Class
                                                  ] ;
-                             rdfs:subClassOf osdi:Intervention ,
-                                             [ rdf:type owl:Restriction ;
-                                               owl:onProperty osdi:hasStrategy ;
-                                               owl:allValuesFrom [ rdf:type owl:Class ;
-                                                                   owl:unionOf ( osdi:FollowUpStrategy
-                                                                                 osdi:LineOfTherapy
-                                                                               )
-                                                                 ]
-                                             ] ;
+                             rdfs:subClassOf osdi:Intervention ;
                              rdfs:comment "An intervention driven by a set of drugs and/or treatments"@en ;
                              rdfs:label "Intervención terapéutica"@es ,
                                         "Therapeutic intervention"@en .

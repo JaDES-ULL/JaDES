@@ -1,6 +1,10 @@
 package es.ull.simulation.hta.osdi.decisiontree.factories;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.IRI;
 
 import es.ull.simulation.hta.MalformedSimulationModelException;
 import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode;
@@ -8,8 +12,11 @@ import es.ull.simulation.hta.osdi.decisiontree.Model;
 import es.ull.simulation.hta.osdi.decisiontree.SingleDiseaseModel;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
+import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
+import es.ull.simulation.hta.osdi.ontology.OSDiClass;
 import es.ull.simulation.hta.osdi.ontology.ResourceUsageSKOSCategory;
+import es.ull.simulation.hta.osdi.ontology.StrategyWrapper;
 
 /**
  * A simple intervention for a single disease and population model.
@@ -29,6 +36,37 @@ public class SimpleInterventionGenerator extends InterventionGenerator {
     }
 
     /**
+     * Returns the strategy replacements of an intervention (decision D2 of docs/osdi-1.3-diseno.md): for each health condition affected by a
+     * strategy replacement effect of the intervention, the strategies that replace its own in the arm of the intervention. Interventions only
+     * declare strategies through such effects.
+     * @param intervention The intervention
+     * @return The strategies that replace those of each health condition, indexed by the IRI of the health condition
+     * @throws MalformedOSDiModelException If the intervention declares strategies directly (hasStrategy), or two strategy replacements affect
+     * the same health condition
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
+     */
+    static Map<IRI, Set<StrategyWrapper>> getStrategyReplacements(InterventionWrapper intervention) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        if (!intervention.getStrategies().isEmpty()) {
+            throw new MalformedOSDiModelException("The intervention " + intervention.getShortName() + " declares strategies (" + intervention.getStrategies()
+                + "). Interventions must declare their strategies through a strategy replacement effect (" + OSDiClass.STRATEGY_REPLACEMENT_EFFECT.getShortName() + ").");
+        }
+        final Map<IRI, Set<StrategyWrapper>> replacements = new HashMap<>();
+        final Map<IRI, EffectWrapper> effectsByHealthCondition = new HashMap<>();
+        for (EffectWrapper effect : intervention.getEffects()) {
+            if (effect.getAffectedHealthCondition().isPresent()) {
+                final IRI healthCondition = effect.getAffectedHealthCondition().get().getIndividualIRI();
+                final EffectWrapper previous = effectsByHealthCondition.put(healthCondition, effect);
+                if (previous != null) {
+                    throw new MalformedOSDiModelException("The intervention " + intervention.getShortName() + " defines two strategy replacements (" + previous.getShortName()
+                        + " and " + effect.getShortName() + ") of the same health condition " + effect.getAffectedHealthCondition().get().getShortName() + ".");
+                }
+                replacements.put(healthCondition, effect.getReplacementStrategies());
+            }
+        }
+        return replacements;
+    }
+
+    /**
      * Generates the sub-tree of the intervention: the sub-tree of the disease (see {@link DiseaseSubTreeGenerator}), whose root node also gets the
      * payoffs and effects of the intervention. The intervention applies from the start of the tree, i.e., from the appearance of its target (D1).
      * If the target is an acute manifestation, the annual costs and utilities of the intervention are ignored with a warning, as those of the
@@ -40,7 +78,7 @@ public class SimpleInterventionGenerator extends InterventionGenerator {
         boolean hasAcuteTarget = false;
         if (getParentTreeModel() instanceof SingleDiseaseModel) {
             final DiseaseSubTreeGenerator diseaseGenerator = ((SingleDiseaseModel)getParentTreeModel()).getDiseaseGenerator();
-            interventionNode = diseaseGenerator.generate(interventionName);
+            interventionNode = diseaseGenerator.generate(interventionName, getStrategyReplacements(getInterventionWrapper()));
             hasAcuteTarget = diseaseGenerator.hasAcuteTarget();
         }
         else {

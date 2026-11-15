@@ -516,7 +516,6 @@ osdi:PBD_FollowUpStrategy rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#BD_InterventionNoScreening
 osdi:BD_InterventionNoScreening rdf:type owl:NamedIndividual ,
                                           osdi:DiagnosisIntervention ;
-                                 osdi:hasStrategy osdi:BD_ClinicalDiagnosis ;
                                  osdi:includedByModel osdi:PBD_ModelTree ,
                                                       osdi:PBD_ModelTreeDebug ,
                                                       osdi:PBD_ModelTreeFake ;
@@ -526,12 +525,34 @@ osdi:BD_InterventionNoScreening rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#BD_InterventionScreening
 osdi:BD_InterventionScreening rdf:type owl:NamedIndividual ,
                                         osdi:ScreeningIntervention ;
-                               osdi:hasStrategy osdi:PBD_ScreeningStrategy ;
                                osdi:includedByModel osdi:PBD_ModelTree ,
                                                     osdi:PBD_ModelTreeDebug ,
                                                     osdi:PBD_ModelTreeFake ;
                                osdi:hasDescription "Basic screening intervention for PBD" ;
-                               osdi:hasEffect osdi:BD_InterventionScreeningEffect .
+                               osdi:hasEffect osdi:BD_InterventionScreeningEffect ,
+                                              osdi:BD_InterventionScreeningStrategies .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_InterventionScreeningStrategies
+osdi:BD_InterventionScreeningStrategies rdf:type owl:NamedIndividual ,
+                                                 osdi:StrategyReplacementEffect ;
+                                        osdi:affects osdi:PBD_ProfoundBiotinidaseDeficiency ;
+                                        osdi:hasReplacementStrategy osdi:BD_ScreeningArmStrategies ;
+                                        osdi:includedByModel osdi:PBD_ModelTree ,
+                                                             osdi:PBD_ModelTreeDebug ,
+                                                             osdi:PBD_ModelTreeFake ;
+                                        osdi:hasDescription "In the screening arm, the detection strategies of the disease are the clinical diagnosis plus the screening strategy (migrated from hasStrategy in the intervention). The follow-up and treatment strategies of the disease are kept" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#BD_ScreeningArmStrategies
+osdi:BD_ScreeningArmStrategies rdf:type owl:NamedIndividual ,
+                                        osdi:Group ;
+                               osdi:hasGroupItem osdi:PBD_ScreeningStrategy ,
+                                                 osdi:BD_ClinicalDiagnosis ;
+                               osdi:includedByModel osdi:PBD_ModelTree ,
+                                                    osdi:PBD_ModelTreeDebug ,
+                                                    osdi:PBD_ModelTreeFake ;
+                               osdi:hasDescription "Detection strategies of the disease in the screening arm" .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#BD_InterventionScreeningEffect

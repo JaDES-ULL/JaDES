@@ -4384,4 +4384,1124 @@ osdi:TT_P32_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P32. Intervention effect on the risk of an acute manifestation: factor (x0.5)." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P33_S1
+osdi:TT_P33_S1 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_P33_S1_Cost ;
+    osdi:includedByModel osdi:TT_P33_Model ;
+    osdi:hasDescription "Follow-up strategy of the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P33_S1_Cost
+osdi:TT_P33_S1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P33_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up strategy S1" ;
+    osdi:hasExpectedValue "200.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P33_L1
+osdi:TT_P33_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P33_L1_Cost ;
+    osdi:includedByModel osdi:TT_P33_Model ;
+    osdi:hasDescription "Treatment strategy of the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P33_L1_Cost
+osdi:TT_P33_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P33_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the treatment strategy L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P33_Disease
+osdi:TT_P33_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P33_S1 ,
+        osdi:TT_P33_L1 ;
+    osdi:includedByModel osdi:TT_P33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P33_Experiment
+osdi:TT_P33_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P33_Model ;
+    osdi:hasDescription "Strategy of the disease: its costs are added to the own costs of the disease." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P33_Model
+osdi:TT_P33_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P33_S1 ,
+        osdi:TT_P33_S1_Cost ,
+        osdi:TT_P33_L1 ,
+        osdi:TT_P33_L1_Cost ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_P33_Disease ;
+    osdi:hasDescription "P33. Strategy of the disease: its costs are added to the own costs of the disease." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_S1
+osdi:TT_P34_S1 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_P34_S1_Cost ;
+    osdi:includedByModel osdi:TT_P34_Model ;
+    osdi:hasDescription "Follow-up strategy of the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_S1_Cost
+osdi:TT_P34_S1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P34_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up strategy S1" ;
+    osdi:hasExpectedValue "200.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_L1
+osdi:TT_P34_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P34_L1_Cost ;
+    osdi:includedByModel osdi:TT_P34_Model ;
+    osdi:hasDescription "Treatment strategy of the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_L1_Cost
+osdi:TT_P34_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P34_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the treatment strategy L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_S2
+osdi:TT_P34_S2 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_P34_S2_Cost ;
+    osdi:includedByModel osdi:TT_P34_Model ;
+    osdi:hasDescription "New follow-up strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_S2_Cost
+osdi:TT_P34_S2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P34_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up strategy S2" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_Replacement
+osdi:TT_P34_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_P34_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_P34_S2 ;
+    osdi:includedByModel osdi:TT_P34_Model ;
+    osdi:hasDescription "Replaces the follow-up strategy of the disease by S2" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_InterventionTreat
+osdi:TT_P34_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P34_Replacement ;
+    osdi:includedByModel osdi:TT_P34_Model ;
+    osdi:hasDescription "Replaces the follow-up strategy of the disease by S2" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_Disease
+osdi:TT_P34_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P34_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P34_S1 ,
+        osdi:TT_P34_L1 ;
+    osdi:includedByModel osdi:TT_P34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_Experiment
+osdi:TT_P34_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P34_Model ;
+    osdi:hasDescription "Strategy replacement by type: a new follow-up strategy replaces the follow-up strategy of the disease and keeps its treatment strategy." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P34_Model
+osdi:TT_P34_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P34_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P34_S1 ,
+        osdi:TT_P34_S1_Cost ,
+        osdi:TT_P34_L1 ,
+        osdi:TT_P34_L1_Cost ,
+        osdi:TT_P34_S2 ,
+        osdi:TT_P34_S2_Cost ,
+        osdi:TT_P34_Replacement ,
+        osdi:TT_P34_InterventionTreat ,
+        osdi:TT_P34_Disease ;
+    osdi:hasDescription "P34. Strategy replacement by type: a new follow-up strategy replaces the follow-up strategy of the disease and keeps its treatment strategy." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P35_S2
+osdi:TT_P35_S2 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_P35_S2_Cost ;
+    osdi:includedByModel osdi:TT_P35_Model ;
+    osdi:hasDescription "New follow-up strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P35_S2_Cost
+osdi:TT_P35_S2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P35_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up strategy S2" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P35_Replacement
+osdi:TT_P35_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_P35_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_P35_S2 ;
+    osdi:includedByModel osdi:TT_P35_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S2 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P35_InterventionTreat
+osdi:TT_P35_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P35_Replacement ;
+    osdi:includedByModel osdi:TT_P35_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S2 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P35_Disease
+osdi:TT_P35_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P35_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:includedByModel osdi:TT_P35_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P35_Experiment
+osdi:TT_P35_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P35_Model ;
+    osdi:hasDescription "Strategy replacement on a health condition without strategies: the new strategy is assigned to it." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P35_Model
+osdi:TT_P35_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P35_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P35_S2 ,
+        osdi:TT_P35_S2_Cost ,
+        osdi:TT_P35_Replacement ,
+        osdi:TT_P35_InterventionTreat ,
+        osdi:TT_P35_Disease ;
+    osdi:hasDescription "P35. Strategy replacement on a health condition without strategies: the new strategy is assigned to it." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_S3
+osdi:TT_P36_S3 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:usesHealthTechnology osdi:TT_P36_T1 ,
+        osdi:TT_P36_T2 ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:hasDescription "Follow-up strategy that uses T1 and T2" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_T1
+osdi:TT_P36_T1 rdf:type owl:NamedIndividual ,
+        osdi:HealthTechnology ;
+    osdi:hasCost osdi:TT_P36_T1_Cost ;
+    osdi:hasGuideline osdi:TT_P36_G1 ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:hasDescription "Health technology applied according to a guideline" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_T1_Cost
+osdi:TT_P36_T1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each application of T1" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_G1
+osdi:TT_P36_G1 rdf:type owl:NamedIndividual ,
+        osdi:Guideline ;
+    osdi:hasDuration osdi:TT_P36_G1_Duration ;
+    osdi:hasFrequency osdi:TT_P36_G1_Frequency ;
+    osdi:hasPeriod osdi:TT_P36_G1_Period ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:hasDescription "One application every 730 hours (12 per year) during 2 years" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_G1_Frequency
+osdi:TT_P36_G1_Frequency rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:hasDescription "One application per period" ;
+    osdi:hasExpectedValue "1.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_G1_Period
+osdi:TT_P36_G1_Period rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:hasDescription "Period of 730 hours" ;
+    osdi:hasExpectedValue "730.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_G1_Duration
+osdi:TT_P36_G1_Duration rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:hasDescription "Duration of 2 years" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_T2
+osdi:TT_P36_T2 rdf:type owl:NamedIndividual ,
+        osdi:HealthTechnology ;
+    osdi:hasCost osdi:TT_P36_T2_Cost ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:hasDescription "Health technology without guideline" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_T2_Cost
+osdi:TT_P36_T2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of T2" ;
+    osdi:hasExpectedValue "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_Replacement
+osdi:TT_P36_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_P36_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_P36_S3 ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_InterventionTreat
+osdi:TT_P36_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P36_Replacement ;
+    osdi:includedByModel osdi:TT_P36_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_Disease
+osdi:TT_P36_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P36_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:includedByModel osdi:TT_P36_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_Experiment
+osdi:TT_P36_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P36_Model ;
+    osdi:hasDescription "Costs of the health technologies of a strategy: with a guideline (frequency, period and duration) and without guideline." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P36_Model
+osdi:TT_P36_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P36_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P36_S3 ,
+        osdi:TT_P36_T1 ,
+        osdi:TT_P36_T1_Cost ,
+        osdi:TT_P36_G1 ,
+        osdi:TT_P36_G1_Frequency ,
+        osdi:TT_P36_G1_Period ,
+        osdi:TT_P36_G1_Duration ,
+        osdi:TT_P36_T2 ,
+        osdi:TT_P36_T2_Cost ,
+        osdi:TT_P36_Replacement ,
+        osdi:TT_P36_InterventionTreat ,
+        osdi:TT_P36_Disease ;
+    osdi:hasDescription "P36. Costs of the health technologies of a strategy: with a guideline (frequency, period and duration) and without guideline." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_S3
+osdi:TT_P37_S3 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:usesHealthTechnology osdi:TT_P37_T1 ;
+    osdi:includedByModel osdi:TT_P37_Model ;
+    osdi:hasDescription "Follow-up strategy that uses T1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_T1
+osdi:TT_P37_T1 rdf:type owl:NamedIndividual ,
+        osdi:HealthTechnology ;
+    osdi:hasCost osdi:TT_P37_T1_Cost ;
+    osdi:hasGuideline osdi:TT_P37_G1 ;
+    osdi:includedByModel osdi:TT_P37_Model ;
+    osdi:hasDescription "Health technology used by the follow-up strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_T1_Cost
+osdi:TT_P37_T1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P37_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each application of T1" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_G1
+osdi:TT_P37_G1 rdf:type owl:NamedIndividual ,
+        osdi:Guideline ;
+    osdi:hasCount osdi:TT_P37_G1_Count ;
+    osdi:includedByModel osdi:TT_P37_Model ;
+    osdi:hasDescription "Three applications" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_Replacement
+osdi:TT_P37_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_P37_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_P37_S3 ;
+    osdi:includedByModel osdi:TT_P37_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_InterventionTreat
+osdi:TT_P37_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P37_Replacement ;
+    osdi:includedByModel osdi:TT_P37_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_G1_Count
+osdi:TT_P37_G1_Count rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TT_P37_Model ;
+    osdi:hasDescription "Three applications" ;
+    osdi:hasExpectedValue "3.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_Disease
+osdi:TT_P37_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P37_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:includedByModel osdi:TT_P37_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_Experiment
+osdi:TT_P37_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P37_Model ;
+    osdi:hasDescription "Guideline with only a number of applications (hasCount): one-time cost at the start." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P37_Model
+osdi:TT_P37_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P37_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P37_S3 ,
+        osdi:TT_P37_T1 ,
+        osdi:TT_P37_T1_Cost ,
+        osdi:TT_P37_G1 ,
+        osdi:TT_P37_Replacement ,
+        osdi:TT_P37_InterventionTreat ,
+        osdi:TT_P37_G1_Count ,
+        osdi:TT_P37_Disease ;
+    osdi:hasDescription "P37. Guideline with only a number of applications (hasCount): one-time cost at the start." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_S3
+osdi:TT_P38_S3 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:usesHealthTechnology osdi:TT_P38_T1 ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:hasDescription "Follow-up strategy that uses T1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_T1
+osdi:TT_P38_T1 rdf:type owl:NamedIndividual ,
+        osdi:HealthTechnology ;
+    osdi:hasCost osdi:TT_P38_T1_Cost ;
+    osdi:hasGuideline osdi:TT_P38_G1 ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:hasDescription "Health technology used by the follow-up strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_T1_Cost
+osdi:TT_P38_T1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each application of T1" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_G1
+osdi:TT_P38_G1 rdf:type owl:NamedIndividual ,
+        osdi:Guideline ;
+    osdi:hasCount osdi:TT_P38_G1_Count ;
+    osdi:hasDuration osdi:TT_P38_G1_Duration ;
+    osdi:hasFrequency osdi:TT_P38_G1_Frequency ;
+    osdi:hasPeriod osdi:TT_P38_G1_Period ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:hasDescription "Twelve applications per year, during 2 years or 6 applications" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_Replacement
+osdi:TT_P38_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_P38_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_P38_S3 ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_InterventionTreat
+osdi:TT_P38_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P38_Replacement ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_G1_Frequency
+osdi:TT_P38_G1_Frequency rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:hasDescription "One application per period" ;
+    osdi:hasExpectedValue "1.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_G1_Period
+osdi:TT_P38_G1_Period rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:hasDescription "Period of 730 hours" ;
+    osdi:hasExpectedValue "730.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_G1_Duration
+osdi:TT_P38_G1_Duration rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:hasDescription "Duration of 2 years" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_G1_Count
+osdi:TT_P38_G1_Count rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TT_P38_Model ;
+    osdi:hasDescription "Six applications" ;
+    osdi:hasExpectedValue "6.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_Disease
+osdi:TT_P38_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P38_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:includedByModel osdi:TT_P38_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_Experiment
+osdi:TT_P38_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P38_Model ;
+    osdi:hasDescription "Guideline with frequency, duration and number of applications: the guideline ends with whatever comes first." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P38_Model
+osdi:TT_P38_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P38_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P38_S3 ,
+        osdi:TT_P38_T1 ,
+        osdi:TT_P38_T1_Cost ,
+        osdi:TT_P38_G1 ,
+        osdi:TT_P38_Replacement ,
+        osdi:TT_P38_InterventionTreat ,
+        osdi:TT_P38_G1_Frequency ,
+        osdi:TT_P38_G1_Period ,
+        osdi:TT_P38_G1_Duration ,
+        osdi:TT_P38_G1_Count ,
+        osdi:TT_P38_Disease ;
+    osdi:hasDescription "P38. Guideline with frequency, duration and number of applications: the guideline ends with whatever comes first." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_S3
+osdi:TT_P39_S3 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:usesHealthTechnology osdi:TT_P39_T1 ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:hasDescription "Follow-up strategy that uses T1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_T1
+osdi:TT_P39_T1 rdf:type owl:NamedIndividual ,
+        osdi:HealthTechnology ;
+    osdi:hasCost osdi:TT_P39_T1_Cost ;
+    osdi:hasGuideline osdi:TT_P39_G1 ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:hasDescription "Health technology used by the follow-up strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_T1_Cost
+osdi:TT_P39_T1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each application of T1" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_G1
+osdi:TT_P39_G1 rdf:type owl:NamedIndividual ,
+        osdi:Guideline ;
+    osdi:hasDuration osdi:TT_P39_G1_Duration ;
+    osdi:hasFrequency osdi:TT_P39_G1_Frequency ;
+    osdi:hasPeriod osdi:TT_P39_G1_Period ;
+    osdi:hasStartOffset osdi:TT_P39_G1_Offset ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:hasDescription "Twelve applications per year during 2 years, starting 64 years after the start" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_Replacement
+osdi:TT_P39_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_P39_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_P39_S3 ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_InterventionTreat
+osdi:TT_P39_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P39_Replacement ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_G1_Frequency
+osdi:TT_P39_G1_Frequency rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:hasDescription "One application per period" ;
+    osdi:hasExpectedValue "1.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_G1_Period
+osdi:TT_P39_G1_Period rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:hasDescription "Period of 730 hours" ;
+    osdi:hasExpectedValue "730.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_G1_Duration
+osdi:TT_P39_G1_Duration rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:hasDescription "Duration of 2 years" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_G1_Offset
+osdi:TT_P39_G1_Offset rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P39_Model ;
+    osdi:hasDescription "Start offset of 64 years" ;
+    osdi:hasExpectedValue "64.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_Disease
+osdi:TT_P39_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P39_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:includedByModel osdi:TT_P39_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_Experiment
+osdi:TT_P39_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P39_Model ;
+    osdi:hasDescription "Guideline with a start offset: the applications after death are not accounted." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P39_Model
+osdi:TT_P39_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P39_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P39_S3 ,
+        osdi:TT_P39_T1 ,
+        osdi:TT_P39_T1_Cost ,
+        osdi:TT_P39_G1 ,
+        osdi:TT_P39_Replacement ,
+        osdi:TT_P39_InterventionTreat ,
+        osdi:TT_P39_G1_Frequency ,
+        osdi:TT_P39_G1_Period ,
+        osdi:TT_P39_G1_Duration ,
+        osdi:TT_P39_G1_Offset ,
+        osdi:TT_P39_Disease ;
+    osdi:hasDescription "P39. Guideline with a start offset: the applications after death are not accounted." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_S3
+osdi:TT_P40_S3 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasGuideline osdi:TT_P40_G1 ;
+    osdi:usesHealthTechnology osdi:TT_P40_T1 ;
+    osdi:includedByModel osdi:TT_P40_Model ;
+    osdi:hasDescription "Follow-up strategy with a guideline, which uses T1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_T1
+osdi:TT_P40_T1 rdf:type owl:NamedIndividual ,
+        osdi:HealthTechnology ;
+    osdi:hasCost osdi:TT_P40_T1_Cost ;
+    osdi:includedByModel osdi:TT_P40_Model ;
+    osdi:hasDescription "Health technology without its own guideline" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_T1_Cost
+osdi:TT_P40_T1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P40_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each application of T1" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_G1
+osdi:TT_P40_G1 rdf:type owl:NamedIndividual ,
+        osdi:Guideline ;
+    osdi:hasCount osdi:TT_P40_G1_Count ;
+    osdi:includedByModel osdi:TT_P40_Model ;
+    osdi:hasDescription "Three applications" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_G1_Count
+osdi:TT_P40_G1_Count rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TT_P40_Model ;
+    osdi:hasDescription "Three applications" ;
+    osdi:hasExpectedValue "3.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_Replacement
+osdi:TT_P40_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_P40_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_P40_S3 ;
+    osdi:includedByModel osdi:TT_P40_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_InterventionTreat
+osdi:TT_P40_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P40_Replacement ;
+    osdi:includedByModel osdi:TT_P40_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_Disease
+osdi:TT_P40_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P40_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:includedByModel osdi:TT_P40_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_Experiment
+osdi:TT_P40_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P40_Model ;
+    osdi:hasDescription "Guideline of the strategy, used by a health technology without its own guideline." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P40_Model
+osdi:TT_P40_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P40_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P40_S3 ,
+        osdi:TT_P40_T1 ,
+        osdi:TT_P40_T1_Cost ,
+        osdi:TT_P40_G1 ,
+        osdi:TT_P40_G1_Count ,
+        osdi:TT_P40_Replacement ,
+        osdi:TT_P40_InterventionTreat ,
+        osdi:TT_P40_Disease ;
+    osdi:hasDescription "P40. Guideline of the strategy, used by a health technology without its own guideline." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_S1
+osdi:TT_P41_S1 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_P41_S1_Cost ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:hasDescription "Follow-up strategy of the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_S1_Cost
+osdi:TT_P41_S1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up strategy S1" ;
+    osdi:hasExpectedValue "200.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_L1
+osdi:TT_P41_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P41_L1_Cost ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:hasDescription "Treatment strategy of the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_L1_Cost
+osdi:TT_P41_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the treatment strategy L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_S2
+osdi:TT_P41_S2 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_P41_S2_Cost ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:hasDescription "New follow-up strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_S2_Cost
+osdi:TT_P41_S2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up strategy S2" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_L2
+osdi:TT_P41_L2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P41_L2_Cost ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:hasDescription "New treatment strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_L2_Cost
+osdi:TT_P41_L2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the treatment strategy L2" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_NewStrategies
+osdi:TT_P41_NewStrategies rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TT_P41_S2 ,
+        osdi:TT_P41_L2 ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:hasDescription "New follow-up and treatment strategies" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_Replacement
+osdi:TT_P41_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_P41_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_P41_NewStrategies ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:hasDescription "Replaces the follow-up and treatment strategies of the disease by S2 and L2" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_InterventionTreat
+osdi:TT_P41_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P41_Replacement ;
+    osdi:includedByModel osdi:TT_P41_Model ;
+    osdi:hasDescription "Replaces the follow-up and treatment strategies of the disease by S2 and L2" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_Disease
+osdi:TT_P41_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P41_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P41_S1 ,
+        osdi:TT_P41_L1 ;
+    osdi:includedByModel osdi:TT_P41_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_Experiment
+osdi:TT_P41_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P41_Model ;
+    osdi:hasDescription "Strategy replacement by a group: each member replaces the strategies of its type." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P41_Model
+osdi:TT_P41_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P41_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P41_S1 ,
+        osdi:TT_P41_S1_Cost ,
+        osdi:TT_P41_L1 ,
+        osdi:TT_P41_L1_Cost ,
+        osdi:TT_P41_S2 ,
+        osdi:TT_P41_S2_Cost ,
+        osdi:TT_P41_L2 ,
+        osdi:TT_P41_L2_Cost ,
+        osdi:TT_P41_NewStrategies ,
+        osdi:TT_P41_Replacement ,
+        osdi:TT_P41_InterventionTreat ,
+        osdi:TT_P41_Disease ;
+    osdi:hasDescription "P41. Strategy replacement by a group: each member replaces the strategies of its type." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

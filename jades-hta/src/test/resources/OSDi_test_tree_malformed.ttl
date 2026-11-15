@@ -2349,4 +2349,292 @@ osdi:TT_N16_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "N16. Interventions whose target is a manifestation that depends on a development (ManY, sub-progression of DevA). A patient that presents ManY also presents DevA, but a manifestation may depend on several developments, so this is not supported yet in decision trees and the generation of the tree must fail." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N17_S2
+osdi:TT_N17_S2 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_N17_S2_Cost ;
+    osdi:includedByModel osdi:TT_N17_Model ;
+    osdi:hasDescription "New follow-up strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N17_S2_Cost
+osdi:TT_N17_S2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_N17_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up strategy S2" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N17_S4
+osdi:TT_N17_S4 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:includedByModel osdi:TT_N17_Model ;
+    osdi:hasDescription "Another follow-up strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N17_Replacement1
+osdi:TT_N17_Replacement1 rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_N17_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_N17_S2 ;
+    osdi:includedByModel osdi:TT_N17_Model ;
+    osdi:hasDescription "Replaces the follow-up strategy of the disease by S2" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N17_Replacement2
+osdi:TT_N17_Replacement2 rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_N17_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_N17_S4 ;
+    osdi:includedByModel osdi:TT_N17_Model ;
+    osdi:hasDescription "Replaces the follow-up strategy of the disease by S4" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N17_InterventionTreat
+osdi:TT_N17_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_N17_Replacement1 ,
+        osdi:TT_N17_Replacement2 ;
+    osdi:includedByModel osdi:TT_N17_Model ;
+    osdi:hasDescription "Two strategy replacements of the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N17_Disease
+osdi:TT_N17_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_N17_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:includedByModel osdi:TT_N17_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N17_Experiment
+osdi:TT_N17_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N17_Model ;
+    osdi:hasDescription "Two strategy replacements of the same health condition in the same arm." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N17_Model
+osdi:TT_N17_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N17_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_N17_S2 ,
+        osdi:TT_N17_S2_Cost ,
+        osdi:TT_N17_S4 ,
+        osdi:TT_N17_Replacement1 ,
+        osdi:TT_N17_Replacement2 ,
+        osdi:TT_N17_InterventionTreat ,
+        osdi:TT_N17_Disease ;
+    osdi:hasDescription "N17. Two strategy replacements of the same health condition in the same arm." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N18_EffectMagnitude
+osdi:TT_N18_EffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Factor ;
+    osdi:includedByModel osdi:TT_N18_Model ;
+    osdi:hasDescription "Factor applied to the disease" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N18_Effect
+osdi:TT_N18_Effect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_N18_Disease ;
+    osdi:hasEffectMagnitude osdi:TT_N18_EffectMagnitude ;
+    osdi:includedByModel osdi:TT_N18_Model ;
+    osdi:hasDescription "A generic effect cannot affect a health condition" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N18_InterventionTreat
+osdi:TT_N18_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_N18_Effect ;
+    osdi:includedByModel osdi:TT_N18_Model ;
+    osdi:hasDescription "Intervention with a generic effect on the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N18_Disease
+osdi:TT_N18_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_N18_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:includedByModel osdi:TT_N18_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N18_Experiment
+osdi:TT_N18_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N18_Model ;
+    osdi:hasDescription "Generic effect that affects a health condition." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N18_Model
+osdi:TT_N18_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N18_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_N18_EffectMagnitude ,
+        osdi:TT_N18_Effect ,
+        osdi:TT_N18_InterventionTreat ,
+        osdi:TT_N18_Disease ;
+    osdi:hasDescription "N18. Generic effect that affects a health condition." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_S3
+osdi:TT_N19_S3 rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:usesHealthTechnology osdi:TT_N19_T1 ;
+    osdi:includedByModel osdi:TT_N19_Model ;
+    osdi:hasDescription "Follow-up strategy that uses T1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_T1
+osdi:TT_N19_T1 rdf:type owl:NamedIndividual ,
+        osdi:HealthTechnology ;
+    osdi:hasCost osdi:TT_N19_T1_Cost ;
+    osdi:hasGuideline osdi:TT_N19_G1 ;
+    osdi:includedByModel osdi:TT_N19_Model ;
+    osdi:hasDescription "Health technology used by the follow-up strategy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_T1_Cost
+osdi:TT_N19_T1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_N19_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each application of T1" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_G1
+osdi:TT_N19_G1 rdf:type owl:NamedIndividual ,
+        osdi:Guideline ;
+    osdi:hasCount osdi:TT_N19_G1_Count ;
+    osdi:hasSubGuideline osdi:TT_N19_G2 ;
+    osdi:includedByModel osdi:TT_N19_Model ;
+    osdi:hasDescription "Three applications, decomposed into a sub-guideline" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_Replacement
+osdi:TT_N19_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_N19_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_N19_S3 ;
+    osdi:includedByModel osdi:TT_N19_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_InterventionTreat
+osdi:TT_N19_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_N19_Replacement ;
+    osdi:includedByModel osdi:TT_N19_Model ;
+    osdi:hasDescription "Assigns the follow-up strategy S3 to the disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_G1_Count
+osdi:TT_N19_G1_Count rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TT_N19_Model ;
+    osdi:hasDescription "Three applications" ;
+    osdi:hasExpectedValue "3.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_G2
+osdi:TT_N19_G2 rdf:type owl:NamedIndividual ,
+        osdi:Guideline ;
+    osdi:includedByModel osdi:TT_N19_Model ;
+    osdi:hasDescription "Sub-guideline" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_Disease
+osdi:TT_N19_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_N19_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:includedByModel osdi:TT_N19_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_Experiment
+osdi:TT_N19_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N19_Model ;
+    osdi:hasDescription "Guideline with sub-guidelines (not supported yet)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N19_Model
+osdi:TT_N19_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N19_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_N19_S3 ,
+        osdi:TT_N19_T1 ,
+        osdi:TT_N19_T1_Cost ,
+        osdi:TT_N19_G1 ,
+        osdi:TT_N19_Replacement ,
+        osdi:TT_N19_InterventionTreat ,
+        osdi:TT_N19_G1_Count ,
+        osdi:TT_N19_G2 ,
+        osdi:TT_N19_Disease ;
+    osdi:hasDescription "N19. Guideline with sub-guidelines (not supported yet)." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

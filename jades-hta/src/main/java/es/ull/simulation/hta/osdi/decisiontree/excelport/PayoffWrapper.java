@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import org.apache.poi.ss.util.CellReference;
 import es.ull.simulation.hta.osdi.OSDiLogger;
 import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode;
+import es.ull.simulation.hta.osdi.decisiontree.StrategyCosts.GuidelineCost;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
@@ -50,6 +51,20 @@ public class PayoffWrapper {
      * @param constraint The temporal constraint of the node that contributed the parameter (may be null)
      */
     private record ParameterEntry(ParameterWrapper parameter, TemporalConstraint constraint) {}
+    /**
+     * A cost that applies according to a guideline, contributed by a node of the tree, together with the temporal constraint of such node.
+     * @param cost The cost that applies according to a guideline
+     * @param constraint The temporal constraint of the node that contributed the cost (may be null)
+     */
+    private record GuidelineEntry(GuidelineCost cost, TemporalConstraint constraint) {}
+    /**
+     * Hours per year, used to translate the period of a guideline (in hours) into years.
+     */
+    private static final String HOURS_PER_YEAR = "8760";
+    /**
+     * The costs that apply according to a guideline, contributed by the nodes along the path, in order of appearance.
+     */
+    private final ArrayList<GuidelineEntry> guidelineEntries;
     /**
      * The list of probabilities associated with this node, which is used to calculate the expected value of the decision represented by this node.
      */
@@ -93,6 +108,7 @@ public class PayoffWrapper {
         this.populationAgeName = populationAgeName;
         this.probabilities = new ArrayList<>();
         this.costEntries = new ArrayList<>();
+        this.guidelineEntries = new ArrayList<>();
         this.disutilityEntries = new ArrayList<>();
         this.effects = new TreeSet<>();
         this.effectEntries = new ArrayList<>();
@@ -107,6 +123,7 @@ public class PayoffWrapper {
         this.populationAgeName = original.populationAgeName;
         this.probabilities = new ArrayList<>(original.probabilities);
         this.costEntries = new ArrayList<>(original.costEntries);
+        this.guidelineEntries = new ArrayList<>(original.guidelineEntries);
         this.disutilityEntries = new ArrayList<>(original.disutilityEntries);
         this.effects = new TreeSet<>(original.effects);
         this.effectEntries = new ArrayList<>(original.effectEntries);
@@ -209,6 +226,10 @@ public class PayoffWrapper {
         for (ParameterWrapper param : node.getCostParameters()) {
             this.costEntries.add(new ParameterEntry(param, constraint));
         }
+        // Add the costs that apply according to a guideline
+        for (GuidelineCost cost : node.getGuidelineCosts()) {
+            this.guidelineEntries.add(new GuidelineEntry(cost, constraint));
+        }
         // Add disutility parameters from the node
         for (ParameterWrapper param : node.getDisutilityParameters()) {
             this.disutilityEntries.add(new ParameterEntry(param, constraint));
@@ -247,6 +268,78 @@ public class PayoffWrapper {
             selected.add(entry);
         }
         return selected;
+    }
+
+    /**
+     * Selects the costs that apply according to a guideline that must be included in the cost formula. All of them are included, unless the
+     * combination method counts shared items once; in such case, a cost shared by several nodes (same cost parameter and guideline) is included once.
+     * @param method The combination method of the costs.
+     * @return The selected entries.
+     * @throws UnsupportedOSDiFeatureException If a cost that must be counted once is shared by nodes with different temporal constraints.
+     */
+    private List<GuidelineEntry> selectGuidelineEntries(CombinationMethod method) throws UnsupportedOSDiFeatureException {
+        if (!method.countsSharedItemsOnce()) {
+            return guidelineEntries;
+        }
+        final ArrayList<GuidelineEntry> selected = new ArrayList<>();
+        final Map<String, GuidelineEntry> firstEntries = new HashMap<>();
+        for (GuidelineEntry entry : guidelineEntries) {
+            final GuidelineEntry first = firstEntries.putIfAbsent(entry.cost().key(), entry);
+            if (first != null) {
+                if (!sameConstraint(first.constraint(), entry.constraint())) {
+                    throw new UnsupportedOSDiFeatureException("The cost " + entry.cost().unitCost().getShortName() + " of the guideline " + entry.cost().guidelineName()
+                        + " is shared by several items with different temporal constraints, and the experiment combines it with " + method
+                        + ". Combining shared costs with different onset or end times is not supported.");
+                }
+                continue;
+            }
+            selected.add(entry);
+        }
+        return selected;
+    }
+
+    /**
+     * Returns the formula of a cost that applies according to a guideline (see {@link GuidelineCost}). The guideline starts at the start of the
+     * node that contributed it (MAX(0, Onset - Age0), or 0 if the node has no onset age) plus the start offset of the guideline, and it is
+     * limited to the end of the node (MIN(LY, End - Age0), or LY if the node has no end age). With r = frequency * 8760 / period applications per year:
+     * <ul>
+     * <li>With a frequency, the cost is an annual payoff r * c from the start to MIN(end of the node, start + duration, start + count / r), where
+     * the missing terms are ignored: PV(rate, Duration, -r * c) / (1 + rate) ^ Start.</li>
+     * <li>Without a frequency, the cost is a one-time payoff N * c at the start, where N is the count (1 by default), only if the start is not
+     * after the end of the node: N * c / (1 + rate) ^ Start.</li>
+     * </ul>
+     * @param entry The cost and the temporal constraint of the node that contributed it.
+     * @param cellUndiscountedLY The cell reference for the undiscounted life years.
+     * @return The formula of the cost.
+     * @throws MalformedOSDiModelException If more than one effect of the path replaces the same parameter.
+     */
+    private String getGuidelineCostFormula(GuidelineEntry entry, CellReference cellUndiscountedLY) throws MalformedOSDiModelException {
+        final GuidelineCost cost = entry.cost();
+        final String discount = HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_COSTS.getName();
+        final String ly = cellUndiscountedLY.formatAsString();
+        final Optional<ParameterWrapper> onsetAge = (entry.constraint() == null) ? Optional.empty() : entry.constraint().startTime();
+        final Optional<ParameterWrapper> endAge = (entry.constraint() == null) ? Optional.empty() : entry.constraint().endTime();
+        final String nodeStart = onsetAge.isPresent() ? ExcelFormulaLibrary.MAX.getFormula("0, " + onsetAge.get().getShortName() + " - " + populationAgeName) : "0";
+        final String nodeEnd = endAge.isPresent() ? ExcelFormulaLibrary.MIN.getFormula(ly + ", " + endAge.get().getShortName() + " - " + populationAgeName) : ly;
+        final String start = cost.startOffset().isPresent() ? "(" + nodeStart + " + " + getParameterTextFormula(cost.startOffset().get()) + ")" : nodeStart;
+        final String unitCost = getParameterTextFormula(cost.unitCost());
+        if (cost.frequency().isEmpty()) {
+            final String amount = cost.count().isPresent() ? "(" + getParameterTextFormula(cost.count().get()) + " * " + unitCost + ")" : unitCost;
+            return ExcelFormulaLibrary.IF.getFormula(start + " <= " + nodeEnd, FormulaLibrary.PUNCTUAL_DISCOUNT.getFormula(amount, discount, start), "0");
+        }
+        final String frequency = getParameterTextFormula(cost.frequency().get());
+        final String rate = cost.period().isPresent() ? "(" + frequency + " * " + HOURS_PER_YEAR + " / " + getParameterTextFormula(cost.period().get()) + ")" : frequency;
+        final ArrayList<String> ends = new ArrayList<>();
+        ends.add(nodeEnd);
+        if (cost.duration().isPresent()) {
+            ends.add(start + " + " + getParameterTextFormula(cost.duration().get()));
+        }
+        if (cost.count().isPresent()) {
+            ends.add(start + " + " + getParameterTextFormula(cost.count().get()) + " / " + rate);
+        }
+        final String end = (ends.size() == 1) ? nodeEnd : ExcelFormulaLibrary.MIN.getFormula(String.join(", ", ends));
+        final String duration = ExcelFormulaLibrary.MAX.getFormula("0, " + end + " - " + start);
+        return FormulaLibrary.FUTURE_CONT_DISCOUNT.getFormula(discount, duration, "(" + rate + " * " + unitCost + ")", start);
     }
 
     /**
@@ -303,7 +396,7 @@ public class PayoffWrapper {
     public String getCostFormula(CellReference cellUndiscountedLY, CostCombinationMethod method) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
         final ArrayList<String> costTexts = new ArrayList<>();
         // If there are no cost parameters, return an empty string
-        if (costEntries.isEmpty()) {
+        if (costEntries.isEmpty() && guidelineEntries.isEmpty()) {
             return "";
         }
 
@@ -313,6 +406,9 @@ public class PayoffWrapper {
             String text = getParameterTextFormula(param);
             text = applyDiscountToFormula(text, HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_COSTS.getName(), ((SpecificInformationForCost) param.getSpecificInformation()).appliesOneTime(), entry.constraint(), cellUndiscountedLY);
             costTexts.add(text);
+        }
+        for (GuidelineEntry entry : selectGuidelineEntries(method)) {
+            costTexts.add(getGuidelineCostFormula(entry, cellUndiscountedLY));
         }
         if (costTexts.size() == 1) {
             // If there is only one cost parameter, we can return it directly

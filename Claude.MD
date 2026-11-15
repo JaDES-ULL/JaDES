@@ -44,9 +44,9 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P25, P27–P32 (P26 pasó a ser N13; P28–P32: manifestaciones agudas) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P25, P27–P41 (P26 pasó a ser N13; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
-| `OSDi_test_tree_malformed.ttl` | N01–N16 (casos que deben lanzar excepción) |
+| `OSDi_test_tree_malformed.ttl` | N01–N19 (casos que deben lanzar excepción) |
 
 Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
 
@@ -105,13 +105,18 @@ Convenciones:
 - Solo cuentan los objetivos incluidos en el modelo (las ontologías de prueba comparten intervenciones entre modelos). Sin objetivo: la enfermedad, con aviso. Más de un objetivo (N15), un objetivo ajeno a la enfermedad o intervenciones comparadas con objetivos distintos (N14): `MalformedOSDiModelException`. Etapas y manifestaciones propias de un desarrollo como objetivo (N16): `UnsupportedOSDiFeatureException`.
 - Objetivo en la enfermedad: el árbol no cambia. Objetivo en un elemento T: el árbol empieza en los pacientes que presentan T (rama única con probabilidad 1; se ignoran su riesgo y sus reglas). Se mantienen los pagos y efectos de la enfermedad salvo su muerte inmediata (ocurre al inicio de la enfermedad). Solo se incluye lo que depende de T: las manifestaciones propias de un desarrollo (I04); nada más si T es una manifestación (I03).
 - Si T es aguda, los pagos anuales de la intervención se ignoran con aviso. El modelo de cribado neonatal solo admite la enfermedad como objetivo.
+
+**Estrategias (D2):** las intervenciones no declaran estrategias (`hasStrategy` en una intervención: `MalformedOSDiModelException`); las cambian con un `StrategyReplacementEffect` (`affects`: una condición de salud; `hasReplacementStrategy`: una estrategia o un grupo; sin magnitud, que se ignora con aviso).
+- La sustitución se aplica en el brazo de la intervención y por tipo (detección = cribado o diagnóstico; seguimiento; tratamiento): cada estrategia nueva sustituye a las de su tipo de la condición de salud, o se le asigna si no tenía; las de otros tipos se mantienen (P34, P35, P41). Dos sustituciones sobre la misma condición en un brazo (N17), un efecto de otra clase que afecte a una condición de salud (N18) o una sustitución declarada por la enfermedad o una progresión: `MalformedOSDiModelException`.
+- Costes y utilidades de las estrategias (seguimiento y tratamiento) se suman a los propios del elemento (P33): el modelador elige qué incluye en cada modelo, porque solo se lee lo que el modelo incluye.
+- Coste de una estrategia: sus costes propios más los de las tecnologías que usa. La pauta de la tecnología (o, si no tiene, la de la estrategia) hace que su coste sea por aplicación (c): con r = `hasFrequency` × 8760 / `hasPeriod` (sin periodo, la frecuencia es anual), inicio = inicio del nodo + `hasStartOffset` y L = MIN(`hasDuration`, `hasCount` / r), pago anual r·c durante [inicio, inicio + L] recortado al nodo y a la vida (P36, P38, P39); sin frecuencia, N·c de una vez en el inicio, con N = `hasCount` o 1 (P37, P40). Sin pauta, los costes de la tecnología son pagos normales.
  
 ## Divergencias conocidas entre árbol y DES
  
 - El DES no simula desarrollos (sin riesgo, sin pagos, sin estado) e ignora las reglas de combinación de progresiones; las manifestaciones solo se excluyen entre sí mediante `supersedesClinicalProgression`.
 - En el DES, una manifestación sin riesgo solo ocurre a través de `hasInitialProportion`; en el árbol está siempre activa.
 - El árbol rechaza `hasInitialProportion` con `UnsupportedOSDiFeatureException` (N07).
-- El DES ignora las estrategias y los efectos cuya causa no es una intervención; en el árbol se aplican los efectos de intervenciones, enfermedad y progresiones.
+- El DES ignora las estrategias (y las sustituciones de estrategia, con aviso) y los efectos cuya causa no es una intervención; en el árbol se aplican los efectos de intervenciones, enfermedad y progresiones.
 - `Pathway` (con `requires`) solo se admite en el DES; el árbol lo rechaza.
 - Manifestaciones agudas: el árbol cuenta un episodio y el DES todos los que ocurran; con varios pagos de una vez, el árbol los suma y el DES usa el primero (con aviso).
 - El DES no lee el objetivo de las intervenciones: siempre se aplican desde el inicio de la simulación.
@@ -121,13 +126,13 @@ Convenciones:
 - El árbol rechaza un `Pathway` como caracterización del riesgo (sin test) y un riesgo cuyo `DataItemType` no sea una probabilidad (N04); `DI_TimeToEvent` se convierte en un parámetro sintético `P_…`.
 - El árbol ignora `supersedesClinicalProgression` y `hasDuration`; `hasFrequency` solo se lee en las manifestaciones agudas (véase «Manifestaciones agudas»).
 - `SequentialCombinationRule` se trata como coexistente sin aviso en el árbol; no se leen `hasFirst` ni `hasNext`. El DES ignora todas las reglas con aviso.
-- Estrategias (`hasStrategy` en intervenciones, enfermedad y progresiones): el árbol solo usa los costes y utilidades de estrategias FOLLOW_UP o TREATMENT, y solo si el elemento no tiene costes o utilidades propios. Se ignoran `followedByStrategy` (con aviso), `hasConditionExpression`, `hasGuideline` (con aviso) y `failsIf`.
+- Estrategias en el árbol: no se leen `followedByStrategy` (con aviso), `hasConditionExpression` de la estrategia ni `failsIf`. Las pautas con subpautas, `hasConditionExpression` o edades de aplicación se rechazan (`UnsupportedOSDiFeatureException`, N19); TODO: soportarlas. `hasDose` no se usa. El NBS rechaza las sustituciones de estrategia (pendiente de la fase siguiente).
 - `Group` no tiene wrapper; no se leen `hasGroupItem` ni `hasProportionWithinGroup`.
 - Efectos sobre un tiempo hasta el evento: el árbol los rechaza (N12, N13), porque un riesgo `DI_TimeToEvent` no funciona todavía en árboles (el parámetro sintético `P_…` no se escribe en el Excel).
 - Las operaciones lineales (Factor, Ratio, MeanDifference) sobre una probabilidad no se recortan a [0, 1]; solo se avisa si los dos valores son deterministas.
 - MAX aplicado a totales de toda la vida: no es correcto si los elementos tienen ventanas temporales distintas.
 - El horizonte temporal del experimento no se transfiere al Excel (la plantilla usa 150).
-- Huecos de cobertura: estrategias (ningún test las ejercita), guías, etapas y reglas secuenciales, rechazo de `Pathway` en árboles, aserciones sobre vías y manifestaciones agudas en el DES, parámetros probabilísticos o calculados.
+- Huecos de cobertura: estrategias con utilidades, pautas con descuento o con ventanas temporales del nodo, etapas y reglas secuenciales, rechazo de `Pathway` en árboles, aserciones sobre vías y manifestaciones agudas en el DES, parámetros probabilísticos o calculados.
 - Los recursos `/OSDi.ttl`, `/skos.rdf` y `/time.owl` están en la raíz del jar; conviene moverlos a una ruta de paquete para evitar colisiones en el classpath.
 ## Notas técnicas
  

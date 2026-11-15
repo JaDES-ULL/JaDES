@@ -23,6 +23,7 @@ import es.ull.simulation.hta.osdi.ontology.ClinicalProgressionWrapper;
 import es.ull.simulation.hta.osdi.ontology.DiseaseWrapper;
 import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
+import es.ull.simulation.hta.osdi.ontology.HealthConditionWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
 import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
 import es.ull.simulation.hta.osdi.ontology.ModelWrapper;
@@ -37,6 +38,7 @@ import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleType;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleWrapper;
 import es.ull.simulation.hta.osdi.ontology.ResourceUsageSKOSCategory;
+import es.ull.simulation.hta.osdi.ontology.StrategyWrapper;
 import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
 
 /**
@@ -77,6 +79,11 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
      * {@link #resolveInterventionTarget()}).
      */
     private final Optional<ClinicalProgressionWrapper> targetProgression;
+    /**
+     * The strategies that replace those of each health condition in the arm being generated, indexed by the IRI of the health condition
+     * (see {@link #generate(String, Map)}).
+     */
+    private Map<IRI, Set<StrategyWrapper>> armReplacements = Map.of();
 
     /**
      * Constructs a disease part for the given NBS tree model and part name.
@@ -214,8 +221,102 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         return diseaseWrapper;
     }
 
+    /**
+     * Generates the sub-tree of the disease without strategy replacements (see {@link #generate(String, Map)}).
+     */
     @Override
     public BranchDestinationNode generate(String name) throws MalformedOSDiModelException, MalformedSimulationModelException, UnsupportedOSDiFeatureException {
+        return generate(name, Map.of());
+    }
+
+    /**
+     * Generates the sub-tree of the disease for an arm of the tree. The strategy replacements of the intervention of the arm (decision D2 of
+     * docs/osdi-1.3-diseno.md) change the strategies of the health conditions they affect, wherever such health conditions generate a node of the
+     * sub-tree (see {@link #getArmStrategies(HealthConditionWrapper)}).
+     * @param name The name of the root node of the sub-tree
+     * @param replacements The strategies that replace those of each health condition in this arm, indexed by the IRI of the health condition
+     * @return The root node of the sub-tree
+     * @throws MalformedOSDiModelException If the OSDi model is malformed
+     * @throws MalformedSimulationModelException If the simulation model is malformed
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
+     */
+    public BranchDestinationNode generate(String name, Map<IRI, Set<StrategyWrapper>> replacements) throws MalformedOSDiModelException, MalformedSimulationModelException, UnsupportedOSDiFeatureException {
+        this.armReplacements = replacements;
+        try {
+            return generateArm(name);
+        }
+        finally {
+            this.armReplacements = Map.of();
+        }
+    }
+
+    /**
+     * Returns the strategies of a health condition in the current arm of the tree. A strategy replacement of the intervention of the arm acts by type
+     * of strategy (detection, i.e. screening or diagnosis; follow-up; or treatment): each replacement strategy replaces the strategies of its type
+     * that the health condition declares, or it is assigned to the health condition if it had none of that type. The strategies of other types are kept.
+     * @param healthCondition A health condition (the disease or one of its progressions)
+     * @return The strategies of the health condition in the current arm.
+     * @throws MalformedOSDiModelException If the OSDi model is malformed
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
+     */
+    private Set<StrategyWrapper> getArmStrategies(HealthConditionWrapper healthCondition) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        final Set<StrategyWrapper> strategies = new TreeSet<>(healthCondition.getStrategies());
+        final Set<StrategyWrapper> replacement = armReplacements.get(healthCondition.getIndividualIRI());
+        if (replacement == null) {
+            return strategies;
+        }
+        final Set<StrategyKind> replacedKinds = new TreeSet<>();
+        for (StrategyWrapper strategy : replacement) {
+            replacedKinds.add(StrategyKind.of(strategy));
+        }
+        strategies.removeIf(strategy -> replacedKinds.contains(StrategyKind.of(strategy)));
+        strategies.addAll(replacement);
+        return strategies;
+    }
+
+    /**
+     * The types of strategy used to decide which strategies a strategy replacement replaces.
+     */
+    private enum StrategyKind {
+        DETECTION, FOLLOW_UP, TREATMENT;
+
+        static StrategyKind of(StrategyWrapper strategy) {
+            switch (strategy.getStrategyType()) {
+                case DIAGNOSIS_STRATEGY:
+                case SCREENING_STRATEGY:
+                    return DETECTION;
+                case FOLLOW_UP_STRATEGY:
+                    return FOLLOW_UP;
+                case LINE_OF_THERAPY:
+                default:
+                    return TREATMENT;
+            }
+        }
+    }
+
+    /**
+     * Checks that a health condition does not declare strategy replacement effects, which are reserved to interventions (decision D2).
+     * @param healthCondition A health condition
+     * @throws MalformedOSDiModelException If the health condition declares a strategy replacement effect
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
+     */
+    private static void checkNoStrategyReplacement(HealthConditionWrapper healthCondition) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        for (EffectWrapper effect : healthCondition.getEffects()) {
+            if (EffectType.STRATEGY_REPLACEMENT_EFFECT.equals(effect.getEffectType())) {
+                throw new MalformedOSDiModelException("The health condition " + healthCondition.getShortName() + " declares the strategy replacement effect " + effect.getShortName()
+                    + ". Only interventions can replace strategies.");
+            }
+        }
+    }
+
+    private BranchDestinationNode generateArm(String name) throws MalformedOSDiModelException, MalformedSimulationModelException, UnsupportedOSDiFeatureException {
+        checkNoStrategyReplacement(diseaseWrapper);
+        for (ClinicalProgressionWrapper progression : diseaseWrapper.getDevelopments()) {
+            checkNoStrategyReplacement(progression);
+        }
+        for (ClinicalProgressionWrapper progression : diseaseWrapper.getManifestations()) {
+            checkNoStrategyReplacement(progression);
+        }
         for (ClinicalProgressionWrapper manifestation : diseaseWrapper.getManifestations()) {
             if (ClinicalProgressionType.ACUTE_MANIFESTATION.equals(manifestation.getClinicalProgressionType())) {
                 checkAcuteManifestation(manifestation);
@@ -230,8 +331,8 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             }
         }
         final BranchDestinationNode rootNode = new BranchDestinationNode(parentTreeModel, name);
-        rootNode.updateCosts(diseaseWrapper, Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
-        rootNode.updateUtility(diseaseWrapper, Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
+        rootNode.updateCosts(diseaseWrapper, getArmStrategies(diseaseWrapper), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
+        rootNode.updateUtility(diseaseWrapper, getArmStrategies(diseaseWrapper), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
         rootNode.updateEffects(diseaseWrapper, EffectType.GENERAL_EFFECT);
         rootNode.updateEffects(diseaseWrapper, EffectType.MORTALITY_RATE_EFFECT);
         rootNode.updateEffects(diseaseWrapper, EffectType.LIFE_EXPECTANCY_REDUCTION_EFFECT);
@@ -640,8 +741,8 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         if (temporalConstraint.isPresent()) {
             node.setTemporalConstraint(temporalConstraint.get());
         }
-        node.updateCosts(progression, Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
-        node.updateUtility(progression, Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
+        node.updateCosts(progression, getArmStrategies(progression), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
+        node.updateUtility(progression, getArmStrategies(progression), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
         node.updateEffects(progression);
         if (ClinicalProgressionType.ACUTE_MANIFESTATION.equals(progression.getClinicalProgressionType())) {
             final String owner = "The acute manifestation " + progression.getShortName();

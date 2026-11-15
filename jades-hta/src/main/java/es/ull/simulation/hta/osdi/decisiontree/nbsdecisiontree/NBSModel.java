@@ -17,6 +17,8 @@ import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.DetectionInterventionWrapper;
 import es.ull.simulation.hta.osdi.ontology.DiseaseWrapper;
+import es.ull.simulation.hta.osdi.ontology.EffectType;
+import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.EpidemiologicCharacterizationType;
 import es.ull.simulation.hta.osdi.ontology.ExperimentWrapper;
 import es.ull.simulation.hta.osdi.ontology.InterventionType;
@@ -99,6 +101,19 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
         if (diseaseGenerator.getTargetProgression().isPresent()) {
             throw new UnsupportedOSDiFeatureException("The interventions of the newborn screening model target " + diseaseGenerator.getTargetProgression().get().getShortName()
                 + ". Newborn screening models only support interventions whose target is the disease.");
+        }
+        // TODO: Read the screening and diagnosis strategies of each arm from the strategy replacements of the interventions (see docs/osdi-1.3-diseno.md)
+        for (InterventionWrapper intervention : modelWrapper.getInterventionIndividuals()) {
+            if (!intervention.getStrategies().isEmpty()) {
+                throw new MalformedOSDiModelException("The intervention " + intervention.getShortName() + " declares strategies (" + intervention.getStrategies()
+                    + "). Interventions must declare their strategies through a strategy replacement effect (" + OSDiClass.STRATEGY_REPLACEMENT_EFFECT.getShortName() + ").");
+            }
+            for (EffectWrapper effect : intervention.getEffects()) {
+                if (EffectType.STRATEGY_REPLACEMENT_EFFECT.equals(effect.getEffectType())) {
+                    throw new UnsupportedOSDiFeatureException("The intervention " + intervention.getShortName() + " defines the strategy replacement effect " + effect.getShortName()
+                        + ". Newborn screening models do not support strategy replacements yet.");
+                }
+            }
         }
         if (modelWrapper.getDiseaseIndividuals().size() > 1)
             log.warn("This type of model requires exactly one disease. Found " + modelWrapper.getDiseaseIndividuals().size() + ". Using " + diseaseWrapper.getShortName() + " as the disease for the model and ignoring the rest.");

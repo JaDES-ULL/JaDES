@@ -2,6 +2,7 @@ package es.ull.simulation.hta.osdi.decisiontree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -51,6 +52,10 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
      */
     private final Set<EffectWrapper> effects;
     /**
+     * The costs of the health technologies of the strategies of this node that apply according to a guideline (see {@link StrategyCosts}).
+     */
+    private final ArrayList<StrategyCosts.GuidelineCost> guidelineCosts;
+    /**
      * The temporal constraint for this node, which defines the time period during which this node is valid. Such restrictions are used to 
      * properly compute the payoffs of the decision tree.
      */
@@ -83,6 +88,7 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
         this.costParameters = new ArrayList<>();
         this.disutilityParameters = new TreeSet<>();
         this.effects = new TreeSet<>();
+        this.guidelineCosts = new ArrayList<>();
         this.temporalConstraint = null; // Initialize temporal constraint as null
         this.successors = new ArrayList<>();
     }
@@ -141,6 +147,22 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
      */
     public Set<EffectWrapper> getEffects() {
         return effects;
+    }
+
+    /**
+     * Returns the costs of the health technologies of the strategies of this node that apply according to a guideline.
+     * @return The costs that apply according to a guideline.
+     */
+    public List<StrategyCosts.GuidelineCost> getGuidelineCosts() {
+        return guidelineCosts;
+    }
+
+    /**
+     * Adds costs that apply according to a guideline to this node.
+     * @param guidelineCosts The costs to add.
+     */
+    public void addGuidelineCosts(Collection<StrategyCosts.GuidelineCost> guidelineCosts) {
+        this.guidelineCosts.addAll(guidelineCosts);
     }
 
     /**
@@ -252,54 +274,78 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
         return successors.isEmpty() && (defaultSuccessor == null);
     }
 
+    /**
+     * Adds the costs of an element of the model, including those of its own strategies (see {@link #updateCosts(IModelItemWithStrategyWrapper, Set, Set, boolean)}).
+     * @param osdiElement The element of the model
+     * @param categories The categories of the costs and strategies to include
+     * @param includeUncategorized If true, the own costs without category are also included
+     * @throws MalformedOSDiModelException If the ontology is malformed
+     * @throws UnsupportedOSDiFeatureException If the strategies use features not supported by decision trees
+     */
     public void updateCosts(IModelItemWithStrategyWrapper osdiElement, Set<ResourceUsageSKOSCategory> categories, boolean includeUncategorized) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        updateCosts(osdiElement, osdiElement.getStrategies(), categories, includeUncategorized);
+    }
+
+    /**
+     * Adds the costs of an element of the model: its own costs of the given categories (and, optionally, those without category), plus the costs of
+     * the given strategies of such categories (see {@link StrategyCosts}). Both are added: a modeler may define an overall estimated cost for an
+     * element and a detailed cost through its strategies, and include in each model the one that suits it, since only the items included in the
+     * model are read.
+     * @param osdiElement The element of the model
+     * @param strategies The strategies of the element in the current arm of the tree (they may have been replaced by an intervention)
+     * @param categories The categories of the costs and strategies to include
+     * @param includeUncategorized If true, the own costs without category are also included
+     * @throws MalformedOSDiModelException If the ontology is malformed
+     * @throws UnsupportedOSDiFeatureException If the strategies use features not supported by decision trees
+     */
+    public void updateCosts(IModelItemWithStrategyWrapper osdiElement, Set<StrategyWrapper> strategies, Set<ResourceUsageSKOSCategory> categories, boolean includeUncategorized) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         final Set<ParameterWrapper> costParameters = new TreeSet<>();
-        final Set<StrategyWrapper> strategies = new TreeSet<>();
+        final Set<StrategyWrapper> selectedStrategies = new TreeSet<>();
         for (ResourceUsageSKOSCategory category : categories) {
             costParameters.addAll(osdiElement.getOSDiWrapper().<ParameterWrapper>filterModelItemsWithSKOSCategory(osdiElement.getCosts(), category));
-            strategies.addAll(osdiElement.getOSDiWrapper().<StrategyWrapper>filterModelItemsWithSKOSCategory(osdiElement.getStrategies(), category));
+            selectedStrategies.addAll(osdiElement.getOSDiWrapper().<StrategyWrapper>filterModelItemsWithSKOSCategory(strategies, category));
         }
         if (includeUncategorized) {
             costParameters.addAll(osdiElement.getOSDiWrapper().filterModelItemsWithoutAnySKOSCategory(osdiElement.getCosts()));
         }
-        if (costParameters.isEmpty()) {
-            for (StrategyWrapper strategy : strategies) {
-                // All the costs from a specific strategy are supposed to belong to the expected categories
-                final Set<ParameterWrapper> strategyCostParameters = strategy.getCosts();
-                if (!strategyCostParameters.isEmpty()) {
-                    addCostParameters(strategyCostParameters);
-                }
-            }
-        } else {
-            addCostParameters(costParameters);
-            if (!strategies.isEmpty()) {
-                log.warn("Strategies defined in the disease (" + strategies + ") will be ignored in the model, since costs were also defined: " + costParameters);
-            }
+        addCostParameters(costParameters);
+        for (StrategyWrapper strategy : selectedStrategies) {
+            final ArrayList<ParameterWrapper> strategyCosts = new ArrayList<>();
+            StrategyCosts.collect(strategy, strategyCosts, guidelineCosts);
+            addCostParameters(strategyCosts);
         }
     }
 
+    /**
+     * Adds the utilities of an element of the model, including those of its own strategies (see {@link #updateUtility(IModelItemWithStrategyWrapper, Set, Set)}).
+     * @param osdiElement The element of the model
+     * @param categories The categories of the strategies to include
+     * @throws MalformedOSDiModelException If the ontology is malformed
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
+     */
     public void updateUtility(IModelItemWithStrategyWrapper osdiElement, Set<ResourceUsageSKOSCategory> categories) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
-        final Set<ParameterWrapper> utilityParameters = new TreeSet<>();
-        final Set<StrategyWrapper> strategies = new TreeSet<>();
-        // Utility parameters do not use categories, so they are added regardless of the categories defined for the disease. 
+        updateUtility(osdiElement, osdiElement.getStrategies(), categories);
+    }
+
+    /**
+     * Adds the utilities of an element of the model: its own utilities (which do not use categories), plus the utilities of the given strategies
+     * of the given categories. Both are added, as the costs (see {@link #updateCosts(IModelItemWithStrategyWrapper, Set, Set, boolean)}).
+     * @param osdiElement The element of the model
+     * @param strategies The strategies of the element in the current arm of the tree (they may have been replaced by an intervention)
+     * @param categories The categories of the strategies to include
+     * @throws MalformedOSDiModelException If the ontology is malformed
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
+     */
+    public void updateUtility(IModelItemWithStrategyWrapper osdiElement, Set<StrategyWrapper> strategies, Set<ResourceUsageSKOSCategory> categories) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         if (osdiElement.getUtilities() != null) {
-            utilityParameters.addAll(osdiElement.getUtilities());
+            addDisutilityParameters(osdiElement.getUtilities());
         }
+        final Set<StrategyWrapper> selectedStrategies = new TreeSet<>();
         for (ResourceUsageSKOSCategory category : categories) {
-            strategies.addAll(osdiElement.getOSDiWrapper().<StrategyWrapper>filterModelItemsWithSKOSCategory(osdiElement.getStrategies(), category));
+            selectedStrategies.addAll(osdiElement.getOSDiWrapper().<StrategyWrapper>filterModelItemsWithSKOSCategory(strategies, category));
         }
-        if (utilityParameters.isEmpty()) {
-            for (StrategyWrapper strategy : strategies) {
-                final Set<ParameterWrapper> strategyUtilityParameters = strategy.getUtilities();
-                if (!strategyUtilityParameters.isEmpty()) {
-                    addDisutilityParameters(strategyUtilityParameters);
-                }
-            }
-        } else {
-            addDisutilityParameters(utilityParameters);
-            if (!strategies.isEmpty()) {
-                log.warn("Strategies defined in the disease (" + strategies + ") will be ignored in the model, since at least one utility was also defined: " + utilityParameters);
-            }
+        for (StrategyWrapper strategy : selectedStrategies) {
+            addDisutilityParameters(strategy.getUtilities());
         }
     }
 

@@ -95,6 +95,7 @@ public enum OSDiClass implements IOSDiComponentWrapper {
 	SEQUENTIAL_COMBINATION_RULE("SequentialCombinationRule", ProgressionCombinationRuleWrapper::new),
 	STAGE("Stage", ClinicalProgressionWrapper::new),
 	STRATEGY("Strategy", StrategyWrapper::new),
+	STRATEGY_REPLACEMENT_EFFECT("StrategyReplacementEffect", EffectWrapper::new),
 	THERAPEUTIC_INTERVENTION("TherapeuticIntervention", InterventionWrapper::new),
 	UNIFORM_DISTRIBUTION_EXPRESSION("UniformDistributionExpression", ProbabilisticExpressionWrapper::new),
 	UTILITY("Utility", ParameterWrapper::new),

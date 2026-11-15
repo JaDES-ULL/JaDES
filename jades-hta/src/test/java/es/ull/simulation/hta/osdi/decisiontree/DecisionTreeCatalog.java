@@ -421,6 +421,45 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P32_Experiment", "Intervention effect on the risk of an acute manifestation: factor (x0.5)",
                 leaves("TT_P32_", leaf(0.2, "ManA"), leaf(0.8)),
                 outcomes(71700.0, 65.0, 55.2), outcomes(65400.0, 65.0, 55.15)));
+        // Strategies (P33-P41). No discount; life years = 65 and QALYs = 0.85 * 65 = 55.25 in both arms, since the strategies have no utilities.
+        // The costs of the strategies are added to the own costs of the disease (1000 per year). Assessed arm: + 100 per year.
+        // Disease with S1 (follow-up, 200) and L1 (treatment, 300): comparator = 65 * 1500 = 97500
+        cases.add(tc(PAYOFFS, "TT_P33_Experiment", "Strategy of the disease: its costs are added to the own costs of the disease",
+                leaves("TT_P33_", leaf(1.0)),
+                outcomes(104000.0, 65.0, 55.25), outcomes(97500.0, 65.0, 55.25)));
+        // The new follow-up strategy S2 (50) replaces S1 and keeps L1: 65 * (1000 + 50 + 300 + 100) = 94250
+        cases.add(tc(PAYOFFS, "TT_P34_Experiment", "Strategy replacement by type: a new follow-up strategy replaces the follow-up strategy of the disease and keeps its treatment strategy",
+                leaves("TT_P34_", leaf(1.0)),
+                outcomes(94250.0, 65.0, 55.25), outcomes(97500.0, 65.0, 55.25)));
+        // S2 is assigned to a disease without strategies: 65 * (1000 + 50 + 100) = 74750
+        cases.add(tc(PAYOFFS, "TT_P35_Experiment", "Strategy replacement on a health condition without strategies: the new strategy is assigned to it",
+                leaves("TT_P35_", leaf(1.0)),
+                outcomes(74750.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
+        // T1: 10 per application, 1 every 730 hours = 12 per year, during 2 years = 240. T2 without guideline: 5 per year = 325.
+        // Assessed: 65000 + 6500 + 240 + 325 = 72065
+        cases.add(tc(PAYOFFS, "TT_P36_Experiment", "Costs of the health technologies of a strategy: with a guideline (frequency, period and duration) and without guideline",
+                leaves("TT_P36_", leaf(1.0)),
+                outcomes(72065.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
+        // Only hasCount (3): 3 * 10 = 30 at the start. Assessed: 65000 + 6500 + 30 = 71530
+        cases.add(tc(PAYOFFS, "TT_P37_Experiment", "Guideline with only a number of applications (hasCount): one-time cost at the start",
+                leaves("TT_P37_", leaf(1.0)),
+                outcomes(71530.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
+        // 12 per year; L = MIN(2, 6 / 12) = 0.5 years: 6 * 10 = 60. Assessed: 71560
+        cases.add(tc(PAYOFFS, "TT_P38_Experiment", "Guideline with frequency, duration and number of applications: the guideline ends with whatever comes first",
+                leaves("TT_P38_", leaf(1.0)),
+                outcomes(71560.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
+        // 12 per year during [64, 66], limited by death at 65: 1 year * 12 * 10 = 120. Assessed: 71620
+        cases.add(tc(PAYOFFS, "TT_P39_Experiment", "Guideline with a start offset: the applications after death are not accounted",
+                leaves("TT_P39_", leaf(1.0)),
+                outcomes(71620.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
+        // T1 without its own guideline uses the guideline of the strategy (hasCount 3): 30. Assessed: 71530
+        cases.add(tc(PAYOFFS, "TT_P40_Experiment", "Guideline of the strategy, used by a health technology without its own guideline",
+                leaves("TT_P40_", leaf(1.0)),
+                outcomes(71530.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
+        // The group replaces S1 by S2 (50) and L1 by L2 (20): 65 * (1000 + 50 + 20 + 100) = 76050
+        cases.add(tc(PAYOFFS, "TT_P41_Experiment", "Strategy replacement by a group: each member replaces the strategies of its type",
+                leaves("TT_P41_", leaf(1.0)),
+                outcomes(76050.0, 65.0, 55.25), outcomes(97500.0, 65.0, 55.25)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
@@ -534,7 +573,13 @@ public final class DecisionTreeCatalog {
             // Every intervention has exactly one target.
             new MalformedCase(MALFORMED, "TT_N15_Experiment", "Intervention with two targets", MalformedOSDiModelException.class),
             // A patient that presents a manifestation of a development also presents the development, but the manifestation may depend on several developments.
-            new MalformedCase(MALFORMED, "TT_N16_Experiment", "Interventions whose target is a manifestation that depends on a development (not supported in decision trees)", UnsupportedOSDiFeatureException.class)
+            new MalformedCase(MALFORMED, "TT_N16_Experiment", "Interventions whose target is a manifestation that depends on a development (not supported in decision trees)", UnsupportedOSDiFeatureException.class),
+            // At most one strategy replacement per health condition and arm (D2).
+            new MalformedCase(MALFORMED, "TT_N17_Experiment", "Two strategy replacements of the same health condition in the same arm", MalformedOSDiModelException.class),
+            // Only a strategy replacement effect can affect a health condition.
+            new MalformedCase(MALFORMED, "TT_N18_Experiment", "Generic effect that affects a health condition", MalformedOSDiModelException.class),
+            // The decision tree does not support yet sub-guidelines, condition expressions or application ages in a guideline.
+            new MalformedCase(MALFORMED, "TT_N19_Experiment", "Guideline with sub-guidelines (not supported yet)", UnsupportedOSDiFeatureException.class)
         );
     }
 }

@@ -3,6 +3,7 @@ package es.ull.simulation.hta.osdi.des;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import es.ull.simulation.hta.interventions.Intervention;
 import es.ull.simulation.hta.osdi.OSDiLogger;
@@ -12,6 +13,7 @@ import es.ull.simulation.hta.osdi.des.factories.ParameterFactory;
 import es.ull.simulation.hta.osdi.des.factories.UtilityParametersHandler;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
+import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
 import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
@@ -33,7 +35,16 @@ public class OSDiIntervention extends Intervention {
 	public OSDiIntervention(OSDiDESModel model, InterventionWrapper interventionWrapper) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
 		super(model, interventionWrapper.getShortName(), interventionWrapper.getDescription().orElse(interventionWrapper.getShortName()));
 		this.interventionWrapper = interventionWrapper;
-		this.effects = interventionWrapper.getEffects();
+		// The DES does not simulate strategies, so strategy replacement effects (decision D2) are ignored
+		this.effects = new TreeSet<>();
+		for (EffectWrapper effect : interventionWrapper.getEffects()) {
+			if (EffectType.STRATEGY_REPLACEMENT_EFFECT.equals(effect.getEffectType())) {
+				log.warn("The strategy replacement effect " + effect.getShortName() + " of the intervention " + interventionWrapper.getShortName() + " is ignored by the DES, which does not simulate strategies.");
+			}
+			else {
+				this.effects.add(effect);
+			}
+		}
 		// Checks that the effects of the intervention can be combined (e.g., at most one of them replaces each parameter)
 		for (EffectWrapper effect : effects) {
 			for (IModelItemWrapper modifiedItem : effect.getModifiedItems()) {

@@ -110,3 +110,43 @@ Pendientes de decidir:
 - Las intervenciones compartidas de las ontologías de prueba (`TT_InterventionTreat`, `TT_InterventionNone`) incumplen la cardinalidad global de la ontología. No falla porque `StructuralReasoner` no la comprueba, pero un razonador completo inferiría que las enfermedades son el mismo individuo.
 - No hay un test del aviso de una intervención sin objetivo (todas las ontologías de prueba lo declaran).
 - D2 (estrategias de una intervención como efectos) quitará `hasStrategy` de `Intervention`.
+
+### Fase 5: estrategias de una intervención como efectos (D2) (2026-11-15)
+
+**Hecho:**
+- `OSDi.ttl` (sin cambiar la versión):
+  - Nueva clase `StrategyReplacementEffect`, subclase de `Effect`: una condición de salud en `affects`, una estrategia o grupo en `hasReplacementStrategy` y sin magnitud.
+  - Nueva propiedad `hasReplacementStrategy`.
+  - `affects`, `isAffectedBy` y la restricción de `Effect` admiten `HealthCondition`.
+  - `hasStrategy` sale de `Intervention` y de `TherapeuticIntervention` (dominio: `HealthCondition ∪ Strategy`).
+  - Constantes nuevas en `OSDiClass`, `OSDiObjectProperty` y `EffectType`.
+- Migración: `BD.ttl` era la única ontología de prueba con `hasStrategy` en intervenciones. El brazo con cribado sustituye las estrategias de detección de la enfermedad por un grupo (cribado más diagnóstico clínico). Ningún test la carga, así que no cambia ningún valor esperado.
+- Árbol:
+  - `EffectWrapper` inicializa las sustituciones y rechaza los demás efectos sobre condiciones de salud.
+  - `SimpleInterventionGenerator.getStrategyReplacements` reúne las sustituciones de cada brazo.
+  - `DiseaseSubTreeGenerator.getArmStrategies` aplica la sustitución por tipo.
+  - `BranchDestinationNode` suma los costes y utilidades de las estrategias a los propios.
+  - `StrategyCosts` reúne los costes de estrategias, tecnologías y pautas, y `PayoffWrapper.getGuidelineCostFormula` escribe sus fórmulas en el Excel.
+  - El NBS rechaza las sustituciones y las estrategias declaradas en intervenciones.
+  - El DES (`OSDiIntervention`) ignora las sustituciones con aviso.
+- Tests: P33–P41 y N17–N19, con valores calculados a mano. Los mensajes de N17–N19 se comprobaron a mano con un test temporal.
+- Documentación: Javadoc, `docs/known-limitations.md` (sección «Strategies and guidelines in decision trees» y fila de la tabla de conformidad) y Claude.MD.
+
+**Decidido:**
+- La sustitución actúa por tipo de estrategia (detección, es decir, cribado o diagnóstico; seguimiento; tratamiento). Cada estrategia nueva sustituye a las de su tipo o se asigna si no había ninguna; las de otros tipos se mantienen. Se adoptó en lugar de «sustituye todas» porque el cribado del NBS borraría el seguimiento y el tratamiento.
+- Los costes y utilidades de las estrategias se suman a los propios del elemento. Antes solo se usaban si el elemento no tenía propios. No hay ambigüedad, porque solo se lee lo que el modelo incluye: el modelador elige el coste global, el detallado o ambos.
+- Con pauta, el coste de una tecnología es por aplicación:
+  - r = frecuencia × 8760 / periodo (en horas);
+  - inicio = inicio del nodo + desfase;
+  - L = MIN(duración, número / r);
+  - con frecuencia, pago anual r·c durante [inicio, inicio + L] recortado al nodo y a la vida;
+  - sin frecuencia, N·c de una vez en el inicio, con N = número de aplicaciones o 1.
+  - Si la tecnología no tiene pauta, se usa la de la estrategia; si ninguna tiene, sus costes son pagos normales.
+- Se rechazan dos sustituciones de la misma condición en un brazo, otros efectos sobre condiciones de salud y sustituciones declaradas por la enfermedad o una progresión.
+
+**Pendiente:**
+- NBS con estrategias (fase siguiente): el brazo con cribado sustituye la estrategia de detección de la enfermedad por la de cribado; la sensibilidad, la especificidad y los costes se leen de la estrategia de detección de cada brazo; la confirmación depende de `followedByStrategy` (D4); hay que migrar `PBD.ttl` sin cambiar resultados.
+- TODO: pautas con subpautas, `hasConditionExpression` o edades de aplicación (hoy se rechazan, N19). JaDES no las soporta: ni el árbol ni el DES leen pautas de OSDi.
+- Sin tests: utilidades de estrategias, pautas con descuento, ventanas temporales del nodo combinadas con pautas y `ADD_DISTINCT` con costes de pauta compartidos.
+- `BD.ttl` sigue importando OSDi 1.0, que no tiene `StrategyReplacementEffect`.
+- El DES no simula estrategias.
