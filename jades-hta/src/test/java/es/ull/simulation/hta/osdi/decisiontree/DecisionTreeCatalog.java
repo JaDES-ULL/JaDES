@@ -296,9 +296,11 @@ public final class DecisionTreeCatalog {
                 outcomes(83025.0, 63.0, 51.11), outcomes(76725.0, 63.0, 51.11)));
 
         // ---- Costs, utilities, life expectancy and effects: one feature per case ----
-        cases.add(tc(PAYOFFS, "TT_P01_Experiment", "Intervention effect on a risk: relative risk (x0.5)",
+        // A relative risk on a probability is applied to the equivalent rate: p' = 1 - (1 - 0.8)^0.5 = 0.552786404500042.
+        // Assessed arm: cost = 71500 + 23000 p'; life years = 65 - 20 p'; QALYs = 55.25 - 35 p'
+        cases.add(tc(PAYOFFS, "TT_P01_Experiment", "Intervention effect on a risk: relative risk (0.5), applied to the equivalent rate",
                 leaves("TT_P01_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
-                outcomes(80700.0, 57.0, 41.25), outcomes(85000.0, 49.0, 27.25)));
+                outcomes(84214.087303501, 53.944271910, 35.902475842), outcomes(85000.0, 49.0, 27.25)));
         cases.add(tc(PAYOFFS, "TT_P02_Experiment", "Intervention effect on a risk: difference (-0.3)",
                 leaves("TT_P02_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
                 outcomes(83000.0, 55.0, 37.75), outcomes(85000.0, 49.0, 27.25)));
@@ -382,17 +384,32 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P23_Experiment", "Manifestation whose onset age is lower than the initial age of the population (population starting at 20 years, from 10 years)",
                 leaves("TT_P23_", leaf(0.5, "ManY"), leaf(0.5)),
                 outcomes(104000.0, 65.0, 52.0), outcomes(97500.0, 65.0, 52.0)));
+        // Assessed arm of P24-P27 (same payoffs as P01): cost = 71500 + 23000 p'; life years = 65 - 20 p'; QALYs = 55.25 - 35 p'.
+        // Comparator arm: cost = 65000 + 25000 p; life years = 65 - 20 p; QALYs = 55.25 - 35 p
+        // p' = 1 - (1 - 0.8)^0.25 = 0.331259695023
+        cases.add(tc(PAYOFFS, "TT_P24_Experiment", "Intervention effect on a risk: hazard ratio (0.25), applied to the equivalent rate",
+                leaves("TT_P24_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
+                outcomes(79118.972985542, 58.374806100, 43.655910674), outcomes(85000.0, 49.0, 27.25)));
+        // p' = 0.8 * 0.5 / (1 - 0.8 + 0.8 * 0.5) = 2/3
+        cases.add(tc(PAYOFFS, "TT_P25_Experiment", "Intervention effect on a risk: odds ratio (0.5), applied to the odds",
+                leaves("TT_P25_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
+                outcomes(86833.333333333, 51.666666667, 31.916666667), outcomes(85000.0, 49.0, 27.25)));
+        // P26 (hazard ratio on a time to event) is the malformed case N13 until times to event are supported in decision trees.
+        // Effects are applied in the order: replace, multiply, subtract. p' = 0.6 * 0.5 - 0.1 = 0.2
+        cases.add(tc(PAYOFFS, "TT_P27_Experiment", "Several intervention effects on the same risk: new value (0.6), factor (x0.5) and difference (-0.1)",
+                leaves("TT_P27_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
+                outcomes(76100.0, 61.0, 48.25), outcomes(85000.0, 49.0, 27.25)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
         cases.add(tc(SCENARIOS, "TT_I01_Experiment", "Chronic disease: alternative developments, linked and independent manifestations, shared costs, effects and discount",
                 leaves("TT_I01_", leaf(0.06, "DevA", "ManX", "ManY"), leaf(0.06, "DevA", "ManX"), leaf(0.24, "DevA", "ManY"), leaf(0.24, "DevA"),
                     leaf(0.08, "DevB", "ManX"), leaf(0.32, "DevB")),
-                outcomes(46537.225884784, 35.650025718, 25.895043969), outcomes(56068.863600865, 35.371309585, 23.047094457)));
+                outcomes(49179.593997019, 35.587273275, 25.253833187), outcomes(56068.863600865, 35.371309585, 23.047094457)));
         // Sudden death (0.05). Survivors may suffer ManX (from 0 to 10 years) and ManY (from 5 years until death, with a one-time cost at onset and 10 years of life lost). No discount.
         cases.add(tc(SCENARIOS, "TT_I02_Experiment", "Newborns: sudden death, coexistent manifestations with temporal constraints and intervention effects",
                 leaves("TT_I02_", death(0.05), leaf(0.057, "ManX", "ManY"), leaf(0.228, "ManX"), leaf(0.133, "ManY"), leaf(0.532)),
-                outcomes(92665.0, 77.22, 62.9145), outcomes(84765.0, 74.1, 60.23)));
+                outcomes(92929.131474625, 77.22, 62.901293426), outcomes(84765.0, 74.1, 60.23)));
 
         // ---- Models of OSDi_test.ttl (their outcomes are checked in TestHTAExcelGeneration) ----
         cases.add(tc(BASIC, "TEST_Experiment1", "Test model 1: alternative developments",
@@ -467,7 +484,18 @@ public final class DecisionTreeCatalog {
             // Acute manifestations are not supported yet in decision trees.
             new MalformedCase(MALFORMED, "TT_N06_Experiment", "Acute manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
             // Decision trees assume that every patient starts without progressions.
-            new MalformedCase(MALFORMED, "TT_N07_Experiment", "Initial proportion of a manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class)
+            new MalformedCase(MALFORMED, "TT_N07_Experiment", "Initial proportion of a manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
+            // Two replacements of the same parameter are ambiguous.
+            new MalformedCase(MALFORMED, "TT_N08_Experiment", "Two intervention effects replace the same risk", MalformedOSDiModelException.class),
+            // Odds ratios and hazard ratios only apply to probabilities (and hazard ratios, also to times to event).
+            new MalformedCase(MALFORMED, "TT_N09_Experiment", "Odds ratio applied to a cost", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N10_Experiment", "Hazard ratio applied to a cost", MalformedOSDiModelException.class),
+            // Statistics of the uncertainty are not effect magnitudes.
+            new MalformedCase(MALFORMED, "TT_N11_Experiment", "Effect magnitude defined as a standard deviation", MalformedOSDiModelException.class),
+            // A relative risk is not defined on a time to event (a hazard ratio must be used instead).
+            new MalformedCase(MALFORMED, "TT_N12_Experiment", "Relative risk applied to a time to event", UnsupportedOSDiFeatureException.class),
+            // Decision trees do not support effects on a time to event yet (the probability derived from the time is not written in the Excel file).
+            new MalformedCase(MALFORMED, "TT_N13_Experiment", "Hazard ratio applied to a time to event (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class)
         );
     }
 }

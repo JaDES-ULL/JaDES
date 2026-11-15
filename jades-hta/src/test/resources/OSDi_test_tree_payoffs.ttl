@@ -3398,4 +3398,508 @@ osdi:TT_TreatAnnualCost rdf:type owl:NamedIndividual ,
                         osdi:hasYear "2026"^^xsd:short .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Developments
+osdi:TT_P24_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_P24_Severe ,
+        osdi:TT_P24_Normal ;
+    osdi:includedByModel osdi:TT_P24_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Disease
+osdi:TT_P24_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P24_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P24_Severe ,
+        osdi:TT_P24_Normal ,
+        osdi:TT_P24_Developments ;
+    osdi:includedByModel osdi:TT_P24_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Experiment
+osdi:TT_P24_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P24_Model ;
+    osdi:hasDescription "Intervention effect on a risk: hazard ratio (0.25), applied to the equivalent rate." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_InterventionTreat
+osdi:TT_P24_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P24_TreatEffect ;
+    osdi:includedByModel osdi:TT_P24_Model ;
+    osdi:hasDescription "Intervention effect on a risk: hazard ratio (0.25), applied to the equivalent rate" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Model
+osdi:TT_P24_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P24_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P24_Developments ,
+        osdi:TT_P24_Disease ,
+        osdi:TT_P24_InterventionTreat ,
+        osdi:TT_P24_Normal ,
+        osdi:TT_P24_Severe ,
+        osdi:TT_P24_Severe_Cost ,
+        osdi:TT_P24_Severe_Disutility ,
+        osdi:TT_P24_Severe_LER ,
+        osdi:TT_P24_Severe_LERMagnitude ,
+        osdi:TT_P24_Severe_Risk ,
+        osdi:TT_P24_TreatEffect ,
+        osdi:TT_P24_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P24. Intervention effect on a risk: hazard ratio (0.25), applied to the equivalent rate." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Normal
+osdi:TT_P24_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_P24_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Severe
+osdi:TT_P24_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_P24_Severe_Cost ;
+    osdi:hasEffect osdi:TT_P24_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_P24_Severe_Risk ;
+    osdi:hasUtility osdi:TT_P24_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_P24_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Severe_Cost
+osdi:TT_P24_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P24_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Severe_Disutility
+osdi:TT_P24_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P24_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Severe_LER
+osdi:TT_P24_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P24_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_P24_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Severe_LERMagnitude
+osdi:TT_P24_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P24_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_Severe_Risk
+osdi:TT_P24_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P24_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "0.8"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_TreatEffect
+osdi:TT_P24_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_P24_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_P24_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_P24_Model ;
+    osdi:hasDescription "Hazard ratio of Severe with the intervention" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P24_TreatEffectMagnitude
+osdi:TT_P24_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_HazardRatio ;
+    osdi:includedByModel osdi:TT_P24_Model ;
+    osdi:hasDescription "Hazard ratio of Severe with the intervention" ;
+    osdi:hasExpectedValue "0.25"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Developments
+osdi:TT_P25_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_P25_Severe ,
+        osdi:TT_P25_Normal ;
+    osdi:includedByModel osdi:TT_P25_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Disease
+osdi:TT_P25_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P25_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P25_Severe ,
+        osdi:TT_P25_Normal ,
+        osdi:TT_P25_Developments ;
+    osdi:includedByModel osdi:TT_P25_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Experiment
+osdi:TT_P25_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P25_Model ;
+    osdi:hasDescription "Intervention effect on a risk: odds ratio (0.5), applied to the odds." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_InterventionTreat
+osdi:TT_P25_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P25_TreatEffect ;
+    osdi:includedByModel osdi:TT_P25_Model ;
+    osdi:hasDescription "Intervention effect on a risk: odds ratio (0.5), applied to the odds" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Model
+osdi:TT_P25_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P25_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P25_Developments ,
+        osdi:TT_P25_Disease ,
+        osdi:TT_P25_InterventionTreat ,
+        osdi:TT_P25_Normal ,
+        osdi:TT_P25_Severe ,
+        osdi:TT_P25_Severe_Cost ,
+        osdi:TT_P25_Severe_Disutility ,
+        osdi:TT_P25_Severe_LER ,
+        osdi:TT_P25_Severe_LERMagnitude ,
+        osdi:TT_P25_Severe_Risk ,
+        osdi:TT_P25_TreatEffect ,
+        osdi:TT_P25_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P25. Intervention effect on a risk: odds ratio (0.5), applied to the odds." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Normal
+osdi:TT_P25_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_P25_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Severe
+osdi:TT_P25_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_P25_Severe_Cost ;
+    osdi:hasEffect osdi:TT_P25_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_P25_Severe_Risk ;
+    osdi:hasUtility osdi:TT_P25_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_P25_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Severe_Cost
+osdi:TT_P25_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P25_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Severe_Disutility
+osdi:TT_P25_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P25_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Severe_LER
+osdi:TT_P25_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P25_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_P25_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Severe_LERMagnitude
+osdi:TT_P25_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P25_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_Severe_Risk
+osdi:TT_P25_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P25_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "0.8"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_TreatEffect
+osdi:TT_P25_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_P25_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_P25_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_P25_Model ;
+    osdi:hasDescription "Odds ratio of Severe with the intervention" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P25_TreatEffectMagnitude
+osdi:TT_P25_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_OddsRatio ;
+    osdi:includedByModel osdi:TT_P25_Model ;
+    osdi:hasDescription "Odds ratio of Severe with the intervention" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Developments
+osdi:TT_P27_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_P27_Severe ,
+        osdi:TT_P27_Normal ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Disease
+osdi:TT_P27_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P27_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P27_Severe ,
+        osdi:TT_P27_Normal ,
+        osdi:TT_P27_Developments ;
+    osdi:includedByModel osdi:TT_P27_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Experiment
+osdi:TT_P27_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P27_Model ;
+    osdi:hasDescription "Several intervention effects on the same risk: new value (0.6), factor (x0.5) and difference (-0.1)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_InterventionTreat
+osdi:TT_P27_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P27_TreatEffectSet ,
+        osdi:TT_P27_TreatEffectFactor ,
+        osdi:TT_P27_TreatEffectDiff ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "Several intervention effects on the same risk: new value (0.6), factor (x0.5) and difference (-0.1)" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Model
+osdi:TT_P27_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P27_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P27_Developments ,
+        osdi:TT_P27_Disease ,
+        osdi:TT_P27_InterventionTreat ,
+        osdi:TT_P27_Normal ,
+        osdi:TT_P27_Severe ,
+        osdi:TT_P27_Severe_Cost ,
+        osdi:TT_P27_Severe_Disutility ,
+        osdi:TT_P27_Severe_LER ,
+        osdi:TT_P27_Severe_LERMagnitude ,
+        osdi:TT_P27_Severe_Risk ,
+        osdi:TT_P27_TreatEffectDiff ,
+        osdi:TT_P27_TreatEffectDiffMagnitude ,
+        osdi:TT_P27_TreatEffectFactor ,
+        osdi:TT_P27_TreatEffectFactorMagnitude ,
+        osdi:TT_P27_TreatEffectSet ,
+        osdi:TT_P27_TreatEffectSetMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P27. Several intervention effects on the same risk: new value (0.6), factor (x0.5) and difference (-0.1)." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Normal
+osdi:TT_P27_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_P27_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Severe
+osdi:TT_P27_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_P27_Severe_Cost ;
+    osdi:hasEffect osdi:TT_P27_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_P27_Severe_Risk ;
+    osdi:hasUtility osdi:TT_P27_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_P27_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Severe_Cost
+osdi:TT_P27_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Severe_Disutility
+osdi:TT_P27_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Severe_LER
+osdi:TT_P27_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P27_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Severe_LERMagnitude
+osdi:TT_P27_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Severe_Risk
+osdi:TT_P27_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "0.8"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_TreatEffectSet
+osdi:TT_P27_TreatEffectSet rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_P27_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_P27_TreatEffectSetMagnitude ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "New risk of Severe with the intervention" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_TreatEffectSetMagnitude
+osdi:TT_P27_TreatEffectSetMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "New risk of Severe with the intervention" ;
+    osdi:hasExpectedValue "0.6"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_TreatEffectFactor
+osdi:TT_P27_TreatEffectFactor rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_P27_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_P27_TreatEffectFactorMagnitude ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "Factor applied to the risk of Severe with the intervention" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_TreatEffectFactorMagnitude
+osdi:TT_P27_TreatEffectFactorMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Factor ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "Factor applied to the risk of Severe with the intervention" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_TreatEffectDiff
+osdi:TT_P27_TreatEffectDiff rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_P27_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_P27_TreatEffectDiffMagnitude ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "Difference applied to the risk of Severe with the intervention" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_TreatEffectDiffMagnitude
+osdi:TT_P27_TreatEffectDiffMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_MeanDifference ;
+    osdi:includedByModel osdi:TT_P27_Model ;
+    osdi:hasDescription "Difference applied to the risk of Severe with the intervention" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

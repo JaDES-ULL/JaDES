@@ -345,9 +345,10 @@ public class ModelSheet implements SheetWrapper {
      * Draws the probability formula in the specified cell.
      * @param cell The cell where the probability formula will be drawn.
      * @param successor The successor node for which the probability formula will be drawn.
-     * @throws UnsupportedOSDiFeatureException 
+     * @param effects The effects of the path that may modify the probability
+     * @throws MalformedOSDiModelException If more than one effect of the path replaces the probability
      */
-    private void drawProbabilityFormula(Row valuesRow, int column, BranchDestinationNode successor, Set<EffectWrapper> effects) throws UnsupportedOSDiFeatureException {
+    private void drawProbabilityFormula(Row valuesRow, int column, BranchDestinationNode successor, Set<EffectWrapper> effects) throws MalformedOSDiModelException {
         final Cell cell = ExcelTools.getOrCreateCell(valuesRow, column);
         final String probFormula = HTAExcelModelFactory.getParameterTextFormula(successor.getProbability(), effects);
         cell.setCellFormula(probFormula);

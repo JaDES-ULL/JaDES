@@ -378,7 +378,7 @@ osdi:hasEffect rdf:type owl:ObjectProperty ;
 osdi:hasEffectMagnitude rdf:type owl:ObjectProperty ;
                         rdfs:domain osdi:Effect ;
                         rdfs:range osdi:Parameter ;
-                        rdfs:comment "Defines the parameter that defines the magnitude of the effect"@en ;
+                        rdfs:comment "Defines the parameter that defines the magnitude of the effect. The data item type of the magnitude defines how it is applied to each affected parameter or attribute (x) in a generic Effect: a factor (DI_Factor) or a ratio (DI_Ratio) multiplies (x * m); a relative risk (DI_RelativeRisk) or a hazard ratio (DI_HazardRatio) on a probability multiplies the equivalent constant rate, i.e., 1 - (1 - x)^m; a hazard ratio on a time to event without a distribution divides the mean time (x / m), assuming an exponential time; an odds ratio (DI_OddsRatio) on a probability multiplies the odds, i.e., x * m / (1 - x + x * m); a mean difference (DI_MeanDifference) is subtracted (x - m). Any other type is an absolute value that replaces the affected item; DI_Continuous_Variable always replaces, and a type that does not match the type of the affected item should produce a warning. A relative magnitude always modifies the affected item, even if both share the same type. Statistics of the uncertainty (standard deviation, confidence limits) are not valid magnitudes. Use DI_Factor instead of DI_RelativeRisk to multiply a probability linearly (e.g., when the relative risk and the probability come from the same source and period)."@en ;
                         rdfs:label "has magnitude effect"@en ,
                                    "tiene magnitud del efecto"@es .
 
@@ -2264,7 +2264,7 @@ osdi:Effect rdf:type owl:Class ;
                               owl:onProperty osdi:hasUtility ;
                               owl:allValuesFrom osdi:Utility
                             ] ;
-            rdfs:comment "An effect of a treatment or intervention"@en ;
+            rdfs:comment "An effect of a treatment or intervention. It applies its magnitude (hasEffectMagnitude) to the parameters or attributes it affects (affects). The subclasses define how the magnitude is applied (an instant death effect sets a probability of death, a life expectancy reduction effect subtracts years of life and an increased mortality rate effect multiplies the mortality rate); for a generic effect, the data item type of the magnitude defines the operation (see hasEffectMagnitude). When several effects modify the same parameter, the order is decided by the application; the suggested order is: first replace, then multiply (linear factors, then ratios of rates, then odds ratios) and finally subtract. At most one effect should replace the same parameter."@en ;
             rdfs:label "Efecto"@es ,
                        "Effect"@en .
 
@@ -3784,6 +3784,15 @@ osdi:DI_Generic_Utility rdf:type owl:NamedIndividual ,
                                    "Utility"@en .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#DI_HazardRatio
+osdi:DI_HazardRatio rdf:type owl:NamedIndividual ,
+                             osdi:DataItemType ;
+                    osdi:hasDescription "The ratio of the hazard rates of an event in two groups" ;
+                    rdfs:comment "As the magnitude of an effect, it multiplies the rate equivalent to a probability (1 - (1 - p)^HR), or divides the mean of a time to event, which is assumed exponential if it has no distribution"@en ;
+                    rdfs:label "Hazard ratio"@en ,
+                               "Razón de riesgos instantáneos"@es .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#DI_Incidence
 osdi:DI_Incidence rdf:type owl:NamedIndividual ,
                            osdi:DataItemType ;
@@ -3808,6 +3817,15 @@ osdi:DI_MeanDifference rdf:type owl:NamedIndividual ,
                        osdi:hasRefToSTATO "http://purl.obolibrary.org/obo/STATO_0000457" ;
                        rdfs:label "Diferencia de medias"@es ,
                                   "Mean difference"@en .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#DI_OddsRatio
+osdi:DI_OddsRatio rdf:type owl:NamedIndividual ,
+                           osdi:DataItemType ;
+                  osdi:hasDescription "The ratio of the odds of an event in two groups" ;
+                  rdfs:comment "As the magnitude of an effect, it multiplies the odds of a probability: p * OR / (1 - p + p * OR)"@en ;
+                  rdfs:label "Odds ratio"@en ,
+                             "Razón de odds"@es .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#DI_Other
