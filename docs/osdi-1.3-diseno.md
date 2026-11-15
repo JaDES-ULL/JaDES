@@ -150,3 +150,36 @@ Pendientes de decidir:
 - Sin tests: utilidades de estrategias, pautas con descuento, ventanas temporales del nodo combinadas con pautas y `ADD_DISTINCT` con costes de pauta compartidos.
 - `BD.ttl` sigue importando OSDi 1.0, que no tiene `StrategyReplacementEffect`.
 - El DES no simula estrategias.
+
+### Fase 6: cribado neonatal con estrategias (D2) (2026-11-15)
+
+**Hecho:**
+- `OSDi.ttl` (sin cambiar la versión):
+  - `detects`, `hasSensitivity` y `hasSpecificity` solo tienen dominio en `DetectionStrategy`, y `hasTemporaryThreshold` solo en `ScreeningStrategy`. El rango de `isDetectedBy` pasa a ser `DetectionStrategy`.
+  - Se quitan las restricciones correspondientes de `DetectionIntervention` y `ScreeningIntervention`.
+  - Comentarios nuevos en `ScreeningIntervention`, `DiagnosisIntervention`, `DetectionStrategy` y `detects`. El de `hasIntervention` precisa que el objetivo de una intervención de detección es la enfermedad que detecta y que se aplica a la población en riesgo.
+- Árbol:
+  - `DetectionInterventionWrapper` rechaza las propiedades de detección en intervenciones.
+  - `NBSDetectionArm` reúne las estrategias de detección de cada brazo (tras la sustitución por tipo, con `DiseaseSubTreeGenerator.replaceByType`) y sus costes.
+  - `NBSModel` y los dos constructores del árbol NBS leen de ahí la sensibilidad, la especificidad y los costes, y pasan las sustituciones del brazo al subárbol de la enfermedad.
+- DES: `OSDiDetectionIntervention` lee la sensibilidad y la especificidad de la estrategia de detección del brazo (de sus sustituciones o, si no, de la enfermedad).
+- Migración de `PBD.ttl`:
+  - Estrategias nuevas `PBD_ClinicalDiagnosis` y `PBD_ScreeningStrategy`.
+  - El cribado sustituye las estrategias de detección de la enfermedad por el grupo {cribado, diagnóstico}.
+  - Las intervenciones pierden costes, sensibilidad, especificidad y `detects`, y `PBD_CostDiagnosis` sale de los costes propios de la enfermedad.
+  - Los valores de regresión no cambian (1,5512269701985133 y 0,7636187637821464). `BD.ttl` ya lo declaraba en estrategias.
+- Tests:
+  - Nueva ontología `OSDi_test_tree_nbs.ttl` con B01–B03, que se comprueban en `TestHTAExcelGeneration` con valores calculados a mano.
+  - N20 (intervención con `hasSensitivity`), N21 (cribado en el brazo sin cribado) y N22 (intervención con `detects`). Sus mensajes se comprobaron a mano con un test temporal.
+- Documentación: Javadoc, `docs/known-limitations.md` (sección «Newborn screening» y fila de la tabla de conformidad) y Claude.MD.
+
+**Decidido:**
+- Una sola forma de modelar la detección: las propiedades de detección son de las estrategias, y la enfermedad detectada por una intervención es su objetivo (D1). `detects` sobraba en la intervención y podía contradecir su objetivo.
+- Costes: el cribado lo paga toda la población del brazo (costes propios de la intervención con `ScreeningCat` más la estrategia de cribado). El diagnóstico lo pagan los verdaderos y falsos positivos, o los enfermos sin cribado (costes propios de la enfermedad con `DiagnosisCat` más la estrategia de diagnóstico del brazo).
+- La sensibilidad y especificidad de la estrategia de diagnóstico no se usan: el diagnóstico se supone perfecto.
+
+**Pendiente:**
+- Falsos negativos del cribado: hoy no pagan diagnóstico. Lo que les ocurre depende de la enfermedad (diagnóstico clínico tardío o muerte sin diagnóstico, en parte por una falsa sensación de seguridad tras el cribado). Equipararlos siempre a la detección clínica podría ser engañoso, así que se revisará en una fase posterior.
+- Cribados de varias enfermedades (paneles): D1 limita cada intervención a un objetivo y cada sustitución a una condición, así que no caben. El NBS solo admite una enfermedad.
+- `followedByStrategy` (de cribado a confirmación) sigue ignorándose, a la espera de D4.
+- El DES no aplica los costes de las estrategias de detección.

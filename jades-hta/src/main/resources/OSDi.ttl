@@ -164,13 +164,9 @@ osdi:dependsOn rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#detects
 osdi:detects rdf:type owl:ObjectProperty ;
              owl:inverseOf osdi:isDetectedBy ;
-             rdfs:domain [ rdf:type owl:Class ;
-                           owl:unionOf ( osdi:DetectionIntervention
-                                         osdi:DetectionStrategy
-                                       )
-                         ] ;
+             rdfs:domain osdi:DetectionStrategy ;
              rdfs:range osdi:Disease ;
-             rdfs:comment "Indicates the disease detected by a detection intervention"@en ;
+             rdfs:comment "Indicates the disease or diseases detected by a detection strategy. The disease detected by a detection intervention is its target (isInterventionOf)."@en ;
              rdfs:label "detecta"@es ,
                         "detects"@en .
 
@@ -489,8 +485,8 @@ osdi:hasIntervention rdf:type owl:ObjectProperty ;
                      owl:inverseOf osdi:isInterventionOf ;
                      rdfs:domain osdi:HealthCondition ;
                      rdfs:range osdi:Intervention ;
-                     rdfs:comment "Defines the target of an intervention: the health condition (the disease or an element of its progression) to which the intervention is applied. The intervention applies at each appearance of its target: if the target is the disease, from the start of the model; if it is a clinical progression element (a development, a manifestation or a stage), each time the patient presents it (e.g., each migraine attack). Every intervention has exactly one target (see isInterventionOf). The interventions compared in a model must have the same target, and a decision tree starts with the patients that present it."@en ,
-                                  "Define el objetivo de una intervención: la condición de salud (la enfermedad o un elemento de su progresión) a la que se aplica. La intervención se aplica en cada aparición de su objetivo: si es la enfermedad, desde el inicio del modelo; si es un elemento de progresión clínica (un desarrollo, una manifestación o una etapa), cada vez que el paciente lo presenta (p. ej., cada crisis de migraña). Cada intervención tiene exactamente un objetivo (ver isInterventionOf). Las intervenciones comparadas en un modelo deben tener el mismo objetivo, y un árbol de decisión empieza en los pacientes que lo presentan."@es ;
+                     rdfs:comment "Defines the target of an intervention: the health condition (the disease or an element of its progression) to which the intervention is applied. The intervention applies at each appearance of its target: if the target is the disease, from the start of the model; if it is a clinical progression element (a development, a manifestation or a stage), each time the patient presents it (e.g., each migraine attack). Every intervention has exactly one target (see isInterventionOf). The interventions compared in a model must have the same target, and a decision tree starts with the patients that present it. For a detection intervention (screening or diagnosis), the target is the disease it detects, and the intervention applies to the population at risk of such disease, not only to those who present it."@en ,
+                                  "Define el objetivo de una intervención: la condición de salud (la enfermedad o un elemento de su progresión) a la que se aplica. La intervención se aplica en cada aparición de su objetivo: si es la enfermedad, desde el inicio del modelo; si es un elemento de progresión clínica (un desarrollo, una manifestación o una etapa), cada vez que el paciente lo presenta (p. ej., cada crisis de migraña). Cada intervención tiene exactamente un objetivo (ver isInterventionOf). Las intervenciones comparadas en un modelo deben tener el mismo objetivo, y un árbol de decisión empieza en los pacientes que lo presentan. En una intervención de detección (cribado o diagnóstico), el objetivo es la enfermedad que detecta, y la intervención se aplica a la población en riesgo de padecerla, no solo a quienes la presentan."@es ;
                      rdfs:label "has intervention"@en ,
                                 "tiene la intervención"@es .
 
@@ -640,11 +636,7 @@ osdi:hasRiskCharacterization rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#hasSensitivity
 osdi:hasSensitivity rdf:type owl:ObjectProperty ;
                     rdfs:subPropertyOf osdi:hasParameter ;
-                    rdfs:domain [ rdf:type owl:Class ;
-                                  owl:unionOf ( osdi:DetectionIntervention
-                                                osdi:DetectionStrategy
-                                              )
-                                ] ;
+                    rdfs:domain osdi:DetectionStrategy ;
                     rdfs:range osdi:Parameter ;
                     rdfs:comment "The Sensitivity in epidemiology is the Probability of correctly classifying a sick individual, that is, the Probability that a positive result will be obtained in a diagnostic test for a sick subject. The Sensitivity is, therefore, the ability of the complementary test to detect the disease. Sensitivity is the percentage of true positives or the Probability that the test is positive if the disease is present; False negatives are sick subjects diagnosed as healthy." ;
                     rdfs:label "has sensitivity"@en ,
@@ -667,11 +659,7 @@ osdi:hasSex rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#hasSpecificity
 osdi:hasSpecificity rdf:type owl:ObjectProperty ;
                     rdfs:subPropertyOf osdi:hasParameter ;
-                    rdfs:domain [ rdf:type owl:Class ;
-                                  owl:unionOf ( osdi:DetectionIntervention
-                                                osdi:DetectionStrategy
-                                              )
-                                ] ;
+                    rdfs:domain osdi:DetectionStrategy ;
                     rdfs:range osdi:Parameter ;
                     rdfs:comment "The Specificity of a test is the Probability that a healthy subject will have a negative test result. Specificity is the percentage of true negatives or the Probability that the test will be negative if the disease is not present. False positives are healthy subjects diagnosed as sick." ;
                     rdfs:label "has specificity"@en ,
@@ -761,11 +749,7 @@ osdi:hasSubpopulation rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#hasTemporaryThreshold
 osdi:hasTemporaryThreshold rdf:type owl:ObjectProperty ;
                            rdfs:subPropertyOf osdi:hasParameter ;
-                           rdfs:domain [ rdf:type owl:Class ;
-                                         owl:unionOf ( osdi:ScreeningIntervention
-                                                       osdi:ScreeningStrategy
-                                                     )
-                                       ] ;
+                           rdfs:domain osdi:ScreeningStrategy ;
                            rdfs:range osdi:Parameter ;
                            rdfs:comment "Time limit in which the sample must be made. For example on the third day of birth. This value must be expressed in number of days." ;
                            rdfs:label "has temporary threshold"@en ,
@@ -886,12 +870,8 @@ osdi:isDataItemTypeOf rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#isDetectedBy
 osdi:isDetectedBy rdf:type owl:ObjectProperty ;
                   rdfs:domain osdi:Disease ;
-                  rdfs:range [ rdf:type owl:Class ;
-                               owl:unionOf ( osdi:DetectionIntervention
-                                             osdi:DetectionStrategy
-                                           )
-                             ] ;
-                  rdfs:comment "Defines a relationship between a detection strategy or intervention and a disease, indicating that such estrategy or intervention is used to identify the disease."@en ;
+                  rdfs:range osdi:DetectionStrategy ;
+                  rdfs:comment "Defines a relationship between a disease and a detection strategy, indicating that such strategy is used to identify the disease."@en ;
                   rdfs:label "es detectado por"@es ,
                              "is detected by"@en .
 
@@ -2047,33 +2027,7 @@ osdi:DetectionIntervention rdf:type owl:Class ;
                                                                osdi:ScreeningIntervention
                                                              )
                                                ] ;
-                           rdfs:subClassOf osdi:Intervention ,
-                                           [ rdf:type owl:Restriction ;
-                                             owl:onProperty osdi:detects ;
-                                             owl:allValuesFrom osdi:Disease
-                                           ] ,
-                                           [ rdf:type owl:Restriction ;
-                                             owl:onProperty osdi:hasSensitivity ;
-                                             owl:allValuesFrom [ owl:intersectionOf ( osdi:Parameter
-                                                                                      [ rdf:type owl:Restriction ;
-                                                                                        owl:onProperty osdi:hasDataItemType ;
-                                                                                        owl:hasValue osdi:DI_Sensitivity
-                                                                                      ]
-                                                                                    ) ;
-                                                                 rdf:type owl:Class
-                                                               ]
-                                           ] ,
-                                           [ rdf:type owl:Restriction ;
-                                             owl:onProperty osdi:hasSpecificity ;
-                                             owl:allValuesFrom [ owl:intersectionOf ( osdi:Parameter
-                                                                                      [ rdf:type owl:Restriction ;
-                                                                                        owl:onProperty osdi:hasDataItemType ;
-                                                                                        owl:hasValue osdi:DI_Specificity
-                                                                                      ]
-                                                                                    ) ;
-                                                                 rdf:type owl:Class
-                                                               ]
-                                           ] ;
+                           rdfs:subClassOf osdi:Intervention ;
                            owl:disjointUnionOf ( osdi:DiagnosisIntervention
                                                  osdi:ScreeningIntervention
                                                ) ;
@@ -2111,7 +2065,8 @@ osdi:DetectionStrategy rdf:type owl:Class ;
                                                              rdf:type owl:Class
                                                            ]
                                        ] ;
-                       rdfs:comment "A strategy related to the detection of a disease"@es ;
+                       rdfs:comment "A strategy related to the detection of a disease"@es ,
+                                    "A strategy related to the detection of a disease or diseases (detects), characterized by its sensitivity and specificity. In a screening model, the screening strategy of an arm is applied to the whole population, and the diagnosis strategy is applied to the patients that screen positive or, without screening, to the patients with the disease."@en ;
                        rdfs:label "Detection strategy"@en ,
                                   "Estrategia de detección"@es .
 
@@ -2173,7 +2128,7 @@ osdi:DiagnosisIntervention rdf:type owl:Class ;
                                                ] ;
                            rdfs:subClassOf osdi:DetectionIntervention ;
                            owl:disjointWith osdi:ScreeningIntervention ;
-                           rdfs:comment "An intervention intended to establish the presence/absence of certain disease or condition"@en ;
+                           rdfs:comment "An intervention intended to establish the presence/absence of certain disease or condition. The detection strategies of its arm are those of the disease, unless it replaces them through a StrategyReplacementEffect."@en ;
                            rdfs:label "Diagnosis intervention"@en ,
                                       "Intervención diagnóstica"@es .
 
@@ -3411,12 +3366,8 @@ osdi:ScreeningIntervention rdf:type owl:Class ;
                                                                     ) ;
                                                  rdf:type owl:Class
                                                ] ;
-                           rdfs:subClassOf osdi:DetectionIntervention ,
-                                           [ rdf:type owl:Restriction ;
-                                             owl:onProperty osdi:hasTemporaryThreshold ;
-                                             owl:allValuesFrom osdi:Parameter
-                                           ] ;
-                           rdfs:comment "An intervention to identifiy the subset of population who may have certain disease or condition and require further testing to obtain a final diagnosis"@en ;
+                           rdfs:subClassOf osdi:DetectionIntervention ;
+                           rdfs:comment "An intervention to identifiy the subset of population who may have certain disease or condition and require further testing to obtain a final diagnosis. A screening intervention declares its screening strategy through a StrategyReplacementEffect on the disease: its replacement (usually a group with the screening strategy and the confirmatory diagnosis strategy) replaces the detection strategies of the disease in its arm. The sensitivity, specificity and costs of the screening are those of the screening strategy."@en ;
                            rdfs:label "Intervención de cribado"@es ,
                                       "Screening intervention"@en .
 

@@ -46,7 +46,8 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
 | `OSDi_test_tree_payoffs.ttl` | P01–P25, P27–P41 (P26 pasó a ser N13; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
-| `OSDi_test_tree_malformed.ttl` | N01–N19 (casos que deben lanzar excepción) |
+| `OSDi_test_tree_nbs.ttl` | B01–B03 (cribado neonatal con estrategias; se comprueban en `TestHTAExcelGeneration`) |
+| `OSDi_test_tree_malformed.ttl` | N01–N22 (casos que deben lanzar excepción) |
 
 Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
 
@@ -110,6 +111,10 @@ Convenciones:
 - La sustitución se aplica en el brazo de la intervención y por tipo (detección = cribado o diagnóstico; seguimiento; tratamiento): cada estrategia nueva sustituye a las de su tipo de la condición de salud, o se le asigna si no tenía; las de otros tipos se mantienen (P34, P35, P41). Dos sustituciones sobre la misma condición en un brazo (N17), un efecto de otra clase que afecte a una condición de salud (N18) o una sustitución declarada por la enfermedad o una progresión: `MalformedOSDiModelException`.
 - Costes y utilidades de las estrategias (seguimiento y tratamiento) se suman a los propios del elemento (P33): el modelador elige qué incluye en cada modelo, porque solo se lee lo que el modelo incluye.
 - Coste de una estrategia: sus costes propios más los de las tecnologías que usa. La pauta de la tecnología (o, si no tiene, la de la estrategia) hace que su coste sea por aplicación (c): con r = `hasFrequency` × 8760 / `hasPeriod` (sin periodo, la frecuencia es anual), inicio = inicio del nodo + `hasStartOffset` y L = MIN(`hasDuration`, `hasCount` / r), pago anual r·c durante [inicio, inicio + L] recortado al nodo y a la vida (P36, P38, P39); sin frecuencia, N·c de una vez en el inicio, con N = `hasCount` o 1 (P37, P40). Sin pauta, los costes de la tecnología son pagos normales.
+
+**Cribado neonatal (NBS):** las intervenciones de detección no declaran `hasSensitivity`, `hasSpecificity`, `detects` ni `hasTemporaryThreshold` (`MalformedOSDiModelException`, N20 y N22): la enfermedad que detectan es su objetivo, y lo demás es de sus estrategias de detección.
+- Estrategias de detección de un brazo: las de la enfermedad tras la sustitución de la intervención (por tipo). La intervención de cribado suele sustituirlas por un grupo {cribado, diagnóstico}. Como mucho una de cribado y una de diagnóstico por brazo (`Unsupported`); cribado en el brazo sin cribado (N21) o `detects` hacia otra enfermedad: `Malformed`.
+- Brazo con cribado: toda la población paga los costes propios de la intervención con `ScreeningCat` más los de la estrategia de cribado; sensibilidad y especificidad de la estrategia de cribado (1 con aviso si faltan); verdaderos y falsos positivos pagan el diagnóstico (costes propios de la enfermedad con `DiagnosisCat` más la estrategia de diagnóstico del brazo). Brazo sin cribado: los enfermos pagan el diagnóstico. La sensibilidad y especificidad de la estrategia de diagnóstico no se usan. Las sustituciones del brazo llegan también al subárbol de la enfermedad (B03).
  
 ## Divergencias conocidas entre árbol y DES
  
@@ -117,6 +122,7 @@ Convenciones:
 - En el DES, una manifestación sin riesgo solo ocurre a través de `hasInitialProportion`; en el árbol está siempre activa.
 - El árbol rechaza `hasInitialProportion` con `UnsupportedOSDiFeatureException` (N07).
 - El DES ignora las estrategias (y las sustituciones de estrategia, con aviso) y los efectos cuya causa no es una intervención; en el árbol se aplican los efectos de intervenciones, enfermedad y progresiones.
+- Detección en el DES: la sensibilidad y la especificidad de una intervención de detección salen de la estrategia de detección de su brazo (sus sustituciones o, si no, la de la enfermedad); sus costes no se aplican.
 - `Pathway` (con `requires`) solo se admite en el DES; el árbol lo rechaza.
 - Manifestaciones agudas: el árbol cuenta un episodio y el DES todos los que ocurran; con varios pagos de una vez, el árbol los suma y el DES usa el primero (con aviso).
 - El DES no lee el objetivo de las intervenciones: siempre se aplican desde el inicio de la simulación.
@@ -126,7 +132,7 @@ Convenciones:
 - El árbol rechaza un `Pathway` como caracterización del riesgo (sin test) y un riesgo cuyo `DataItemType` no sea una probabilidad (N04); `DI_TimeToEvent` se convierte en un parámetro sintético `P_…`.
 - El árbol ignora `supersedesClinicalProgression` y `hasDuration`; `hasFrequency` solo se lee en las manifestaciones agudas (véase «Manifestaciones agudas»).
 - `SequentialCombinationRule` se trata como coexistente sin aviso en el árbol; no se leen `hasFirst` ni `hasNext`. El DES ignora todas las reglas con aviso.
-- Estrategias en el árbol: no se leen `followedByStrategy` (con aviso), `hasConditionExpression` de la estrategia ni `failsIf`. Las pautas con subpautas, `hasConditionExpression` o edades de aplicación se rechazan (`UnsupportedOSDiFeatureException`, N19); TODO: soportarlas. `hasDose` no se usa. El NBS rechaza las sustituciones de estrategia (pendiente de la fase siguiente).
+- Estrategias en el árbol: no se leen `followedByStrategy` (con aviso), `hasConditionExpression` de la estrategia ni `failsIf`. Las pautas con subpautas, `hasConditionExpression` o edades de aplicación se rechazan (`UnsupportedOSDiFeatureException`, N19); TODO: soportarlas. `hasDose` no se usa. Falsos negativos del cribado: no pagan diagnóstico; pendiente de decidir (según la enfermedad, diagnóstico clínico tardío o muerte sin diagnóstico).
 - `Group` no tiene wrapper; no se leen `hasGroupItem` ni `hasProportionWithinGroup`.
 - Efectos sobre un tiempo hasta el evento: el árbol los rechaza (N12, N13), porque un riesgo `DI_TimeToEvent` no funciona todavía en árboles (el parámetro sintético `P_…` no se escribe en el Excel).
 - Las operaciones lineales (Factor, Ratio, MeanDifference) sobre una probabilidad no se recortan a [0, 1]; solo se avisa si los dos valores son deterministas.

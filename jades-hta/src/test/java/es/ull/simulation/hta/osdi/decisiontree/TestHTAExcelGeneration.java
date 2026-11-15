@@ -63,6 +63,23 @@ public class TestHTAExcelGeneration {
         };
     }
 
+    /**
+     * Expected outcomes of the newborn screening cases: the costs of both arms, with 80 life years and 68 QALYs in both.
+     * @param screeningCost The cost of the screening arm.
+     * @param noScreeningCost The cost of the arm without screening.
+     * @return The values to check in the Excel file.
+     */
+    private static ToCheckExcel[] nbsArms(double screeningCost, double noScreeningCost) {
+        return new ToCheckExcel[] {
+            new ToCheckExcel("Process", 10, 6, screeningCost),
+            new ToCheckExcel("Process", 10, 7, 80.0),
+            new ToCheckExcel("Process", 10, 8, 68.0),
+            new ToCheckExcel("Process", 10, 9, noScreeningCost),
+            new ToCheckExcel("Process", 10, 10, 80.0),
+            new ToCheckExcel("Process", 10, 11, 68.0)
+        };
+    }
+
     static Stream<DecisionTreeExcelCase> cases() {
         return Stream.of(
             // Alternative developments
@@ -85,7 +102,16 @@ public class TestHTAExcelGeneration {
             new DecisionTreeExcelCase("/PBD.ttl", "PBD_ExperimentBase", "testPBD.xlsm", NBSModel.class, new ToCheckExcel[] {
                 new ToCheckExcel("Process", 10, 6, 1.5512269701985133),
                 new ToCheckExcel("Process", 10, 9, 0.7636187637821464)
-            })
+            }),
+            // Newborn screening with detection strategies (OSDi_test_tree_nbs.ttl). Birth prevalence 0.01; screening: sensitivity 0.9 and specificity 0.95;
+            // diagnosis: 500 for true and false positives (screening) or for the patients with the disease (no screening); disease: 1000 per year during 80 years.
+            // False negatives do not pay a diagnosis (see docs/osdi-1.3-diseno.md). No discount; life years = 80 and QALYs = 0.85 * 80 = 68 in both arms.
+            // Screening: 10 + 0.01 * 0.9 * 500 + 0.01 * 80000 + 0.99 * 0.05 * 500 = 839.25. No screening: 0.01 * (500 + 80000) = 805
+            new DecisionTreeExcelCase("/OSDi_test_tree_nbs.ttl", "TT_B01_Experiment", "testB01.xlsm", NBSModel.class, nbsArms(839.25, 805.0)),
+            // The screening test costs 4 per application, applied twice according to its guideline: 8 instead of 10
+            new DecisionTreeExcelCase("/OSDi_test_tree_nbs.ttl", "TT_B02_Experiment", "testB02.xlsm", NBSModel.class, nbsArms(837.25, 805.0)),
+            // The disease has a follow-up of 200 per year, replaced by 50 per year in the screening arm: + 0.01 * 80 * 50 = 40 (screening); + 0.01 * 80 * 200 = 160 (no screening)
+            new DecisionTreeExcelCase("/OSDi_test_tree_nbs.ttl", "TT_B03_Experiment", "testB03.xlsm", NBSModel.class, nbsArms(879.25, 965.0))
         );
     }
 

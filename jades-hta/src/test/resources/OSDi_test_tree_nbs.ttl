@@ -1,0 +1,635 @@
+@prefix : <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix osdi: <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-nbs> .
+
+<https://w3id.org/ontologies-ULL/OSDi/individuals/test-tree-nbs> rdf:type owl:Ontology ;
+    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.2> ;
+    rdfs:comment "Individuals for OSDi ontology, version 1.2. Small newborn screening models to test how the detection strategies of each arm (screening and diagnosis) are used in decision trees. The screening intervention replaces the detection strategies of the disease with a group of a screening strategy and a diagnosis strategy."@en ;
+    rdfs:label "OSDi individuals for testing decision trees: newborn screening"@en .
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_BaseAnnualCost
+osdi:TT_BaseAnnualCost rdf:type owl:NamedIndividual ,
+                                osdi:Cost ,
+                                osdi:DeterministicParameter ;
+                       osdi:hasDataItemType osdi:Currency_Euro ;
+                       osdi:appliesOneTime "false"^^xsd:boolean ;
+                       osdi:hasDescription "Annual cost of the disease, whatever its progression" ;
+                       osdi:hasExpectedValue "1000.0"^^xsd:double ;
+                       osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_NewbornLifeExpectancy
+osdi:TT_NewbornLifeExpectancy rdf:type owl:NamedIndividual ,
+                                       osdi:AttributeValueParameter ,
+                                       osdi:DeterministicParameter ;
+                              osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+                              osdi:isValueOfAttribute osdi:Attribute_LifeExpectancy ;
+                              osdi:hasExpectedValue "80.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_NewbornPopulationAge
+osdi:TT_NewbornPopulationAge rdf:type owl:NamedIndividual ,
+                                      osdi:AttributeValueParameter ,
+                                      osdi:DeterministicParameter ;
+                             osdi:hasDataItemType osdi:DI_Other ;
+                             osdi:isValueOfAttribute osdi:Attribute_Age ;
+                             osdi:hasExpectedValue "0.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_PopulationBaseUtility
+osdi:TT_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+                                       osdi:DeterministicParameter ,
+                                       osdi:Utility ;
+                              osdi:hasDataItemType osdi:DI_Generic_Utility ;
+                              osdi:appliesOneTime "false"^^xsd:boolean ;
+                              osdi:hasDescription "Base utility for the studied population" ;
+                              osdi:hasExpectedValue "0.85"^^xsd:double ;
+                              osdi:isDisutility "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_PopulationSex
+osdi:TT_PopulationSex rdf:type owl:NamedIndividual ,
+                               osdi:AttributeValueParameter ,
+                               osdi:DeterministicParameter ;
+                      osdi:hasDataItemType osdi:DI_Proportion ;
+                      osdi:isValueOfAttribute osdi:Attribute_Sex ;
+                      osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_NbsPopulation
+osdi:TT_NbsPopulation rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TT_NewbornPopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:TT_B01_BirthPrevalence ,
+        osdi:TT_B02_BirthPrevalence ,
+        osdi:TT_B03_BirthPrevalence ;
+    osdi:hasLifeExpectancy osdi:TT_NewbornLifeExpectancy ;
+    osdi:hasSex osdi:TT_PopulationSex ;
+    osdi:hasUtility osdi:TT_PopulationBaseUtility ;
+    osdi:hasDescription "A dummy population of 1000 newborns, with a life expectancy of 80 years and a base utility of 0.85" ;
+    osdi:hasMaxAge "100.0"^^xsd:double ;
+    osdi:hasMinAge "0.0"^^xsd:double ;
+    osdi:hasSize 1000 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_BirthPrevalence
+osdi:TT_B01_BirthPrevalence rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:EpidemiologicalParameter ;
+    osdi:hasDataItemType osdi:DI_BirthPrevalence ;
+    osdi:isParameterOf osdi:TT_NbsPopulation ,
+        osdi:TT_B01_Disease ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "Birth prevalence of the disease" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_Diagnosis
+osdi:TT_B01_Diagnosis rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisStrategy ;
+    osdi:detects osdi:TT_B01_Disease ;
+    osdi:hasCategory osdi:DiagnosisCat ;
+    osdi:hasCost osdi:TT_B01_DiagnosisCost ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "Diagnosis of the disease: clinical detection without screening, and confirmation of the positive results of the screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_DiagnosisCost
+osdi:TT_B01_DiagnosisCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the diagnosis" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_ScreeningStrategy
+osdi:TT_B01_ScreeningStrategy rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:detects osdi:TT_B01_Disease ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:hasCost osdi:TT_B01_ScreeningCost ;
+    osdi:hasSensitivity osdi:TT_B01_Sensitivity ;
+    osdi:hasSpecificity osdi:TT_B01_Specificity ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "Screening test" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_Sensitivity
+osdi:TT_B01_Sensitivity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Sensitivity ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "Sensitivity of the screening test" ;
+    osdi:hasExpectedValue "0.9"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_Specificity
+osdi:TT_B01_Specificity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Specificity ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "Specificity of the screening test" ;
+    osdi:hasExpectedValue "0.95"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_ArmStrategies
+osdi:TT_B01_ArmStrategies rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TT_B01_ScreeningStrategy ,
+        osdi:TT_B01_Diagnosis ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "Detection strategies of the disease in the screening arm" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_Replacement
+osdi:TT_B01_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_B01_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_B01_ArmStrategies ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "In the screening arm, the detection strategies of the disease are the screening test and the confirmatory diagnosis" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_Screening
+osdi:TT_B01_Screening rdf:type owl:NamedIndividual ,
+        osdi:ScreeningIntervention ;
+    osdi:hasEffect osdi:TT_B01_Replacement ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "Newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_NoScreening
+osdi:TT_B01_NoScreening rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisIntervention ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "No screening: clinical detection" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_Disease
+osdi:TT_B01_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_B01_Screening ,
+        osdi:TT_B01_NoScreening ;
+    osdi:hasStrategy osdi:TT_B01_Diagnosis ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:hasDescription "Disease detected by newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_ScreeningCost
+osdi:TT_B01_ScreeningCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B01_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the screening test" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_Experiment
+osdi:TT_B01_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_B01_Model ;
+    osdi:hasDescription "Newborn screening with a screening strategy and a diagnosis strategy." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B01_Model
+osdi:TT_B01_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_B01_Screening ;
+    osdi:hasComparatorIntervention osdi:TT_B01_NoScreening ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_NbsPopulation ,
+        osdi:TT_NewbornPopulationAge ,
+        osdi:TT_NewbornLifeExpectancy ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_B01_BirthPrevalence ,
+        osdi:TT_B01_Diagnosis ,
+        osdi:TT_B01_DiagnosisCost ,
+        osdi:TT_B01_ScreeningStrategy ,
+        osdi:TT_B01_Sensitivity ,
+        osdi:TT_B01_Specificity ,
+        osdi:TT_B01_ArmStrategies ,
+        osdi:TT_B01_Replacement ,
+        osdi:TT_B01_Screening ,
+        osdi:TT_B01_NoScreening ,
+        osdi:TT_B01_Disease ,
+        osdi:TT_B01_ScreeningCost ;
+    osdi:hasDescription "B01. Newborn screening with a screening strategy and a diagnosis strategy." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_BirthPrevalence
+osdi:TT_B02_BirthPrevalence rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:EpidemiologicalParameter ;
+    osdi:hasDataItemType osdi:DI_BirthPrevalence ;
+    osdi:isParameterOf osdi:TT_NbsPopulation ,
+        osdi:TT_B02_Disease ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Birth prevalence of the disease" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_Diagnosis
+osdi:TT_B02_Diagnosis rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisStrategy ;
+    osdi:detects osdi:TT_B02_Disease ;
+    osdi:hasCategory osdi:DiagnosisCat ;
+    osdi:hasCost osdi:TT_B02_DiagnosisCost ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Diagnosis of the disease: clinical detection without screening, and confirmation of the positive results of the screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_DiagnosisCost
+osdi:TT_B02_DiagnosisCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the diagnosis" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_ScreeningStrategy
+osdi:TT_B02_ScreeningStrategy rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:detects osdi:TT_B02_Disease ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:usesHealthTechnology osdi:TT_B02_Test ;
+    osdi:hasSensitivity osdi:TT_B02_Sensitivity ;
+    osdi:hasSpecificity osdi:TT_B02_Specificity ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Screening test" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_Sensitivity
+osdi:TT_B02_Sensitivity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Sensitivity ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Sensitivity of the screening test" ;
+    osdi:hasExpectedValue "0.9"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_Specificity
+osdi:TT_B02_Specificity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Specificity ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Specificity of the screening test" ;
+    osdi:hasExpectedValue "0.95"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_ArmStrategies
+osdi:TT_B02_ArmStrategies rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TT_B02_ScreeningStrategy ,
+        osdi:TT_B02_Diagnosis ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Detection strategies of the disease in the screening arm" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_Replacement
+osdi:TT_B02_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_B02_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_B02_ArmStrategies ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "In the screening arm, the detection strategies of the disease are the screening test and the confirmatory diagnosis" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_Screening
+osdi:TT_B02_Screening rdf:type owl:NamedIndividual ,
+        osdi:ScreeningIntervention ;
+    osdi:hasEffect osdi:TT_B02_Replacement ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_NoScreening
+osdi:TT_B02_NoScreening rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisIntervention ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "No screening: clinical detection" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_Disease
+osdi:TT_B02_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_B02_Screening ,
+        osdi:TT_B02_NoScreening ;
+    osdi:hasStrategy osdi:TT_B02_Diagnosis ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Disease detected by newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_Test
+osdi:TT_B02_Test rdf:type owl:NamedIndividual ,
+        osdi:HealthTechnology ;
+    osdi:hasCost osdi:TT_B02_TestCost ;
+    osdi:hasGuideline osdi:TT_B02_TestGuideline ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Screening test applied twice" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_TestCost
+osdi:TT_B02_TestCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each application of the screening test" ;
+    osdi:hasExpectedValue "4.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_TestGuideline
+osdi:TT_B02_TestGuideline rdf:type owl:NamedIndividual ,
+        osdi:Guideline ;
+    osdi:hasCount osdi:TT_B02_TestCount ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Two applications of the screening test" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_TestCount
+osdi:TT_B02_TestCount rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Two applications" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_Experiment
+osdi:TT_B02_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_B02_Model ;
+    osdi:hasDescription "Newborn screening whose cost comes from a health technology applied according to a guideline (two applications)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B02_Model
+osdi:TT_B02_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_B02_Screening ;
+    osdi:hasComparatorIntervention osdi:TT_B02_NoScreening ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_NbsPopulation ,
+        osdi:TT_NewbornPopulationAge ,
+        osdi:TT_NewbornLifeExpectancy ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_B02_BirthPrevalence ,
+        osdi:TT_B02_Diagnosis ,
+        osdi:TT_B02_DiagnosisCost ,
+        osdi:TT_B02_ScreeningStrategy ,
+        osdi:TT_B02_Sensitivity ,
+        osdi:TT_B02_Specificity ,
+        osdi:TT_B02_ArmStrategies ,
+        osdi:TT_B02_Replacement ,
+        osdi:TT_B02_Screening ,
+        osdi:TT_B02_NoScreening ,
+        osdi:TT_B02_Disease ,
+        osdi:TT_B02_Test ,
+        osdi:TT_B02_TestCost ,
+        osdi:TT_B02_TestGuideline ,
+        osdi:TT_B02_TestCount ;
+    osdi:hasDescription "B02. Newborn screening whose cost comes from a health technology applied according to a guideline (two applications)." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_BirthPrevalence
+osdi:TT_B03_BirthPrevalence rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:EpidemiologicalParameter ;
+    osdi:hasDataItemType osdi:DI_BirthPrevalence ;
+    osdi:isParameterOf osdi:TT_NbsPopulation ,
+        osdi:TT_B03_Disease ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Birth prevalence of the disease" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_Diagnosis
+osdi:TT_B03_Diagnosis rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisStrategy ;
+    osdi:detects osdi:TT_B03_Disease ;
+    osdi:hasCategory osdi:DiagnosisCat ;
+    osdi:hasCost osdi:TT_B03_DiagnosisCost ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Diagnosis of the disease: clinical detection without screening, and confirmation of the positive results of the screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_DiagnosisCost
+osdi:TT_B03_DiagnosisCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the diagnosis" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_ScreeningStrategy
+osdi:TT_B03_ScreeningStrategy rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:detects osdi:TT_B03_Disease ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:hasCost osdi:TT_B03_ScreeningCost ;
+    osdi:hasSensitivity osdi:TT_B03_Sensitivity ;
+    osdi:hasSpecificity osdi:TT_B03_Specificity ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Screening test" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_Sensitivity
+osdi:TT_B03_Sensitivity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Sensitivity ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Sensitivity of the screening test" ;
+    osdi:hasExpectedValue "0.9"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_Specificity
+osdi:TT_B03_Specificity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Specificity ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Specificity of the screening test" ;
+    osdi:hasExpectedValue "0.95"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_ArmStrategies
+osdi:TT_B03_ArmStrategies rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TT_B03_ScreeningStrategy ,
+        osdi:TT_B03_Diagnosis ,
+        osdi:TT_B03_NewFollowUp ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Detection strategies of the disease in the screening arm" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_Replacement
+osdi:TT_B03_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_B03_Disease ;
+    osdi:hasReplacementStrategy osdi:TT_B03_ArmStrategies ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "In the screening arm, the detection strategies of the disease are the screening test and the confirmatory diagnosis" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_Screening
+osdi:TT_B03_Screening rdf:type owl:NamedIndividual ,
+        osdi:ScreeningIntervention ;
+    osdi:hasEffect osdi:TT_B03_Replacement ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_NoScreening
+osdi:TT_B03_NoScreening rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisIntervention ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "No screening: clinical detection" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_Disease
+osdi:TT_B03_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_B03_Screening ,
+        osdi:TT_B03_NoScreening ;
+    osdi:hasStrategy osdi:TT_B03_Diagnosis ,
+        osdi:TT_B03_FollowUp ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Disease detected by newborn screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_ScreeningCost
+osdi:TT_B03_ScreeningCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the screening test" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_FollowUp
+osdi:TT_B03_FollowUp rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_B03_FollowUpCost ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Follow-up of the disease without screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_FollowUpCost
+osdi:TT_B03_FollowUpCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up without screening" ;
+    osdi:hasExpectedValue "200.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_NewFollowUp
+osdi:TT_B03_NewFollowUp rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_B03_NewFollowUpCost ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Follow-up of the disease detected by screening" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_NewFollowUpCost
+osdi:TT_B03_NewFollowUpCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_B03_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up after screening" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_Experiment
+osdi:TT_B03_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_B03_Model ;
+    osdi:hasDescription "Newborn screening that also replaces the follow-up strategy of the disease." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_B03_Model
+osdi:TT_B03_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_B03_Screening ;
+    osdi:hasComparatorIntervention osdi:TT_B03_NoScreening ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_NbsPopulation ,
+        osdi:TT_NewbornPopulationAge ,
+        osdi:TT_NewbornLifeExpectancy ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_B03_BirthPrevalence ,
+        osdi:TT_B03_Diagnosis ,
+        osdi:TT_B03_DiagnosisCost ,
+        osdi:TT_B03_ScreeningStrategy ,
+        osdi:TT_B03_Sensitivity ,
+        osdi:TT_B03_Specificity ,
+        osdi:TT_B03_ArmStrategies ,
+        osdi:TT_B03_Replacement ,
+        osdi:TT_B03_Screening ,
+        osdi:TT_B03_NoScreening ,
+        osdi:TT_B03_Disease ,
+        osdi:TT_B03_ScreeningCost ,
+        osdi:TT_B03_FollowUp ,
+        osdi:TT_B03_FollowUpCost ,
+        osdi:TT_B03_NewFollowUp ,
+        osdi:TT_B03_NewFollowUpCost ;
+    osdi:hasDescription "B03. Newborn screening that also replaces the follow-up strategy of the disease." .
+
+
+###  Generated from the test specification of JaDES-HTA decision trees

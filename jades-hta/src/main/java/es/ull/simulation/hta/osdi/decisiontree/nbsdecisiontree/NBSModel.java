@@ -1,6 +1,8 @@
 package es.ull.simulation.hta.osdi.decisiontree.nbsdecisiontree;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.semanticweb.owlapi.model.IRI;
@@ -17,8 +19,6 @@ import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.DetectionInterventionWrapper;
 import es.ull.simulation.hta.osdi.ontology.DiseaseWrapper;
-import es.ull.simulation.hta.osdi.ontology.EffectType;
-import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.EpidemiologicCharacterizationType;
 import es.ull.simulation.hta.osdi.ontology.ExperimentWrapper;
 import es.ull.simulation.hta.osdi.ontology.InterventionType;
@@ -55,6 +55,10 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
      * The diagnosis costs associated with the disease.
      */
     private final Set<ParameterWrapper> diagnosisCosts;
+    /**
+     * The detection strategies of each arm, and the costs they produce, indexed by the IRI of the intervention of the arm.
+     */
+    private final Map<IRI, NBSDetectionArm> detectionArms = new HashMap<>();
     /**
      * The wrapper of the disease instance in this model.
      */
@@ -102,19 +106,6 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
             throw new UnsupportedOSDiFeatureException("The interventions of the newborn screening model target " + diseaseGenerator.getTargetProgression().get().getShortName()
                 + ". Newborn screening models only support interventions whose target is the disease.");
         }
-        // TODO: Read the screening and diagnosis strategies of each arm from the strategy replacements of the interventions (see docs/osdi-1.3-diseno.md)
-        for (InterventionWrapper intervention : modelWrapper.getInterventionIndividuals()) {
-            if (!intervention.getStrategies().isEmpty()) {
-                throw new MalformedOSDiModelException("The intervention " + intervention.getShortName() + " declares strategies (" + intervention.getStrategies()
-                    + "). Interventions must declare their strategies through a strategy replacement effect (" + OSDiClass.STRATEGY_REPLACEMENT_EFFECT.getShortName() + ").");
-            }
-            for (EffectWrapper effect : intervention.getEffects()) {
-                if (EffectType.STRATEGY_REPLACEMENT_EFFECT.equals(effect.getEffectType())) {
-                    throw new UnsupportedOSDiFeatureException("The intervention " + intervention.getShortName() + " defines the strategy replacement effect " + effect.getShortName()
-                        + ". Newborn screening models do not support strategy replacements yet.");
-                }
-            }
-        }
         if (modelWrapper.getDiseaseIndividuals().size() > 1)
             log.warn("This type of model requires exactly one disease. Found " + modelWrapper.getDiseaseIndividuals().size() + ". Using " + diseaseWrapper.getShortName() + " as the disease for the model and ignoring the rest.");
 
@@ -127,6 +118,8 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
                 throw new MalformedOSDiModelException("The wrapper for the intervention " + interventionWrapper.getIndividualIRI() + " is not a DetectionInterventionWrapper, which is required for the NBS model.");
             }
             DetectionInterventionWrapper detectionInterventionWrapper = (DetectionInterventionWrapper) interventionWrapper;
+            // The detection strategies of the arm must be known before building its sub-tree
+            detectionArms.put(detectionInterventionWrapper.getIndividualIRI(), new NBSDetectionArm(this, detectionInterventionWrapper, diagnosisCosts));
             if (InterventionType.DIAGNOSIS.equals(detectionInterventionWrapper.getInterventionType())) {
                 if (noScreeningTreePart == null) {
                     noScreeningTreePart = new NBSNoScreeningInterventionBuilder(this, detectionInterventionWrapper);
@@ -159,17 +152,14 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
     }
 
     /**
-     * Find the diagnosis costs associated with the disease. This method looks for a diagnosis strategy defined in the disease and returns its costs. If there is no diagnosis strategy, an empty set will be returned.        
-     * TODO: Currently we assume that the disease defines a diagnosis cost. Another way of getting this cost would be using the no screening intervention and
-     * even the screening intervention (in case it includes diagnosis costs as well)
-     * @return A set of ParameterWrapper instances representing the diagnosis costs associated with the disease.
-     * @throws UnsupportedOSDiFeatureException 
+     * Finds the own diagnosis costs of the disease: its costs with the diagnosis category. They are added to the costs of the diagnosis strategy of
+     * each arm (see {@link NBSDetectionArm}), as the own costs and the strategies of any other element of the model.
+     * @return The own diagnosis costs of the disease.
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered.
      * @throws MalformedOSDiModelException If there are issues with the OSDi model, such as missing parameters or incorrect data types.
      */
     private Set<ParameterWrapper> findDiagnosisCosts() throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
-        Set<ParameterWrapper> diagnosisCosts = getOSDiWrapper().filterModelItemsWithSKOSCategory(diseaseWrapper.getCosts(), ResourceUsageSKOSCategory.DIAGNOSIS);
-        // TODO: Explore strategies in the disease and even in the interventions to find diagnosis costs as well.
-        return diagnosisCosts;
+        return getOSDiWrapper().filterModelItemsWithSKOSCategory(diseaseWrapper.getCosts(), ResourceUsageSKOSCategory.DIAGNOSIS);
     }
 
     /**
@@ -220,11 +210,12 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
     }
     
     /**
-     * Returns the diagnosis costs associated with the disease.
-     * @return The diagnosis costs.
+     * Returns the detection strategies of the arm of an intervention, and the costs they produce (see {@link NBSDetectionArm}).
+     * @param intervention The intervention of the arm.
+     * @return The detection strategies of the arm of the intervention.
      */
-    public Set<ParameterWrapper> getDiagnosisCosts() {
-        return diagnosisCosts;
+    public NBSDetectionArm getDetectionArm(InterventionWrapper intervention) {
+        return detectionArms.get(intervention.getIndividualIRI());
     }
     
     /**

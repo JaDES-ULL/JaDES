@@ -45,7 +45,7 @@ public class SimpleInterventionGenerator extends InterventionGenerator {
      * the same health condition
      * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
      */
-    static Map<IRI, Set<StrategyWrapper>> getStrategyReplacements(InterventionWrapper intervention) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+    public static Map<IRI, Set<StrategyWrapper>> getStrategyReplacements(InterventionWrapper intervention) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         if (!intervention.getStrategies().isEmpty()) {
             throw new MalformedOSDiModelException("The intervention " + intervention.getShortName() + " declares strategies (" + intervention.getStrategies()
                 + "). Interventions must declare their strategies through a strategy replacement effect (" + OSDiClass.STRATEGY_REPLACEMENT_EFFECT.getShortName() + ").");

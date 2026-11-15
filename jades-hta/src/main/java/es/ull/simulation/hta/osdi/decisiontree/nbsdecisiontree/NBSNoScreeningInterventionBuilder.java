@@ -39,8 +39,10 @@ public class NBSNoScreeningInterventionBuilder extends InterventionGenerator {
         noScreeningPopulationNode.updateCosts(getInterventionWrapper(), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
         noScreeningPopulationNode.updateUtility(getInterventionWrapper(), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
         noScreeningPopulationNode.updateEffects(getInterventionWrapper());
-        final BranchDestinationNode diseaseNode = parentTreeModel.getDiseaseGenerator().generate("Has the disease");
-        diseaseNode.addCostParameters(parentTreeModel.getDiagnosisCosts());
+        // The patients with the disease are diagnosed with the diagnosis strategy of the arm (see NBSDetectionArm)
+        final NBSDetectionArm arm = parentTreeModel.getDetectionArm(getInterventionWrapper());
+        final BranchDestinationNode diseaseNode = parentTreeModel.getDiseaseGenerator().generate("Has the disease", arm.getReplacements());
+        arm.addDiagnosisCosts(diseaseNode);
         
         noScreeningPopulationNode.link(diseaseNode, birthPrevalenceParam);
         // Adds a default branch for those not affected by the disease

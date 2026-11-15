@@ -579,7 +579,11 @@ public final class DecisionTreeCatalog {
             // Only a strategy replacement effect can affect a health condition.
             new MalformedCase(MALFORMED, "TT_N18_Experiment", "Generic effect that affects a health condition", MalformedOSDiModelException.class),
             // The decision tree does not support yet sub-guidelines, condition expressions or application ages in a guideline.
-            new MalformedCase(MALFORMED, "TT_N19_Experiment", "Guideline with sub-guidelines (not supported yet)", UnsupportedOSDiFeatureException.class)
+            new MalformedCase(MALFORMED, "TT_N19_Experiment", "Guideline with sub-guidelines (not supported yet)", UnsupportedOSDiFeatureException.class),
+            // Detection properties are declared by the detection strategies, and the disease detected by an intervention is its target.
+            new MalformedCase(MALFORMED, "TT_N20_Experiment", "Screening intervention with a sensitivity", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N21_Experiment", "Screening strategy in the arm without screening", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N22_Experiment", "Detection intervention that declares the disease it detects", MalformedOSDiModelException.class)
         );
     }
 }

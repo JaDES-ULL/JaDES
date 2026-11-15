@@ -260,8 +260,18 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
      * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
      */
     private Set<StrategyWrapper> getArmStrategies(HealthConditionWrapper healthCondition) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
-        final Set<StrategyWrapper> strategies = new TreeSet<>(healthCondition.getStrategies());
-        final Set<StrategyWrapper> replacement = armReplacements.get(healthCondition.getIndividualIRI());
+        return replaceByType(healthCondition.getStrategies(), armReplacements.get(healthCondition.getIndividualIRI()));
+    }
+
+    /**
+     * Applies a strategy replacement by type of strategy (detection, i.e. screening or diagnosis; follow-up; or treatment): each replacement
+     * strategy replaces the strategies of its type, or it is added if there was none of that type. The strategies of other types are kept.
+     * @param originalStrategies The strategies of a health condition
+     * @param replacement The replacement strategies, or null if there is no replacement
+     * @return The strategies after the replacement
+     */
+    public static Set<StrategyWrapper> replaceByType(Set<StrategyWrapper> originalStrategies, Set<StrategyWrapper> replacement) {
+        final Set<StrategyWrapper> strategies = new TreeSet<>(originalStrategies);
         if (replacement == null) {
             return strategies;
         }
