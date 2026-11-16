@@ -48,8 +48,7 @@ osdi:TD_D01_Model rdf:type owl:NamedIndividual ,
         osdi:TD_D01_Population ,
         osdi:TD_D01_PopulationAge ,
         osdi:TD_D01_PopulationBaseUtility ,
-        osdi:TD_D01_PopulationSex ,
-        osdi:TD_D01_PopulationSex_StochasticUncertainty ;
+        osdi:TD_D01_PopulationSex ;
     osdi:hasDescription "D01. Chronic manifestations with an annual probability, modified by a hazard ratio (ManX) and a factor (ManY) of the intervention." .
 
 ###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_Population
@@ -78,18 +77,12 @@ osdi:TD_D01_PopulationAge rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_PopulationSex
 osdi:TD_D01_PopulationSex rdf:type owl:NamedIndividual ,
         osdi:AttributeValueParameter ,
-        osdi:FirstOrderUncertaintyParameter ;
+        osdi:DeterministicParameter ;
     osdi:hasDataItemType osdi:DI_Proportion ;
-    osdi:hasUncertaintyCharacterization osdi:TD_D01_PopulationSex_StochasticUncertainty ;
     osdi:includedByModel osdi:TD_D01_Model ;
     osdi:isValueOfAttribute osdi:Attribute_Sex ;
-    osdi:hasDescription "Value of Attribute_Sex (the DES requires a Bernoulli distribution)" .
-
-###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_PopulationSex_StochasticUncertainty
-osdi:TD_D01_PopulationSex_StochasticUncertainty rdf:type owl:NamedIndividual ,
-        osdi:BernoulliDistributionExpression ;
-    osdi:includedByModel osdi:TD_D01_Model ;
-    osdi:hasProbabilityParameter "0.5"^^xsd:double .
+    osdi:hasDescription "Proportion of women" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
 
 ###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_PopulationBaseUtility
 osdi:TD_D01_PopulationBaseUtility rdf:type owl:NamedIndividual ,

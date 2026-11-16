@@ -147,6 +147,14 @@ Limitations:
 - A risk of a clinical progression that is a time to event T (`DI_TimeToEvent`) is converted in decision trees into the probability `1 - e^(-1/T)` (exponential time). The formula of each branch computes it from the time modified by the effects of the path: a hazard ratio m gives `1 - e^(-m/T)` (P26). The synthetic parameter `P_<time>` is not written in the Excel file. The risk of a strategy outcome cannot be a time to event yet (N24).
 - The DES only applies the effects whose cause is an intervention, and it does not support times to event as risks yet.
 
+## jades-hta: Sex of the population in the DES
+
+The sex parameter of a population (`hasSex`) represents the heterogeneity of the sex in the population (first-order uncertainty), with 0 for men and 1 for women (`OSDiPopulation.initializeSexVariate`):
+
+- A deterministic, second-order or calculated parameter is the proportion of women, p, and each patient's sex is drawn from a Bernoulli(p). A second-order parameter is the uncertainty on the true proportion: it is sampled once per simulation (its expected value in the base case), and the value is then the parameter of the Bernoulli. A deterministic value outside [0, 1] is rejected (`MalformedOSDiModelException`); a sampled value outside [0, 1] is not checked in advance.
+- A first-order parameter must be a discrete distribution (e.g., Bernoulli), which is sampled for each patient; any other distribution is rejected (`MalformedOSDiModelException`).
+- TODO: the age (`hasAge`) is still converted directly into a distribution that is sampled for each patient, so a second-order age is treated as first-order heterogeneity.
+
 ## jades-hta: Conformance between the decision tree and the DES
 
 OSDi defines the semantics of a model; the decision tree generator (`osdi.decisiontree`) and the discrete-event simulation (`osdi.des`) implement it to a different extent. The table describes what each one does today. When a feature is not supported, the generator either rejects the model (`UnsupportedOSDiFeatureException`), logs a warning, or ignores it silently.

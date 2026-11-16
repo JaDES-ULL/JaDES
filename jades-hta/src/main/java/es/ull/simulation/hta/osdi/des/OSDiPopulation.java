@@ -12,7 +12,9 @@ import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.EpidemiologicCharacterizationType;
 import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
 import es.ull.simulation.hta.osdi.ontology.OSDiDataProperty;
+import es.ull.simulation.hta.osdi.ontology.ParameterNatureType;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
+import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.DeterministicParameterData;
 import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.hta.params.ParameterGroup;
 import es.ull.simulation.hta.params.StandardParameter;
@@ -26,6 +28,9 @@ import simkit.random.RandomVariateFactory;
 public class OSDiPopulation extends StdPopulation {
 	private final static OSDiLogger log = OSDiLogger.getLogger(OSDiPopulation.class);
 	private final RandomVariate ageVariate;
+	/** The parameter that defines the sex of the patients: the proportion of women, or a first-order discrete distribution */
+	private final ParameterWrapper sexWrapper;
+	/** The distribution of the sex when the sex parameter is first-order; null otherwise (see {@link #getSexVariate(Patient)}) */
 	private final DiscreteRandomVariate sexVariate;
 	private final Set<ParameterWrapper> epidemParams;
 	private final ParameterWrapper utilityParam;
@@ -52,8 +57,8 @@ public class OSDiPopulation extends StdPopulation {
 		final ParameterWrapper ageWrapper = populationWrapper.getAgeParameter().orElseThrow(() -> new MalformedOSDiModelException("Population " + populationWrapper.getShortName() + " does not have a valid age parameter."));
 		ageVariate = ParameterFactory.getRandomVariateInstance(ageWrapper);
 		// Process population sex
-		final ParameterWrapper sexWrapper = populationWrapper.getSexParameter().orElseThrow(() -> new MalformedOSDiModelException("Population " + populationWrapper.getShortName() + " does not have a valid sex parameter."));
-		sexVariate = (DiscreteRandomVariate) ParameterFactory.getRandomVariateInstance(sexWrapper);
+		this.sexWrapper = populationWrapper.getSexParameter().orElseThrow(() -> new MalformedOSDiModelException("Population " + populationWrapper.getShortName() + " does not have a valid sex parameter."));
+		this.sexVariate = initializeSexVariate(populationWrapper.getShortName());
 		
 		this.utilityParam = getAndCheckUtilityParam(populationWrapper);
 		if (utilityParam != null)
@@ -69,10 +74,43 @@ public class OSDiPopulation extends StdPopulation {
 		return (OSDiDESModel) super.getModel();
 	}
 
+	/**
+	 * Checks the sex parameter of the population and, if it is a first-order parameter, returns its distribution.
+	 * The sex parameter represents the heterogeneity of the sex in the population (first-order uncertainty), with 0 for men and 1 for women:
+	 * <ul>
+	 * <li>A first-order parameter must be a discrete distribution (e.g., Bernoulli), which is sampled for each patient.</li>
+	 * <li>Any other parameter (deterministic, second-order or calculated) is the proportion of women, p, which is the parameter of a
+	 * Bernoulli distribution sampled for each patient. A second-order parameter defines the uncertainty on the true proportion: it is
+	 * sampled once per simulation (its expected value in the base case), and the value is then used as the parameter of the Bernoulli.</li>
+	 * </ul>
+	 * @param populationName The name of the population, for the messages
+	 * @return The distribution of the sex if the sex parameter is first-order; null otherwise
+	 * @throws MalformedOSDiModelException If a first-order parameter is not a discrete distribution, or a deterministic proportion of women
+	 * is not between 0 and 1
+	 */
+	private DiscreteRandomVariate initializeSexVariate(String populationName) throws MalformedOSDiModelException {
+		if (ParameterNatureType.FIRST_ORDER.equals(sexWrapper.getNature())) {
+			if (ParameterFactory.getRandomVariateInstance(sexWrapper) instanceof DiscreteRandomVariate discrete) {
+				return discrete;
+			}
+			throw new MalformedOSDiModelException("The sex parameter " + sexWrapper.getShortName() + " of the population " + populationName
+				+ " is a first-order parameter, so it must be a discrete distribution (e.g., Bernoulli). Use a deterministic or second-order parameter to define the proportion of women.");
+		}
+		if (sexWrapper.getParameterNatureData() instanceof DeterministicParameterData data && (data.value() < 0.0 || data.value() > 1.0)) {
+			throw new MalformedOSDiModelException("The sex parameter " + sexWrapper.getShortName() + " of the population " + populationName
+				+ " must be a proportion of women between 0 and 1. Found " + data.value());
+		}
+		return null;
+	}
+
 	@Override
 	public void createParameters() {
 		for (ParameterWrapper attrWrapper : attributeValues) {
 			model.addParameter(ParameterFactory.getParameterInstance(getModel(), attrWrapper, ParameterGroup.ATTRIBUTE));
+		}
+		// The proportion of women is a parameter of the model (see initializeSexVariate)
+		if (sexVariate == null) {
+			model.addParameter(ParameterFactory.getParameterInstance(getModel(), sexWrapper, ParameterGroup.ATTRIBUTE));
 		}
 		if (epidemParams.isEmpty()) {
 			log.warn("No valid epidemiological parameter found for population " + name() + " and disease " + disease.name() + ". We will assume a full prevalence for the population and disease.");
@@ -126,9 +164,17 @@ public class OSDiPopulation extends StdPopulation {
 		return utilityParams.iterator().next();
 	}
 
+	/**
+	 * Returns the distribution of the sex of the patients (0 for men, 1 for women). It is called once per simulation (see
+	 * {@link StdPopulation#getSex(Patient)}), so a second-order proportion of women is sampled once per simulation and then used as the
+	 * parameter of a Bernoulli distribution, which is sampled for each patient (see {@link #initializeSexVariate(String)}).
+	 */
 	@Override
 	protected DiscreteRandomVariate getSexVariate(Patient pat) {
-		return sexVariate;
+		if (sexVariate != null) {
+			return sexVariate;
+		}
+		return RandomVariateFactory.getDiscreteRandomVariateInstance("BernoulliVariate", getCommonRandomNumber(), getModel().getParameterValue(sexWrapper.getShortName(), pat));
 	}
 	
 	@Override

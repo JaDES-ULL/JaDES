@@ -116,6 +116,17 @@ public class TestDESRisksAndEffects {
     }
 
     @Test
+    @DisplayName("D01. A deterministic sex parameter is the proportion of women, used as the parameter of a Bernoulli distribution")
+    public void assignsSexFromProportionOfWomen() {
+        // Sex: 0 for men, 1 for women. The proportion of women is 0.5. Tolerance: about three standard errors for 5000 patients (0.007)
+        int women = 0;
+        for (Patient pat : comparatorPatients) {
+            women += pat.getSex();
+        }
+        assertEquals(0.5, (double) women / comparatorPatients.length, 0.02, "Proportion of women");
+    }
+
+    @Test
     @DisplayName("D01. The annual probability of a manifestation is converted into the exact rate: the proportion after 5 years is 1 - (1 - p)^5")
     public void convertsAnnualProbabilityIntoExactRate() {
         // With the exact rate -ln(1 - p), the proportion of patients with the manifestation after 5 years is 1 - (1 - p)^5 (the mortality of
