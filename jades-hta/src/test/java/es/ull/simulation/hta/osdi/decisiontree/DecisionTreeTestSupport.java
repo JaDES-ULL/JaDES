@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -26,6 +27,7 @@ import org.semanticweb.owlapi.io.StreamDocumentSource;
 
 import es.ull.simulation.hta.osdi.decisiontree.excelport.HTAExcelModelFactory;
 import es.ull.simulation.hta.osdi.decisiontree.excelport.ProcessSheet;
+import es.ull.simulation.hta.osdi.decisiontree.factories.AbstractModelFactory;
 import es.ull.simulation.hta.osdi.decisiontree.factories.CentralModelFactory;
 import es.ull.simulation.hta.osdi.decisiontree.factories.SimpleModel;
 import es.ull.simulation.hta.osdi.decisiontree.nbsdecisiontree.NBSModel;
@@ -156,6 +158,11 @@ final class DecisionTreeTestSupport {
      */
     static double expectedValue(ParameterWrapper parameter) {
         assertNotNull(parameter, "A branch that is not the default one must define a probability");
+        // Probability derived from a time to event T: 1 - e^(-1/T)
+        final Optional<ParameterWrapper> sourceTime = AbstractModelFactory.getSourceTimeToEvent(parameter);
+        if (sourceTime.isPresent()) {
+            return 1.0 - Math.exp(-1.0 / expectedValue(sourceTime.get()));
+        }
         if (parameter.getParameterNatureData() instanceof DeterministicParameterData data) {
             return data.value();
         }

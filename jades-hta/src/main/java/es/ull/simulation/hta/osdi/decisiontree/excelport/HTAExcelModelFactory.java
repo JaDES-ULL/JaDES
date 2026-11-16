@@ -9,12 +9,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import es.ull.simulation.hta.MalformedSimulationModelException;
 import es.ull.simulation.hta.osdi.decisiontree.SingleDiseaseAndPopulationModel;
+import es.ull.simulation.hta.osdi.decisiontree.factories.AbstractModelFactory;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
@@ -194,13 +196,17 @@ public class HTAExcelModelFactory {
      * <li>odds ratio: (x * m / (1 - x + x * m));</li>
      * <li>subtract: (x - m).</li>
      * </ul>
+     * A synthetic probability derived from a time to event T (see {@link AbstractModelFactory#getProbabilityParameterFromGenericParameter(ParameterWrapper)})
+     * is not written in the Excel file: its formula is (1 - EXP(-1 / T')), where T' is the formula of T modified by the effects of the path. For
+     * instance, a hazard ratio m on T gives (1 - EXP(-1 / (T / m))).
      * @param param The parameter
      * @param effects The effects of the path of the decision tree (only those that affect the parameter are used)
      * @return The Excel formula for the parameter
      * @throws MalformedOSDiModelException If more than one effect replaces the parameter
      */
     public static String getParameterTextFormula(ParameterWrapper param, Set<EffectWrapper> effects) throws MalformedOSDiModelException {
-        String formula = param.getShortName();
+        final Optional<ParameterWrapper> sourceTime = AbstractModelFactory.getSourceTimeToEvent(param);
+        String formula = sourceTime.isPresent() ? "(1 - EXP(-1 / " + getParameterTextFormula(sourceTime.get(), effects) + "))" : param.getShortName();
         for (EffectWrapper effect : EffectWrapper.sortForParameter(param, effects)) {
             final String magnitude = effect.getEffectMagnitude().getShortName();
             switch (effect.getOperation(param)) {

@@ -507,14 +507,12 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         if (!(param instanceof ParameterWrapper)) {
             throw new MalformedOSDiModelException("The risk characterization " + param.getShortName() + " for the clinical progression " + progression.getShortName() + " is not a parameter.");
         }
-        // TODO: Support effects on times to event in decision trees (see docs/known-limitations.md). The probability derived from the time is a
-        // synthetic parameter, so an effect on the time would be silently lost
+        // A time to event becomes a synthetic probability 1 - e^(-1/T), whose formula in the Excel file uses the time modified by the effects of
+        // the path. The operations of the effects on the time are resolved here so that unsupported ones (e.g., a relative risk) are rejected
+        // when the tree is built
         if (OSDiDataItemType.DI_TIME_TO_EVENT.equals(((ParameterWrapper) param).getDataItemType())) {
             for (EffectWrapper effect : parentTreeModel.getExperimentWrapper().getModelWrapper().getAndInitializeModelItemsByClassAs(OSDiClass.EFFECT, EffectWrapper.class, false)) {
-                if (effect.getOperation(param) != null) {
-                    throw new UnsupportedOSDiFeatureException("The effect " + effect.getShortName() + " modifies the time to event " + param.getShortName()
-                        + " of the clinical progression " + progression.getShortName() + ". Effects on times to event are not supported yet in decision trees.");
-                }
+                effect.getOperation(param);
             }
         }
         // In case the original parameter was not a valid probability parameter, we need to convert it

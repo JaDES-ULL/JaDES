@@ -3706,6 +3706,146 @@ osdi:TT_P25_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
     osdi:hasExpectedValue "0.5"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Developments
+osdi:TT_P26_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_P26_Severe ,
+        osdi:TT_P26_Normal ;
+    osdi:includedByModel osdi:TT_P26_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Disease
+osdi:TT_P26_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P26_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P26_Severe ,
+        osdi:TT_P26_Normal ,
+        osdi:TT_P26_Developments ;
+    osdi:includedByModel osdi:TT_P26_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Experiment
+osdi:TT_P26_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P26_Model ;
+    osdi:hasDescription "Intervention effect on a time to event: hazard ratio (0.5), which divides the time." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_InterventionTreat
+osdi:TT_P26_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P26_TreatEffect ;
+    osdi:includedByModel osdi:TT_P26_Model ;
+    osdi:hasDescription "Intervention effect on a time to event: hazard ratio (0.5), which divides the time" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Model
+osdi:TT_P26_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P26_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P26_Developments ,
+        osdi:TT_P26_Disease ,
+        osdi:TT_P26_InterventionTreat ,
+        osdi:TT_P26_Normal ,
+        osdi:TT_P26_Severe ,
+        osdi:TT_P26_Severe_Cost ,
+        osdi:TT_P26_Severe_Disutility ,
+        osdi:TT_P26_Severe_LER ,
+        osdi:TT_P26_Severe_LERMagnitude ,
+        osdi:TT_P26_Severe_Risk ,
+        osdi:TT_P26_TreatEffect ,
+        osdi:TT_P26_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P26. Intervention effect on a time to event: hazard ratio (0.5), which divides the time." .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Normal
+osdi:TT_P26_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_P26_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Severe
+osdi:TT_P26_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_P26_Severe_Cost ;
+    osdi:hasEffect osdi:TT_P26_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_P26_Severe_Risk ;
+    osdi:hasUtility osdi:TT_P26_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_P26_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Severe_Cost
+osdi:TT_P26_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P26_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Severe_Disutility
+osdi:TT_P26_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P26_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Severe_LER
+osdi:TT_P26_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P26_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_P26_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Severe_LERMagnitude
+osdi:TT_P26_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P26_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_Severe_Risk
+osdi:TT_P26_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_TimeToEvent ;
+    osdi:includedByModel osdi:TT_P26_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_TreatEffect
+osdi:TT_P26_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_P26_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_P26_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_P26_Model ;
+    osdi:hasDescription "Hazard ratio of Severe with the intervention" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P26_TreatEffectMagnitude
+osdi:TT_P26_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_HazardRatio ;
+    osdi:includedByModel osdi:TT_P26_Model ;
+    osdi:hasDescription "Hazard ratio of Severe with the intervention" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_P27_Developments
 osdi:TT_P27_Developments rdf:type owl:NamedIndividual ,
         osdi:AlternativeCombinationRule ;

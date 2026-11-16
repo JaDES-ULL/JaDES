@@ -394,7 +394,11 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P25_Experiment", "Intervention effect on a risk: odds ratio (0.5), applied to the odds",
                 leaves("TT_P25_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
                 outcomes(86833.333333333, 51.666666667, 31.916666667), outcomes(85000.0, 49.0, 27.25)));
-        // P26 (hazard ratio on a time to event) is the malformed case N13 until times to event are supported in decision trees.
+        // The risk is a time to event T = 2, whose probability is 1 - e^(-1/T). The hazard ratio divides the time: T' = 2 / 0.5 = 4.
+        // p = 1 - e^(-1/2) = 0.393469340287; p' = 1 - e^(-1/4) = 0.221199216929
+        cases.add(tc(PAYOFFS, "TT_P26_Experiment", "Intervention effect on a time to event: hazard ratio (0.5), which divides the time",
+                leaves("TT_P26_", leaf(0.3934693402873666, "Severe"), leaf(0.6065306597126334, "Normal")),
+                outcomes(76587.581989358, 60.576015661, 47.508027407), outcomes(74836.733507184, 57.130613194, 41.478573090)));
         // Effects are applied in the order: replace, multiply, subtract. p' = 0.6 * 0.5 - 0.1 = 0.2
         cases.add(tc(PAYOFFS, "TT_P27_Experiment", "Several intervention effects on the same risk: new value (0.6), factor (x0.5) and difference (-0.1)",
                 leaves("TT_P27_", leaf(0.8, "Severe"), leaf(0.2, "Normal")),
@@ -592,8 +596,7 @@ public final class DecisionTreeCatalog {
             new MalformedCase(MALFORMED, "TT_N11_Experiment", "Effect magnitude defined as a standard deviation", MalformedOSDiModelException.class),
             // A relative risk is not defined on a time to event (a hazard ratio must be used instead).
             new MalformedCase(MALFORMED, "TT_N12_Experiment", "Relative risk applied to a time to event", UnsupportedOSDiFeatureException.class),
-            // Decision trees do not support effects on a time to event yet (the probability derived from the time is not written in the Excel file).
-            new MalformedCase(MALFORMED, "TT_N13_Experiment", "Hazard ratio applied to a time to event (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
+            // N13 (hazard ratio on a time to event) became P26 again when times to event were supported in decision trees.
             // The compared interventions must have the same target (D1).
             new MalformedCase(MALFORMED, "TT_N14_Experiment", "Compared interventions with different targets", MalformedOSDiModelException.class),
             // Every intervention has exactly one target.

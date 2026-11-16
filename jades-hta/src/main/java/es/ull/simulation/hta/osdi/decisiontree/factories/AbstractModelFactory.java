@@ -1,6 +1,7 @@
 package es.ull.simulation.hta.osdi.decisiontree.factories;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.IRI;
@@ -42,8 +43,12 @@ public interface AbstractModelFactory {
     /**
      * Returns a probability parameter that can be used in the decision tree by processing the original parameter. If the original parameter
      * is already a probability or proportion returns the parameter unmodified.
-     * @throws UnsupportedOSDiFeatureException 
-     * @throws MalformedOSDiModelException 
+     * A time to event T (DI_TimeToEvent, assumed exponential) is converted into a synthetic probability parameter P_T, calculated as
+     * 1 - e^(-1/T). The synthetic parameter is not written in the Excel file: {@link #getSourceTimeToEvent(ParameterWrapper)} identifies it,
+     * so that the formula of each branch computes the probability from the time, modified by the effects of the path
+     * (see {@link es.ull.simulation.hta.osdi.decisiontree.excelport.HTAExcelModelFactory#getParameterTextFormula(ParameterWrapper, Set)}).
+     * @throws UnsupportedOSDiFeatureException
+     * @throws MalformedOSDiModelException
      */
     static ParameterWrapper getProbabilityParameterFromGenericParameter(ParameterWrapper originalParam) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
         switch (originalParam.getDataItemType()) {
@@ -63,11 +68,28 @@ public interface AbstractModelFactory {
                 ParameterWrapper.SyntheticBuilder builder = new ParameterWrapper.SyntheticBuilder(originalParam.getModelWrapper(), 
                     "P_" + originalParam.getShortName(), paramData)
                     .withSource("Computed from " + originalParam.getShortName())
-                    .withDescription("Probability derived from time to event " + originalParam.getShortName()); 
+                    .withDescription("Probability derived from time to event " + originalParam.getShortName())
+                    .withDataItemType(OSDiDataItemType.DI_PROBABILITY);
                 return builder.build();
             default:
                 throw new UnsupportedOSDiFeatureException("The data type (" + originalParam.getDataItemType() + ") for the parameter " + originalParam.getShortName() + " cannot be used as a probability in the decision tree.");
         }
+    }
+
+    /**
+     * Returns the time to event from which a synthetic probability parameter was derived by {@link #getProbabilityParameterFromGenericParameter(ParameterWrapper)}.
+     * @param param A parameter
+     * @return The time to event from which the parameter was derived; an empty optional if the parameter is not a synthetic probability
+     * derived from a time to event
+     */
+    static Optional<ParameterWrapper> getSourceTimeToEvent(ParameterWrapper param) {
+        if (param.isSynthetic() && param.getParameterNatureData() instanceof CalculatedParameterData data && data.dependantParameters().size() == 1) {
+            final ParameterWrapper source = data.dependantParameters().get(0);
+            if (OSDiDataItemType.DI_TIME_TO_EVENT.equals(source.getDataItemType())) {
+                return Optional.of(source);
+            }
+        }
+        return Optional.empty();
     }
 
     /**
