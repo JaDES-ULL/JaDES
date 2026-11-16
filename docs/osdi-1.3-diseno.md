@@ -5,7 +5,7 @@ El número de versión de la copia no cambia hasta que los cambios se trasladen 
 
 ## Decisiones acordadas
 
-Las decisiones tal como quedaron al implementarlas, según el registro hasta la fase 7b. D8, D9 y D10 siguen pendientes de implementar, y D11 es nueva. La fase 8 copia esta sección al fichero de diseño para sincronizarlo.
+Las decisiones tal como quedaron al implementarlas, según el registro hasta la fase 7b. D8, D9 y D10 siguen pendientes de implementar, y D11 es nueva.
 
 | Id | Decisión | Cambio en la ontología |
 | --- | --- | --- |
