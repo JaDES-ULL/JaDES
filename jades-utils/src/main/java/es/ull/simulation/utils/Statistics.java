@@ -241,6 +241,9 @@ public class Statistics {
   /**
    * Generates a time to event based on annual risk. The time to event is absolute,
    * i.e., can be used directly to schedule a new event.
+   * The annual risk p is converted into the exact equivalent rate, -ln(1 - p), and the relative risk multiplies that rate, so the time is
+   * exponential with rate -rr * ln(1 - p): T = ln(U) / (rr * ln(1 - p)). The modified annual risk, 1 - (1 - p)^rr, must not be used as
+   * if it were the rate, since it underestimates the rate (e.g., p = 0.2 corresponds to a rate of 0.223, not 0.2).
    * @param p Annual risk of the event
    * @param logRnd The natural log of a random number (0, 1)
    * @param rr Relative risk for the patient
@@ -250,8 +253,8 @@ public class Statistics {
     // In case the probability of transition was 0
     if (p == 0.0)
       return Double.MAX_VALUE;
-    final double newMinus = -1 / (1-Math.pow(1 - p, rr));
-    return newMinus * logRnd;
+    final double rate = -rr * Math.log(1 - p);
+    return -logRnd / rate;
   }
 
   /**

@@ -114,4 +114,27 @@ public class TestDESRisksAndEffects {
             () -> assertTrue(manYAssessed < manYComparator, "ManY should be less frequent with the intervention: " + manYAssessed + " vs " + manYComparator)
         );
     }
+
+    @Test
+    @DisplayName("D01. The annual probability of a manifestation is converted into the exact rate: the proportion after 5 years is 1 - (1 - p)^5")
+    public void convertsAnnualProbabilityIntoExactRate() {
+        // With the exact rate -ln(1 - p), the proportion of patients with the manifestation after 5 years is 1 - (1 - p)^5 (the mortality of
+        // a population between 20 and 25 years old, about 0.2%, is neglected). Using p as the rate would give 1 - e^(-5p):
+        // ManX: p = 0.2 -> 0.672320 (0.632121 with p as the rate); with the hazard ratio, p' = 0.105572809 -> 1 - 0.8^2.5 = 0.427567 (0.410136)
+        // ManY: p = 0.3 -> 0.831930 (0.776870); with the factor, p' = 0.15 -> 0.556295 (0.527633)
+        // Tolerance: about three standard errors for 5000 patients (0.007)
+        final double tolerance = 0.02;
+        final DiseaseProgression manX = model.getDiseaseProgression("TD_D01_ManX");
+        final DiseaseProgression manY = model.getDiseaseProgression("TD_D01_ManY");
+        final double manXComparator = proportionWith(comparatorPatients, manX);
+        final double manXAssessed = proportionWith(assessedPatients, manX);
+        final double manYComparator = proportionWith(comparatorPatients, manY);
+        final double manYAssessed = proportionWith(assessedPatients, manY);
+        assertAll("Proportion of patients with each manifestation after 5 years",
+            () -> assertEquals(0.672320, manXComparator, tolerance, "ManX without intervention"),
+            () -> assertEquals(0.427567, manXAssessed, tolerance, "ManX with the hazard ratio"),
+            () -> assertEquals(0.831930, manYComparator, tolerance, "ManY without intervention"),
+            () -> assertEquals(0.556295, manYAssessed, tolerance, "ManY with the factor")
+        );
+    }
 }

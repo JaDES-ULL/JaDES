@@ -85,6 +85,15 @@ class StatisticsTest {
     }
 
     @Test
+    void shouldComputeAnnualBasedTimeToEventWithTheExactRate() {
+        // Annual probability p = 0.2 and relative risk 0.5: the rate is -ln(1 - p) * rr = 0.5 * 0.223143551 = 0.111571776,
+        // so the time for U = 0.5 is -ln(0.5) / 0.111571776 = 6.212567439
+        assertEquals(6.212567439010781, Statistics.getAnnualBasedTimeToEvent(0.2, Math.log(0.5), 0.5), 1e-9);
+        // Without relative risk: -ln(0.5) / -ln(0.8) = 3.106283720
+        assertEquals(3.1062837195053903, Statistics.getAnnualBasedTimeToEvent(0.2, Math.log(0.5), 1.0), 1e-9);
+    }
+
+    @Test
     void shouldComputeAnnualBasedTimeToEventFromRate() {
         assertEquals(Double.MAX_VALUE, Statistics.getAnnualBasedTimeToEventFromRate(0.0, -0.5, 1.0));
         double value = Statistics.getAnnualBasedTimeToEventFromRate(0.2, -0.5, 2.0);
