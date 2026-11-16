@@ -44,10 +44,10 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P46 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P49 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
-| `OSDi_test_tree_malformed.ttl` | N01–N12, N14–N30 (casos que deben lanzar excepción; N13 volvió a ser P26) |
+| `OSDi_test_tree_malformed.ttl` | N01–N12, N14–N32 (casos que deben lanzar excepción; N13 volvió a ser P26) |
 
 Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
 
@@ -67,7 +67,7 @@ Convenciones:
 - Base común: `TT_Population` (edad 20, esperanza de vida 65), `TT_NewbornPopulation` (edad 0, esperanza de vida 80), utilidad basal 0,85, coste anual de la enfermedad 1000, `TT_InterventionTreat` (solo añade un coste anual de 100) y `TT_InterventionNone`.
 - Valores habituales de las progresiones (riesgo, coste anual, desutilidad anual, reducción de esperanza de vida): DevA (0,3; 500; 0,10; 10), DevB (0,5; 300; 0,05; 4), DevC (0,2; 200; 0,02; —), DevD (0,7; 100; 0,01; —), DevE (0,4; 400; 0,08; 6), ManX (0,2; 150; 0,03; —), ManY (0,5; 250; 0,06; 2), ManZ (0,4; 350; 0,04; —).
 - Clave semántica de una hoja: nombres de las progresiones activas, ordenados y unidos con `+`; `""` si no hay ninguna; `DEATH` para la muerte.
-- Las probabilidades de las hojas se comprueban en el brazo comparador.
+- Las probabilidades de las hojas se comprueban en el brazo comparador. Si los brazos tienen hojas distintas (p. ej., una intervención sustituye una estrategia con resultados o efectos adversos), el caso declara las del brazo evaluado con `withAssessedLeaves`.
 - Resultados del Excel: hoja `Process`, fila 10, columnas 6–11 (coste, esperanza de vida y AVAC del brazo evaluado y del comparador). Tolerancia relativa 1e-8.
 - Combinaciones por defecto: costes ADD, desutilidades ADD, reducción de esperanza de vida MAX, tasa de mortalidad MAX.
 - Defectos conocidos: se marcan en el catálogo con `knownIssue(...)` o `knownOutcomesIssue(...)` y un valor del enum `KnownIssue`; los tests correspondientes llevan `@Tag("known-issue")`. Al corregir el defecto, se quita la marca y el valor del enum.
@@ -117,6 +117,11 @@ Convenciones:
 - Los resultados se expanden bajo cada hoja (`StrategyOutcomeExpander`): una rama por resultado con su riesgo (el que no tiene riesgo se lleva el resto). Con `failsIf` hacia una condición, fracasa donde la condición está activa y tiene éxito donde no.
 - Momento T = inicio de la estrategia + `hasEvaluationTime` (inicio, con aviso, si falta). Los pagos anuales de la estrategia van hasta T si el resultado tiene estrategia siguiente o resuelve; si no, hasta el final del nodo. La siguiente empieza en T. Pagos del resultado: una vez en T (anuales ignorados con aviso). «Resuelve»: los pagos anuales de la condición paran en T; sus efectos sobre la LE se mantienen, con aviso.
 - Rechazos: ciclos (N23) y riesgo de tiempo hasta el evento (N24), `Unsupported`; dos resultados sin riesgo (N25) y `failsIf` con resultados explícitos (N26), `Malformed`. Estrategias con resultados cuyos costes siguen una pauta: `Unsupported`.
+
+**Efectos adversos (D8, árbol):** `AdverseEvent` (subclase de `HealthCondition`, disjunta de `Disease` y `ClinicalProgressionElement`), `hasAdverseEvent` / `isAdverseEventOf` (de `Strategy`) e `isOccurrenceOf` (solo identifica la condición; no activa su estructura). Regla para quien modela: problema de la evolución natural cuyo riesgo cambia la estrategia → `Effect`; problema provocado por la estrategia → `AdverseEvent`.
+- Se expanden bajo las hojas (`StrategyOutcomeExpander`) cada vez que una rama aplica una estrategia (con o sin resultados, tras un resultado o como estrategia de otro efecto adverso), antes de sus resultados: una rama independiente por efecto adverso con su probabilidad por aplicación (riesgo obligatorio) y otra sin él.
+- Son independientes del resultado, salvo `failsIf` hacia el efecto adverso: entonces el fracaso ocurre donde el efecto adverso ocurrió (P48). Pagos de una vez al inicio de la estrategia (anuales ignorados con aviso); sus efectos se aplican en su rama; un `InstantDeathEffect` abre una rama de muerte (esperanza de vida 0, aunque la estrategia empiece más tarde, con aviso) en la que no se expande nada más (P49); sus estrategias se aplican en su rama.
+- Rechazos: sin riesgo, con varios o con un riesgo que no es un parámetro (N31, `Malformed`); riesgo de tiempo hasta el evento (N32, `Unsupported`); efectos adversos en las estrategias de detección del NBS (`Unsupported`). El DES los ignora (no simula estrategias).
 
 **Cribado neonatal (NBS):** las intervenciones de detección no declaran `hasSensitivity`, `hasSpecificity`, `detects` ni `hasTemporaryThreshold` (`MalformedOSDiModelException`, N20 y N22): la enfermedad que detectan es su objetivo, y lo demás es de sus estrategias de detección.
 - Estrategias de detección de un brazo: las de la enfermedad tras la sustitución de la intervención (por tipo). La intervención de cribado suele sustituirlas por un grupo {cribado, diagnóstico}. Como mucho una de cribado y una de diagnóstico por brazo (`Unsupported`); cribado en el brazo sin cribado (N21) o `detects` hacia otra enfermedad: `Malformed`.

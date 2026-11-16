@@ -48,7 +48,7 @@ final class DecisionTreeTestSupport {
     /** Index, among the successors of the root of the tree, of the comparator intervention */
     static final int COMPARATOR = 1;
     /** Prefixes of the names of the nodes that represent a development, a manifestation (see DiseaseSubTreeGenerator.generateNode) or an outcome of a strategy (see StrategyOutcomeExpander) */
-    private static final String[] PROGRESSION_PREFIXES = {"DEVELOPMENT: ", "CHRONIC_MANIFESTATION: ", "ACUTE_MANIFESTATION: ", "STAGE: ", "OUTCOME: "};
+    private static final String[] PROGRESSION_PREFIXES = {"DEVELOPMENT: ", "CHRONIC_MANIFESTATION: ", "ACUTE_MANIFESTATION: ", "STAGE: ", "OUTCOME: ", "ADVERSE EVENT: "};
     /** Prefix of the name of the node that represents the death at the onset of the disease (see DiseaseSubTreeGenerator.generate) */
     private static final String DEATH_PREFIX = "Death from ";
     /** Row of the "Process" sheet with the deterministic results */

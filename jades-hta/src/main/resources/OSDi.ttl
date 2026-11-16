@@ -179,7 +179,7 @@ osdi:failsIf rdf:type owl:ObjectProperty ;
                                          osdi:Parameter
                                        )
                          ] ;
-             rdfs:comment "Short form of two outcomes of a strategy: a FailureOutcome and a SuccessOutcome (see StrategyOutcome). The failure happens with the probability per episode or the time to event of the parameter (according to its data item type), or when the health condition appears (e.g., the progression of the disease). The success is the default outcome (in a simulation, it arrives with the duration of the health condition, modified by the effects). The next strategies are given by followedOnFailureBy and followedOnSuccessBy, and resolvesOnSuccess says whether the success resolves the health condition. It cannot be combined with hasStrategyOutcome."@en ;
+             rdfs:comment "Short form of two outcomes of a strategy: a FailureOutcome and a SuccessOutcome (see StrategyOutcome). The failure happens with the probability per episode or the time to event of the parameter (according to its data item type), or when the health condition appears (e.g., the progression of the disease, or an adverse event of the strategy, which models the abandonment of the treatment). The success is the default outcome (in a simulation, it arrives with the duration of the health condition, modified by the effects). The next strategies are given by followedOnFailureBy and followedOnSuccessBy, and resolvesOnSuccess says whether the success resolves the health condition. It cannot be combined with hasStrategyOutcome."@en ;
              rdfs:label "fails if"@en ,
                         "falla si"@es .
 
@@ -286,6 +286,17 @@ osdi:isStrategyOutcomeOf rdf:type owl:ObjectProperty ;
                          rdfs:comment "Inverse of hasStrategyOutcome."@en ;
                          rdfs:label "is strategy outcome of"@en ,
                                     "es resultado de la estrategia"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasAdverseEvent
+osdi:hasAdverseEvent rdf:type owl:ObjectProperty ;
+                     owl:inverseOf osdi:isAdverseEventOf ;
+                     rdfs:domain osdi:Strategy ;
+                     rdfs:range osdi:AdverseEvent ;
+                     rdfs:comment "Defines an adverse event that the strategy may cause each time it is applied (see AdverseEvent)."@en ,
+                                  "Define un efecto adverso que la estrategia puede provocar cada vez que se aplica (ver AdverseEvent)."@es ;
+                     rdfs:label "has adverse event"@en ,
+                                "tiene el efecto adverso"@es .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#hasAge
@@ -712,13 +723,17 @@ osdi:hasReplacementStrategy rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#hasRiskCharacterization
 osdi:hasRiskCharacterization rdf:type owl:ObjectProperty ;
                              owl:inverseOf osdi:isRiskCharacterizationOf ;
-                             rdfs:domain osdi:ClinicalProgressionElement ;
+                             rdfs:domain [ rdf:type owl:Class ;
+                                           owl:unionOf ( osdi:AdverseEvent
+                                                         osdi:ClinicalProgressionElement
+                                                       )
+                                         ] ;
                              rdfs:range [ rdf:type owl:Class ;
                                           owl:unionOf ( osdi:Parameter
                                                         osdi:Pathway
                                                       )
                                         ] ;
-                             rdfs:comment "Defines the risk characterization of a clinical progression element, which can be expressed as a parameter (e.g., relative risk) or as a pathway (e.g., a pathway that defines the events that lead to the occurrence of a certain manifestation). A development or chronic manifestation without risk characterization that does not belong to a group of two or more alternative progressions (i.e., not affected by any combination rule, affected by a coexistent rule, or by an alternative rule with a single member) is always active in its context: it applies from the start, and a manifestation without risk that depends on a development (hasSubProgression) is active whenever such development is active. Within a group of two or more alternative progressions, the progression without risk (at most one, and only if the group has no null progression) takes the remaining probability (1 minus the sum of the rest). Both decision trees and discrete-event simulations should interpret progressions without risk in this way."@en ;
+                             rdfs:comment "Defines the risk characterization of a clinical progression element, which can be expressed as a parameter (e.g., relative risk) or as a pathway (e.g., a pathway that defines the events that lead to the occurrence of a certain manifestation). A development or chronic manifestation without risk characterization that does not belong to a group of two or more alternative progressions (i.e., not affected by any combination rule, affected by a coexistent rule, or by an alternative rule with a single member) is always active in its context: it applies from the start, and a manifestation without risk that depends on a development (hasSubProgression) is active whenever such development is active. Within a group of two or more alternative progressions, the progression without risk (at most one, and only if the group has no null progression) takes the remaining probability (1 minus the sum of the rest). Both decision trees and discrete-event simulations should interpret progressions without risk in this way. For an adverse event, the risk is mandatory and is a probability per application of the strategy that causes it (or a time to event in a simulation)."@en ;
                              rdfs:label "has risk characterization"@en ,
                                         "tiene la caracterización de riesgo"@es ;
                              osdi:TODO "Check if this is the best name for the property" .
@@ -905,6 +920,16 @@ osdi:includesModelItem rdf:type owl:ObjectProperty ;
                                   "incluye el elemento del modelo"@es .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#isAdverseEventOf
+osdi:isAdverseEventOf rdf:type owl:ObjectProperty ;
+                      rdfs:domain osdi:AdverseEvent ;
+                      rdfs:range osdi:Strategy ;
+                      rdfs:comment "Inverse of hasAdverseEvent."@en ,
+                                   "Inversa de hasAdverseEvent."@es ;
+                      rdfs:label "es efecto adverso de"@es ,
+                                 "is adverse event of"@en .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#isAffectedBy
 osdi:isAffectedBy rdf:type owl:ObjectProperty ;
                   rdfs:domain [ rdf:type owl:Class ;
@@ -1026,6 +1051,16 @@ osdi:isInterventionOf rdf:type owl:ObjectProperty ;
                                  "is intervention of"@en .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#isOccurrenceOf
+osdi:isOccurrenceOf rdf:type owl:ObjectProperty ;
+                    rdfs:domain osdi:AdverseEvent ;
+                    rdfs:range osdi:HealthCondition ;
+                    rdfs:comment "Identifies the health condition of which the adverse event is an occurrence (e.g., the adverse event 'diarrhoea due to amoxicillin' is an occurrence of 'diarrhoea'). It only identifies the condition: the adverse event does not activate the progression, payoffs or effects of that condition."@en ,
+                                 "Identifica la condición de salud de la que el efecto adverso es una aparición (p. ej., el efecto adverso «diarrea por amoxicilina» es una aparición de «diarrea»). Solo la identifica: el efecto adverso no activa la progresión, los pagos ni los efectos de esa condición."@es ;
+                    rdfs:label "es una aparición de"@es ,
+                               "is occurrence of"@en .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#isParameterOf
 osdi:isParameterOf rdf:type owl:ObjectProperty ;
                    rdfs:domain osdi:Parameter ;
@@ -1078,8 +1113,12 @@ osdi:isRiskCharacterizationOf rdf:type owl:ObjectProperty ;
                                                           osdi:Pathway
                                                         )
                                           ] ;
-                              rdfs:range osdi:ClinicalProgressionElement ;
-                              rdfs:comment "Defines a relationship between a risk characterization and a clinical progression element, indicating that the characterization applies to that element."@en ;
+                              rdfs:range [ rdf:type owl:Class ;
+                                           owl:unionOf ( osdi:AdverseEvent
+                                                         osdi:ClinicalProgressionElement
+                                                       )
+                                         ] ;
+                              rdfs:comment "Defines a relationship between a risk characterization and a clinical progression element or an adverse event, indicating that the characterization applies to that element."@en ;
                               rdfs:label "es caracterización de riesgo de"@es ,
                                          "is risk characterization of"@en .
 
@@ -1794,6 +1833,27 @@ osdi:AcuteManifestation rdf:type owl:Class ;
                         rdfs:comment "Sudden or rapid appearance of clinical signs or symtoms, in general with a short and intense course. Its costs and utilities apply per episode, so they should be one-time (appliesOneTime = true); a one-time utility is a loss of QALYs. In a decision tree, an acute manifestation represents a single episode between the initial age of the population and death: its risk characterization is the probability that the episode happens, and, as for any other progression, an acute manifestation without risk always happens in its context. A decision tree ignores the frequency (hasFrequency) of an acute manifestation that defines a risk, and cannot represent one that only defines a frequency. Annual costs and utilities of an acute manifestation are ignored both in decision trees and in discrete-event simulations."@en ;
                         rdfs:label "Acute manifestation"@en ,
                                    "Manifestación aguda"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#AdverseEvent
+osdi:AdverseEvent rdf:type owl:Class ;
+                  rdfs:subClassOf osdi:HealthCondition ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty osdi:hasRiskCharacterization ;
+                                    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                    owl:onClass osdi:Parameter
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty osdi:isOccurrenceOf ;
+                                    owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                    owl:onClass osdi:HealthCondition
+                                  ] ;
+                  owl:disjointWith osdi:ClinicalProgressionElement ,
+                                   osdi:Disease ;
+                  rdfs:comment "A health condition caused by a strategy (hasAdverseEvent), e.g., the diarrhoea caused by an antibiotic. Each time a strategy is applied, each of its adverse events happens with its risk (hasRiskCharacterization: a probability per application, or a time to event in a simulation), independently of the outcome of the strategy, unless the strategy fails because of the adverse event (failsIf), e.g., when the treatment is abandoned. Its costs and utilities apply once, when it happens (annual ones are not meaningful); its effects (including an InstantDeathEffect) and its own strategies apply to the patients who suffer it. isOccurrenceOf identifies the health condition it represents, but does not activate the structure of that condition. Rule for the modeller: if the problem belongs to the natural history of the disease and the strategy only changes its risk, use an Effect of the strategy on that risk; if the problem is caused by the strategy, use an AdverseEvent."@en ,
+                               "Una condición de salud provocada por una estrategia (hasAdverseEvent), p. ej., la diarrea causada por un antibiótico. Cada vez que se aplica una estrategia, cada uno de sus efectos adversos ocurre con su riesgo (hasRiskCharacterization: una probabilidad por aplicación o, en simulación, un tiempo hasta el evento), con independencia del resultado de la estrategia, salvo que esta fracase por el efecto adverso (failsIf), p. ej., cuando se abandona el tratamiento. Sus costes y utilidades se aplican una vez, cuando ocurre (los anuales no tienen sentido); sus efectos (incluido un InstantDeathEffect) y sus propias estrategias se aplican a los pacientes que lo sufren. isOccurrenceOf identifica la condición de salud que representa, pero no activa la estructura de esa condición. Regla para quien modela: si el problema forma parte de la evolución natural de la enfermedad y la estrategia solo cambia su riesgo, se usa un Effect de la estrategia sobre ese riesgo; si lo provoca la estrategia, un AdverseEvent."@es ;
+                  rdfs:label "Adverse event"@en ,
+                             "Efecto adverso"@es .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#AgentBasedModel

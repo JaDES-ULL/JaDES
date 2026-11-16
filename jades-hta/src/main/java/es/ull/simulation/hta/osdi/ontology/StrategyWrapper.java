@@ -135,6 +135,34 @@ public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemW
         return outcomes;
     }
 
+    /**
+     * Returns true if this strategy declares adverse events (hasAdverseEvent).
+     * @return true if this strategy declares adverse events
+     */
+    public boolean hasAdverseEvents() {
+        return !getOSDiWrapper().getValues(getIndividualIRI(), OSDiObjectProperty.HAS_ADVERSE_EVENT).isEmpty();
+    }
+
+    /**
+     * Returns the adverse events of this strategy (decision D8 of docs/osdi-1.3-diseno.md), sorted by name. Each time the strategy is applied, each
+     * adverse event happens with its risk, independently of the rest and of the outcome of the strategy (unless the strategy fails because of it).
+     * @return The adverse events of this strategy (empty if it has none)
+     * @throws MalformedOSDiModelException If an adverse event is not an AdverseEvent, or its risk is missing or is not a parameter
+     * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
+     */
+    public List<AdverseEventWrapper> getAdverseEvents() throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        final List<AdverseEventWrapper> adverseEvents = new ArrayList<>();
+        for (IModelItemWrapper item : getModelWrapper().getWrappersForProperty(getIndividualIRI(), OSDiObjectProperty.HAS_ADVERSE_EVENT)) {
+            if (!(item instanceof AdverseEventWrapper adverseEvent)) {
+                throw new MalformedOSDiModelException("The adverse event (hasAdverseEvent) " + item.getShortName() + " of the strategy " + getShortName() + " is not an AdverseEvent.");
+            }
+            adverseEvent.initialize();
+            adverseEvents.add(adverseEvent);
+        }
+        adverseEvents.sort((a, b) -> a.getShortName().compareTo(b.getShortName()));
+        return adverseEvents;
+    }
+
     public StrategyType getStrategyType() {
         return strategyType;
     }

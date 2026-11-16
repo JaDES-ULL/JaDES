@@ -83,6 +83,13 @@ public final class NBSDetectionArm {
             throw new UnsupportedOSDiFeatureException("The diagnosis strategy " + diagnosisStrategy.get().getShortName() + " of the arm of the intervention " + intervention.getShortName()
                 + " defines explicit outcomes. The diagnosis is assumed to be perfect in newborn screening models, so diagnosis strategies with outcomes are not supported yet.");
         }
+        // TODO: Support the adverse events of detection strategies (e.g., the complications of an invasive test) in newborn screening models
+        for (Optional<DetectionStrategyWrapper> detection : List.of(screeningStrategy, diagnosisStrategy)) {
+            if (detection.isPresent() && detection.get().hasAdverseEvents()) {
+                throw new UnsupportedOSDiFeatureException("The detection strategy " + detection.get().getShortName() + " of the arm of the intervention " + intervention.getShortName()
+                    + " defines adverse events, which are not supported yet in newborn screening models.");
+            }
+        }
         if (screeningStrategy.isPresent() && !InterventionType.SCREENING.equals(intervention.getInterventionType())) {
             throw new MalformedOSDiModelException("The arm of the intervention " + intervention.getShortName() + " uses the screening strategy " + screeningStrategy.get().getShortName()
                 + ", but it is not a screening intervention.");

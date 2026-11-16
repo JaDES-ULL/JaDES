@@ -91,18 +91,25 @@ public final class DecisionTreeCatalog {
      * @param comparator Expected cost, life years and QALYs for the comparator intervention (null if they are not checked)
      * @param structureIssue The reason why the leaves are not expected to be right with the current generator (null if they are)
      * @param outcomesIssue The reason why the outcomes are not expected to be right with the current generator (null if they are)
+     * @param assessedLeaves The expected leaves of the arm of the assessed intervention, when they differ from those of the comparator (e.g., when the
+     * intervention replaces a strategy with outcomes or adverse events); null if both arms have the same leaves
      */
     public record TreeCase(String ontology, String experiment, String title, Map<String, Double> leaves, double[] assessed, double[] comparator, 
-            KnownIssue structureIssue, KnownIssue outcomesIssue) {
+            KnownIssue structureIssue, KnownIssue outcomesIssue, Map<String, Double> assessedLeaves) {
 
         /** Marks the case: neither its leaves nor its outcomes are expected to be right with the current generator */
         public TreeCase knownIssue(KnownIssue issue) {
-            return new TreeCase(ontology, experiment, title, leaves, assessed, comparator, issue, issue);
+            return new TreeCase(ontology, experiment, title, leaves, assessed, comparator, issue, issue, assessedLeaves);
         }
 
         /** Marks the case: its leaves are expected to be right, but not its outcomes */
         public TreeCase knownOutcomesIssue(KnownIssue issue) {
-            return new TreeCase(ontology, experiment, title, leaves, assessed, comparator, structureIssue, issue);
+            return new TreeCase(ontology, experiment, title, leaves, assessed, comparator, structureIssue, issue, assessedLeaves);
+        }
+
+        /** Declares the leaves of the arm of the assessed intervention, when they differ from those of the comparator */
+        public TreeCase withAssessedLeaves(Map<String, Double> assessedLeaves) {
+            return new TreeCase(ontology, experiment, title, leaves, assessed, comparator, structureIssue, outcomesIssue, assessedLeaves);
         }
 
         @Override
@@ -179,7 +186,7 @@ public final class DecisionTreeCatalog {
     }
 
     private static TreeCase tc(String ontology, String experiment, String title, Map<String, Double> leaves, double[] assessed, double[] comparator) {
-        return new TreeCase(ontology, experiment, title, leaves, assessed, comparator, null, null);
+        return new TreeCase(ontology, experiment, title, leaves, assessed, comparator, null, null, null);
     }
 
     /**
@@ -490,6 +497,30 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P46_Experiment", "Treatment of an acute episode: the success resolves it and the failure is followed by a rescue treatment",
                 leaves("TT_P46_", leaf(0.7, "ManA", "T_Success"), leaf(0.3, "ManA", "T_Failure")),
                 outcomes(73535.0, 65.0, 54.69), outcomes(67035.0, 65.0, 54.69)));
+        // Adverse events (P47-P49, D8). No discount. They happen each time a strategy is applied, independently of its outcome, with one-time payoffs.
+        // P47 (as in Coco 2007): acute episode (2000, 0.5 QALYs), always present. Antibiotic A (20) with two independent adverse events:
+        // diarrhoea (0.1; 30; 0.01 QALYs) and rash (0.05; 60; 0.02 QALYs). Expected per application of A: 20 + 0.1 * 30 + 0.05 * 60 = 26; 0.1 * 0.01 + 0.05 * 0.02 = 0.002 QALYs.
+        // Assessed (immediate antibiotic, replaces W): 65000 + 2000 + 26 = 67026; QALYs 55.25 - 0.5 - 0.002 = 54.748.
+        // Comparator: watchful waiting W (10): success 0.7 (resolves) or failure 0.3 (0.05 QALYs), followed by A.
+        // 65000 + 2000 + 10 + 0.3 * 26 = 67017.8; QALYs 55.25 - 0.5 - 0.3 * 0.05 - 0.3 * 0.002 = 54.7344
+        cases.add(tc(PAYOFFS, "TT_P47_Experiment", "Adverse events of an antibiotic, given at once or after the failure of watchful waiting (otitis media, as in Coco 2007)",
+                // Comparator (watchful waiting): success 0.7; failure 0.3 * (0.1 * 0.05, 0.1 * 0.95, 0.9 * 0.05, 0.9 * 0.95)
+                leaves("TT_P47_", leaf(0.7, "ManA", "W_Success"), leaf(0.0015, "ManA", "W_Failure", "Diarrhoea", "Rash"), leaf(0.0285, "ManA", "W_Failure", "Diarrhoea"),
+                    leaf(0.0135, "ManA", "W_Failure", "Rash"), leaf(0.2565, "ManA", "W_Failure")),
+                outcomes(67026.0, 65.0, 54.748), outcomes(67017.8, 65.0, 54.7344))
+                // Immediate antibiotic: 0.1 * 0.05; 0.1 * 0.95; 0.9 * 0.05; 0.9 * 0.95
+                .withAssessedLeaves(leaves("TT_P47_", leaf(0.005, "ManA", "Diarrhoea", "Rash"), leaf(0.095, "ManA", "Diarrhoea"), leaf(0.045, "ManA", "Rash"), leaf(0.855, "ManA"))));
+        // P48: the episode (2000, 0.5 QALYs) is treated with A (20), which is abandoned if diarrhoea (0.1; 30; 0.01 QALYs) appears (failsIf), and then followed by B (40).
+        // Comparator: 65000 + 2000 + 20 + 0.1 * (30 + 40) = 67027; QALYs 55.25 - 0.5 - 0.1 * 0.01 = 54.749. Assessed: + 6500
+        cases.add(tc(PAYOFFS, "TT_P48_Experiment", "Abandonment of a treatment because of an adverse event (failsIf the adverse event), followed by another treatment",
+                leaves("TT_P48_", leaf(0.1, "Diarrhoea", "ManA", "A_Failure"), leaf(0.9, "ManA", "A_Success")),
+                outcomes(73527.0, 65.0, 54.749), outcomes(67027.0, 65.0, 54.749)));
+        // P49: the disease is treated with A (20), whose anaphylaxis (0.01; 500) is fatal with probability 0.1 (at the start: life expectancy 0).
+        // No adverse event (0.99): 65000 + 20 = 65020. Anaphylaxis, alive (0.009): 65520. Anaphylaxis, death (0.001): 20 + 500 = 520 (one-time costs at time 0).
+        // Comparator: 64369.8 + 589.68 + 0.52 = 64960; life years 0.999 * 65 = 64.935; QALYs 0.999 * 55.25 = 55.19475. Assessed: + 100 * 64.935 = 71453.5
+        cases.add(tc(PAYOFFS, "TT_P49_Experiment", "Fatal adverse event of a treatment of the disease (InstantDeathEffect of the adverse event)",
+                leaves("TT_P49_", death(0.001), leaf(0.009, "Anaphylaxis"), leaf(0.99)),
+                outcomes(71453.5, 64.935, 55.19475), outcomes(64960.0, 64.935, 55.19475)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
@@ -621,7 +652,11 @@ public final class DecisionTreeCatalog {
             new MalformedCase(MALFORMED, "TT_N27_Experiment", "Two detection outcomes without risk for the patients with the disease", MalformedOSDiModelException.class),
             new MalformedCase(MALFORMED, "TT_N28_Experiment", "Inconclusive detection outcome followed by a strategy that is not a detection strategy", MalformedOSDiModelException.class),
             new MalformedCase(MALFORMED, "TT_N29_Experiment", "Cycle in the chain of detection strategies", UnsupportedOSDiFeatureException.class),
-            new MalformedCase(MALFORMED, "TT_N30_Experiment", "Confirmation of the positive results with a diagnosis strategy with explicit outcomes (not supported yet)", UnsupportedOSDiFeatureException.class)
+            new MalformedCase(MALFORMED, "TT_N30_Experiment", "Confirmation of the positive results with a diagnosis strategy with explicit outcomes (not supported yet)", UnsupportedOSDiFeatureException.class),
+            // The risk of an adverse event is mandatory (D8).
+            new MalformedCase(MALFORMED, "TT_N31_Experiment", "Adverse event without risk", MalformedOSDiModelException.class),
+            // The risk of an adverse event is a probability per application of the strategy in decision trees (D6, D8).
+            new MalformedCase(MALFORMED, "TT_N32_Experiment", "Adverse event whose risk is a time to event (not supported in decision trees)", UnsupportedOSDiFeatureException.class)
         );
     }
 }

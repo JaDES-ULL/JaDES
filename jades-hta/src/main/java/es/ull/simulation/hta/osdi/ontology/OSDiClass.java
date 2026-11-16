@@ -13,6 +13,7 @@ import org.semanticweb.owlapi.model.IRI;
  */
 public enum OSDiClass implements IOSDiComponentWrapper {
 	ACUTE_MANIFESTATION("AcuteManifestation", ClinicalProgressionWrapper::new),
+	ADVERSE_EVENT("AdverseEvent", AdverseEventWrapper::new),
 	AGENT_BASED_MODEL("AgentBasedModel", null),
 	ALTERNATIVE_COMBINATION_RULE("AlternativeCombinationRule", ProgressionCombinationRuleWrapper::new),
 	ATOMIC_GUIDELINE("AtomicGuideline", null),

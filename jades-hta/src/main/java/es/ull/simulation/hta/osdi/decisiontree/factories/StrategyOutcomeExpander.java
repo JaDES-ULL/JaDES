@@ -20,6 +20,7 @@ import es.ull.simulation.hta.osdi.decisiontree.StrategyCosts;
 import es.ull.simulation.hta.osdi.decisiontree.StrategyCosts.GuidelineCost;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
+import es.ull.simulation.hta.osdi.ontology.AdverseEventWrapper;
 import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
@@ -41,13 +42,35 @@ import es.ull.simulation.hta.osdi.ontology.StrategyWrapper.Outcome;
  * <li>If the outcome resolves the health condition, the annual payoffs of the health condition stop at T. Its effects on the life expectancy
  * cannot stop in a decision tree, so they are kept, with a warning.</li>
  * </ul>
- * Cycles in the chain of strategies, outcomes whose risk is a time to event and strategies with outcomes whose costs follow a guideline are not
- * supported yet.
+ * The adverse events of a strategy (decision D8) are expanded each time the strategy is applied, before its outcomes, also for the strategies
+ * without outcomes and for those that follow an outcome:
+ * <ul>
+ * <li>Each adverse event is an independent branch with its risk (a probability per application) and a branch without it.</li>
+ * <li>Its payoffs apply once, at the start of the strategy; annual ones are ignored with a warning (D7). Its effects apply to the leaf, and an
+ * InstantDeathEffect splits the branch into death (with the probability of the magnitude of the effect, and a life expectancy of 0) and survival.
+ * Nothing else is expanded after the death.</li>
+ * <li>The strategies of the adverse event are applied in its branch.</li>
+ * <li>The adverse event is active in its branch, so a strategy that fails if the adverse event appears (failsIf) fails only there.</li>
+ * <li>The adverse event does not activate the structure of the health condition it represents (isOccurrenceOf).</li>
+ * </ul>
+ * Cycles in the chain of strategies, outcomes and adverse events whose risk is a time to event, and strategies with outcomes whose costs follow a
+ * guideline are not supported yet.
  */
 final class StrategyOutcomeExpander {
     private final static OSDiLogger log = OSDiLogger.getLogger(StrategyOutcomeExpander.class);
-    /** A strategy with outcomes pending to be expanded: the node of its health condition, its start, and the strategies of its chain */
-    private record Pending(StrategyWrapper strategy, BranchDestinationNode owner, List<ParameterWrapper> start, Set<IRI> chain) {}
+    /**
+     * A strategy with outcomes or adverse events pending to be expanded: the node of its health condition, its start, the strategies of its chain,
+     * and whether its adverse events have already been expanded
+     */
+    private record Pending(StrategyWrapper strategy, BranchDestinationNode owner, List<ParameterWrapper> start, Set<IRI> chain, boolean adverseEventsExpanded) {
+        Pending(StrategyWrapper strategy, BranchDestinationNode owner, List<ParameterWrapper> start, Set<IRI> chain) {
+            this(strategy, owner, start, chain, false);
+        }
+
+        Pending withAdverseEventsExpanded() {
+            return new Pending(strategy, owner, start, chain, true);
+        }
+    }
     /** A leaf of the tree, with the strategies with outcomes and the health conditions of its path */
     private record Leaf(BranchDestinationNode node, List<Pending> pending, Set<IRI> activeHealthConditions) {}
 
@@ -79,6 +102,9 @@ final class StrategyOutcomeExpander {
         for (StrategyWrapper strategy : node.getOutcomeStrategies()) {
             newPending.add(new Pending(strategy, node, List.of(), Set.of(strategy.getIndividualIRI())));
         }
+        for (StrategyWrapper strategy : node.getAdverseEventStrategies()) {
+            newPending.add(new Pending(strategy, node, List.of(), Set.of(strategy.getIndividualIRI())));
+        }
         final Set<IRI> newActive = new HashSet<>(active);
         node.getHealthCondition().ifPresent(hc -> newActive.add(hc.getIndividualIRI()));
         final List<BranchDestinationNode> children = new ArrayList<>(node.getSuccessors());
@@ -102,6 +128,16 @@ final class StrategyOutcomeExpander {
         }
         final Pending current = pending.get(0);
         final List<Pending> rest = pending.subList(1, pending.size());
+        // The adverse events are expanded first, since the strategy may fail because of them
+        if (!current.adverseEventsExpanded() && current.strategy().hasAdverseEvents()) {
+            expandAdverseEvents(leaf, current, current.strategy().getAdverseEvents(), 0, rest, active);
+            return;
+        }
+        // The payoffs of a strategy without outcomes were already added
+        if (!current.strategy().hasOutcomes()) {
+            expandLeaf(leaf, new ArrayList<>(rest), active);
+            return;
+        }
         final List<Outcome> outcomes = current.strategy().getOutcomes();
         // A failure produced by the appearance of a health condition is decided by the path
         final Optional<Outcome> conditionedFailure = outcomes.stream().filter(o -> o.failureCondition().isPresent()).findFirst();
@@ -128,18 +164,119 @@ final class StrategyOutcomeExpander {
                         + ". Cycles are not supported in decision trees: a repetition must be modeled as another strategy.");
                 }
                 final List<ParameterWrapper> nextStart = getOutcomeTime(current, outcome);
-                if (next.hasOutcomes()) {
+                if (!next.hasOutcomes()) {
+                    addStrategyPayoffs(node, next, new PayoffWindow(current.owner(), nextStart, Optional.empty()));
+                }
+                if (next.hasOutcomes() || next.hasAdverseEvents()) {
                     final Set<IRI> chain = new HashSet<>(current.chain());
                     chain.add(next.getIndividualIRI());
                     newPending.add(new Pending(next, current.owner(), nextStart, chain));
-                }
-                else {
-                    addStrategyPayoffs(node, next, new PayoffWindow(current.owner(), nextStart, Optional.empty()));
                 }
             }
             newPending.addAll(rest);
             expandLeaf(node, newPending, active);
         }
+    }
+
+    /**
+     * Expands the adverse events of a strategy, from the i-th one, below a node. Each adverse event is an independent branch with its risk, and a branch
+     * without it. When all of them are expanded, the expansion continues with the outcomes of the strategy and with the rest of pending strategies.
+     * @param node The node below which the adverse events are expanded
+     * @param current The strategy whose adverse events are expanded
+     * @param adverseEvents The adverse events of the strategy
+     * @param i The index of the next adverse event to expand
+     * @param rest The rest of pending strategies
+     * @param active The health conditions active in the path (including the adverse events that happened)
+     */
+    private void expandAdverseEvents(BranchDestinationNode node, Pending current, List<AdverseEventWrapper> adverseEvents, int i, List<Pending> rest, Set<IRI> active)
+            throws MalformedOSDiModelException, UnsupportedOSDiFeatureException, MalformedSimulationModelException {
+        if (i == adverseEvents.size()) {
+            final List<Pending> newPending = new ArrayList<>();
+            newPending.add(current.withAdverseEventsExpanded());
+            newPending.addAll(rest);
+            expandLeaf(node, newPending, active);
+            return;
+        }
+        final AdverseEventWrapper adverseEvent = adverseEvents.get(i);
+        final BranchDestinationNode happens = createAdverseEventNode(current, adverseEvent);
+        node.link(happens, getProbability(current.strategy(), adverseEvent));
+        final BranchDestinationNode doesNotHappen = new BranchDestinationNode(model, "NO ADVERSE EVENT: " + adverseEvent.getShortName());
+        node.link(doesNotHappen);
+
+        // The branch where the adverse event happens. An instant death is a branch of its own, where nothing else is expanded
+        BranchDestinationNode alive = happens;
+        for (EffectWrapper effect : adverseEvent.getEffects()) {
+            if (EffectType.INSTANT_DEATH_EFFECT.equals(effect.getEffectType())) {
+                if (!current.start().isEmpty()) {
+                    log.warn("The adverse event " + adverseEvent.getShortName() + " of the strategy " + current.strategy().getShortName() + " may cause death, but the strategy starts after the start of "
+                        + current.owner().name() + ". Decision trees assume that the death happens at the start of the model (life expectancy 0).");
+                }
+                final BranchDestinationNode death = new BranchDestinationNode(model, "Death from " + adverseEvent.getShortName());
+                death.updateEffects(adverseEvent, EffectType.INSTANT_DEATH_EFFECT);
+                happens.link(death, effect.getEffectMagnitude());
+                if (alive == happens) {
+                    alive = new BranchDestinationNode(model, "Alive with " + adverseEvent.getShortName());
+                }
+            }
+        }
+        if (alive != happens) {
+            happens.link(alive);
+        }
+        // The strategies of the adverse event are applied in its branch
+        final List<Pending> restWithAdverseEvent = new ArrayList<>();
+        for (StrategyWrapper strategy : adverseEvent.getStrategies()) {
+            if (current.chain().contains(strategy.getIndividualIRI())) {
+                throw new UnsupportedOSDiFeatureException("The adverse event " + adverseEvent.getShortName() + " is treated with the strategy " + strategy.getShortName()
+                    + ", which is already applied in the chain. Cycles are not supported in decision trees: a repetition must be modeled as another strategy.");
+            }
+            if (!strategy.hasOutcomes()) {
+                addStrategyPayoffs(happens, strategy, new PayoffWindow(current.owner(), current.start(), Optional.empty()));
+            }
+            if (strategy.hasOutcomes() || strategy.hasAdverseEvents()) {
+                final Set<IRI> chain = new HashSet<>(current.chain());
+                chain.add(strategy.getIndividualIRI());
+                restWithAdverseEvent.add(new Pending(strategy, current.owner(), current.start(), chain));
+            }
+        }
+        restWithAdverseEvent.addAll(rest);
+        final Set<IRI> activeWithAdverseEvent = new HashSet<>(active);
+        activeWithAdverseEvent.add(adverseEvent.getIndividualIRI());
+        expandAdverseEvents(alive, current, adverseEvents, i + 1, restWithAdverseEvent, activeWithAdverseEvent);
+        // The branch without the adverse event
+        expandAdverseEvents(doesNotHappen, current, adverseEvents, i + 1, rest, active);
+    }
+
+    /**
+     * Creates the node of an adverse event, with its payoffs, which apply once, at the start of the strategy, and its effects (except death, which
+     * is a branch of its own).
+     */
+    private BranchDestinationNode createAdverseEventNode(Pending current, AdverseEventWrapper adverseEvent) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        final BranchDestinationNode node = new BranchDestinationNode(model, "ADVERSE EVENT: " + adverseEvent.getShortName());
+        final PayoffWindow atStart = new PayoffWindow(current.owner(), current.start(), Optional.empty());
+        final List<ParameterWrapper> costs = new ArrayList<>(adverseEvent.getCosts());
+        final List<ParameterWrapper> utilities = new ArrayList<>(adverseEvent.getUtilities());
+        final String owner = "The adverse event " + adverseEvent.getShortName();
+        DiseaseSubTreeGenerator.removeAnnualPayoffs(owner, costs);
+        DiseaseSubTreeGenerator.removeAnnualPayoffs(owner, utilities);
+        costs.forEach(cost -> node.getWindowedCosts().add(new WindowedPayoff(cost, atStart)));
+        utilities.forEach(utility -> node.getWindowedDisutilities().add(new WindowedPayoff(utility, atStart)));
+        node.updateEffects(adverseEvent, EffectType.GENERAL_EFFECT);
+        node.updateEffects(adverseEvent, EffectType.MORTALITY_RATE_EFFECT);
+        node.updateEffects(adverseEvent, EffectType.LIFE_EXPECTANCY_REDUCTION_EFFECT);
+        return node;
+    }
+
+    /**
+     * Returns the probability of an adverse event per application of the strategy, converted into a probability parameter if needed.
+     */
+    private static ParameterWrapper getProbability(StrategyWrapper strategy, AdverseEventWrapper adverseEvent) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        final ParameterWrapper risk = adverseEvent.getRisk();
+        // TODO: Support times to event in the risks of the adverse events in decision trees (see docs/known-limitations.md)
+        if (OSDiDataItemType.DI_TIME_TO_EVENT.equals(risk.getDataItemType())) {
+            throw new UnsupportedOSDiFeatureException("The risk of the adverse event " + adverseEvent.getShortName() + " of the strategy " + strategy.getShortName()
+                + " is a time to event, which is not supported in decision trees: it must be a probability per application of the strategy.");
+        }
+        return AbstractModelFactory.getProbabilityParameterFromGenericParameter(risk);
     }
 
     /**

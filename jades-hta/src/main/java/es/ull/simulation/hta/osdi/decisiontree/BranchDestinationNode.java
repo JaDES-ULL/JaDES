@@ -177,6 +177,8 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
     private Optional<HealthConditionWrapper> healthCondition = Optional.empty();
     /** The strategies with outcomes of the health condition of this node, whose outcomes are expanded below the leaves (see StrategyOutcomeExpander) */
     private final List<StrategyWrapper> outcomeStrategies = new ArrayList<>();
+    /** The strategies without outcomes of the health condition of this node that have adverse events, which are expanded below the leaves (see StrategyOutcomeExpander) */
+    private final List<StrategyWrapper> adverseEventStrategies = new ArrayList<>();
     /** The costs of this node that apply within a period */
     private final List<WindowedPayoff> windowedCosts = new ArrayList<>();
     /** The disutilities of this node that apply within a period */
@@ -194,6 +196,16 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
 
     public List<StrategyWrapper> getOutcomeStrategies() {
         return outcomeStrategies;
+    }
+
+    /**
+     * Returns the strategies without outcomes of the health condition of this node that have adverse events. Their payoffs are added to this node,
+     * and their adverse events are expanded below the leaves (see StrategyOutcomeExpander). The adverse events of the strategies with outcomes are
+     * expanded together with their outcomes.
+     * @return The strategies without outcomes of the health condition of this node that have adverse events
+     */
+    public List<StrategyWrapper> getAdverseEventStrategies() {
+        return adverseEventStrategies;
     }
 
     public List<WindowedPayoff> getWindowedCosts() {
@@ -383,6 +395,10 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
             final ArrayList<ParameterWrapper> strategyCosts = new ArrayList<>();
             StrategyCosts.collect(strategy, strategyCosts, guidelineCosts);
             addCostParameters(strategyCosts);
+            // The adverse events of the strategy are expanded below the leaves (decision D8)
+            if (strategy.hasAdverseEvents() && !adverseEventStrategies.contains(strategy)) {
+                adverseEventStrategies.add(strategy);
+            }
         }
     }
 

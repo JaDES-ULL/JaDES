@@ -16,7 +16,7 @@ Las decisiones tal como quedaron al implementarlas, según el registro hasta la 
 | D5 | Una estrategia puede fracasar cuando aparece una condición de salud. Hoy el fracaso ocurre al inicio de la estrategia; falta tener en cuenta la edad de inicio de la condición. | Rango de `failsIf`: `Parameter` o `HealthCondition`. |
 | D6 | La eficacia la expresa el `DataItemType`: probabilidad por episodio (árbol) o tiempo hasta el evento (simulación). «Resuelve» detiene los pagos anuales de la condición. En árboles, el riesgo de tiempo hasta el evento T de una progresión se convierte en la probabilidad 1 − e^(−1/T), con T modificado por los efectos de la ruta; el de un resultado de estrategia se rechaza por ahora. | Comentarios de `failsIf`, `hasDuration` y `StrategyOutcome`. |
 | D7 | Las utilidades por episodio son pérdidas de AVAC de una vez, que se suman al aplicar una estrategia o un resultado, o al aparecer una manifestación aguda. Los pagos anuales de una aguda se ignoran con aviso. | Comentarios de `appliesOneTime` e `isDisutility`. |
-| D8 | Pendiente (fase 9). Efectos adversos. Si el problema forma parte de la evolución natural de la enfermedad y el tratamiento solo cambia su riesgo, se usa un Effect de la estrategia sobre ese riesgo. Si lo provoca el tratamiento, se declara un AdverseEvent: el acontecimiento (por ejemplo, «hipoglucemia por insulina»), causado por una estrategia, con su riesgo, sus pagos de una vez (D7) y sus estrategias. Apunta al problema de salud, que puede ser una manifestación de la enfermedad o un problema ajeno a ella. Los casos complejos (dosis, combinaciones) se expresan con hasConditionExpression. Puede provocar el fracaso de la estrategia (failsIf, D5) o la muerte. En la primera versión no activa la estructura de la enfermedad: el enlace solo identifica el problema. | Nueva clase AdverseEvent ⊑ HealthCondition, disjunta de Disease y de ClinicalProgressionElement. Nuevas propiedades hasAdverseEvent (de Strategy a AdverseEvent) e isOccurrenceOf (de AdverseEvent a HealthCondition). hasRiskCharacterization admite AdverseEvent. Nombres por confirmar en la fase 9. |
+| D8 | Efectos adversos. Si el problema forma parte de la evolución natural de la enfermedad y el tratamiento solo cambia su riesgo, se usa un Effect de la estrategia sobre ese riesgo. Si lo provoca el tratamiento, se declara un AdverseEvent: el acontecimiento (por ejemplo, «hipoglucemia por insulina»), causado por una estrategia, con su riesgo, sus pagos de una vez (D7) y sus estrategias. Apunta al problema de salud, que puede ser una manifestación de la enfermedad o un problema ajeno a ella. Los casos complejos (dosis, combinaciones) se expresan con hasConditionExpression. Puede provocar el fracaso de la estrategia (failsIf, D5) o la muerte. En la primera versión no activa la estructura de la enfermedad: el enlace solo identifica el problema. | Nueva clase AdverseEvent ⊑ HealthCondition, disjunta de Disease y de ClinicalProgressionElement. Nuevas propiedades hasAdverseEvent (de Strategy a AdverseEvent), con su inversa isAdverseEventOf, e isOccurrenceOf (de AdverseEvent a HealthCondition). hasRiskCharacterization admite AdverseEvent, con un riesgo obligatorio. |
 | D9 | *Pendiente (fase 10).* La recurrencia es una relación propia: el destino solo aparece cuando el origen se ha resuelto. La secuencia (`hasNext`) queda para la progresión. También modela los episodios repetidos de una aguda. | Nueva propiedad de `Manifestation` a `Manifestation` (nombre por decidir). |
 | D10 | *Pendiente (fase 13).* Si la población no declara edad o sexo, la aplicación avisa al construir el modelo y supone 18 años y un 50 % de mujeres. Si ningún parámetro depende de ellos, el aviso basta. Sustituye el valor por defecto actual de JaDES (edad 0 con aviso). | Ninguno: las restricciones de `Population` se mantienen. |
 | D11 | Las propiedades de detección (`detects`, sensibilidad, especificidad y umbral temporal) son de las estrategias de detección, no de las intervenciones. Las estrategias de diagnóstico son confirmaciones perfectas. | Dominio de `detects`, `hasSensitivity`, `hasSpecificity` y `hasTemporaryThreshold` en `DetectionStrategy` (umbral, en `ScreeningStrategy`); rango de `isDetectedBy` en `DetectionStrategy`. |
@@ -218,7 +218,7 @@ Ya no están pendientes los nombres (salvo el de la recurrencia) ni el momento d
 - Fase 7b: resultados de detección en el NBS (riesgos por estado, resultados no concluyentes encadenados a otra prueba, confirmación con el `followedByStrategy` de los positivos). Hecho en la Fase 7b.
 - Pautas en estrategias con resultados (hoy `Unsupported`).
 - El fracaso por una condición de salud ocurre al inicio de la estrategia: no se tiene en cuenta la edad de inicio de la condición.
-- Efectos adversos que pueden coincidir con el éxito o el fracaso: habría que modelarlos como manifestaciones agudas cuyo riesgo depende de la estrategia.
+- Efectos adversos: resuelto en la fase 9 con `AdverseEvent` (D8), que son independientes del resultado de la estrategia salvo que esta tenga `failsIf` hacia el efecto adverso.
 - El DES no simula estrategias ni sus resultados.
 - El aviso de `StrategyWrapper` sobre las estrategias con pauta («Guideline-based strategies are not supported yet») ha quedado desfasado desde la Fase 5. No lo he cambiado porque queda fuera del alcance de esta fase.
 
@@ -268,3 +268,49 @@ Ya no están pendientes los nombres (salvo el de la recurrencia) ni el momento d
 - DES: un sexo de la población declarado como parámetro determinista provocaba un `ClassCastException` en `OSDiPopulation`. Hecho: véase la entrada siguiente.
 - DES: la edad de la población no distingue la heterogeneidad (primer orden) de la incertidumbre paramétrica (segundo orden): un parámetro de edad de segundo orden se muestrea para cada paciente.
 - DES, sexo de la población: `hasSex` es la heterogeneidad del sexo (primer orden; 0 = hombre, 1 = mujer). Un parámetro determinista, de segundo orden o calculado es la proporción de mujeres p, que se registra como parámetro del modelo; cada paciente se sortea con un Bernoulli(p). El segundo orden se muestrea una vez por simulación (valor esperado en el caso base) y ese valor es la p del Bernoulli. Un parámetro de primer orden sigue usando su distribución, que debe ser discreta (T1DM no cambia). Se rechazan, con `MalformedOSDiModelException`, un valor determinista fuera de [0, 1] y una distribución de primer orden no discreta (`OSDiPopulation.initializeSexVariate` y `getSexVariate`). `OSDi_test_des.ttl` vuelve a declarar el sexo como determinista (0,5). Antes del cambio, `TestDESRisksAndEffects` falló en `setUp` con `ClassCast class simkit.random.ConstantVariate cannot be cast to class simkit.random.DiscreteRandomVariate`. El test nuevo `assignsSexFromProportionOfWomen` comprueba una proporción de mujeres de 0,5 ± 0,02.
+
+### Fase 9: efectos adversos (D8) (2026-11-16)
+
+**Hecho:**
+- `OSDi.ttl` (sin cambiar la versión):
+  - Nueva clase `AdverseEvent`, subclase de `HealthCondition` y disjunta de `Disease` y `ClinicalProgressionElement`. Tiene exactamente un riesgo (`hasRiskCharacterization` hacia un `Parameter`) y como mucho un `isOccurrenceOf`.
+  - Propiedades nuevas: `hasAdverseEvent` (de `Strategy` a `AdverseEvent`), con su inversa `isAdverseEventOf`, e `isOccurrenceOf` (de `AdverseEvent` a `HealthCondition`).
+  - El dominio de `hasRiskCharacterization` y el rango de `isRiskCharacterizationOf` admiten `AdverseEvent`.
+  - El comentario de `failsIf` menciona el abandono por un efecto adverso.
+  - Comentarios en inglés y en español, con la regla para quien modela: si el problema forma parte de la evolución natural y la estrategia solo cambia su riesgo, se usa un `Effect`; si lo provoca la estrategia, un `AdverseEvent`.
+  - Constantes nuevas en `OSDiClass` y `OSDiObjectProperty`.
+- Código:
+  - `AdverseEventWrapper` lee y valida el riesgo y la condición de salud.
+  - `StrategyWrapper.getAdverseEvents` y `hasAdverseEvents`.
+  - `BranchDestinationNode` reúne las estrategias sin resultados que tienen efectos adversos.
+  - `StrategyOutcomeExpander` expande los efectos adversos bajo las hojas cada vez que una rama aplica una estrategia, antes de sus resultados, y también tras un resultado y en las estrategias de un efecto adverso.
+  - `NBSDetectionArm` rechaza los efectos adversos de las estrategias de detección.
+- Tests, con valores calculados a mano:
+  - P47: otitis, como en Coco (2007). El antibiótico tiene dos efectos adversos independientes y se da de entrada (sustituye a la observación) o tras su fracaso.
+  - P48: abandono por efecto adverso (`failsIf` hacia el efecto adverso), seguido de otro antibiótico.
+  - P49: efecto adverso mortal (`InstantDeathEffect`).
+  - N31: efecto adverso sin riesgo (`Malformed`).
+  - N32: riesgo de tiempo hasta el evento (`Unsupported`).
+  - Antes de implementar, P47–P49 fallaron en estructura y resultados (por ejemplo, en P48 `expected: <[TT_P48_A_Failure+TT_P48_Diarrhoea+TT_P48_ManA, TT_P48_A_Success+TT_P48_ManA]> but was: <[TT_P48_A_Success+TT_P48_ManA]>`), y N31 y N32 con `Expected ... to be thrown, but nothing was thrown`.
+- Soporte de tests:
+  - Prefijo `ADVERSE EVENT: ` en la clave de las hojas.
+  - `TreeCase.withAssessedLeaves` declara las hojas del brazo evaluado cuando difieren de las del comparador, como en P47.
+- Documentación: Javadoc, `docs/known-limitations.md` (sección «Adverse events in decision trees» y fila de la tabla de conformidad), CLAUDE.md y la fila D8, que pasa de pendiente a implementada.
+
+**Decidido:**
+- Nombres: `AdverseEvent`, `hasAdverseEvent` / `isAdverseEventOf` e `isOccurrenceOf`. El riesgo es obligatorio.
+- Árbol:
+  - Cada efecto adverso es una rama independiente con su probabilidad por aplicación, y otra sin él.
+  - Se expanden antes de los resultados de la estrategia. El efecto adverso queda activo en su rama, así que un `failsIf` hacia él decide el fracaso con el mismo mecanismo que D5.
+  - Pagos de una vez al inicio de la estrategia; los anuales se ignoran con aviso (D7). Sus efectos se aplican en su rama.
+  - Un `InstantDeathEffect` abre una rama de muerte, con esperanza de vida 0 y sin nada expandido después. Si la estrategia empieza más tarde, se avisa.
+  - Sus estrategias se aplican en su rama. `isOccurrenceOf` solo identifica la condición.
+- Los tests de estructura comprueban que los dos brazos tengan las mismas hojas. En P47 no es así por diseño (la intervención sustituye la estrategia), así que el caso declara las hojas de cada brazo. Esto no cambia ningún valor esperado: en una primera versión, mientras entendía qué brazo se comprueba, llegué a cambiar las hojas esperadas de P47 a las del brazo evaluado, y lo deshice.
+- D8 deja de estar pendiente y cubre el uso que se preveía para «una ruta que requiere una estrategia».
+
+**Pendiente:**
+- D8 prevé expresar los casos complejos (dosis, combinaciones) con `hasConditionExpression`, pero el árbol no lee esa propiedad en las estrategias (se ignora con aviso).
+- La muerte por un efecto adverso ocurre al inicio del modelo aunque la estrategia empiece más tarde (por ejemplo, el rescate tras la observación), igual que la muerte inmediata de la enfermedad.
+- DES: no simula estrategias, así que ignora sus efectos adversos. Riesgos de tiempo hasta el evento de los efectos adversos (simulación).
+- Efectos adversos de las estrategias de detección en el NBS (por ejemplo, complicaciones de una prueba invasiva).
+- Los brazos comparados solo se comprueban en estructura con hojas declaradas para cada uno cuando difieren. El resto de casos sigue suponiendo que las hojas son iguales.

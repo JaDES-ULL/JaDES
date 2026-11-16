@@ -6387,4 +6387,580 @@ osdi:TT_P46_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P46. Treatment of an acute episode: the success resolves it and the failure is followed by a rescue treatment." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Diarrhoea_Risk
+osdi:TT_P47_Diarrhoea_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Risk of Diarrhoea per application of the strategy" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Diarrhoea_Cost
+osdi:TT_P47_Diarrhoea_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of Diarrhoea" ;
+    osdi:hasExpectedValue "30.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Diarrhoea_Loss
+osdi:TT_P47_Diarrhoea_Loss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of Diarrhoea" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Diarrhoea
+osdi:TT_P47_Diarrhoea rdf:type owl:NamedIndividual ,
+        osdi:AdverseEvent ;
+    osdi:hasRiskCharacterization osdi:TT_P47_Diarrhoea_Risk ;
+    osdi:hasCost osdi:TT_P47_Diarrhoea_Cost ;
+    osdi:hasUtility osdi:TT_P47_Diarrhoea_Loss ;
+    osdi:hasDescription "Adverse event Diarrhoea" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Rash_Risk
+osdi:TT_P47_Rash_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Risk of Rash per application of the strategy" ;
+    osdi:hasExpectedValue "0.05"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Rash_Cost
+osdi:TT_P47_Rash_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of Rash" ;
+    osdi:hasExpectedValue "60.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Rash_Loss
+osdi:TT_P47_Rash_Loss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of Rash" ;
+    osdi:hasExpectedValue "0.02"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Rash
+osdi:TT_P47_Rash rdf:type owl:NamedIndividual ,
+        osdi:AdverseEvent ;
+    osdi:hasRiskCharacterization osdi:TT_P47_Rash_Risk ;
+    osdi:hasCost osdi:TT_P47_Rash_Cost ;
+    osdi:hasUtility osdi:TT_P47_Rash_Loss ;
+    osdi:hasDescription "Adverse event Rash" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_A_Cost
+osdi:TT_P47_A_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of A" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_A
+osdi:TT_P47_A rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P47_A_Cost ;
+    osdi:hasAdverseEvent osdi:TT_P47_Diarrhoea ,
+        osdi:TT_P47_Rash ;
+    osdi:hasDescription "Antibiotic" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_W_SuccessRisk
+osdi:TT_P47_W_SuccessRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability that the episode resolves without antibiotic" ;
+    osdi:hasExpectedValue "0.7"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_W_Success
+osdi:TT_P47_W_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasOutcomeRisk osdi:TT_P47_W_SuccessRisk ;
+    osdi:resolvesHealthCondition "true"^^xsd:boolean ;
+    osdi:hasDescription "The episode resolves" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_W_FailureLoss
+osdi:TT_P47_W_FailureLoss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the persistent symptoms" ;
+    osdi:hasExpectedValue "0.05"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_W_Failure
+osdi:TT_P47_W_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_P47_A ;
+    osdi:hasUtility osdi:TT_P47_W_FailureLoss ;
+    osdi:hasDescription "Persistent symptoms: antibiotic" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_W_Cost
+osdi:TT_P47_W_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of W" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_W
+osdi:TT_P47_W rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P47_W_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_P47_W_Success ,
+        osdi:TT_P47_W_Failure ;
+    osdi:hasDescription "Watchful waiting" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_ManA_Cost
+osdi:TT_P47_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the episode" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_ManA_Loss
+osdi:TT_P47_ManA_Loss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the episode" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_ManA
+osdi:TT_P47_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_P47_ManA_Cost ;
+    osdi:hasStrategy osdi:TT_P47_W ;
+    osdi:hasUtility osdi:TT_P47_ManA_Loss ;
+    osdi:hasDescription "Acute episode, always present" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Replacement
+osdi:TT_P47_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TT_P47_ManA ;
+    osdi:hasReplacementStrategy osdi:TT_P47_A ;
+    osdi:hasDescription "The antibiotic replaces watchful waiting" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_InterventionAntibiotic
+osdi:TT_P47_InterventionAntibiotic rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasEffect osdi:TT_P47_Replacement ;
+    osdi:hasDescription "Immediate antibiotic" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Disease
+osdi:TT_P47_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P47_InterventionAntibiotic ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P47_ManA ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P47_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Experiment
+osdi:TT_P47_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P47_Model ;
+    osdi:hasDescription "Adverse events of an antibiotic, given at once or after the failure of watchful waiting (otitis media, as in Coco 2007)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P47_Model
+osdi:TT_P47_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P47_InterventionAntibiotic ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_P47_Diarrhoea_Risk ,
+        osdi:TT_P47_Diarrhoea_Cost ,
+        osdi:TT_P47_Diarrhoea_Loss ,
+        osdi:TT_P47_Diarrhoea ,
+        osdi:TT_P47_Rash_Risk ,
+        osdi:TT_P47_Rash_Cost ,
+        osdi:TT_P47_Rash_Loss ,
+        osdi:TT_P47_Rash ,
+        osdi:TT_P47_A_Cost ,
+        osdi:TT_P47_A ,
+        osdi:TT_P47_W_SuccessRisk ,
+        osdi:TT_P47_W_Success ,
+        osdi:TT_P47_W_FailureLoss ,
+        osdi:TT_P47_W_Failure ,
+        osdi:TT_P47_W_Cost ,
+        osdi:TT_P47_W ,
+        osdi:TT_P47_ManA_Cost ,
+        osdi:TT_P47_ManA_Loss ,
+        osdi:TT_P47_ManA ,
+        osdi:TT_P47_Replacement ,
+        osdi:TT_P47_InterventionAntibiotic ,
+        osdi:TT_P47_Disease ;
+    osdi:hasDescription "P47. Adverse events of an antibiotic, given at once or after the failure of watchful waiting (otitis media, as in Coco 2007)." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_Diarrhoea_Risk
+osdi:TT_P48_Diarrhoea_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Risk of Diarrhoea per application of the strategy" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_Diarrhoea_Cost
+osdi:TT_P48_Diarrhoea_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of Diarrhoea" ;
+    osdi:hasExpectedValue "30.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_Diarrhoea_Loss
+osdi:TT_P48_Diarrhoea_Loss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of Diarrhoea" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_Diarrhoea
+osdi:TT_P48_Diarrhoea rdf:type owl:NamedIndividual ,
+        osdi:AdverseEvent ;
+    osdi:hasRiskCharacterization osdi:TT_P48_Diarrhoea_Risk ;
+    osdi:hasCost osdi:TT_P48_Diarrhoea_Cost ;
+    osdi:hasUtility osdi:TT_P48_Diarrhoea_Loss ;
+    osdi:hasDescription "Adverse event Diarrhoea" ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_B_Cost
+osdi:TT_P48_B_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of B" ;
+    osdi:hasExpectedValue "40.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_B
+osdi:TT_P48_B rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P48_B_Cost ;
+    osdi:hasDescription "Second antibiotic" ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_A_Cost
+osdi:TT_P48_A_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of A" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_A
+osdi:TT_P48_A rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P48_A_Cost ;
+    osdi:hasAdverseEvent osdi:TT_P48_Diarrhoea ;
+    osdi:failsIf osdi:TT_P48_Diarrhoea ;
+    osdi:followedOnFailureBy osdi:TT_P48_B ;
+    osdi:resolvesOnSuccess "true"^^xsd:boolean ;
+    osdi:hasDescription "First antibiotic" ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_ManA_Cost
+osdi:TT_P48_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the episode" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_ManA_Loss
+osdi:TT_P48_ManA_Loss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the episode" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_ManA
+osdi:TT_P48_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_P48_ManA_Cost ;
+    osdi:hasStrategy osdi:TT_P48_A ;
+    osdi:hasUtility osdi:TT_P48_ManA_Loss ;
+    osdi:hasDescription "Acute episode, always present" ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_Disease
+osdi:TT_P48_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P48_ManA ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P48_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_Experiment
+osdi:TT_P48_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P48_Model ;
+    osdi:hasDescription "Abandonment of a treatment because of an adverse event (failsIf the adverse event), followed by another treatment." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P48_Model
+osdi:TT_P48_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P48_Diarrhoea_Risk ,
+        osdi:TT_P48_Diarrhoea_Cost ,
+        osdi:TT_P48_Diarrhoea_Loss ,
+        osdi:TT_P48_Diarrhoea ,
+        osdi:TT_P48_B_Cost ,
+        osdi:TT_P48_B ,
+        osdi:TT_P48_A_Cost ,
+        osdi:TT_P48_A ,
+        osdi:TT_P48_ManA_Cost ,
+        osdi:TT_P48_ManA_Loss ,
+        osdi:TT_P48_ManA ,
+        osdi:TT_P48_Disease ;
+    osdi:hasDescription "P48. Abandonment of a treatment because of an adverse event (failsIf the adverse event), followed by another treatment." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_AnaphylaxisDeathProbability
+osdi:TT_P49_AnaphylaxisDeathProbability rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability of dying from anaphylaxis" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P49_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_AnaphylaxisDeath
+osdi:TT_P49_AnaphylaxisDeath rdf:type owl:NamedIndividual ,
+        osdi:InstantDeathEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P49_AnaphylaxisDeathProbability ;
+    osdi:hasDescription "Death from anaphylaxis" ;
+    osdi:includedByModel osdi:TT_P49_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_Anaphylaxis_Risk
+osdi:TT_P49_Anaphylaxis_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Risk of Anaphylaxis per application of the strategy" ;
+    osdi:hasExpectedValue "0.01"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P49_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_Anaphylaxis_Cost
+osdi:TT_P49_Anaphylaxis_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of Anaphylaxis" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P49_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_Anaphylaxis
+osdi:TT_P49_Anaphylaxis rdf:type owl:NamedIndividual ,
+        osdi:AdverseEvent ;
+    osdi:hasRiskCharacterization osdi:TT_P49_Anaphylaxis_Risk ;
+    osdi:hasCost osdi:TT_P49_Anaphylaxis_Cost ;
+    osdi:hasEffect osdi:TT_P49_AnaphylaxisDeath ;
+    osdi:hasDescription "Adverse event Anaphylaxis" ;
+    osdi:includedByModel osdi:TT_P49_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_A_Cost
+osdi:TT_P49_A_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of A" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P49_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_A
+osdi:TT_P49_A rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P49_A_Cost ;
+    osdi:hasAdverseEvent osdi:TT_P49_Anaphylaxis ;
+    osdi:hasDescription "Treatment of the disease" ;
+    osdi:includedByModel osdi:TT_P49_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_Disease
+osdi:TT_P49_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P49_A ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P49_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_Experiment
+osdi:TT_P49_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P49_Model ;
+    osdi:hasDescription "Fatal adverse event of a treatment of the disease (InstantDeathEffect of the adverse event)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P49_Model
+osdi:TT_P49_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P49_AnaphylaxisDeathProbability ,
+        osdi:TT_P49_AnaphylaxisDeath ,
+        osdi:TT_P49_Anaphylaxis_Risk ,
+        osdi:TT_P49_Anaphylaxis_Cost ,
+        osdi:TT_P49_Anaphylaxis ,
+        osdi:TT_P49_A_Cost ,
+        osdi:TT_P49_A ,
+        osdi:TT_P49_Disease ;
+    osdi:hasDescription "P49. Fatal adverse event of a treatment of the disease (InstantDeathEffect of the adverse event)." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

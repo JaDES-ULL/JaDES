@@ -4180,4 +4180,189 @@ osdi:TT_N30_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "N30. Confirmation of the positive results with a diagnosis strategy with explicit outcomes (not supported yet)." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N31_Diarrhoea_Cost
+osdi:TT_N31_Diarrhoea_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of Diarrhoea" ;
+    osdi:hasExpectedValue "30.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N31_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N31_Diarrhoea
+osdi:TT_N31_Diarrhoea rdf:type owl:NamedIndividual ,
+        osdi:AdverseEvent ;
+    osdi:hasCost osdi:TT_N31_Diarrhoea_Cost ;
+    osdi:hasDescription "Adverse event Diarrhoea" ;
+    osdi:includedByModel osdi:TT_N31_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N31_A_Cost
+osdi:TT_N31_A_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of A" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N31_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N31_A
+osdi:TT_N31_A rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_N31_A_Cost ;
+    osdi:hasAdverseEvent osdi:TT_N31_Diarrhoea ;
+    osdi:hasDescription "Antibiotic" ;
+    osdi:includedByModel osdi:TT_N31_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N31_Disease
+osdi:TT_N31_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_N31_A ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_N31_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N31_Experiment
+osdi:TT_N31_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N31_Model ;
+    osdi:hasDescription "Adverse event without risk." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N31_Model
+osdi:TT_N31_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_N31_Diarrhoea_Cost ,
+        osdi:TT_N31_Diarrhoea ,
+        osdi:TT_N31_A_Cost ,
+        osdi:TT_N31_A ,
+        osdi:TT_N31_Disease ;
+    osdi:hasDescription "N31. Adverse event without risk." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N32_Diarrhoea_Risk
+osdi:TT_N32_Diarrhoea_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_TimeToEvent ;
+    osdi:hasDescription "Risk of Diarrhoea per application of the strategy" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double ;
+    osdi:includedByModel osdi:TT_N32_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N32_Diarrhoea_Cost
+osdi:TT_N32_Diarrhoea_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of Diarrhoea" ;
+    osdi:hasExpectedValue "30.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N32_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N32_Diarrhoea
+osdi:TT_N32_Diarrhoea rdf:type owl:NamedIndividual ,
+        osdi:AdverseEvent ;
+    osdi:hasRiskCharacterization osdi:TT_N32_Diarrhoea_Risk ;
+    osdi:hasCost osdi:TT_N32_Diarrhoea_Cost ;
+    osdi:hasDescription "Adverse event Diarrhoea" ;
+    osdi:includedByModel osdi:TT_N32_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N32_A_Cost
+osdi:TT_N32_A_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of A" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N32_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N32_A
+osdi:TT_N32_A rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_N32_A_Cost ;
+    osdi:hasAdverseEvent osdi:TT_N32_Diarrhoea ;
+    osdi:hasDescription "Antibiotic" ;
+    osdi:includedByModel osdi:TT_N32_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N32_Disease
+osdi:TT_N32_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_N32_A ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_N32_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N32_Experiment
+osdi:TT_N32_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N32_Model ;
+    osdi:hasDescription "Adverse event whose risk is a time to event (not supported in decision trees)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N32_Model
+osdi:TT_N32_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_N32_Diarrhoea_Risk ,
+        osdi:TT_N32_Diarrhoea_Cost ,
+        osdi:TT_N32_Diarrhoea ,
+        osdi:TT_N32_A_Cost ,
+        osdi:TT_N32_A ,
+        osdi:TT_N32_Disease ;
+    osdi:hasDescription "N32. Adverse event whose risk is a time to event (not supported in decision trees)." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

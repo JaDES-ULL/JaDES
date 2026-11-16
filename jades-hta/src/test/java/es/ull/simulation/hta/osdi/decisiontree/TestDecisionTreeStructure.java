@@ -59,8 +59,9 @@ public class TestDecisionTreeStructure {
         for (int i = 0; i < interventions.size(); i++) {
             final String arm = interventions.get(i).name();
             final Map<String, Double> leaves = DecisionTreeTestSupport.readLeaves(interventions.get(i));
-            // Same combinations of progressions in both arms
-            assertEquals(tc.leaves().keySet(), leaves.keySet(), "Unexpected leaves in the arm " + arm + hint);
+            // Same combinations of progressions in both arms, unless the case declares the leaves of the assessed intervention
+            final Map<String, Double> expectedLeaves = (i == DecisionTreeTestSupport.COMPARATOR || tc.assessedLeaves() == null) ? tc.leaves() : tc.assessedLeaves();
+            assertEquals(expectedLeaves.keySet(), leaves.keySet(), "Unexpected leaves in the arm " + arm + hint);
             final double sum = leaves.values().stream().mapToDouble(value -> value == null ? Double.NaN : value).sum();
             assertTrue(DecisionTreeTestSupport.close(1.0, sum), "The probabilities of the leaves of the arm " + arm + " sum " + sum + hint);
         }
@@ -70,6 +71,15 @@ public class TestDecisionTreeStructure {
             final double actual = comparatorLeaves.get(expected.getKey());
             assertTrue(DecisionTreeTestSupport.close(expected.getValue(), actual), "Probability of the leaf '" + expected.getKey()
                 + "' in the comparator arm. Expected " + expected.getValue() + " but found " + actual + hint);
+        }
+        // The leaves declared for the assessed intervention are also checked (the case must not apply effects on their probabilities)
+        if (tc.assessedLeaves() != null) {
+            final Map<String, Double> assessedLeaves = DecisionTreeTestSupport.readLeaves(interventions.get(1 - DecisionTreeTestSupport.COMPARATOR));
+            for (Map.Entry<String, Double> expected : tc.assessedLeaves().entrySet()) {
+                final double actual = assessedLeaves.get(expected.getKey());
+                assertTrue(DecisionTreeTestSupport.close(expected.getValue(), actual), "Probability of the leaf '" + expected.getKey()
+                    + "' in the assessed arm. Expected " + expected.getValue() + " but found " + actual + hint);
+            }
         }
     }
 }
