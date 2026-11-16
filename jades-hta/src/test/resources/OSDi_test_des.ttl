@@ -1,0 +1,200 @@
+@prefix : <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix osdi: <https://w3id.org/ontologies-ULL/OSDi#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/ontologies-ULL/OSDi/individuals/test-des> .
+
+<https://w3id.org/ontologies-ULL/OSDi/individuals/test-des> rdf:type owl:Ontology ;
+    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.2> ;
+    rdfs:comment "Individuals for OSDi ontology, version 1.2. Small discrete event simulation models to test how the risks of the manifestations and the effects of the interventions on them are simulated."@en ;
+    rdfs:label "OSDi individuals for testing discrete event simulation models: risks and effects"@en .
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_Experiment
+osdi:TD_D01_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TD_D01_Model ;
+    osdi:hasDescription "D01. Chronic manifestations with an annual probability, modified by a hazard ratio (ManX) and a factor (ManY) of the intervention." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasNumberOfSimulatedIndividuals 5000 ;
+    osdi:hasTimeHorizon "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_Model
+osdi:TD_D01_Model rdf:type owl:NamedIndividual ,
+        osdi:DiscreteEventSimulationModel ;
+    osdi:hasAssessedIntervention osdi:TD_D01_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TD_D01_InterventionNone ;
+    osdi:includesModelItem osdi:TD_D01_Disease ,
+        osdi:TD_D01_DiseaseCost ,
+        osdi:TD_D01_InterventionNone ,
+        osdi:TD_D01_InterventionTreat ,
+        osdi:TD_D01_ManX ,
+        osdi:TD_D01_ManX_Risk ,
+        osdi:TD_D01_ManX_Effect ,
+        osdi:TD_D01_ManX_EffectMagnitude ,
+        osdi:TD_D01_ManY ,
+        osdi:TD_D01_ManY_Risk ,
+        osdi:TD_D01_ManY_Effect ,
+        osdi:TD_D01_ManY_EffectMagnitude ,
+        osdi:TD_D01_Population ,
+        osdi:TD_D01_PopulationAge ,
+        osdi:TD_D01_PopulationBaseUtility ,
+        osdi:TD_D01_PopulationSex ,
+        osdi:TD_D01_PopulationSex_StochasticUncertainty ;
+    osdi:hasDescription "D01. Chronic manifestations with an annual probability, modified by a hazard ratio (ManX) and a factor (ManY) of the intervention." .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_Population
+osdi:TD_D01_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TD_D01_PopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasSex osdi:TD_D01_PopulationSex ;
+    osdi:hasUtility osdi:TD_D01_PopulationBaseUtility ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Everyone has the disease and starts at 20 years old" ;
+    osdi:hasGeographicalContext "Spain" ;
+    osdi:hasMaxAge "100.0"^^xsd:double ;
+    osdi:hasMinAge "18.0"^^xsd:double ;
+    osdi:hasSize 5000 .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_PopulationAge
+osdi:TD_D01_PopulationAge rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Other ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Age ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_PopulationSex
+osdi:TD_D01_PopulationSex rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:FirstOrderUncertaintyParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:hasUncertaintyCharacterization osdi:TD_D01_PopulationSex_StochasticUncertainty ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Sex ;
+    osdi:hasDescription "Value of Attribute_Sex (the DES requires a Bernoulli distribution)" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_PopulationSex_StochasticUncertainty
+osdi:TD_D01_PopulationSex_StochasticUncertainty rdf:type owl:NamedIndividual ,
+        osdi:BernoulliDistributionExpression ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasProbabilityParameter "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_PopulationBaseUtility
+osdi:TD_D01_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Base utility for the studied population" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double ;
+    osdi:isDisutility "false"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_Disease
+osdi:TD_D01_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TD_D01_DiseaseCost ;
+    osdi:hasIntervention osdi:TD_D01_InterventionTreat ,
+        osdi:TD_D01_InterventionNone ;
+    osdi:hasProgressionElement osdi:TD_D01_ManX ,
+        osdi:TD_D01_ManY ;
+    osdi:includedByModel osdi:TD_D01_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_DiseaseCost
+osdi:TD_D01_DiseaseCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the disease" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_InterventionNone
+osdi:TD_D01_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Comparator: do nothing" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_InterventionTreat
+osdi:TD_D01_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasEffect osdi:TD_D01_ManX_Effect ,
+        osdi:TD_D01_ManY_Effect ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Treatment that reduces the risks of ManX and ManY" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_ManX
+osdi:TD_D01_ManX rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasRiskCharacterization osdi:TD_D01_ManX_Risk ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Chronic manifestation X" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_ManX_Risk
+osdi:TD_D01_ManX_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Annual probability of ManX" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_ManX_Effect
+osdi:TD_D01_ManX_Effect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TD_D01_ManX_Risk ;
+    osdi:hasEffectMagnitude osdi:TD_D01_ManX_EffectMagnitude ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Hazard ratio of ManX with the intervention" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_ManX_EffectMagnitude
+osdi:TD_D01_ManX_EffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_HazardRatio ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Hazard ratio of ManX with the intervention" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_ManY
+osdi:TD_D01_ManY rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasRiskCharacterization osdi:TD_D01_ManY_Risk ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Chronic manifestation Y" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_ManY_Risk
+osdi:TD_D01_ManY_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Annual probability of ManY" ;
+    osdi:hasExpectedValue "0.3"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_ManY_Effect
+osdi:TD_D01_ManY_Effect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TD_D01_ManY_Risk ;
+    osdi:hasEffectMagnitude osdi:TD_D01_ManY_EffectMagnitude ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Factor on the probability of ManY with the intervention" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D01_ManY_EffectMagnitude
+osdi:TD_D01_ManY_EffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Factor ;
+    osdi:includedByModel osdi:TD_D01_Model ;
+    osdi:hasDescription "Factor on the probability of ManY with the intervention" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .

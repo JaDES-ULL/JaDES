@@ -31,7 +31,11 @@ public interface TimeToEventCalculatorFactory extends DESModelComponentFactory {
 
 	/**
 	 * Creates the calculator for the time to event associated to this pathway. Currently only allows the time to be expressed as an annual risk and, consequently, uses 
-	 * a {@link AnnualRiskBasedTimeToEventCalculator}. 
+	 * a {@link AnnualRiskBasedTimeToEventCalculator}.
+	 * The calculators use the short names of the risk parameters, which are the names used to register them in the model
+	 * ({@link es.ull.simulation.hta.osdi.des.OSDiManifestationPathway#createParameters()}) and to register the modifiers of the effects
+	 * ({@link EffectFactory}). With the prefixed names of {@link StandardParameter} (e.g., P_), which are never registered, the risk was NaN
+	 * and the manifestations never happened.
 	 * @param model Repository
 	 * @param progression The destination progression for this pathway
 	 * @return
@@ -44,16 +48,16 @@ public interface TimeToEventCalculatorFactory extends DESModelComponentFactory {
         }
         switch(comb) {
             case PROPORTION:
-                return new ProportionBasedTimeToEventCalculator(progression, StandardParameter.PROPORTION.createName(riskWrappers.get(0).getShortName()));
+                return new ProportionBasedTimeToEventCalculator(progression, riskWrappers.get(0).getShortName());
             case PROBABILITY_RR:
                 if (riskWrappers.get(0).getDataItemType().equals(OSDiDataItemType.DI_RELATIVE_RISK)) {
-                    return new AnnualRiskBasedTimeToEventCalculator(progression, StandardParameter.PROBABILITY.createName(riskWrappers.get(1).getShortName()), StandardParameter.RELATIVE_RISK.createName(riskWrappers.get(0).getShortName()));
+                    return new AnnualRiskBasedTimeToEventCalculator(progression, riskWrappers.get(1).getShortName(), riskWrappers.get(0).getShortName());
                 } else {
-                    return new AnnualRiskBasedTimeToEventCalculator(progression, StandardParameter.PROBABILITY.createName(riskWrappers.get(0).getShortName()));
+                    return new AnnualRiskBasedTimeToEventCalculator(progression, riskWrappers.get(0).getShortName());
                 }
             case PROBABILITY:
             default:
-                return new AnnualRiskBasedTimeToEventCalculator(progression, StandardParameter.PROBABILITY.createName(riskWrappers.get(0).getShortName()));
+                return new AnnualRiskBasedTimeToEventCalculator(progression, riskWrappers.get(0).getShortName());
         }
 	}
  

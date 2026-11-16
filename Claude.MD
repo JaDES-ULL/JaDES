@@ -56,6 +56,7 @@ Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OS
 | `OSDi_test.ttl` | `TestOSDiCompliance`, `TestOntology`, `TestHTAExcelGeneration`, `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration` |
 | `PBD.ttl` | `TestOntology`, `TestHTAExcelGeneration` (árbol de cribado neonatal), `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration` |
 | `T1DM.ttl` | `TestOntology`, `TestLoadOntology` (DES; único modelo de prueba con `Pathway`, `requires` y `Group`) |
+| `OSDi_test_des.ttl` | `TestDESRisksAndEffects` (DES: D01, riesgos de manifestaciones y valores de los efectos de una intervención sobre ellos) |
 | `BD.ttl` | Ningún test la carga; importa OSDi 1.0 y es la única que usa `hasStrategy`, `LineOfTherapy` y `followedByStrategy` |
 
 `TestOSDiCompliance` exige que cada constante "core" de `OSDiClass`, `OSDiObjectProperty` y `OSDiDataProperty` exista en `OSDi.ttl`: renombrar o eliminar un término de la ontología obliga a actualizar esos enums.
