@@ -44,10 +44,10 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P52 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P56 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal; P53–P54: tiempo hasta el evento con horizonte; P55–P56 y P30: frecuencia de una aguda) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
-| `OSDi_test_tree_malformed.ttl` | N01–N12, N14–N32 (casos que deben lanzar excepción; N13 volvió a ser P26) |
+| `OSDi_test_tree_malformed.ttl` | N01–N05, N07–N12, N14–N32 (casos que deben lanzar excepción; N13 volvió a ser P26 y N06, P56) |
 
 Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
 
@@ -102,7 +102,7 @@ Convenciones:
 
 **Manifestaciones agudas (árbol):** un único episodio entre la edad inicial y la muerte, con el mismo nodo que una crónica (reglas, dependencia de un desarrollo y efectos sobre la hoja).
 - El riesgo es la probabilidad de que ocurra el episodio; una aguda sin riesgo ocurre siempre en su contexto (D1: el árbol empieza en la crisis).
-- `hasFrequency`: se ignora con aviso si hay riesgo; si solo hay frecuencia, `UnsupportedOSDiFeatureException` (N06). No se convierte en 1 − e^(−f·H): se perdería el número esperado de episodios. Decidido (fase 11): la frecuencia servirá para sumar costes o desutilidades, sin cambiar la estructura del árbol (semántica concreta pendiente).
+- `hasFrequency` f (episodios por año, fase 11): no cambia la estructura del árbol. El riesgo es la probabilidad de tener episodios (sin riesgo, siempre en su contexto: P56). Los pagos de una vez cuyo dueño es el nodo de la aguda (los suyos, los de sus estrategias y los de sus resultados y efectos adversos) se multiplican por los episodios esperados: pago anual f·x dentro de la ventana del nodo (`BranchDestinationNode.getEpisodeFrequency`, `PayoffWrapper.applyDiscount`), que siguen sumándose siempre como pagos de una vez (P30, P55). Sus efectos (muerte, LER) no se multiplican. Si la aguda es el objetivo de la intervención, la frecuencia se ignora con aviso (pendiente de reanalizar).
 - Pagos de una vez: una vez por episodio, en el momento 0 o en la edad de inicio (reglas de las ventanas temporales); una utilidad de una vez es una pérdida de AVAC. Pagos anuales: se ignoran con aviso, como en el DES.
 
 **Objetivo de las intervenciones (D1):** cada intervención declara su objetivo, la enfermedad o un elemento de su progresión (`isInterventionOf` o su inversa `hasIntervention`, que se leen en las dos direcciones). Se aplica en cada aparición del objetivo; si es la enfermedad, desde el inicio.

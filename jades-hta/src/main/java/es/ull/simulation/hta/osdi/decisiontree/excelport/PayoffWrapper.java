@@ -631,6 +631,13 @@ public class PayoffWrapper {
      * @throws MalformedOSDiModelException If more than one effect of the path replaces the same parameter.
      */
     private String applyDiscount(String text, String discountName, boolean appliesOneTime, ParameterEntry entry, CellReference cellUndiscountedLY) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
+        // A one-time payoff of an acute manifestation with a frequency f (or of its strategies, outcomes and adverse events) happens in every episode:
+        // it is multiplied by the expected number of episodes, i.e., it becomes an annual payoff f * x within the time window of the acute manifestation.
+        // It is still a one-time payoff for the combination methods (always added)
+        if (appliesOneTime && entry.owner() != null && entry.owner().getEpisodeFrequency().isPresent()) {
+            final String repeated = "(" + text + " * " + getParameterTextFormula(entry.owner().getEpisodeFrequency().get()) + ")";
+            return applyDiscountToFormula(repeated, discountName, false, entry.owner().getTemporalConstraint(), cellUndiscountedLY);
+        }
         Optional<Resolution> resolution = Optional.empty();
         for (Resolution candidate : resolutions) {
             if (entry.owner() != null && candidate.owner() == entry.owner() && candidate.parameters().contains(entry.parameter())) {

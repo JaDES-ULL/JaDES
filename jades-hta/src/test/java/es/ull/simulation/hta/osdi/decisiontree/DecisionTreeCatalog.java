@@ -420,10 +420,11 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P29_Experiment", "Acute manifestation with annual payoffs, which are ignored with a warning",
                 leaves("TT_P29_", leaf(0.2, "ManA"), leaf(0.8)),
                 outcomes(71900.0, 65.0, 55.15), outcomes(65400.0, 65.0, 55.15)));
-        // Same as P28: the frequency (12 episodes per year) is ignored, since the acute manifestation also defines a risk
-        cases.add(tc(PAYOFFS, "TT_P30_Experiment", "Acute manifestation with a risk and a frequency: the frequency is ignored with a warning",
+        // P28 with a frequency (0.1 episodes per year, phase 11): the risk is the probability of having episodes, and the one-time payoffs are multiplied
+        // by the expected number of episodes in the lifetime, E = 0.1 * 65 = 6.5. Comparator: 65000 + 0.2 * 6.5 * 2000 = 67600; QALYs 55.25 - 0.2 * 6.5 * 0.5 = 54.6
+        cases.add(tc(PAYOFFS, "TT_P30_Experiment", "Acute manifestation with a risk and a frequency (0.1 episodes per year, no horizon): the one-time payoffs are multiplied by the expected number of episodes in the lifetime",
                 leaves("TT_P30_", leaf(0.2, "ManA"), leaf(0.8)),
-                outcomes(71900.0, 65.0, 55.15), outcomes(65400.0, 65.0, 55.15)));
+                outcomes(74100.0, 65.0, 54.6), outcomes(67600.0, 65.0, 54.6)));
         // p = 1: cost = 65000 + 2000 = 67000 (73500); QALYs = 55.25 - 0.5 = 54.75
         cases.add(tc(PAYOFFS, "TT_P31_Experiment", "Acute manifestation without risk: the episode always happens",
                 leaves("TT_P31_", leaf(1.0, "ManA")),
@@ -551,6 +552,19 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P54_Experiment", "Strategy outcome whose risk is a time to event (5 years), evaluated at 2 years: probability 1 - exp(-2 / 5)",
                 leaves("TT_P54_", leaf(0.6703200460356393, "L1_Success"), leaf(0.3296799539643607, "L1_Failure")),
                 outcomes(95153.96741995095, 65.0, 55.25), outcomes(88653.96741995095, 65.0, 55.25)));
+        // Frequency of an acute manifestation (P55-P56, phase 11): it does not change the tree; the one-time payoffs of the episode, of the strategies of the
+        // acute manifestation and of their outcomes and adverse events are multiplied by the expected number of episodes, E = f * duration of the window of the leaf.
+        // P55: horizon of 10 years; ManA (0.2) with 3 episodes per year (E = 30), 200 and 0.01 QALYs per episode; T (20 per episode) with nausea (0.1; 10).
+        // ManA with nausea: 10000 + 30 * (200 + 20 + 10) = 16900; ManA without nausea: 10000 + 30 * 220 = 16600; no ManA: 10000. QALYs: 8.5 - 30 * 0.01 = 8.2 with ManA.
+        // Comparator: 0.02 * 16900 + 0.18 * 16600 + 0.8 * 10000 = 11326; life years 10; QALYs 0.2 * 8.2 + 0.8 * 8.5 = 8.44. Assessed: + 10 * 100
+        cases.add(tc(PAYOFFS, "TT_P55_Experiment", "Acute manifestation with a risk and a frequency (3 episodes per year, horizon of 10 years): the one-time payoffs of the episode, of its strategy and of the adverse event of the strategy are multiplied by the expected number of episodes",
+                leaves("TT_P55_", leaf(0.02, "ManA", "Nausea"), leaf(0.18, "ManA"), leaf(0.8)),
+                outcomes(12326.0, 10.0, 8.44), outcomes(11326.0, 10.0, 8.44)));
+        // P56 (formerly N06): only a frequency (2 per year), so ManA is always present; horizon of 5 years: E = 10, 300 per episode.
+        // Comparator: 5 * 1000 + 10 * 300 = 8000; life years 5; QALYs 4.25. Assessed: + 5 * 100
+        cases.add(tc(PAYOFFS, "TT_P56_Experiment", "Acute manifestation characterized only by a frequency (2 episodes per year, horizon of 5 years): always present, with the expected number of episodes",
+                leaves("TT_P56_", leaf(1.0, "ManA")),
+                outcomes(8500.0, 5.0, 4.25), outcomes(8000.0, 5.0, 4.25)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
@@ -644,8 +658,7 @@ public final class DecisionTreeCatalog {
             new MalformedCase(MALFORMED, "TT_N04_Experiment", "Risk of a development characterized by a parameter that is not a probability", UnsupportedOSDiFeatureException.class),
             // A shared cost cannot be counted once if it applies in different periods.
             new MalformedCase(MALFORMED, "TT_N05_Experiment", "ADD_DISTINCT with a cost shared by manifestations with different temporal constraints", UnsupportedOSDiFeatureException.class),
-            // A decision tree represents a single episode of an acute manifestation, whose probability must be declared as a risk: a frequency alone is not enough.
-            new MalformedCase(MALFORMED, "TT_N06_Experiment", "Acute manifestation characterized only by a frequency (not supported in decision trees)", UnsupportedOSDiFeatureException.class),
+            // N06 (acute manifestation with only a frequency) became P56 when the frequency was supported in decision trees (phase 11).
             // Decision trees assume that every patient starts without progressions.
             new MalformedCase(MALFORMED, "TT_N07_Experiment", "Initial proportion of a manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
             // Two replacements of the same parameter are ambiguous.

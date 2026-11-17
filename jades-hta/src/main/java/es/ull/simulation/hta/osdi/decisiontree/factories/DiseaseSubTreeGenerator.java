@@ -56,9 +56,10 @@ import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
  * (default) branch of its parent, with probability 1, so its payoffs apply to every leaf of the sub-tree that hangs from it. A manifestation without risk that
  * depends on a development is only active in the branches where such development is active.
  *
- * An acute manifestation represents a single episode between the initial age of the population and death (see {@link #checkAcuteManifestation} and
- * {@link #generateNode}). It produces the same nodes as a chronic manifestation: its risk is the probability that the episode happens, and an acute
- * manifestation without risk always happens in its context. Initial proportions of progressions (hasInitialProportion) are not supported yet.
+ * An acute manifestation produces the same nodes as a chronic manifestation (see {@link #generateNode}): its risk is the probability that the patient
+ * suffers its episode (or episodes), and an acute manifestation without risk always happens in its context. Without frequency, the node represents a
+ * single episode between the initial age of the population and death; with a frequency (hasFrequency), its one-time payoffs are multiplied by the
+ * expected number of episodes (see {@link #getEpisodeFrequency}). Initial proportions of progressions (hasInitialProportion) are not supported yet.
  *
  * Manifestations declared as subprogressions of one or more developments are assumed to appear only together with such developments. Conversely, "orphan" manifestations 
  * are supposed to appear independently of any development. 
@@ -327,11 +328,6 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         for (ClinicalProgressionWrapper progression : diseaseWrapper.getManifestations()) {
             checkNoStrategyReplacement(progression);
         }
-        for (ClinicalProgressionWrapper manifestation : diseaseWrapper.getManifestations()) {
-            if (ClinicalProgressionType.ACUTE_MANIFESTATION.equals(manifestation.getClinicalProgressionType())) {
-                checkAcuteManifestation(manifestation);
-            }
-        }
         for (PopulationWrapper population : parentTreeModel.getExperimentWrapper().getModelWrapper().getPopulationIndividuals()) {
             // TODO: Support initial proportions in decision trees (see docs/known-limitations.md)
             if (!population.getInitialProportions().isEmpty()) {
@@ -466,30 +462,26 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
     }
 
     /**
-     * Checks how the frequency of an acute manifestation (hasFrequency) is used in a decision tree. A decision tree represents a single episode
-     * of the acute manifestation, whose probability is its risk:
-     * <ul>
-     * <li>If the acute manifestation defines both a risk and a frequency, the frequency is ignored with a warning.</li>
-     * <li>If it only defines a frequency, the tree cannot be built. The frequency cannot be converted into the probability of the episode:
-     * such conversion (1 - e^(-frequency * horizon)) requires a time horizon, which the tree does not have (each leaf accounts for its own
-     * life years), and counting a single episode would discard the expected number of episodes. Without this check, the acute manifestation
-     * would be treated as a manifestation without risk, i.e., an episode that always happens.</li>
-     * </ul>
+     * Returns the frequency of the episodes of an acute manifestation (hasFrequency, episodes per year) that a decision tree uses (phase 11 of
+     * docs/osdi-1.3-diseno.md). The frequency does not change the structure of the tree: the node of the acute manifestation represents the
+     * patients who suffer its episodes (with the probability of its risk or, if it has no risk, always in its context), and its one-time payoffs
+     * are multiplied by the expected number of episodes (see {@link BranchDestinationNode#getEpisodeFrequency()}).
+     * <p>
+     * If the acute manifestation is the target of the interventions, the tree starts with an episode (D1), so its frequency is ignored with a warning.
+     * TODO: Reanalyze the frequency of an acute manifestation that is the target of the interventions.
+     * </p>
      * @param manifestation An acute manifestation
-     * @throws UnsupportedOSDiFeatureException If the acute manifestation defines a frequency but no risk
+     * @return The frequency of the episodes of the acute manifestation, if it is used
      * @throws MalformedOSDiModelException If the frequency of the acute manifestation is not a valid parameter
      */
-    private void checkAcuteManifestation(ClinicalProgressionWrapper manifestation) throws UnsupportedOSDiFeatureException, MalformedOSDiModelException {
+    private Optional<ParameterWrapper> getEpisodeFrequency(ClinicalProgressionWrapper manifestation) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         final Optional<ParameterWrapper> frequency = manifestation.getModelWrapper().getWrapperForPropertyAs(manifestation.getIndividualIRI(), OSDiObjectProperty.HAS_FREQUENCY, ParameterWrapper.class);
-        if (frequency.isEmpty()) {
-            return;
+        if (frequency.isPresent() && targetProgression.isPresent() && targetProgression.get().getIndividualIRI().equals(manifestation.getIndividualIRI())) {
+            log.warn("The acute manifestation " + manifestation.getShortName() + " defines a frequency (" + frequency.get().getShortName()
+                + "), which is ignored, since it is the target of the interventions: the tree starts with an episode.");
+            return Optional.empty();
         }
-        if (manifestation.isDefaultProgression()) {
-            throw new UnsupportedOSDiFeatureException("The acute manifestation " + manifestation.getShortName() + " defines a frequency (" + frequency.get().getShortName()
-                + ") but no risk. Decision trees represent a single episode of an acute manifestation, whose probability must be defined as a risk (hasRiskCharacterization).");
-        }
-        log.warn("The acute manifestation " + manifestation.getShortName() + " defines a frequency (" + frequency.get().getShortName()
-            + "), which is ignored in decision trees: they represent a single episode, whose probability is the risk of the acute manifestation.");
+        return frequency;
     }
 
     public ParameterWrapper getAdaptedRiskParameter(ClinicalProgressionWrapper progression) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
@@ -760,6 +752,7 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             final String owner = "The acute manifestation " + progression.getShortName();
             removeAnnualPayoffs(owner, node.getCostParameters());
             removeAnnualPayoffs(owner, node.getDisutilityParameters());
+            getEpisodeFrequency(progression).ifPresent(node::setEpisodeFrequency);
         }
         return node;
     }

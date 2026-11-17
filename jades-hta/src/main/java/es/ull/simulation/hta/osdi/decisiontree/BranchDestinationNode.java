@@ -198,6 +198,24 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
         return outcomeStrategies;
     }
 
+    /** The frequency of the episodes of the acute manifestation represented by this node (hasFrequency), if it is used (see {@link #getEpisodeFrequency()}) */
+    private Optional<ParameterWrapper> episodeFrequency = Optional.empty();
+
+    /**
+     * Returns the frequency of the episodes (per year) of the acute manifestation represented by this node, if any. The frequency does not change the
+     * structure of the tree: each one-time payoff whose owner is this node (those of the acute manifestation, of its strategies, and of their outcomes
+     * and adverse events) is multiplied by the expected number of episodes, i.e., it becomes an annual payoff of frequency * payoff within the time
+     * window of the node (see {@link es.ull.simulation.hta.osdi.decisiontree.excelport.PayoffWrapper}).
+     * @return The frequency of the episodes of the acute manifestation represented by this node, if any
+     */
+    public Optional<ParameterWrapper> getEpisodeFrequency() {
+        return episodeFrequency;
+    }
+
+    public void setEpisodeFrequency(ParameterWrapper episodeFrequency) {
+        this.episodeFrequency = Optional.of(episodeFrequency);
+    }
+
     /**
      * Returns the strategies without outcomes of the health condition of this node that have adverse events. Their payoffs are added to this node,
      * and their adverse events are expanded below the leaves (see StrategyOutcomeExpander). The adverse events of the strategies with outcomes are

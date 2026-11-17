@@ -26,7 +26,6 @@ osdi:TT_BaseAnnualCost rdf:type owl:NamedIndividual ,
                                             osdi:TT_N03_Model ,
                                             osdi:TT_N04_Model ,
                                             osdi:TT_N05_Model ,
-                                            osdi:TT_N06_Model ,
                                             osdi:TT_N07_Model ;
                        osdi:appliesOneTime "false"^^xsd:boolean ;
                        osdi:hasDescription "Annual cost of the disease, whatever its progression" ;
@@ -42,7 +41,6 @@ osdi:TT_InterventionNone rdf:type owl:NamedIndividual ,
                                               osdi:TT_N03_Model ,
                                               osdi:TT_N04_Model ,
                                               osdi:TT_N05_Model ,
-                                              osdi:TT_N06_Model ,
                                               osdi:TT_N07_Model ;
                          osdi:hasDescription "Comparator: do nothing" .
 
@@ -56,7 +54,6 @@ osdi:TT_InterventionTreat rdf:type owl:NamedIndividual ,
                                                osdi:TT_N03_Model ,
                                                osdi:TT_N04_Model ,
                                                osdi:TT_N05_Model ,
-                                               osdi:TT_N06_Model ,
                                                osdi:TT_N07_Model ;
                           osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" .
 
@@ -70,7 +67,6 @@ osdi:TT_LifeExpectancy rdf:type owl:NamedIndividual ,
                                             osdi:TT_N02_Model ,
                                             osdi:TT_N03_Model ,
                                             osdi:TT_N04_Model ,
-                                            osdi:TT_N06_Model ,
                                             osdi:TT_N07_Model ;
                        osdi:isValueOfAttribute osdi:Attribute_LifeExpectancy ;
                        osdi:hasExpectedValue "65.0"^^xsd:double .
@@ -844,91 +840,6 @@ osdi:TT_N05_SharedCost rdf:type owl:NamedIndividual ,
                        osdi:hasYear "2026"^^xsd:short .
 
 
-###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_Disease
-osdi:TT_N06_Disease rdf:type owl:NamedIndividual ,
-                             osdi:Disease ;
-                    osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
-                    osdi:hasProgressionElement osdi:TT_N06_ManX ;
-                    osdi:includedByModel osdi:TT_N06_Model .
-
-
-###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_Experiment
-osdi:TT_N06_Experiment rdf:type owl:NamedIndividual ,
-                                osdi:Experiment ;
-                       osdi:usesModel osdi:TT_N06_Model ;
-                       osdi:hasDescription "Acute manifestation characterized only by a frequency (not supported in decision trees)." ;
-                       osdi:hasDiscountForCosts "0.0"^^xsd:double ;
-                       osdi:hasDiscountForEffects "0.0"^^xsd:double ;
-                       osdi:hasDisutilityCombinationMethod "ADD" ;
-                       osdi:hasYear "2026"^^xsd:short .
-
-
-###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_ManX
-osdi:TT_N06_ManX rdf:type owl:NamedIndividual ,
-                          osdi:AcuteManifestation ;
-                 osdi:hasCost osdi:TT_N06_ManX_Cost ;
-                 osdi:hasFrequency osdi:TT_N06_ManX_Frequency ;
-                 osdi:hasUtility osdi:TT_N06_ManX_Disutility ;
-                 osdi:includedByModel osdi:TT_N06_Model .
-
-
-###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_ManX_Cost
-osdi:TT_N06_ManX_Cost rdf:type owl:NamedIndividual ,
-                               osdi:Cost ,
-                               osdi:DeterministicParameter ;
-                      osdi:hasDataItemType osdi:Currency_Euro ;
-                      osdi:includedByModel osdi:TT_N06_Model ;
-                      osdi:appliesOneTime "false"^^xsd:boolean ;
-                      osdi:hasDescription "Annual cost of ManX" ;
-                      osdi:hasExpectedValue "150.0"^^xsd:double ;
-                      osdi:hasYear "2026"^^xsd:short .
-
-
-###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_ManX_Disutility
-osdi:TT_N06_ManX_Disutility rdf:type owl:NamedIndividual ,
-                                     osdi:DeterministicParameter ,
-                                     osdi:Utility ;
-                            osdi:hasDataItemType osdi:DI_Generic_Utility ;
-                            osdi:includedByModel osdi:TT_N06_Model ;
-                            osdi:appliesOneTime "false"^^xsd:boolean ;
-                            osdi:hasDescription "Annual disutility of ManX" ;
-                            osdi:hasExpectedValue "0.03"^^xsd:double ;
-                            osdi:isDisutility "true"^^xsd:boolean .
-
-
-###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_ManX_Frequency
-osdi:TT_N06_ManX_Frequency rdf:type owl:NamedIndividual ,
-                               osdi:DeterministicParameter ;
-                      osdi:hasDataItemType osdi:DI_Count ;
-                      osdi:includedByModel osdi:TT_N06_Model ;
-                      osdi:hasDescription "Episodes of ManX per year" ;
-                      osdi:hasExpectedValue "12.0"^^xsd:double .
-
-
-###  https://w3id.org/ontologies-ULL/OSDi#TT_N06_Model
-osdi:TT_N06_Model rdf:type owl:NamedIndividual ,
-                           osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
-                  osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
-                                         osdi:TT_LifeExpectancy ,
-                                         osdi:TT_N06_Disease ,
-                                         osdi:TT_N06_ManX ,
-                                         osdi:TT_N06_ManX_Cost ,
-                                         osdi:TT_N06_ManX_Disutility ,
-                                         osdi:TT_N06_ManX_Frequency ,
-                                         osdi:TT_Population ,
-                                         osdi:TT_PopulationAge ,
-                                         osdi:TT_PopulationBaseUtility ,
-                                         osdi:TT_PopulationSex ,
-                                         osdi:TT_TreatAnnualCost ;
-                  osdi:hasDescription "N06. Acute manifestation characterized only by a frequency (not supported in decision trees). A decision tree represents a single episode, whose probability must be declared as a risk: the frequency cannot be converted into such probability, so the generation of the tree must fail." .
-
-
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_N07_Disease
 osdi:TT_N07_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
@@ -1091,8 +1002,7 @@ osdi:TT_Population rdf:type owl:NamedIndividual ,
                    osdi:includedByModel osdi:TT_N01_Model ,
                                         osdi:TT_N02_Model ,
                                         osdi:TT_N03_Model ,
-                                        osdi:TT_N04_Model ,
-                                        osdi:TT_N06_Model ;
+                                        osdi:TT_N04_Model ;
                    osdi:hasDescription "A dummy population of 1000 individuals. Everyone starts at 20 years old, with 65 remaining years of life and a base utility of 0.85" ;
                    osdi:hasGeographicalContext "Spain" ;
                    osdi:hasMaxAge "100.0"^^xsd:double ;
@@ -1109,7 +1019,6 @@ osdi:TT_PopulationAge rdf:type owl:NamedIndividual ,
                                            osdi:TT_N02_Model ,
                                            osdi:TT_N03_Model ,
                                            osdi:TT_N04_Model ,
-                                           osdi:TT_N06_Model ,
                                            osdi:TT_N07_Model ;
                       osdi:isValueOfAttribute osdi:Attribute_Age ;
                       osdi:hasExpectedValue "20.0"^^xsd:double .
@@ -1125,7 +1034,6 @@ osdi:TT_PopulationBaseUtility rdf:type owl:NamedIndividual ,
                                                    osdi:TT_N03_Model ,
                                                    osdi:TT_N04_Model ,
                                                    osdi:TT_N05_Model ,
-                                                   osdi:TT_N06_Model ,
                                                    osdi:TT_N07_Model ;
                               osdi:appliesOneTime "false"^^xsd:boolean ;
                               osdi:hasDescription "Base utility for the studied population" ;
@@ -1143,7 +1051,6 @@ osdi:TT_PopulationSex rdf:type owl:NamedIndividual ,
                                            osdi:TT_N03_Model ,
                                            osdi:TT_N04_Model ,
                                            osdi:TT_N05_Model ,
-                                           osdi:TT_N06_Model ,
                                            osdi:TT_N07_Model ;
                       osdi:isValueOfAttribute osdi:Attribute_Sex ;
                       osdi:hasExpectedValue "0.5"^^xsd:double .
@@ -1159,7 +1066,6 @@ osdi:TT_TreatAnnualCost rdf:type owl:NamedIndividual ,
                                              osdi:TT_N03_Model ,
                                              osdi:TT_N04_Model ,
                                              osdi:TT_N05_Model ,
-                                             osdi:TT_N06_Model ,
                                              osdi:TT_N07_Model ;
                         osdi:appliesOneTime "false"^^xsd:boolean ;
                         osdi:hasDescription "Annual cost of the assessed intervention" ;
