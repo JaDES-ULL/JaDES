@@ -313,3 +313,21 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
 - DES: no simula estrategias, así que ignora sus efectos adversos. Riesgos de tiempo hasta el evento de los efectos adversos (simulación).
 - Efectos adversos de las estrategias de detección en el NBS (por ejemplo, complicaciones de una prueba invasiva).
 - Los brazos comparados solo se comprueban en estructura con hojas declaradas para cada uno cuando difieren. El resto de casos sigue suponiendo que las hojas son iguales.
+
+### Fase 10: recaídas tras la respuesta (D9) (2026-11-17)
+
+**Hecho:**
+- D9 se sustituyó por la decisión «Recaídas y recurrencias, sin vocabulario nuevo» (commit aparte). La propuesta anterior de una propiedad de recurrencia entre manifestaciones se descartó.
+- Comprobación: el árbol ya encadena el éxito de una estrategia (`followedOnSuccessBy`) con una `FollowUpStrategy` con resultados de tratamiento propios, y aplica en su rama los pagos y la estrategia siguiente de esos resultados. La ontología ya lo permitía (`FollowUpStrategy` restringe `hasStrategyOutcome` a `TreatmentOutcome`) y el código no distingue el tipo de estrategia al expandir los resultados. No hizo falta cambiar el código.
+- Test P50, con valores calculados a mano: episodio agudo tratado con A (fracaso 0,3 por `failsIf`), cuyo fracaso va seguido de un rescate sin seguimiento y cuyo éxito va seguido del seguimiento F. El fracaso de F es la recaída (0,4; pérdida de 0,1 AVAC de una vez) y va seguido de una segunda dosis sin resultados. Comparador: 67247,4; 65; 54,722. El test pasó a la primera, porque no había defecto que corregir.
+- `OSDi.ttl` (sin cambiar la versión): comentarios de `FollowUpStrategy` y `followedOnSuccessBy`, en inglés y en español, con el patrón de recaída. El comentario anterior de `FollowUpStrategy` estaba en inglés pero etiquetado como `@es`.
+- Documentación: `docs/known-limitations.md` (sección «Strategy outcomes in decision trees») y CLAUDE.md.
+
+**Decidido:**
+- Una recaída tras la respuesta no necesita vocabulario: es el fracaso de un periodo de seguimiento tras el éxito, con su probabilidad entre quienes respondieron.
+- Una recurrencia a largo plazo es un nuevo episodio de la misma manifestación aguda, y se modelará en el árbol cuando haya horizonte (fase 11).
+
+**Pendiente:**
+- Recurrencias a largo plazo y episodios repetidos de una aguda en el árbol (fase 11).
+- Si una recaída necesitara ser un elemento clínico con evolución propia, valorar que una ruta pueda requerir un resultado de estrategia.
+- Sin tiempo de evaluación, los resultados de F se evalúan al inicio de la estrategia (con aviso). Para que los pagos anuales del seguimiento duren hasta la recaída, hay que declarar `hasEvaluationTime` en el resultado.

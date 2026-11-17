@@ -84,6 +84,8 @@ Limitations:
 
 A strategy has mutually exclusive outcomes (decision D4 of `docs/osdi-1.3-diseno.md`): `StrategyOutcome`, with the subclasses `TreatmentOutcome` (`SuccessOutcome`, `FailureOutcome`) and `DetectionOutcome` (positive, negative and inconclusive results, which declare a risk for diseased and non-diseased individuals; supported in newborn screening models, see "Newborn screening"). `failsIf`, with `followedOnFailureBy`, `followedOnSuccessBy` and `resolvesOnSuccess`, is the short form of a failure and a default success; its failure condition is a parameter or a health condition (D5). The risk of an outcome (`hasOutcomeRisk`) is a probability per episode or a time to event (D6). The payoffs of an outcome are one-time (D7).
 
+A relapse after the response (decision D9) needs no specific vocabulary: the success of a treatment is followed (`followedOnSuccessBy`, or the `followedByStrategy` of its `SuccessOutcome`) by a follow-up strategy (`FollowUpStrategy`) whose failure is the relapse, with the probability of relapse among the patients who responded, and which may be followed by the treatment of the relapse (P50). A long-term recurrence is a new episode of the same acute manifestation, which decision trees do not model yet (they count a single episode).
+
 `StrategyOutcomeExpander` expands the outcomes below each leaf of the sub-tree of the disease, for every strategy with outcomes of the health conditions of the path (the outcomes are independent of the rest of branches):
 
 - Each outcome is a branch with its risk; the outcome without risk takes the remaining probability. With `failsIf` a health condition, the failure is the only branch where the health condition is active, and the success, where it is not (P45).

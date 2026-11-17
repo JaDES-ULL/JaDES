@@ -44,7 +44,7 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P49 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P50 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
 | `OSDi_test_tree_malformed.ttl` | N01–N12, N14–N32 (casos que deben lanzar excepción; N13 volvió a ser P26) |
@@ -117,6 +117,7 @@ Convenciones:
 - Los resultados se expanden bajo cada hoja (`StrategyOutcomeExpander`): una rama por resultado con su riesgo (el que no tiene riesgo se lleva el resto). Con `failsIf` hacia una condición, fracasa donde la condición está activa y tiene éxito donde no.
 - Momento T = inicio de la estrategia + `hasEvaluationTime` (inicio, con aviso, si falta). Los pagos anuales de la estrategia van hasta T si el resultado tiene estrategia siguiente o resuelve; si no, hasta el final del nodo. La siguiente empieza en T. Pagos del resultado: una vez en T (anuales ignorados con aviso). «Resuelve»: los pagos anuales de la condición paran en T; sus efectos sobre la LE se mantienen, con aviso.
 - Rechazos: ciclos (N23) y riesgo de tiempo hasta el evento (N24), `Unsupported`; dos resultados sin riesgo (N25) y `failsIf` con resultados explícitos (N26), `Malformed`. Estrategias con resultados cuyos costes siguen una pauta: `Unsupported`.
+- Recaída tras la respuesta (D9, sin vocabulario nuevo): el éxito va seguido (`followedOnSuccessBy` o el `followedByStrategy` de su `SuccessOutcome`) de una `FollowUpStrategy` cuyo fracaso es la recaída (probabilidad entre quienes respondieron), seguido del tratamiento de la recaída (P50). Una recurrencia a largo plazo es un nuevo episodio de la misma aguda (fase 11).
 
 **Efectos adversos (D8, árbol):** `AdverseEvent` (subclase de `HealthCondition`, disjunta de `Disease` y `ClinicalProgressionElement`), `hasAdverseEvent` / `isAdverseEventOf` (de `Strategy`) e `isOccurrenceOf` (solo identifica la condición; no activa su estructura). Regla para quien modela: problema de la evolución natural cuyo riesgo cambia la estrategia → `Effect`; problema provocado por la estrategia → `AdverseEvent`.
 - Se expanden bajo las hojas (`StrategyOutcomeExpander`) cada vez que una rama aplica una estrategia (con o sin resultados, tras un resultado o como estrategia de otro efecto adverso), antes de sus resultados: una rama independiente por efecto adverso con su probabilidad por aplicación (riesgo obligatorio) y otra sin él.

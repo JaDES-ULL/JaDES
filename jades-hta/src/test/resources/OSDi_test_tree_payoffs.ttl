@@ -6963,4 +6963,232 @@ osdi:TT_P49_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P49. Fatal adverse event of a treatment of the disease (InstantDeathEffect of the adverse event)." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_D_Cost
+osdi:TT_P50_D_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of D" ;
+    osdi:hasExpectedValue "80.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_D
+osdi:TT_P50_D rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P50_D_Cost ;
+    osdi:hasDescription "Second dose, after the relapse" ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_F_RelapseRisk
+osdi:TT_P50_F_RelapseRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability of relapse among the patients who responded" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_F_RelapseLoss
+osdi:TT_P50_F_RelapseLoss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the relapse" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_F_Relapse
+osdi:TT_P50_F_Relapse rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:hasOutcomeRisk osdi:TT_P50_F_RelapseRisk ;
+    osdi:hasUtility osdi:TT_P50_F_RelapseLoss ;
+    osdi:followedByStrategy osdi:TT_P50_D ;
+    osdi:hasDescription "Relapse during the follow-up" ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_F_NoRelapse
+osdi:TT_P50_F_NoRelapse rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasDescription "No relapse during the follow-up" ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_F_Cost
+osdi:TT_P50_F_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of F" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_F
+osdi:TT_P50_F rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TT_P50_F_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_P50_F_Relapse ,
+        osdi:TT_P50_F_NoRelapse ;
+    osdi:hasDescription "Follow-up after the response" ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_R_Cost
+osdi:TT_P50_R_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of R" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_R
+osdi:TT_P50_R rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P50_R_Cost ;
+    osdi:hasDescription "Rescue treatment, without follow-up" ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_A_FailureRisk
+osdi:TT_P50_A_FailureRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability of failure of the first treatment" ;
+    osdi:hasExpectedValue "0.3"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_A_Cost
+osdi:TT_P50_A_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of A" ;
+    osdi:hasExpectedValue "100.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_A
+osdi:TT_P50_A rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P50_A_Cost ;
+    osdi:failsIf osdi:TT_P50_A_FailureRisk ;
+    osdi:followedOnFailureBy osdi:TT_P50_R ;
+    osdi:followedOnSuccessBy osdi:TT_P50_F ;
+    osdi:resolvesOnSuccess "true"^^xsd:boolean ;
+    osdi:hasDescription "First treatment" ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_ManA_Cost
+osdi:TT_P50_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the episode" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_ManA_Loss
+osdi:TT_P50_ManA_Loss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the episode" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_ManA
+osdi:TT_P50_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_P50_ManA_Cost ;
+    osdi:hasStrategy osdi:TT_P50_A ;
+    osdi:hasUtility osdi:TT_P50_ManA_Loss ;
+    osdi:hasDescription "Acute episode, always present" ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_Disease
+osdi:TT_P50_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P50_ManA ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P50_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_Experiment
+osdi:TT_P50_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P50_Model ;
+    osdi:hasDescription "Relapse after the response: the success of a treatment is followed by a follow-up strategy whose failure is the relapse, treated with a second dose; the rescue after the failure has no follow-up." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P50_Model
+osdi:TT_P50_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P50_D_Cost ,
+        osdi:TT_P50_D ,
+        osdi:TT_P50_F_RelapseRisk ,
+        osdi:TT_P50_F_RelapseLoss ,
+        osdi:TT_P50_F_Relapse ,
+        osdi:TT_P50_F_NoRelapse ,
+        osdi:TT_P50_F_Cost ,
+        osdi:TT_P50_F ,
+        osdi:TT_P50_R_Cost ,
+        osdi:TT_P50_R ,
+        osdi:TT_P50_A_FailureRisk ,
+        osdi:TT_P50_A_Cost ,
+        osdi:TT_P50_A ,
+        osdi:TT_P50_ManA_Cost ,
+        osdi:TT_P50_ManA_Loss ,
+        osdi:TT_P50_ManA ,
+        osdi:TT_P50_Disease ;
+    osdi:hasDescription "P50. Relapse after the response: the success of a treatment is followed by a follow-up strategy whose failure is the relapse, treated with a second dose; the rescue after the failure has no follow-up." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

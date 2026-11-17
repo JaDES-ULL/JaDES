@@ -521,6 +521,13 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P49_Experiment", "Fatal adverse event of a treatment of the disease (InstantDeathEffect of the adverse event)",
                 leaves("TT_P49_", death(0.001), leaf(0.009, "Anaphylaxis"), leaf(0.99)),
                 outcomes(71453.5, 64.935, 55.19475), outcomes(64960.0, 64.935, 55.19475)));
+        // Relapse after the response (P50, D9). No discount. Acute episode (2000, 0.5 QALYs), always present, treated with A (100): failure 0.3 (failsIf),
+        // followed by a rescue R (300) without follow-up; success (resolves), followed by the follow-up F (50), whose failure is the relapse (0.4 among
+        // those who responded; 0.1 QALYs, once), followed by a second dose D (80).
+        // Comparator: 65000 + 2000 + 100 + 0.3 * 300 + 0.7 * (50 + 0.4 * 80) = 67247.4; QALYs 55.25 - 0.5 - 0.7 * 0.4 * 0.1 = 54.722. Assessed: + 6500
+        cases.add(tc(PAYOFFS, "TT_P50_Experiment", "Relapse after the response: the success is followed by a follow-up whose failure is the relapse, treated with a second dose; no relapse after the rescue",
+                leaves("TT_P50_", leaf(0.3, "ManA", "A_Failure"), leaf(0.28, "ManA", "A_Success", "F_Relapse"), leaf(0.42, "ManA", "A_Success", "F_NoRelapse")),
+                outcomes(73747.4, 65.0, 54.722), outcomes(67247.4, 65.0, 54.722)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.

@@ -224,7 +224,8 @@ osdi:followedOnFailureBy rdf:type owl:ObjectProperty ;
 osdi:followedOnSuccessBy rdf:type owl:ObjectProperty ;
                          rdfs:domain osdi:Strategy ;
                          rdfs:range osdi:Strategy ;
-                         rdfs:comment "Short form (see failsIf): the strategy that follows the success of a strategy."@en ;
+                         rdfs:comment "Short form (see failsIf): the strategy that follows the success of a strategy. To model a relapse after the response, the success is followed by a follow-up strategy (FollowUpStrategy) whose failure is the relapse, with the probability of relapse among the patients who responded; that failure may be followed by the treatment of the relapse."@en ,
+                                      "Forma abreviada (ver failsIf): la estrategia que sigue al éxito de una estrategia. Para modelar una recaída tras la respuesta, el éxito va seguido de una estrategia de seguimiento (FollowUpStrategy) cuyo fracaso es la recaída, con la probabilidad de recaída entre los pacientes que respondieron; ese fracaso puede ir seguido del tratamiento de la recaída."@es ;
                          rdfs:label "followed on success by"@en ,
                                     "seguida en caso de éxito por"@es .
 
@@ -2604,7 +2605,8 @@ osdi:FollowUpStrategy rdf:type owl:Class ;
                                          owl:onProperty osdi:hasStrategyOutcome ;
                                          owl:allValuesFrom osdi:TreatmentOutcome
                                        ] ;
-                      rdfs:comment "A strategy related to the follow-up of a disease or condition"@es ;
+                      rdfs:comment "A strategy related to the follow-up of a disease or condition. It may have treatment outcomes (TreatmentOutcome). A relapse after the response is modeled with a follow-up strategy: the success of a treatment is followed (followedOnSuccessBy, or the followedByStrategy of its SuccessOutcome) by a follow-up strategy whose failure (FailureOutcome) is the relapse. The risk of that failure is the probability of relapse among the patients who responded, and the failure may be followed by the treatment of the relapse (followedByStrategy). A long-term recurrence is not a relapse, but a new episode of the same acute manifestation."@en ,
+                                   "Una estrategia relacionada con el seguimiento de una enfermedad o condición. Puede tener resultados de tratamiento (TreatmentOutcome). Una recaída tras la respuesta se modela con una estrategia de seguimiento: el éxito de un tratamiento va seguido (followedOnSuccessBy, o el followedByStrategy de su SuccessOutcome) de una estrategia de seguimiento cuyo fracaso (FailureOutcome) es la recaída. El riesgo de ese fracaso es la probabilidad de recaída entre los pacientes que respondieron, y el fracaso puede ir seguido del tratamiento de la recaída (followedByStrategy). Una recurrencia a largo plazo no es una recaída, sino un nuevo episodio de la misma manifestación aguda."@es ;
                       rdfs:label "Estrategia de seguimiento"@es ,
                                  "Follow-up strategy"@en .
 
