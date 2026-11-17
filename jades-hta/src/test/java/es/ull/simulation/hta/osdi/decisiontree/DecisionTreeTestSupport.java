@@ -158,10 +158,11 @@ final class DecisionTreeTestSupport {
      */
     static double expectedValue(ParameterWrapper parameter) {
         assertNotNull(parameter, "A branch that is not the default one must define a probability");
-        // Probability derived from a time to event T: 1 - e^(-1/T)
-        final Optional<ParameterWrapper> sourceTime = AbstractModelFactory.getSourceTimeToEvent(parameter);
-        if (sourceTime.isPresent()) {
-            return 1.0 - Math.exp(-1.0 / expectedValue(sourceTime.get()));
+        // Probability derived from a time to event T within a period: 1 - e^(-period/T)
+        final Optional<AbstractModelFactory.TimeToEventProbability> tte = AbstractModelFactory.getTimeToEventProbability(parameter);
+        if (tte.isPresent()) {
+            final double period = tte.get().periodParameter().isPresent() ? expectedValue(tte.get().periodParameter().get()) : tte.get().periodValue();
+            return 1.0 - Math.exp(-period / expectedValue(tte.get().time()));
         }
         if (parameter.getParameterNatureData() instanceof DeterministicParameterData data) {
             return data.value();

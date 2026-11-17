@@ -539,6 +539,18 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P52_Experiment", "Time horizon of 24 hours (1/365 years), as in Evans: the annual payoffs and QALYs of the disease are limited to the horizon",
                 leaves("TT_P52_", leaf(1.0)),
                 outcomes(3.0136986301369864, 0.0027397260273972603, 0.002328767123287671), outcomes(2.73972602739726, 0.0027397260273972603, 0.002328767123287671)));
+        // Times to event with a horizon (P53-P54, D6). A time to event T becomes the probability of the event within a period: 1 - exp(-period / T).
+        // P53: P26 with a horizon of 10 years. p = 1 - exp(-10 / 2) = 0.993262053; with the hazard ratio (0.5), T' = 4: p' = 1 - exp(-10 / 4) = 0.917915001.
+        // The life years of both leaves are 10 (Severe: 45; Normal: 65). Severe adds 1000 per year and 0.4 of disutility per year.
+        // Comparator: 10000 + 10000 p = 19932.62053; QALYs 8.5 - 4 p = 4.526951788. Assessed: 11000 + 10000 p' = 20179.150014; QALYs 8.5 - 4 p' = 4.828339994
+        cases.add(tc(PAYOFFS, "TT_P53_Experiment", "Time to event with a time horizon (10 years): the probability of the event within the horizon, 1 - exp(-H / T), with T divided by a hazard ratio (0.5)",
+                leaves("TT_P53_", leaf(0.9932620530009145, "Severe"), leaf(0.006737946999085476, "Normal")),
+                outcomes(20179.150013761013, 10.0, 4.828339994495595), outcomes(19932.620530009146, 10.0, 4.526951787996342)));
+        // P54: P42 whose failure has a time to event T = 5, evaluated at 2 years (no horizon): p = 1 - exp(-2 / 5) = 0.329679954; the success is the default outcome.
+        // Comparator: 65000 + (1 - p) * 19500 + p * 32100 = 84500 + 12600 p = 88653.96742. Assessed: + 6500
+        cases.add(tc(PAYOFFS, "TT_P54_Experiment", "Strategy outcome whose risk is a time to event (5 years), evaluated at 2 years: probability 1 - exp(-2 / 5)",
+                leaves("TT_P54_", leaf(0.6703200460356393, "L1_Success"), leaf(0.3296799539643607, "L1_Failure")),
+                outcomes(95153.96741995095, 65.0, 55.25), outcomes(88653.96741995095, 65.0, 55.25)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
@@ -664,7 +676,7 @@ public final class DecisionTreeCatalog {
             new MalformedCase(MALFORMED, "TT_N22_Experiment", "Detection intervention that declares the disease it detects", MalformedOSDiModelException.class),
             // Strategy outcomes (phase 7a): decision trees cannot expand cycles nor times to event, and outcomes must be well defined.
             new MalformedCase(MALFORMED, "TT_N23_Experiment", "Cycle in the chain of strategies", UnsupportedOSDiFeatureException.class),
-            new MalformedCase(MALFORMED, "TT_N24_Experiment", "Strategy outcome whose risk is a time to event (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N24_Experiment", "Strategy outcome whose risk is a time to event, without evaluation time or time horizon", UnsupportedOSDiFeatureException.class),
             new MalformedCase(MALFORMED, "TT_N25_Experiment", "Two strategy outcomes without risk", MalformedOSDiModelException.class),
             new MalformedCase(MALFORMED, "TT_N26_Experiment", "Short form (failsIf) combined with explicit strategy outcomes", MalformedOSDiModelException.class),
             new MalformedCase(MALFORMED, "TT_N27_Experiment", "Two detection outcomes without risk for the patients with the disease", MalformedOSDiModelException.class),

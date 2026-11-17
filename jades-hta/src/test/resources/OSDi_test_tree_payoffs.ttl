@@ -7401,4 +7401,288 @@ osdi:TT_P52_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P52. Time horizon of 24 hours (1/365 years), as in Evans: the annual payoffs and QALYs of the disease are limited to the horizon." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Developments
+osdi:TT_P53_Developments rdf:type owl:NamedIndividual ,
+        osdi:AlternativeCombinationRule ;
+    osdi:affectsProgressionElement osdi:TT_P53_Severe ,
+        osdi:TT_P53_Normal ;
+    osdi:includedByModel osdi:TT_P53_Model ;
+    osdi:hasNullProgression "false"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Disease
+osdi:TT_P53_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P53_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P53_Severe ,
+        osdi:TT_P53_Normal ,
+        osdi:TT_P53_Developments ;
+    osdi:includedByModel osdi:TT_P53_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Experiment
+osdi:TT_P53_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P53_Model ;
+    osdi:hasDescription "Time to event with a time horizon (10 years): the probability of the event within the horizon, 1 - exp(-H / T), with T divided by a hazard ratio (0.5)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasTimeHorizon "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_InterventionTreat
+osdi:TT_P53_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasEffect osdi:TT_P53_TreatEffect ;
+    osdi:includedByModel osdi:TT_P53_Model ;
+    osdi:hasDescription "Time to event with a time horizon (10 years): the probability of the event within the horizon, 1 - exp(-H / T), with T divided by a hazard ratio (0.5)" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Model
+osdi:TT_P53_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P53_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_P53_Developments ,
+        osdi:TT_P53_Disease ,
+        osdi:TT_P53_InterventionTreat ,
+        osdi:TT_P53_Normal ,
+        osdi:TT_P53_Severe ,
+        osdi:TT_P53_Severe_Cost ,
+        osdi:TT_P53_Severe_Disutility ,
+        osdi:TT_P53_Severe_LER ,
+        osdi:TT_P53_Severe_LERMagnitude ,
+        osdi:TT_P53_Severe_Risk ,
+        osdi:TT_P53_TreatEffect ,
+        osdi:TT_P53_TreatEffectMagnitude ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "P53. Time to event with a time horizon (10 years): the probability of the event within the horizon, 1 - exp(-H / T), with T divided by a hazard ratio (0.5)." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Normal
+osdi:TT_P53_Normal rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:includedByModel osdi:TT_P53_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Severe
+osdi:TT_P53_Severe rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_P53_Severe_Cost ;
+    osdi:hasEffect osdi:TT_P53_Severe_LER ;
+    osdi:hasRiskCharacterization osdi:TT_P53_Severe_Risk ;
+    osdi:hasUtility osdi:TT_P53_Severe_Disutility ;
+    osdi:includedByModel osdi:TT_P53_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Severe_Cost
+osdi:TT_P53_Severe_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P53_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Severe" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Severe_Disutility
+osdi:TT_P53_Severe_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P53_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Severe" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Severe_LER
+osdi:TT_P53_Severe_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P53_Severe_LERMagnitude ;
+    osdi:includedByModel osdi:TT_P53_Model ;
+    osdi:hasDescription "Life expectancy reduction due to Severe" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Severe_LERMagnitude
+osdi:TT_P53_Severe_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P53_Model ;
+    osdi:hasDescription "Years of life lost due to Severe" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_Severe_Risk
+osdi:TT_P53_Severe_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_TimeToEvent ;
+    osdi:includedByModel osdi:TT_P53_Model ;
+    osdi:hasDescription "Risk of Severe" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_TreatEffect
+osdi:TT_P53_TreatEffect rdf:type owl:NamedIndividual ,
+        osdi:Effect ;
+    osdi:affects osdi:TT_P53_Severe_Risk ;
+    osdi:hasEffectMagnitude osdi:TT_P53_TreatEffectMagnitude ;
+    osdi:includedByModel osdi:TT_P53_Model ;
+    osdi:hasDescription "Hazard ratio of Severe with the intervention" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P53_TreatEffectMagnitude
+osdi:TT_P53_TreatEffectMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_HazardRatio ;
+    osdi:includedByModel osdi:TT_P53_Model ;
+    osdi:hasDescription "Hazard ratio of Severe with the intervention" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_L1
+osdi:TT_P54_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P54_L1_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_P54_L1_Success ,
+        osdi:TT_P54_L1_Failure ;
+    osdi:includedByModel osdi:TT_P54_Model ;
+    osdi:hasDescription "First line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_L1_Cost
+osdi:TT_P54_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P54_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_L1_Success
+osdi:TT_P54_L1_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasEvaluationTime osdi:TT_P54_EvaluationTime ;
+    osdi:includedByModel osdi:TT_P54_Model ;
+    osdi:hasDescription "Success of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_FailureTime
+osdi:TT_P54_FailureTime rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_TimeToEvent ;
+    osdi:includedByModel osdi:TT_P54_Model ;
+    osdi:hasDescription "Mean time to the failure of L1" ;
+    osdi:hasExpectedValue "5.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_L1_Failure
+osdi:TT_P54_L1_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_P54_L2 ;
+    osdi:hasOutcomeRisk osdi:TT_P54_FailureTime ;
+    osdi:hasEvaluationTime osdi:TT_P54_EvaluationTime ;
+    osdi:includedByModel osdi:TT_P54_Model ;
+    osdi:hasDescription "Failure of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_EvaluationTime
+osdi:TT_P54_EvaluationTime rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P54_Model ;
+    osdi:hasDescription "The response to L1 is evaluated at 2 years" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_L2
+osdi:TT_P54_L2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P54_L2_Cost ;
+    osdi:includedByModel osdi:TT_P54_Model ;
+    osdi:hasDescription "Second line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_L2_Cost
+osdi:TT_P54_L2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P54_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L2" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_Disease
+osdi:TT_P54_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P54_L1 ;
+    osdi:includedByModel osdi:TT_P54_Model ;
+    osdi:hasDescription "Disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_Experiment
+osdi:TT_P54_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P54_Model ;
+    osdi:hasDescription "Strategy outcome whose risk is a time to event (5 years), evaluated at 2 years: probability 1 - exp(-2 / 5)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P54_Model
+osdi:TT_P54_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P54_L1 ,
+        osdi:TT_P54_L1_Cost ,
+        osdi:TT_P54_L1_Success ,
+        osdi:TT_P54_FailureTime ,
+        osdi:TT_P54_L1_Failure ,
+        osdi:TT_P54_EvaluationTime ,
+        osdi:TT_P54_L2 ,
+        osdi:TT_P54_L2_Cost ,
+        osdi:TT_P54_Disease ;
+    osdi:hasDescription "P54. Strategy outcome whose risk is a time to event (5 years), evaluated at 2 years: probability 1 - exp(-2 / 5)." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

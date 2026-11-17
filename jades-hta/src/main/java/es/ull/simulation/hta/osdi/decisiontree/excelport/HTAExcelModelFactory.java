@@ -196,17 +196,23 @@ public class HTAExcelModelFactory {
      * <li>odds ratio: (x * m / (1 - x + x * m));</li>
      * <li>subtract: (x - m).</li>
      * </ul>
-     * A synthetic probability derived from a time to event T (see {@link AbstractModelFactory#getProbabilityParameterFromGenericParameter(ParameterWrapper)})
-     * is not written in the Excel file: its formula is (1 - EXP(-1 / T')), where T' is the formula of T modified by the effects of the path. For
-     * instance, a hazard ratio m on T gives (1 - EXP(-1 / (T / m))).
+     * A synthetic probability derived from a time to event T within a period (see
+     * {@link AbstractModelFactory#getProbabilityParameterFromTimeToEvent(ParameterWrapper, Optional, double)}) is not written in the Excel file: its
+     * formula is (1 - EXP(-period / T')), where T' is the formula of T modified by the effects of the path, and the period is the time horizon,
+     * the evaluation time of an outcome (also modified by the effects of the path) or 1 year. For instance, a hazard ratio m on T gives
+     * (1 - EXP(-H / (T / m))).
      * @param param The parameter
      * @param effects The effects of the path of the decision tree (only those that affect the parameter are used)
      * @return The Excel formula for the parameter
      * @throws MalformedOSDiModelException If more than one effect replaces the parameter
      */
     public static String getParameterTextFormula(ParameterWrapper param, Set<EffectWrapper> effects) throws MalformedOSDiModelException {
-        final Optional<ParameterWrapper> sourceTime = AbstractModelFactory.getSourceTimeToEvent(param);
-        String formula = sourceTime.isPresent() ? "(1 - EXP(-1 / " + getParameterTextFormula(sourceTime.get(), effects) + "))" : param.getShortName();
+        final Optional<AbstractModelFactory.TimeToEventProbability> tte = AbstractModelFactory.getTimeToEventProbability(param);
+        String formula = param.getShortName();
+        if (tte.isPresent()) {
+            final String period = tte.get().periodParameter().isPresent() ? getParameterTextFormula(tte.get().periodParameter().get(), effects) : Double.toString(tte.get().periodValue());
+            formula = "(1 - EXP(-" + period + " / " + getParameterTextFormula(tte.get().time(), effects) + "))";
+        }
         for (EffectWrapper effect : EffectWrapper.sortForParameter(param, effects)) {
             final String magnitude = effect.getEffectMagnitude().getShortName();
             switch (effect.getOperation(param)) {

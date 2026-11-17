@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -53,7 +54,9 @@ import es.ull.simulation.hta.osdi.ontology.StrategyWrapper.Outcome;
  * <li>The adverse event is active in its branch, so a strategy that fails if the adverse event appears (failsIf) fails only there.</li>
  * <li>The adverse event does not activate the structure of the health condition it represents (isOccurrenceOf).</li>
  * </ul>
- * Cycles in the chain of strategies, outcomes and adverse events whose risk is a time to event, and strategies with outcomes whose costs follow a
+ * A time to event T as the risk of an outcome is the probability 1 - e^(-τ/T), where τ is its evaluation time or, if there is none, the time horizon.
+ * Cycles in the chain of strategies, adverse events whose risk is a time to event, outcomes whose risk is a time to event without evaluation time
+ * or time horizon, and strategies with outcomes whose costs follow a
  * guideline are not supported yet.
  */
 final class StrategyOutcomeExpander {
@@ -343,13 +346,23 @@ final class StrategyOutcomeExpander {
     }
 
     /**
-     * Returns the probability of an outcome, converted into a probability parameter if needed.
+     * Returns the probability of an outcome, converted into a probability parameter if needed. A time to event T (decision D6) becomes the
+     * probability that the outcome happens before it is evaluated, 1 - e^(-τ/T), where τ is its evaluation time; without evaluation time, the
+     * time horizon H of the experiment is used, 1 - e^(-H/T).
+     * @throws UnsupportedOSDiFeatureException If the risk is a time to event, and neither the outcome defines an evaluation time nor the experiment a time horizon
      */
-    private static ParameterWrapper getProbability(StrategyWrapper strategy, Outcome outcome) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+    private ParameterWrapper getProbability(StrategyWrapper strategy, Outcome outcome) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         final ParameterWrapper risk = outcome.risk().get();
-        // TODO: Support times to event in decision trees (see docs/known-limitations.md)
         if (OSDiDataItemType.DI_TIME_TO_EVENT.equals(risk.getDataItemType())) {
-            throw new UnsupportedOSDiFeatureException("The risk of the outcome " + outcome.name() + " of the strategy " + strategy.getShortName() + " is a time to event, which is not supported yet in decision trees.");
+            if (outcome.evaluationTime().isPresent()) {
+                return AbstractModelFactory.getProbabilityParameterFromTimeToEvent(risk, outcome.evaluationTime(), Double.NaN);
+            }
+            final OptionalDouble horizon = model.getExperimentWrapper().getDeclaredTimeHorizon();
+            if (horizon.isPresent()) {
+                return AbstractModelFactory.getProbabilityParameterFromTimeToEvent(risk, Optional.empty(), horizon.getAsDouble());
+            }
+            throw new UnsupportedOSDiFeatureException("The risk of the outcome " + outcome.name() + " of the strategy " + strategy.getShortName() + " is a time to event, "
+                + "but neither the outcome defines an evaluation time (hasEvaluationTime) nor the experiment a time horizon (hasTimeHorizon), so it cannot be converted into a probability.");
         }
         return AbstractModelFactory.getProbabilityParameterFromGenericParameter(risk);
     }
