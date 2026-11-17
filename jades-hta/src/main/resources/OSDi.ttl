@@ -1760,7 +1760,8 @@ osdi:hasStandardDeviationParameter rdf:type owl:DatatypeProperty ;
 osdi:hasTimeHorizon rdf:type owl:DatatypeProperty ;
                     rdfs:domain osdi:Experiment ;
                     rdfs:range xsd:double ;
-                    rdfs:comment "Defines the time horizon (in years) applied to a simulation"@en ;
+                    rdfs:comment "Defines the time horizon (in years) applied to a simulation. In a decision tree, it limits the life years of each leaf, and the payoffs that depend on them; without it, the horizon is the lifetime."@en ,
+                                 "Define el horizonte temporal (en años) que se aplica a una simulación. En un árbol de decisión, limita los años de vida de cada hoja y los pagos que dependen de ellos; sin él, el horizonte es la vida entera."@es ;
                     rdfs:label "has time horizon"@en ,
                                "tiene horizonte temporal"@es .
 

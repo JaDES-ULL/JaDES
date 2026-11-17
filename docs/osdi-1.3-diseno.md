@@ -343,6 +343,12 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
 - El horizonte del árbol es el declarado en el experimento, sin redondear; sin él, la vida entera.
 
 **Pendiente:**
-- Propuestas de esta fase, a la espera de aprobación: convertir `hasFrequency` de una aguda y admitir riesgos de tiempo hasta el evento en árboles con el horizonte (revisión de la fase 3 y de D6), y episodios repetidos de una aguda (D9).
+- Riesgos de tiempo hasta el evento en árboles con el horizonte (revisión de D6): propuesta pendiente de respuesta (progresiones con 1 − e^(−H/T); resultados con 1 − e^(−τ/T), con τ el tiempo de evaluación o, si falta, H).
+- `hasFrequency` de una aguda en árboles: servirá para sumar costes o desutilidades (episodios esperados), no para cambiar la estructura del árbol. Falta acordar la semántica concreta antes de implementarla.
 - El DES redondea el horizonte a años enteros: un horizonte de 24 horas queda en 0.
 - Una primera ejecución de los tests previa al cambio falló con errores de clases y recursos no encontrados, porque edité las fuentes mientras se ejecutaban (el IDE recompila `target`). Se repitió sin editar.
+
+**Revisión tras las propuestas (2026-11-17):**
+- `OSDi.ttl` (sin cambiar la versión): el comentario de `hasTimeHorizon`, en inglés y en español, explica su efecto en los árboles.
+- Decidido: la frecuencia de una aguda en un árbol sirve para sumar costes o desutilidades, no para cambiar la estructura del árbol.
+- Decidido: no se modelan episodios repetidos como estructura del árbol con un tope fijado por el generador. Si hiciera falta declarar un máximo de repeticiones, habría que incorporar esa semántica a la ontología; no se considera un caso habitual.

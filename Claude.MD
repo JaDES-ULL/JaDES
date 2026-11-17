@@ -102,7 +102,7 @@ Convenciones:
 
 **Manifestaciones agudas (árbol):** un único episodio entre la edad inicial y la muerte, con el mismo nodo que una crónica (reglas, dependencia de un desarrollo y efectos sobre la hoja).
 - El riesgo es la probabilidad de que ocurra el episodio; una aguda sin riesgo ocurre siempre en su contexto (D1: el árbol empieza en la crisis).
-- `hasFrequency`: se ignora con aviso si hay riesgo; si solo hay frecuencia, `UnsupportedOSDiFeatureException` (N06). No se convierte en 1 − e^(−f·H): se perdería el número esperado de episodios (propuesta de episodios repetidos, fase 11).
+- `hasFrequency`: se ignora con aviso si hay riesgo; si solo hay frecuencia, `UnsupportedOSDiFeatureException` (N06). No se convierte en 1 − e^(−f·H): se perdería el número esperado de episodios. Decidido (fase 11): la frecuencia servirá para sumar costes o desutilidades, sin cambiar la estructura del árbol (semántica concreta pendiente).
 - Pagos de una vez: una vez por episodio, en el momento 0 o en la edad de inicio (reglas de las ventanas temporales); una utilidad de una vez es una pérdida de AVAC. Pagos anuales: se ignoran con aviso, como en el DES.
 
 **Objetivo de las intervenciones (D1):** cada intervención declara su objetivo, la enfermedad o un elemento de su progresión (`isInterventionOf` o su inversa `hasIntervention`, que se leen en las dos direcciones). Se aplica en cada aparición del objetivo; si es la enfermedad, desde el inicio.
