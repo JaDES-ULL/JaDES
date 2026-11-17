@@ -17,18 +17,17 @@ Las decisiones tal como quedaron al implementarlas, según el registro hasta la 
 | D6 | La eficacia la expresa el `DataItemType`: probabilidad por episodio (árbol) o tiempo hasta el evento (simulación). «Resuelve» detiene los pagos anuales de la condición. En árboles, el riesgo de tiempo hasta el evento T de una progresión se convierte en la probabilidad 1 − e^(−1/T), con T modificado por los efectos de la ruta; el de un resultado de estrategia se rechaza por ahora. | Comentarios de `failsIf`, `hasDuration` y `StrategyOutcome`. |
 | D7 | Las utilidades por episodio son pérdidas de AVAC de una vez, que se suman al aplicar una estrategia o un resultado, o al aparecer una manifestación aguda. Los pagos anuales de una aguda se ignoran con aviso. | Comentarios de `appliesOneTime` e `isDisutility`. |
 | D8 | Efectos adversos. Si el problema forma parte de la evolución natural de la enfermedad y el tratamiento solo cambia su riesgo, se usa un Effect de la estrategia sobre ese riesgo. Si lo provoca el tratamiento, se declara un AdverseEvent: el acontecimiento (por ejemplo, «hipoglucemia por insulina»), causado por una estrategia, con su riesgo, sus pagos de una vez (D7) y sus estrategias. Apunta al problema de salud, que puede ser una manifestación de la enfermedad o un problema ajeno a ella. Los casos complejos (dosis, combinaciones) se expresan con hasConditionExpression. Puede provocar el fracaso de la estrategia (failsIf, D5) o la muerte. En la primera versión no activa la estructura de la enfermedad: el enlace solo identifica el problema. | Nueva clase AdverseEvent ⊑ HealthCondition, disjunta de Disease y de ClinicalProgressionElement. Nuevas propiedades hasAdverseEvent (de Strategy a AdverseEvent), con su inversa isAdverseEventOf, e isOccurrenceOf (de AdverseEvent a HealthCondition). hasRiskCharacterization admite AdverseEvent, con un riesgo obligatorio. |
-| D9 | *Pendiente (fase 10).* La recurrencia es una relación propia: el destino solo aparece cuando el origen se ha resuelto. La secuencia (`hasNext`) queda para la progresión. También modela los episodios repetidos de una aguda. | Nueva propiedad de `Manifestation` a `Manifestation` (nombre por decidir). |
+| D9 | Recaídas y recurrencias, sin vocabulario nuevo. Una recaída tras la respuesta es un resultado del tratamiento: el éxito va seguido (followedOnSuccessBy) de una estrategia de seguimiento cuyo fracaso es la recaída, con su probabilidad entre quienes respondieron, y ese fracaso va seguido del tratamiento de la recaída (fase 10). Una recurrencia a largo plazo es un nuevo episodio de la misma manifestación aguda: la intervención se aplica en cada aparición (D1) y los efectos pueden cambiar su riesgo; se modela en el árbol cuando haya horizonte (fase 11). La secuencia (hasNext) queda para la progresión. Si una recaída necesitara ser un elemento clínico con evolución propia, se valoraría que una ruta pueda requerir un resultado de estrategia. | Ninguno; comentarios de FollowUpStrategy y followedOnSuccessBy con el patrón de recaída. |
 | D10 | *Pendiente (fase 13).* Si la población no declara edad o sexo, la aplicación avisa al construir el modelo y supone 18 años y un 50 % de mujeres. Si ningún parámetro depende de ellos, el aviso basta. Sustituye el valor por defecto actual de JaDES (edad 0 con aviso). | Ninguno: las restricciones de `Population` se mantienen. |
 | D11 | Las propiedades de detección (`detects`, sensibilidad, especificidad y umbral temporal) son de las estrategias de detección, no de las intervenciones. Las estrategias de diagnóstico son confirmaciones perfectas. | Dominio de `detects`, `hasSensitivity`, `hasSpecificity` y `hasTemporaryThreshold` en `DetectionStrategy` (umbral, en `ScreeningStrategy`); rango de `isDetectedBy` en `DetectionStrategy`. |
 
 **Pendientes de decidir:**
 
-- El nombre de la propiedad de recurrencia (se propone en la fase 10).
 - Qué ocurre con los falsos negativos del cribado: diagnóstico clínico tardío, muerte sin diagnóstico o falsa sensación de seguridad. Hoy no pagan diagnóstico. Bloquea la fase 14.
 - Los cribados de varias enfermedades (paneles), que no caben porque cada intervención tiene un solo objetivo.
 - El objetivo en una manifestación propia de uno o varios desarrollos: qué desarrollos presenta el paciente.
 
-Ya no están pendientes los nombres (salvo el de la recurrencia) ni el momento de evaluación de los resultados, que entró en la fase 7a.
+Ya no están pendientes los nombres ni el momento de evaluación de los resultados, que entró en la fase 7a.
 
 ## Registro
 
@@ -77,7 +76,7 @@ Ya no están pendientes los nombres (salvo el de la recurrencia) ni el momento d
 - Pagos de una vez: una vez por episodio, en el momento 0 o en la edad de inicio, con las reglas de las ventanas temporales; una utilidad de una vez es una pérdida de AVAC (D7); varios se suman. Pagos anuales: se ignoran con aviso, como en el DES.
 
 **Pendiente:**
-- Episodios repetidos en el árbol: se modelarán con la recurrencia (D9). Hasta entonces, el árbol cuenta un episodio y el DES todos.
+- Episodios repetidos en el árbol: se modelarán como recurrencias a largo plazo cuando haya horizonte (D9, fase 11). Hasta entonces, el árbol cuenta un episodio y el DES todos.
 - Divergencia: con varios pagos de una vez en una aguda, el DES solo usa el primero (`OSDiDiseaseProgression`), mientras que el árbol los suma.
 - El DES no lee `hasFrequency`: el tiempo hasta el siguiente episodio sale solo del riesgo.
 - N06 comprueba el tipo de excepción, no el mensaje (como todos los casos N).
