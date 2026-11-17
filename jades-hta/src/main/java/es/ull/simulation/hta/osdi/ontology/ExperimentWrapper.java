@@ -102,6 +102,10 @@ public class ExperimentWrapper implements IIndividualWrapper {
      */
     private int timeHorizon;
 	/**
+	 * The time horizon declared in the experiment (hasTimeHorizon), in years, without rounding; empty if not declared
+	 */
+	private OptionalDouble declaredTimeHorizon;
+	/**
 	 * The number of PSA runs defined in the experiment
 	 */
 	private int nPSARuns;
@@ -160,21 +164,32 @@ public class ExperimentWrapper implements IIndividualWrapper {
     }
 
 	/**
-	 * Reads the time horizon defined for the experiment. OSDi defines hasTimeHorizon as a double, but the models work with whole years,
-	 * so a value that is not a whole number is rounded to the nearest year (and a warning is logged). If the property is not defined, or
-	 * its value is not a valid number, returns the default time horizon.
+	 * Reads the time horizon defined for the experiment. OSDi defines hasTimeHorizon as a double. Decision trees use it without rounding (see
+	 * {@link #getDeclaredTimeHorizon()}), but discrete-event simulations work with whole years, so for them a value that is not a whole number is
+	 * rounded to the nearest year (and a warning is logged). If the property is not defined, or its value is not a valid number, returns the
+	 * default time horizon.
 	 * @return The time horizon, in whole years
 	 */
 	private int readTimeHorizon() {
-		final OptionalDouble value = wrap.getDoubleValue(this.individualIRI, OSDiDataProperty.HAS_TIME_HORIZON);
-		if (value.isEmpty()) {
+		declaredTimeHorizon = wrap.getDoubleValue(this.individualIRI, OSDiDataProperty.HAS_TIME_HORIZON);
+		if (declaredTimeHorizon.isEmpty()) {
 			return DEF_TIME_HORIZON;
 		}
-		final int years = (int) Math.round(value.getAsDouble());
-		if (years != value.getAsDouble()) {
-			log.warn(this.individualIRI, OSDiDataProperty.HAS_TIME_HORIZON, "The time horizon (" + value.getAsDouble() + ") is not a whole number of years. It is rounded to " + years + ".");
+		final int years = (int) Math.round(declaredTimeHorizon.getAsDouble());
+		if (years != declaredTimeHorizon.getAsDouble() && !ModelType.DECISION_TREE.equals(modelType)) {
+			log.warn(this.individualIRI, OSDiDataProperty.HAS_TIME_HORIZON, "The time horizon (" + declaredTimeHorizon.getAsDouble() + ") is not a whole number of years. It is rounded to " + years
+				+ ", since discrete-event simulations work with whole years.");
 		}
 		return years;
+	}
+
+	/**
+	 * Returns the time horizon declared in the experiment (hasTimeHorizon), in years and without rounding. Decision trees limit the life years of
+	 * each leaf, and the payoffs that depend on them, to this horizon; without it, the horizon is the lifetime.
+	 * @return The time horizon declared in the experiment, in years; empty if it is not declared
+	 */
+	public OptionalDouble getDeclaredTimeHorizon() {
+		return declaredTimeHorizon;
 	}
 
 	/**

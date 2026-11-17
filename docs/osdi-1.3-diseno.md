@@ -331,3 +331,18 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
 - Recurrencias a largo plazo y episodios repetidos de una aguda en el árbol (fase 11).
 - Si una recaída necesitara ser un elemento clínico con evolución propia, valorar que una ruta pueda requerir un resultado de estrategia.
 - Sin tiempo de evaluación, los resultados de F se evalúan al inicio de la estrategia (con aviso). Para que los pagos anuales del seguimiento duren hasta la recaída, hay que declarar `hasEvaluationTime` en el resultado.
+
+### Fase 11: horizonte temporal del experimento (2026-11-17)
+
+**Hecho:**
+- `ExperimentWrapper.getDeclaredTimeHorizon` conserva `hasTimeHorizon` sin redondear; el redondeo a años enteros (y su aviso) queda para el DES. `ControlSheet` escribe el horizonte en el rango `timeHorizon` del Excel, que ya limitaba los años de vida sin descontar de cada hoja (`MIN(LE, timeHorizon)`) y, a través de ellos, los pagos anuales, los AVAC y los pagos de una vez posteriores. Un horizonte no positivo es `Malformed`. Sin horizonte se mantiene la vida entera (150 en la plantilla), así que los casos existentes no cambian.
+- Tests P51 (10 años: los años de vida quedan en 10 aunque una manifestación reduzca la esperanza de vida a 55, y una manifestación que empieza a los 15 años no se cobra) y P52 (24 horas, 1/365 años, como en Evans), con valores calculados a mano. Antes del cambio fallaron, por ejemplo, con `Unexpected cost (comparator). Expected 11000.0 but found 75500.0` y `Expected 2.73972602739726 but found 65000.0`.
+- Documentación: CLAUDE.md (se quita la limitación del horizonte), `docs/known-limitations.md` (tabla de conformidad) y Javadoc.
+
+**Decidido:**
+- El horizonte del árbol es el declarado en el experimento, sin redondear; sin él, la vida entera.
+
+**Pendiente:**
+- Propuestas de esta fase, a la espera de aprobación: convertir `hasFrequency` de una aguda y admitir riesgos de tiempo hasta el evento en árboles con el horizonte (revisión de la fase 3 y de D6), y episodios repetidos de una aguda (D9).
+- El DES redondea el horizonte a años enteros: un horizonte de 24 horas queda en 0.
+- Una primera ejecución de los tests previa al cambio falló con errores de clases y recursos no encontrados, porque edité las fuentes mientras se ejecutaban (el IDE recompila `target`). Se repitió sin editar.

@@ -7191,4 +7191,214 @@ osdi:TT_P50_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P50. Relapse after the response: the success of a treatment is followed by a follow-up strategy whose failure is the relapse, treated with a second dose; the rescue after the failure has no follow-up." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManX_Risk
+osdi:TT_P51_ManX_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability of ManX" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManX_Cost
+osdi:TT_P51_ManX_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of ManX" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManX_Disutility
+osdi:TT_P51_ManX_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of ManX" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManX_LERMagnitude
+osdi:TT_P51_ManX_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:hasDescription "Years of life lost due to ManX" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManX_LER
+osdi:TT_P51_ManX_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P51_ManX_LERMagnitude ;
+    osdi:hasDescription "Life expectancy reduction due to ManX" ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManX
+osdi:TT_P51_ManX rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasCost osdi:TT_P51_ManX_Cost ;
+    osdi:hasEffect osdi:TT_P51_ManX_LER ;
+    osdi:hasRiskCharacterization osdi:TT_P51_ManX_Risk ;
+    osdi:hasUtility osdi:TT_P51_ManX_Disutility ;
+    osdi:hasDescription "Chronic manifestation from the start" ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManY_Risk
+osdi:TT_P51_ManY_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability of ManY" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManY_OnsetAge
+osdi:TT_P51_ManY_OnsetAge rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:hasDescription "Age 35" ;
+    osdi:hasExpectedValue "35.0"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManY_OneTimeCost
+osdi:TT_P51_ManY_OneTimeCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "One-time cost of ManY at its onset" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManY_Cost
+osdi:TT_P51_ManY_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of ManY" ;
+    osdi:hasExpectedValue "250.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_ManY
+osdi:TT_P51_ManY rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasCost osdi:TT_P51_ManY_OneTimeCost ,
+        osdi:TT_P51_ManY_Cost ;
+    osdi:hasOnsetAge osdi:TT_P51_ManY_OnsetAge ;
+    osdi:hasRiskCharacterization osdi:TT_P51_ManY_Risk ;
+    osdi:hasDescription "Chronic manifestation from 35 years (15 years after the start)" ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_Disease
+osdi:TT_P51_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P51_ManX ,
+        osdi:TT_P51_ManY ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P51_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_Experiment
+osdi:TT_P51_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P51_Model ;
+    osdi:hasDescription "Time horizon (10 years) shorter than the life expectancy: annual payoffs and QALYs are limited to the horizon, and a manifestation that starts after it is not accounted." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasTimeHorizon "10.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P51_Model
+osdi:TT_P51_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P51_ManX_Risk ,
+        osdi:TT_P51_ManX_Cost ,
+        osdi:TT_P51_ManX_Disutility ,
+        osdi:TT_P51_ManX_LERMagnitude ,
+        osdi:TT_P51_ManX_LER ,
+        osdi:TT_P51_ManX ,
+        osdi:TT_P51_ManY_Risk ,
+        osdi:TT_P51_ManY_OnsetAge ,
+        osdi:TT_P51_ManY_OneTimeCost ,
+        osdi:TT_P51_ManY_Cost ,
+        osdi:TT_P51_ManY ,
+        osdi:TT_P51_Disease ;
+    osdi:hasDescription "P51. Time horizon (10 years) shorter than the life expectancy: annual payoffs and QALYs are limited to the horizon, and a manifestation that starts after it is not accounted." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P52_Disease
+osdi:TT_P52_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P52_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P52_Experiment
+osdi:TT_P52_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P52_Model ;
+    osdi:hasDescription "Time horizon of 24 hours (1/365 years), as in Evans: the annual payoffs and QALYs of the disease are limited to the horizon." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasTimeHorizon "0.0027397260273972603"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P52_Model
+osdi:TT_P52_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P52_Disease ;
+    osdi:hasDescription "P52. Time horizon of 24 hours (1/365 years), as in Evans: the annual payoffs and QALYs of the disease are limited to the horizon." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

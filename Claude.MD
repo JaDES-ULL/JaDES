@@ -44,7 +44,7 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P50 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P52 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
 | `OSDi_test_tree_malformed.ttl` | N01–N12, N14–N32 (casos que deben lanzar excepción; N13 volvió a ser P26) |
@@ -85,6 +85,8 @@ Convenciones:
 
 **Utilidades:** una utilidad con `isDisutility = false` es un valor absoluto y se convierte en desutilidad: utilidad basal − u, igual que en el DES. Limitación documentada: se asume que la utilidad absoluta y la basal tienen la misma referencia.
  
+**Horizonte temporal (árbol):** `hasTimeHorizon` del experimento, en años y sin redondear (`ExperimentWrapper.getDeclaredTimeHorizon`), se escribe en el rango `timeHorizon` del Excel (`ControlSheet`). Los años de vida de cada hoja son MIN(LE de la hoja, horizonte), y con ellos se limitan los pagos anuales, los AVAC y los pagos de una vez posteriores (P51; P52: 24 horas). Sin horizonte, la vida entera (la plantilla mantiene 150). Un horizonte no positivo es `Malformed`. El DES lo redondea a años enteros (con aviso).
+
 **Ventanas temporales:**
 - `hasOnsetAge` y `hasEndAge` son edades, no tiempos desde el inicio. Con Age0 = edad inicial de la población (0 con aviso si no la define) y LY = años de vida de la hoja:
   - Inicio = MAX(0, Onset − Age0);
@@ -100,7 +102,7 @@ Convenciones:
 
 **Manifestaciones agudas (árbol):** un único episodio entre la edad inicial y la muerte, con el mismo nodo que una crónica (reglas, dependencia de un desarrollo y efectos sobre la hoja).
 - El riesgo es la probabilidad de que ocurra el episodio; una aguda sin riesgo ocurre siempre en su contexto (D1: el árbol empieza en la crisis).
-- `hasFrequency`: se ignora con aviso si hay riesgo; si solo hay frecuencia, `UnsupportedOSDiFeatureException` (N06). No se convierte en 1 − e^(−f·H): el árbol no tiene horizonte y se perdería el número esperado de episodios.
+- `hasFrequency`: se ignora con aviso si hay riesgo; si solo hay frecuencia, `UnsupportedOSDiFeatureException` (N06). No se convierte en 1 − e^(−f·H): se perdería el número esperado de episodios (propuesta de episodios repetidos, fase 11).
 - Pagos de una vez: una vez por episodio, en el momento 0 o en la edad de inicio (reglas de las ventanas temporales); una utilidad de una vez es una pérdida de AVAC. Pagos anuales: se ignoran con aviso, como en el DES.
 
 **Objetivo de las intervenciones (D1):** cada intervención declara su objetivo, la enfermedad o un elemento de su progresión (`isInterventionOf` o su inversa `hasIntervention`, que se leen en las dos direcciones). Se aplica en cada aparición del objetivo; si es la enfermedad, desde el inicio.
@@ -153,7 +155,6 @@ Convenciones:
 - Riesgo `DI_TimeToEvent` de una progresión en el árbol: probabilidad 1 − e^(−1/T) (exponencial), calculada en la fórmula de cada rama con T modificado por los efectos de la ruta (P26; `AbstractModelFactory.getSourceTimeToEvent`). El parámetro sintético `P_…` no se escribe en el Excel. El RR sobre un tiempo sigue rechazado (N12), y el riesgo de un resultado de estrategia no puede ser un tiempo (N24).
 - Las operaciones lineales (Factor, Ratio, MeanDifference) sobre una probabilidad no se recortan a [0, 1]; solo se avisa si los dos valores son deterministas.
 - MAX aplicado a totales de toda la vida: no es correcto si los elementos tienen ventanas temporales distintas.
-- El horizonte temporal del experimento no se transfiere al Excel (la plantilla usa 150).
 - Huecos de cobertura: estrategias con utilidades, pautas con descuento o con ventanas temporales del nodo, etapas y reglas secuenciales, rechazo de `Pathway` en árboles, aserciones sobre vías y manifestaciones agudas en el DES, parámetros probabilísticos o calculados.
 - Los recursos `/OSDi.ttl`, `/skos.rdf` y `/time.owl` están en la raíz del jar; conviene moverlos a una ruta de paquete para evitar colisiones en el classpath.
 ## Notas técnicas

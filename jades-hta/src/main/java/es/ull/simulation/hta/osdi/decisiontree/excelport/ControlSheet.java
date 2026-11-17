@@ -1,6 +1,7 @@
 package es.ull.simulation.hta.osdi.decisiontree.excelport;
 
 import java.util.ArrayList;
+import java.util.OptionalDouble;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -53,6 +54,14 @@ public class ControlSheet implements SheetWrapper {
         HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_COSTS.setValue(workbook, modelBuilder.getModel().getDiscountRateForCosts());
         HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_LE.setValue(workbook, modelBuilder.getModel().getDiscountRateForEffects());
         HTAExcelModelFactory.CommonNamedRanges.DISCOUNT_QALE.setValue(workbook, modelBuilder.getModel().getDiscountRateForEffects());
+        // The time horizon limits the life years of each leaf, and so the payoffs that depend on them. Without it, the template keeps a lifetime horizon
+        final OptionalDouble horizon = modelBuilder.getModel().getExperimentWrapper().getDeclaredTimeHorizon();
+        if (horizon.isPresent()) {
+            if (horizon.getAsDouble() <= 0.0) {
+                throw new MalformedOSDiModelException("The time horizon of the experiment " + modelBuilder.getModel().getExperimentWrapper().getShortName() + " must be positive. Found: " + horizon.getAsDouble());
+            }
+            HTAExcelModelFactory.CommonNamedRanges.TIME_HORIZON.setValue(workbook, horizon.getAsDouble());
+        }
         HTAExcelModelFactory.CommonNamedRanges.INTERVENTION1.setValue(workbook, interventions.get(0).name());
         HTAExcelModelFactory.CommonNamedRanges.INTERVENTION2.setValue(workbook, interventions.get(1).name());
     }

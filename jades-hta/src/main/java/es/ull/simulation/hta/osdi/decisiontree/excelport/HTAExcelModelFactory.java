@@ -45,7 +45,7 @@ public class HTAExcelModelFactory {
         DISCOUNT_COSTS("discountCosts"),
         DISCOUNT_LE("discountLE"),
         DISCOUNT_QALE("discountQALE"),
-        TIME_HORIZON("timeHorizon");    // In case of trees, this is useful only to prepare the model for budget impact analysis
+        TIME_HORIZON("timeHorizon");    // Limits the life years of each leaf (hasTimeHorizon of the experiment); lifetime if not declared
         private final String internalName;
         private CommonNamedRanges(String internalName) {
             this.internalName = internalName;

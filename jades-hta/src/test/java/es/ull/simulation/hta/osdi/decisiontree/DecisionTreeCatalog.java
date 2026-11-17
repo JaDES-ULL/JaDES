@@ -528,6 +528,17 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P50_Experiment", "Relapse after the response: the success is followed by a follow-up whose failure is the relapse, treated with a second dose; no relapse after the rescue",
                 leaves("TT_P50_", leaf(0.3, "ManA", "A_Failure"), leaf(0.28, "ManA", "A_Success", "F_Relapse"), leaf(0.42, "ManA", "A_Success", "F_NoRelapse")),
                 outcomes(73747.4, 65.0, 54.722), outcomes(67247.4, 65.0, 54.722)));
+        // Time horizon (P51-P52). No discount. The life years of each leaf are limited to the horizon, and so are the payoffs that depend on them.
+        // P51: horizon of 10 years. ManX (0.2): 500 and 0.1 of disutility per year, and 10 years of life lost (55 > 10, so it does not matter).
+        // ManY (0.5) starts at 35 years, 15 years after the start, beyond the horizon: neither its one-time cost (2000) nor its annual cost (250) are accounted.
+        // Comparator: 10 * 1000 + 0.2 * 10 * 500 = 11000; life years 10; QALYs 10 * 0.85 - 0.2 * 10 * 0.1 = 8.3. Assessed: + 10 * 100
+        cases.add(tc(PAYOFFS, "TT_P51_Experiment", "Time horizon (10 years) shorter than the life expectancy: annual payoffs and QALYs limited to the horizon, and a manifestation that starts after it",
+                leaves("TT_P51_", leaf(0.4), leaf(0.1, "ManX"), leaf(0.4, "ManY"), leaf(0.1, "ManX", "ManY")),
+                outcomes(12000.0, 10.0, 8.3), outcomes(11000.0, 10.0, 8.3)));
+        // P52: horizon of 24 hours (h = 1/365 years), as in Evans. Comparator: 1000 h; life years h; QALYs 0.85 h. Assessed: 1100 h
+        cases.add(tc(PAYOFFS, "TT_P52_Experiment", "Time horizon of 24 hours (1/365 years), as in Evans: the annual payoffs and QALYs of the disease are limited to the horizon",
+                leaves("TT_P52_", leaf(1.0)),
+                outcomes(3.0136986301369864, 0.0027397260273972603, 0.002328767123287671), outcomes(2.73972602739726, 0.0027397260273972603, 0.002328767123287671)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
