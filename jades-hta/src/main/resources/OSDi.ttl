@@ -536,8 +536,8 @@ osdi:hasFrequency rdf:type owl:ObjectProperty ;
                                             )
                               ] ;
                   rdfs:range osdi:Parameter ;
-                  rdfs:comment "For a guideline: number of applications per period (see hasPeriod), e.g. 3 applications every 1 day. For an acute manifestation: number of occurrences per year."@en ,
-                               "Para una pauta: número de aplicaciones por periodo (ver hasPeriod), p. ej. 3 aplicaciones cada 1 día. Para una manifestación aguda: número de apariciones al año."@es ;
+                  rdfs:comment "For a guideline: number of applications per period (see hasPeriod), e.g. 3 applications every 1 day. For an acute manifestation: number of occurrences per year. In a decision tree, the frequency does not change the structure of the tree: the one-time payoffs of the acute manifestation, and of its strategies, outcomes and adverse events, are multiplied by the expected number of episodes within the time window of the manifestation."@en ,
+                               "Para una pauta: número de aplicaciones por periodo (ver hasPeriod), p. ej. 3 aplicaciones cada 1 día. Para una manifestación aguda: número de apariciones al año. En un árbol de decisión, la frecuencia no cambia la estructura del árbol: los pagos de una vez de la manifestación aguda, y de sus estrategias, resultados y efectos adversos, se multiplican por el número esperado de episodios dentro de la ventana temporal de la manifestación."@es ;
                   rdfs:label "has frequency"@en ,
                              "tiene la frecuencia"@es .
 

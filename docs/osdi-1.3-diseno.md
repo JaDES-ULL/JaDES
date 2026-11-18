@@ -365,4 +365,5 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
   - `BranchDestinationNode.getEpisodeFrequency`, `DiseaseSubTreeGenerator.getEpisodeFrequency` (sustituye a `checkAcuteManifestation`) y `PayoffWrapper.applyDiscount`.
   - Tests, con valores calculados a mano: P55 (riesgo y frecuencia, con estrategia, efecto adverso y horizonte de 10 años), P56 (solo frecuencia, horizonte de 5 años; antes N06) y P30. P30 comprobaba que la frecuencia se ignoraba; con la nueva semántica sus datos (12 episodios al año de 0,5 AVAC durante 65 años) darían AVAC negativos, así que se rediseñó antes de implementar: frecuencia 0,1 al año y nuevas descripciones (comparador 67600; 65; 54,6).
   - Antes del cambio fallaron con `Unexpected cost (comparator). Expected 67600.0 but found 65400.0` (P30), `Expected 11326.0 but found 10044.2` (P55) y el rechazo «defines a frequency … but no risk» (P56).
-- Pendiente: el comentario de `hasFrequency` en `OSDi.ttl` no describe todavía su uso en los árboles (propuesta pendiente de aprobación). Los efectos de una aguda (muerte, LER) no se multiplican por los episodios.
+- `OSDi.ttl` (sin cambiar la versión): el comentario de `hasFrequency`, en inglés y en español, describe su uso en los árboles.
+- Pendiente: los efectos de una aguda (muerte, LER) no se multiplican por los episodios.
