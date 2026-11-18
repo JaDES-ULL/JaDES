@@ -15,7 +15,12 @@ mvn -pl jades-hta -am test -Dtest='TestDecisionTreeOutcomes,TestDecisionTreeStru
  
 # Excluir los defectos conocidos (cuando vuelva a haberlos)
 mvn -pl jades-hta -am test -DexcludedGroups=known-issue
+
+# Escribir a disco los Excel de los tests de árboles (por defecto se evalúan en memoria)
+mvn -pl jades-hta -am test -Djades.tests.excel=true
 ```
+
+Los tests de árboles cargan cada ontología una sola vez (`DecisionTreeTestSupport.loadModel`) y evalúan el Excel en memoria (`HTAExcelModelFactory.createWorkbook`): las fórmulas son las mismas, pero no se escribe ni se relee el fichero, que era lo más lento. `TestHTAExcelGeneration` sigue escribiendo los ficheros, como prueba de la escritura.
  
 ## Cómo trabajar
  
@@ -161,6 +166,7 @@ Convenciones:
 ## Notas técnicas
  
 - El proyecto compila con `release 25`: si Maven usa otro JDK, ejecutar con `JAVA_HOME` apuntando a un JDK 25.
+- El IDE también compila en `target/`: no editar las fuentes mientras se ejecutan los tests, y si aparecen errores `Unresolved compilation problem` o clases no encontradas, ejecutar `mvn -pl jades-hta -am clean test`.
 - OWL API 5.5.0 con `StructuralReasoner`; Apache POI 5.4.1 para el Excel.
 - `OSDiWrapper` resuelve las importaciones de SKOS y OWL-Time con copias locales (`SimpleIRIMapper`) para no depender de w3.org (error HTTP 429).
 - `OSDiWrapper.Builder.build` mapea la `owl:versionIRI` declarada en la copia local de `OSDi.ttl` al núcleo ya cargado. Si se cambia esa versión, hay que actualizar a la vez los `owl:imports` de las ontologías de prueba, o se intentará descargar la versión antigua.

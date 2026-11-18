@@ -15,12 +15,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
@@ -75,7 +77,30 @@ final class DecisionTreeTestSupport {
     }
 
     /**
-     * Loads an ontology and creates the decision tree model for one of its experiments
+     * The ontologies already loaded, by resource. Loading an ontology is the most expensive step of a test (more than one second for the largest
+     * one), and building an experiment does not modify the ontology: each experiment creates its own model wrapper and model item wrappers.
+     */
+    private static final Map<String, OSDiWrapper> LOADED_ONTOLOGIES = new ConcurrentHashMap<>();
+
+    /**
+     * Returns the wrapper of an ontology, which is loaded only once per resource
+     * @param ontology The resource with the ontology
+     * @return The wrapper of the ontology
+     */
+    private static OSDiWrapper getOntology(String ontology) {
+        return LOADED_ONTOLOGIES.computeIfAbsent(ontology, resource -> {
+            final OWLOntologyDocumentSource source = new StreamDocumentSource(Objects.requireNonNull(
+                DecisionTreeTestSupport.class.getResourceAsStream(resource), "Ontology file not found in resources: " + resource));
+            try {
+                return new OSDiWrapper.Builder().build(source);
+            } catch (Exception e) {
+                throw new IllegalStateException("The ontology " + resource + " cannot be loaded", e);
+            }
+        });
+    }
+
+    /**
+     * Creates the decision tree model for an experiment of an ontology (loaded only once per resource, see {@link #getOntology(String)})
      * @param ontology The resource with the ontology
      * @param experiment The name of the experiment
      * @return The decision tree model
@@ -83,9 +108,7 @@ final class DecisionTreeTestSupport {
      */
     static SingleDiseaseAndPopulationModel loadModel(String ontology, String experiment) throws Exception {
         registerFactories();
-        final OWLOntologyDocumentSource source = new StreamDocumentSource(Objects.requireNonNull(
-            DecisionTreeTestSupport.class.getResourceAsStream(ontology), "Ontology file not found in resources: " + ontology));
-        final OSDiWrapper wrapper = new OSDiWrapper.Builder().build(source);
+        final OSDiWrapper wrapper = getOntology(ontology);
         final ExperimentWrapper experimentWrapper = wrapper.buildExperiment(wrapper.toIRI(experiment));
         final Model model = CentralModelFactory.create(experimentWrapper);
         assertTrue(model instanceof SingleDiseaseAndPopulationModel,
@@ -174,16 +197,47 @@ final class DecisionTreeTestSupport {
     }
 
     /**
-     * Generates the Excel file of a decision tree model and returns its deterministic results
-     * @param model A decision tree model
-     * @param excelFile The file to generate
-     * @return Cost, life years and QALYs of the assessed intervention, followed by those of the comparator intervention
-     * @throws Exception If the file cannot be generated or read
+     * System property that makes the tests write the Excel files to disk and read them back, instead of evaluating the workbooks in memory
+     * (e.g., -Djades.tests.excel=true). Writing the file is the most expensive step of the tests of decision trees, and it does not change the
+     * formulas that are evaluated.
      */
-    static double[] readExcelOutcomes(SingleDiseaseAndPopulationModel model, Path excelFile) throws Exception {
+    static final String WRITE_EXCEL_PROPERTY = "jades.tests.excel";
+
+    /**
+     * Returns true if the tests must write the Excel files to disk (see {@link #WRITE_EXCEL_PROPERTY})
+     * @return true if the tests must write the Excel files to disk
+     */
+    static boolean writeExcelFiles() {
+        return Boolean.getBoolean(WRITE_EXCEL_PROPERTY);
+    }
+
+    /**
+     * Generates the Excel model of a decision tree, in memory or, if {@link #WRITE_EXCEL_PROPERTY} is set, written to a file and read back
+     * @param model A decision tree model
+     * @param excelFile The file to generate, if the Excel files are written to disk
+     * @return The workbook with the Excel model; the caller must close it
+     * @throws Exception If the Excel model cannot be generated or read
+     */
+    static Workbook generateExcel(SingleDiseaseAndPopulationModel model, Path excelFile) throws Exception {
+        if (!writeExcelFiles()) {
+            return HTAExcelModelFactory.createWorkbook(model);
+        }
         HTAExcelModelFactory.build(excelFile.toString(), model);
         assertTrue(Files.exists(excelFile) && Files.size(excelFile) > 0, "Excel was not generated: " + excelFile);
-        try (InputStream in = Files.newInputStream(excelFile); XSSFWorkbook workbook = new XSSFWorkbook(in)) {
+        try (InputStream in = Files.newInputStream(excelFile)) {
+            return new XSSFWorkbook(in);
+        }
+    }
+
+    /**
+     * Generates the Excel model of a decision tree (see {@link #generateExcel(SingleDiseaseAndPopulationModel, Path)}) and returns its deterministic results
+     * @param model A decision tree model
+     * @param excelFile The file to generate, if the Excel files are written to disk
+     * @return Cost, life years and QALYs of the assessed intervention, followed by those of the comparator intervention
+     * @throws Exception If the Excel model cannot be generated or read
+     */
+    static double[] readExcelOutcomes(SingleDiseaseAndPopulationModel model, Path excelFile) throws Exception {
+        try (Workbook workbook = generateExcel(model, excelFile)) {
             final FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
             final Sheet sheet = workbook.getSheet(ProcessSheet.SHEET_NAME);
             assertNotNull(sheet, "The generated Excel has no sheet " + ProcessSheet.SHEET_NAME);

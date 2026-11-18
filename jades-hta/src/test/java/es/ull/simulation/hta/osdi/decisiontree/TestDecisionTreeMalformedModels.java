@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import es.ull.simulation.hta.osdi.ontology.OSDiTest;
 import es.ull.simulation.hta.osdi.decisiontree.DecisionTreeCatalog.MalformedCase;
-import es.ull.simulation.hta.osdi.decisiontree.excelport.HTAExcelModelFactory;
 
 /**
  * Checks that the models that cannot be converted into a decision tree are rejected with the right exception, instead of
@@ -35,7 +34,7 @@ public class TestDecisionTreeMalformedModels {
         assertThrows(tc.expectedException(), () -> {
             final SingleDiseaseAndPopulationModel model = DecisionTreeTestSupport.loadModel(tc.ontology(), tc.experiment());
             model.getTree();
-            HTAExcelModelFactory.build(tempDir.resolve(tc.experiment() + ".xlsm").toString(), model);
+            DecisionTreeTestSupport.generateExcel(model, tempDir.resolve(tc.experiment() + ".xlsm")).close();
         }, tc.toString());
     }
 }

@@ -1,14 +1,8 @@
 package es.ull.simulation.hta.osdi.decisiontree.excelport;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.Set;
 
@@ -92,26 +86,21 @@ public class HTAExcelModelFactory {
     private final int treeDepth;
 
     /**
-     * Constructor to initialize the ExcelModelWrapper with a new workbook.
-     * IMPORTANT: This constructor ALWAYS creates a new workbook that overrides the existing one.
-     * @param excelFilePath The path to the Excel file.
+     * Creates the workbook of the HTA model from the template, and fills its sheets. The workbook is kept in memory: it is written to a file by
+     * {@link #build(String, SingleDiseaseAndPopulationModel)}.
      * @param model The OSDiTreeModel to be used.
-     * @throws IOException If there is an error reading the Excel file.
-     * @throws UnsupportedOSDiFeatureException 
-     * @throws MalformedOSDiModelException 
+     * @throws IOException If there is an error reading the template.
+     * @throws UnsupportedOSDiFeatureException
+     * @throws MalformedOSDiModelException
      */
-    private HTAExcelModelFactory(String excelFilePath, SingleDiseaseAndPopulationModel model) throws IOException, MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
-        final Path target = Paths.get(excelFilePath);
-
+    private HTAExcelModelFactory(SingleDiseaseAndPopulationModel model) throws IOException, MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         try (InputStream in = getClass().getResourceAsStream(PATH_TO_TEMPLATE)) {
             if (in == null) {
                 throw new IllegalStateException("Resource not found: " + PATH_TO_TEMPLATE);
             }
-            Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
-        }        
-        final FileInputStream fis = new FileInputStream(new File(excelFilePath));
+            this.workbook = new XSSFWorkbook(in);
+        }
         try {
-            this.workbook = new XSSFWorkbook(fis);
             this.model = model;
             this.treeDepth = model.getDepth();
             this.paramsSheet = new ParamSheet(this);
@@ -124,10 +113,9 @@ public class HTAExcelModelFactory {
             this.processSheet.updateSheet();
             // Remove the template sheet after copying styles
             this.workbook.removeSheetAt(this.workbook.getSheetIndex(SHEET_TEMPLATES));
-        } catch (IOException | MalformedOSDiModelException | MalformedSimulationModelException | UnsupportedOSDiFeatureException e) {
+        } catch (MalformedOSDiModelException | MalformedSimulationModelException | UnsupportedOSDiFeatureException | RuntimeException e) {
+            workbook.close();
             throw e;
-        } finally {
-            fis.close();
         }
     }
 
@@ -137,11 +125,13 @@ public class HTAExcelModelFactory {
      * @throws IOException If there is an error writing to the Excel file.
      */
     private void writeAndClose(String excelFilePath) throws IOException {
-        FileOutputStream fos = new FileOutputStream(excelFilePath);
-        workbook.setForceFormulaRecalculation(true);
-        workbook.write(fos);
-        fos.close();
-        workbook.close();
+        try (FileOutputStream fos = new FileOutputStream(excelFilePath)) {
+            workbook.setForceFormulaRecalculation(true);
+            workbook.write(fos);
+        }
+        finally {
+            workbook.close();
+        }
     }
 
     /**
@@ -247,16 +237,19 @@ public class HTAExcelModelFactory {
      * @throws UnsupportedOSDiFeatureException 
      */
     public static void build(String excelFilePath, SingleDiseaseAndPopulationModel model) throws IOException, MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
-        HTAExcelModelFactory excelWrapper = null;
-        try {
-            excelWrapper = new HTAExcelModelFactory(excelFilePath, model);
-        } catch (IOException | MalformedOSDiModelException | MalformedSimulationModelException | UnsupportedOSDiFeatureException e) {
-            throw e;
-        } finally {
-            // Ensure the workbook is written and closed properly
-            if (excelWrapper != null) {
-                excelWrapper.writeAndClose(excelFilePath);
-            }
-        }
+        new HTAExcelModelFactory(model).writeAndClose(excelFilePath);
+    }
+
+    /**
+     * Generates the Excel model for the HTA decision tree in memory, without writing it to a file (e.g., to evaluate its formulas). Writing the file
+     * is the most expensive step of {@link #build(String, SingleDiseaseAndPopulationModel)}. The caller must close the workbook.
+     * @param model The decision tree model
+     * @return The workbook with the Excel model, ready to evaluate its formulas
+     * @throws IOException If there is an error reading the template
+     * @throws MalformedOSDiModelException If the OSDi model is malformed
+     * @throws UnsupportedOSDiFeatureException If the OSDi model uses features not supported by decision trees
+     */
+    public static Workbook createWorkbook(SingleDiseaseAndPopulationModel model) throws IOException, MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        return new HTAExcelModelFactory(model).getWorkbook();
     }
 }
