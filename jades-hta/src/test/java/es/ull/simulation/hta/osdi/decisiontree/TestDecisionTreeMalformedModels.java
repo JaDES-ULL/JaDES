@@ -1,6 +1,7 @@
 package es.ull.simulation.hta.osdi.decisiontree;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -31,10 +32,13 @@ public class TestDecisionTreeMalformedModels {
     @MethodSource("cases")
     void rejectsModel(MalformedCase tc) {
         // The exception may be thrown when loading the experiment, when generating the tree or when generating the Excel file
-        assertThrows(tc.expectedException(), () -> {
+        final Exception exception = assertThrows(tc.expectedException(), () -> {
             final SingleDiseaseAndPopulationModel model = DecisionTreeTestSupport.loadModel(tc.ontology(), tc.experiment());
             model.getTree();
             DecisionTreeTestSupport.generateExcel(model, tempDir.resolve(tc.experiment() + ".xlsm")).close();
         }, tc.toString());
+        // The message checks that the model is rejected for the right reason
+        assertTrue(exception.getMessage() != null && exception.getMessage().contains(tc.expectedMessage()),
+            tc + ": unexpected message. Expected it to contain \"" + tc.expectedMessage() + "\" but found \"" + exception.getMessage() + "\"");
     }
 }

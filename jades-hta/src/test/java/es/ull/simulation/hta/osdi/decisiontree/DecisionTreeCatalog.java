@@ -125,7 +125,15 @@ public final class DecisionTreeCatalog {
      * @param title What the case tests
      * @param expectedException The exception that must be thrown
      */
-    public record MalformedCase(String ontology, String experiment, String title, Class<? extends Exception> expectedException) {
+    /**
+     * A model that must be rejected
+     * @param ontology The resource with the ontology
+     * @param experiment The name of the experiment
+     * @param title What the case tests
+     * @param expectedException The type of the exception that must be thrown
+     * @param expectedMessage A fragment of the message of the exception, which checks that the model is rejected for the right reason
+     */
+    public record MalformedCase(String ontology, String experiment, String title, Class<? extends Exception> expectedException, String expectedMessage) {
         @Override
         public final String toString() {
             return experiment + ": " + title;
@@ -699,60 +707,92 @@ public final class DecisionTreeCatalog {
     public static Stream<MalformedCase> malformedCases() {
         return Stream.of(
             // Only one development of an alternative set can lack a risk (it takes the remaining probability).
-            new MalformedCase(MALFORMED, "TT_N01_Experiment", "Alternative developments: two of them without risk", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N01_Experiment", "Alternative developments: two of them without risk", MalformedOSDiModelException.class,
+                "Multiple developments without risk parameter are not allowed in an alternative combination rule"),
             // The remaining probability cannot be assigned both to a default development and to the null progression.
-            new MalformedCase(MALFORMED, "TT_N02_Experiment", "Alternative developments: null progression and a development without risk", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N02_Experiment", "Alternative developments: null progression and a development without risk", MalformedOSDiModelException.class,
+                "is affected by an alternative combination rule that is supposed to include a null progression"),
             // A combination rule must affect progressions of the same type.
-            new MalformedCase(MALFORMED, "TT_N03_Experiment", "Combination rule that mixes a development and a manifestation", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N03_Experiment", "Combination rule that mixes a development and a manifestation", MalformedOSDiModelException.class,
+                "TT_N03_MixedRule affects progressions of different types"),
             // Only probabilities, proportions, incidences... can characterize a risk in a decision tree.
-            new MalformedCase(MALFORMED, "TT_N04_Experiment", "Risk of a development characterized by a parameter that is not a probability", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N04_Experiment", "Risk of a development characterized by a parameter that is not a probability", UnsupportedOSDiFeatureException.class,
+                "for the parameter TT_N04_DevA_Risk cannot be used as a probability in the decision tree"),
             // A shared cost cannot be counted once if it applies in different periods.
-            new MalformedCase(MALFORMED, "TT_N05_Experiment", "ADD_DISTINCT with a cost shared by manifestations with different temporal constraints", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N05_Experiment", "ADD_DISTINCT with a cost shared by manifestations with different temporal constraints", UnsupportedOSDiFeatureException.class,
+                "The cost parameter TT_N05_SharedCost is shared by several items with different temporal constraints"),
             // N06 (acute manifestation with only a frequency) became P56 when the frequency was supported in decision trees (phase 11).
             // Decision trees assume that every patient starts without progressions.
-            new MalformedCase(MALFORMED, "TT_N07_Experiment", "Initial proportion of a manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N07_Experiment", "Initial proportion of a manifestation (not supported yet in decision trees)", UnsupportedOSDiFeatureException.class,
+                "defines an initial proportion (hasInitialProportion) for the progression TT_N07_ManX"),
             // Two replacements of the same parameter are ambiguous.
-            new MalformedCase(MALFORMED, "TT_N08_Experiment", "Two intervention effects replace the same risk", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N08_Experiment", "Two intervention effects replace the same risk", MalformedOSDiModelException.class,
+                "modify TT_N08_Severe_Risk, and 2 of them replace its value"),
             // Odds ratios and hazard ratios only apply to probabilities (and hazard ratios, also to times to event).
-            new MalformedCase(MALFORMED, "TT_N09_Experiment", "Odds ratio applied to a cost", MalformedOSDiModelException.class),
-            new MalformedCase(MALFORMED, "TT_N10_Experiment", "Hazard ratio applied to a cost", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N09_Experiment", "Odds ratio applied to a cost", MalformedOSDiModelException.class,
+                "on TT_N09_Severe_Cost (of type Currency_Euro): an odds ratio can only modify a probability"),
+            new MalformedCase(MALFORMED, "TT_N10_Experiment", "Hazard ratio applied to a cost", MalformedOSDiModelException.class,
+                "on TT_N10_Severe_Cost (of type Currency_Euro): a hazard ratio can only modify a probability or a time to event"),
             // Statistics of the uncertainty are not effect magnitudes.
-            new MalformedCase(MALFORMED, "TT_N11_Experiment", "Effect magnitude defined as a standard deviation", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N11_Experiment", "Effect magnitude defined as a standard deviation", MalformedOSDiModelException.class,
+                "a statistic of the uncertainty cannot be the magnitude of an effect"),
             // A relative risk is not defined on a time to event (a hazard ratio must be used instead).
-            new MalformedCase(MALFORMED, "TT_N12_Experiment", "Relative risk applied to a time to event", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N12_Experiment", "Relative risk applied to a time to event", UnsupportedOSDiFeatureException.class,
+                "a relative risk cannot modify a time to event"),
             // N13 (hazard ratio on a time to event) became P26 again when times to event were supported in decision trees.
             // The compared interventions must have the same target (D1).
-            new MalformedCase(MALFORMED, "TT_N14_Experiment", "Compared interventions with different targets", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N14_Experiment", "Compared interventions with different targets", MalformedOSDiModelException.class,
+                "The compared interventions must have the same target"),
             // Every intervention has exactly one target.
-            new MalformedCase(MALFORMED, "TT_N15_Experiment", "Intervention with two targets", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N15_Experiment", "Intervention with two targets", MalformedOSDiModelException.class,
+                "The intervention TT_N15_InterventionTreat defines more than one target in the model"),
             // A patient that presents a manifestation of a development also presents the development, but the manifestation may depend on several developments.
-            new MalformedCase(MALFORMED, "TT_N16_Experiment", "Interventions whose target is a manifestation that depends on a development (not supported in decision trees)", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N16_Experiment", "Interventions whose target is a manifestation that depends on a development (not supported in decision trees)", UnsupportedOSDiFeatureException.class,
+                "The interventions of the model target the manifestation TT_N16_ManY, which depends on the development TT_N16_DevA"),
             // At most one strategy replacement per health condition and arm (D2).
-            new MalformedCase(MALFORMED, "TT_N17_Experiment", "Two strategy replacements of the same health condition in the same arm", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N17_Experiment", "Two strategy replacements of the same health condition in the same arm", MalformedOSDiModelException.class,
+                "defines two strategy replacements (TT_N17_Replacement1 and TT_N17_Replacement2) of the same health condition"),
             // Only a strategy replacement effect can affect a health condition.
-            new MalformedCase(MALFORMED, "TT_N18_Experiment", "Generic effect that affects a health condition", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N18_Experiment", "Generic effect that affects a health condition", MalformedOSDiModelException.class,
+                "Only a strategy replacement effect (StrategyReplacementEffect) can affect a health condition"),
             // The decision tree does not support yet sub-guidelines, condition expressions or application ages in a guideline.
-            new MalformedCase(MALFORMED, "TT_N19_Experiment", "Guideline with sub-guidelines (not supported yet)", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N19_Experiment", "Guideline with sub-guidelines (not supported yet)", UnsupportedOSDiFeatureException.class,
+                "The guideline TT_N19_G1 defines hasSubGuideline"),
             // Detection properties are declared by the detection strategies, and the disease detected by an intervention is its target.
-            new MalformedCase(MALFORMED, "TT_N20_Experiment", "Screening intervention with a sensitivity", MalformedOSDiModelException.class),
-            new MalformedCase(MALFORMED, "TT_N21_Experiment", "Screening strategy in the arm without screening", MalformedOSDiModelException.class),
-            new MalformedCase(MALFORMED, "TT_N22_Experiment", "Detection intervention that declares the disease it detects", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N20_Experiment", "Screening intervention with a sensitivity", MalformedOSDiModelException.class,
+                "The detection intervention TT_N20_Screening declares hasSensitivity"),
+            new MalformedCase(MALFORMED, "TT_N21_Experiment", "Screening strategy in the arm without screening", MalformedOSDiModelException.class,
+                "uses the screening strategy TT_N21_ScreeningStrategy, but it is not a screening intervention"),
+            new MalformedCase(MALFORMED, "TT_N22_Experiment", "Detection intervention that declares the disease it detects", MalformedOSDiModelException.class,
+                "The detection intervention TT_N22_Screening declares detects"),
             // Strategy outcomes (phase 7a): decision trees cannot expand cycles nor times to event, and outcomes must be well defined.
-            new MalformedCase(MALFORMED, "TT_N23_Experiment", "Cycle in the chain of strategies", UnsupportedOSDiFeatureException.class),
-            new MalformedCase(MALFORMED, "TT_N24_Experiment", "Strategy outcome whose risk is a time to event, without evaluation time or time horizon", UnsupportedOSDiFeatureException.class),
-            new MalformedCase(MALFORMED, "TT_N25_Experiment", "Two strategy outcomes without risk", MalformedOSDiModelException.class),
-            new MalformedCase(MALFORMED, "TT_N26_Experiment", "Short form (failsIf) combined with explicit strategy outcomes", MalformedOSDiModelException.class),
-            new MalformedCase(MALFORMED, "TT_N27_Experiment", "Two detection outcomes without risk for the patients with the disease", MalformedOSDiModelException.class),
-            new MalformedCase(MALFORMED, "TT_N28_Experiment", "Inconclusive detection outcome followed by a strategy that is not a detection strategy", MalformedOSDiModelException.class),
-            new MalformedCase(MALFORMED, "TT_N29_Experiment", "Cycle in the chain of detection strategies", UnsupportedOSDiFeatureException.class),
-            new MalformedCase(MALFORMED, "TT_N30_Experiment", "Confirmation of the positive results with a diagnosis strategy with explicit outcomes (not supported yet)", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N23_Experiment", "Cycle in the chain of strategies", UnsupportedOSDiFeatureException.class,
+                "goes back to the strategy TT_N23_L1. Cycles are not supported in decision trees"),
+            new MalformedCase(MALFORMED, "TT_N24_Experiment", "Strategy outcome whose risk is a time to event, without evaluation time or time horizon", UnsupportedOSDiFeatureException.class,
+                "is a time to event, but neither the outcome defines an evaluation time (hasEvaluationTime) nor the experiment a time horizon"),
+            new MalformedCase(MALFORMED, "TT_N25_Experiment", "Two strategy outcomes without risk", MalformedOSDiModelException.class,
+                "The strategy TT_N25_L1 has 2 outcomes without risk"),
+            new MalformedCase(MALFORMED, "TT_N26_Experiment", "Short form (failsIf) combined with explicit strategy outcomes", MalformedOSDiModelException.class,
+                "The strategy TT_N26_L1 combines the short form (failsIf) with explicit outcomes"),
+            new MalformedCase(MALFORMED, "TT_N27_Experiment", "Two detection outcomes without risk for the patients with the disease", MalformedOSDiModelException.class,
+                "The detection strategy TT_N27_S1 has 2 outcomes without risk for the individuals with the disease"),
+            new MalformedCase(MALFORMED, "TT_N28_Experiment", "Inconclusive detection outcome followed by a strategy that is not a detection strategy", MalformedOSDiModelException.class,
+                "is followed by the strategy TT_N28_FollowUp, which is not a detection strategy"),
+            new MalformedCase(MALFORMED, "TT_N29_Experiment", "Cycle in the chain of detection strategies", UnsupportedOSDiFeatureException.class,
+                "goes back to the strategy TT_N29_S1. Cycles are not supported in decision trees"),
+            new MalformedCase(MALFORMED, "TT_N30_Experiment", "Confirmation of the positive results with a diagnosis strategy with explicit outcomes (not supported yet)", UnsupportedOSDiFeatureException.class,
+                "The diagnosis strategy TT_N30_Diagnosis of the arm of the intervention TT_N30_NoScreening defines explicit outcomes"),
             // The risk of an adverse event is mandatory (D8).
-            new MalformedCase(MALFORMED, "TT_N31_Experiment", "Adverse event without risk", MalformedOSDiModelException.class),
+            new MalformedCase(MALFORMED, "TT_N31_Experiment", "Adverse event without risk", MalformedOSDiModelException.class,
+                "The adverse event TT_N31_Diarrhoea does not define a risk"),
             // The risk of an adverse event is a probability per application of the strategy in decision trees (D6, D8).
-            new MalformedCase(MALFORMED, "TT_N32_Experiment", "Adverse event whose risk is a time to event (not supported in decision trees)", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N32_Experiment", "Adverse event whose risk is a time to event (not supported in decision trees)", UnsupportedOSDiFeatureException.class,
+                "The risk of the adverse event TT_N32_Diarrhoea of the strategy TT_N32_A is a time to event"),
             // A group of strategies as the next strategy is a choice among alternatives: its members must declare their proportions (phase 12).
-            new MalformedCase(MALFORMED, "TT_N33_Experiment", "Group of strategies without proportions as the next strategy of an outcome", UnsupportedOSDiFeatureException.class),
-            new MalformedCase(MALFORMED, "TT_N34_Experiment", "Group of alternative strategies whose proportions do not add up to 1, without a member without proportion", MalformedOSDiModelException.class)
+            new MalformedCase(MALFORMED, "TT_N33_Experiment", "Group of strategies without proportions as the next strategy of an outcome", UnsupportedOSDiFeatureException.class,
+                "but its strategies do not declare their proportions (hasProportionWithinGroup)"),
+            new MalformedCase(MALFORMED, "TT_N34_Experiment", "Group of alternative strategies whose proportions do not add up to 1, without a member without proportion", MalformedOSDiModelException.class,
+                "and none of them takes the rest")
         );
     }
 }

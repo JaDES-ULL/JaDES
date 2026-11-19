@@ -75,6 +75,7 @@ Convenciones:
 - Las probabilidades de las hojas se comprueban en el brazo comparador. Si los brazos tienen hojas distintas (p. ej., una intervención sustituye una estrategia con resultados o efectos adversos), el caso declara las del brazo evaluado con `withAssessedLeaves`.
 - Resultados del Excel: hoja `Process`, fila 10, columnas 6–11 (coste, esperanza de vida y AVAC del brazo evaluado y del comparador). Tolerancia relativa 1e-8.
 - Combinaciones por defecto: costes ADD, desutilidades ADD, reducción de esperanza de vida MAX, tasa de mortalidad MAX.
+- Los casos N comprueban el tipo de la excepción y un fragmento de su mensaje (`MalformedCase.expectedMessage`), para asegurar que el modelo se rechaza por el motivo correcto.
 - Defectos conocidos: se marcan en el catálogo con `knownIssue(...)` o `knownOutcomesIssue(...)` y un valor del enum `KnownIssue`; los tests correspondientes llevan `@Tag("known-issue")`. Al corregir el defecto, se quita la marca y el valor del enum.
 - Los tests que cargan OSDi llevan `@OSDiTest` (tag `osdi`).
 ## Semántica de OSDi decidida
