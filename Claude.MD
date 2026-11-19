@@ -50,7 +50,7 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
 | `OSDi_test_tree_payoffs.ttl` | P01–P58 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal; P53–P54: tiempo hasta el evento con horizonte; P55–P56 y P30: frecuencia de una aguda; P57: costes en dólares canadienses de 1997; P58: grupo de estrategias alternativas como estrategia siguiente) |
-| `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
+| `OSDi_test_tree_scenarios.ttl` | I01–I05 (I03–I04: objetivo de las intervenciones en una progresión; I05: Evans et al. (1997), sumatriptán frente a cafeína/ergotamina) |
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
 | `OSDi_test_tree_malformed.ttl` | N01–N05, N07–N12, N14–N34 (casos que deben lanzar excepción; N13 volvió a ser P26 y N06, P56) |
 

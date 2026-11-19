@@ -599,6 +599,22 @@ public final class DecisionTreeCatalog {
         cases.add(tc(SCENARIOS, "TT_I04_Experiment", "Interventions whose target is a development: the tree starts with the patients that present it and only includes its own manifestations",
                 leaves("TT_I04_", leaf(0.5, "DevA", "ManY"), leaf(0.5, "DevA")),
                 outcomes(94875.0, 55.0, 39.6), outcomes(89375.0, 55.0, 39.6)));
+        // Evans et al. (1997), sumatriptan versus caffeine/ergotamine for a migraine attack (phase 12). Horizon of 24 hours (1/365 years), no discount, base utility 1,
+        // costs in CAD of 1997. Each arm replaces the treatment of the attack (the target) by its drug: dose c, no relief f (1.3/365 QALYs), followed by a rescue at
+        // home (0.92) or in the emergency department (0.08; 63.16), whose relief has a QALY loss of -0.4/365 and whose failure (0.002) leads to a hospitalization (1093).
+        // The relief of the drug is followed by a follow-up whose failure is the relapse r (0.1/365 QALYs), followed by another dose, which always relieves.
+        // Cost = c + (1 - f) r c + 0.08 f (63.16 + 0.002 * 1093); QALY loss = 1.3 f - 0.4 * 0.08 * 0.998 f + 0.1 (1 - f) r (x 1/365).
+        // Caffeine/ergotamine (c = 1.32, f = 0.621, r = 0.297): 4.71497244; QALYs (1 - 0.798724044) / 365 = 0.201275956 / 365.
+        // Sumatriptan (c = 16.10, f = 0.442, r = 0.406): 22.05805736; QALYs 0.416860912 / 365. ICER 29363 CAD/QALY (29366 in Evans et al.)
+        cases.add(tc(SCENARIOS, "TT_I05_Experiment", "Evans et al. (1997): sumatriptan versus caffeine/ergotamine for a migraine attack, with rescue and relapse after the relief",
+                leaves("TT_I05_", leaf(0.26643700000000003, "Attack", "Cafergot_Relief", "CafergotFollowUp_NoRelapse"), leaf(0.112563, "Attack", "Cafergot_Relief", "CafergotFollowUp_Relapse"),
+                    leaf(0.57132, "Attack", "Cafergot_NoRelief", "Home"), leaf(0.04958064, "Attack", "Cafergot_NoRelief", "EmergencyDepartment", "EmergencyDepartment_Relief"),
+                    leaf(9.936000000000001e-05, "Attack", "Cafergot_NoRelief", "EmergencyDepartment", "EmergencyDepartment_NoRelief")),
+                outcomes(22.058057360000003, 0.0027397260273972603, 0.001142084690410959), outcomes(4.71497244, 0.0027397260273972603, 0.0005514409753424658))
+                .withAssessedLeaves(leaves("TT_I05_", leaf(0.331452, "Attack", "Sumatriptan_Relief", "SumatriptanFollowUp_NoRelapse"),
+                    leaf(0.22654800000000003, "Attack", "Sumatriptan_Relief", "SumatriptanFollowUp_Relapse"), leaf(0.40664, "Attack", "Sumatriptan_NoRelief", "Home"),
+                    leaf(0.03528928, "Attack", "Sumatriptan_NoRelief", "EmergencyDepartment", "EmergencyDepartment_Relief"),
+                    leaf(7.072e-05, "Attack", "Sumatriptan_NoRelief", "EmergencyDepartment", "EmergencyDepartment_NoRelief"))));
 
         // ---- Models of OSDi_test.ttl (their outcomes are checked in TestHTAExcelGeneration) ----
         cases.add(tc(BASIC, "TEST_Experiment1", "Test model 1: alternative developments",
