@@ -16,6 +16,7 @@ import es.ull.simulation.hta.params.Discount;
 import es.ull.simulation.hta.params.ParameterTemplate;
 import es.ull.simulation.hta.params.StandardParameter;
 import es.ull.simulation.hta.params.modifiers.ParameterModifier;
+import es.ull.simulation.hta.progression.DiseaseProgression;
 import es.ull.simulation.model.DiscreteEvent;
 
 /**
@@ -105,11 +106,23 @@ public abstract class Intervention extends HTAModelComponent implements Comparab
 	/**
 	 * Returns true if the one-time payoffs of this intervention (its one-time cost, {@link #getStartingCost}, and its one-time disutility,
 	 * {@link #getStartingDisutility}) are applied once, when the patient starts the simulation. Detection interventions return false, since they
-	 * apply them with each test they perform ({@link es.ull.simulation.hta.info.PatientInfo.Type#SCREEN}).
+	 * apply them with each test they perform ({@link es.ull.simulation.hta.info.PatientInfo.Type#SCREEN}), and an intervention may apply them with each
+	 * onset of a disease progression instead (see {@link #appliesOneTimePayoffsOn(DiseaseProgression)}).
 	 * @return true if the one-time payoffs of this intervention are applied when the patient starts the simulation
 	 */
 	public boolean appliesOneTimePayoffsAtStart() {
 		return true;
+	}
+
+	/**
+	 * Returns true if the one-time payoffs of this intervention (its one-time cost, {@link #getStartingCost}, and its one-time disutility,
+	 * {@link #getStartingDisutility}) apply with each onset of a disease progression ({@link es.ull.simulation.hta.info.PatientInfo.Type#START_MANIF}),
+	 * e.g., with each episode of an acute manifestation that the intervention treats. By default, false.
+	 * @param progression A disease progression
+	 * @return true if the one-time payoffs of this intervention apply with each onset of the disease progression
+	 */
+	public boolean appliesOneTimePayoffsOn(DiseaseProgression progression) {
+		return false;
 	}
 
 	@Override

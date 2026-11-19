@@ -1,17 +1,21 @@
 package es.ull.simulation.hta.osdi.des.factories;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Set;
 
 import es.ull.simulation.hta.osdi.OSDiLogger;
 import es.ull.simulation.hta.osdi.des.OSDiDESModel;
 import es.ull.simulation.hta.osdi.des.OSDiDisease;
 import es.ull.simulation.hta.osdi.des.OSDiDiseaseProgression;
+import es.ull.simulation.hta.osdi.des.TargetEpisodePathways;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.ClinicalProgressionType;
 import es.ull.simulation.hta.osdi.ontology.ClinicalProgressionWrapper;
 import es.ull.simulation.hta.osdi.ontology.DiseaseWrapper;
+import es.ull.simulation.hta.osdi.ontology.OSDiObjectProperty;
+import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleWrapper;
 import es.ull.simulation.hta.progression.DiseaseProgression;
@@ -65,12 +69,18 @@ public interface DiseaseFactory extends DESModelComponentFactory {
 		// Build progression pathways after creating all the manifestations
 		for (ClinicalProgressionWrapper progressionWrapper : progressions) {
 			final DiseaseProgression progression = disease.getDiseaseProgression(progressionWrapper.getShortName());
-			final ArrayList<DiseaseProgressionPathway> pathways = DiseaseProgressionRiskFactory.getPathwayInstances(model, (OSDiDiseaseProgression) progression);
-			// Acute manifestations never get an initial proportion in the DES (see OSDiDiseaseProgression)
-			final boolean hasInitialProportion = !ClinicalProgressionType.ACUTE_MANIFESTATION.equals(progressionWrapper.getClinicalProgressionType())
-				&& populationWrapper.getInitialProportions().containsKey(progressionWrapper);
-			if (pathways.isEmpty() && !hasInitialProportion) {
-				log.warn("The manifestation " + progressionWrapper.getShortName() + " has neither risk characterization nor initial proportion, so it will never occur in the DES.");
+			if (model.isTarget(progressionWrapper) && model.hasAcuteTarget()) {
+				createTargetEpisodePathways(model, progressionWrapper, (OSDiDiseaseProgression) progression);
+			}
+			else {
+				final ArrayList<DiseaseProgressionPathway> pathways = DiseaseProgressionRiskFactory.getPathwayInstances(model, (OSDiDiseaseProgression) progression);
+				// Acute manifestations never get an initial proportion in the DES (see OSDiDiseaseProgression). A chronic target of the interventions
+				// is present in every patient at time 0 (D1)
+				final boolean hasInitialProportion = model.isTarget(progressionWrapper) || (!ClinicalProgressionType.ACUTE_MANIFESTATION.equals(progressionWrapper.getClinicalProgressionType())
+					&& populationWrapper.getInitialProportions().containsKey(progressionWrapper));
+				if (pathways.isEmpty() && !hasInitialProportion) {
+					log.warn("The manifestation " + progressionWrapper.getShortName() + " has neither risk characterization nor initial proportion, so it will never occur in the DES.");
+				}
 			}
 			// Also include exclusions among progressions
 			final Set<ClinicalProgressionWrapper> exclusions = progressionWrapper.getSupersededProgressions();
@@ -79,5 +89,31 @@ public interface DiseaseFactory extends DESModelComponentFactory {
 			}
 		}
 		return disease;
+	}
+
+	/**
+	 * Creates the pathways of an acute manifestation that is the target of the interventions (decision D1 of docs/osdi-1.3-diseno.md): every
+	 * patient suffers an episode at time 0, and the next ones come from the frequency of the manifestation (hasFrequency) or, if it has none, from
+	 * its risk (see {@link TargetEpisodePathways}). If the manifestation defines both, its risk is ignored with a warning, since every patient
+	 * suffers its episodes.
+	 * @param model The model
+	 * @param targetWrapper The acute manifestation that the interventions target
+	 * @param target The disease progression of the acute manifestation
+	 * @throws MalformedOSDiModelException If the ontology is malformed
+	 * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
+	 */
+	private static void createTargetEpisodePathways(OSDiDESModel model, ClinicalProgressionWrapper targetWrapper, OSDiDiseaseProgression target) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+		TargetEpisodePathways.createFirstEpisodePathway(model, target);
+		final Optional<ParameterWrapper> frequency = model.getModelWrapper().getWrapperForPropertyAs(targetWrapper.getIndividualIRI(), OSDiObjectProperty.HAS_FREQUENCY, ParameterWrapper.class);
+		if (frequency.isPresent()) {
+			if (!targetWrapper.getProgressionRisks().isEmpty()) {
+				log.warn("The acute manifestation " + targetWrapper.getShortName() + ", the target of the interventions, defines both a frequency (" + frequency.get().getShortName()
+					+ ") and a risk (" + targetWrapper.getProgressionRisks() + "). Every patient suffers its episodes, so the risk is ignored and the next episodes come from the frequency.");
+			}
+			TargetEpisodePathways.createFrequencyPathway(model, target, frequency.get());
+		}
+		else if (DiseaseProgressionRiskFactory.getPathwayInstances(model, target).isEmpty()) {
+			log.warn("The acute manifestation " + targetWrapper.getShortName() + ", the target of the interventions, defines neither a frequency nor a risk, so every patient only suffers the episode at time 0.");
+		}
 	}
 }

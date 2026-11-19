@@ -412,3 +412,27 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
 - `BD.ttl` importa OSDi 1.2 en lugar de 1.0, y se quitan sus redeclaraciones locales de `affects`, `hasEffect`, `hasEffectMagnitude` (como propiedades de anotación, que chocaban con el núcleo) y de las clases `Effect`, `InstantDeathEffect` y `LifeExpectancyReductionEffect`. No tiene experimentos (está a medias), así que no había resultados que conservar ni se añaden tests: con experimentos creados en memoria, sus tres modelos (`PBD_ModelTree`, `PBD_ModelTreeDebug`, `PBD_ModelTreeFake`) se construyen y dan resultados.
 - Utilidad basal por defecto: si la población no la declara, se supone 1, con aviso. `SimpleModel` y `NBSModel` crean una sola vez el parámetro sintético `DefaultBaseUtility` (utilidad anual, no desutilidad) al construir el modelo, para que se escriba en el Excel. Antes, `getBaseUtility` fallaba con `NoSuchElementException`. Test P63 (comparador 65000; 65 años de vida; 65 AVAC).
 - `EffectWrapper.toString` devuelve el nombre del efecto: los mensajes que listan efectos (p. ej., N08) son legibles.
+
+### Fase 14: el DES y el objetivo y las estrategias de una intervención (2026-11-19, en curso)
+
+**Hecho:**
+- Refactorización sin cambios de comportamiento (commit 0): `InterventionTargets.resolve` (objetivo común de las intervenciones, con los mismos rechazos y aviso) y `StrategyReplacements` (`of` y `replaceByType`) pasan al paquete `osdi/ontology`, para que el DES use las mismas reglas que el árbol. El rechazo de etapas y manifestaciones propias de un desarrollo se queda en el generador del árbol.
+- Pagos de una vez de las intervenciones en el DES (commit 1, defecto previo): el DES nunca aplicaba el coste ni la utilidad de una vez de una intervención que no fuera de detección (los listeners solo los usaban en `SCREEN`). Ahora se aplican una vez, al inicio de la simulación (`Intervention.appliesOneTimePayoffsAtStart`); las de detección los siguen aplicando con cada prueba. Los listeners de costes tenían `START_MANIF` sin `break` hasta `START`; se separan los casos. Test D03 (`TestDESInterventionPayoffs`): 500 por paciente y −0,05 AVAC por paciente; antes fallaba con `expected: <500.0> but was: <0.0>` y `expected: <-0.05> but was: <0.0>`.
+- D1 en el DES (commit 2; la primera propuesta, que activaba la intervención en la aparición del objetivo, se rechazó: eso corresponde a un análisis de impacto presupuestario). `DESInterventionTarget` resuelve el objetivo y comprueba la población; `OSDiDESModel` lo conoce antes de construir la enfermedad.
+  - T crónica: proporción inicial 1 (sintética, con aviso, si la población no la declara; `OSDiDiseaseProgression`), así que `startAction` la pone en el estado en el tiempo 0 y emite `START_MANIF` (pagos de una vez de T en el tiempo 0, como el árbol, que los aplica en el tiempo 0 si T no tiene edad de inicio: I03).
+  - T aguda: rutas sintéticas (`TargetEpisodePathways`): un episodio en el tiempo 0 para quien aún no ha tenido ninguno y los siguientes de la frecuencia (tasa exponencial) o, si no hay, del riesgo. Pagos de una vez de la intervención en cada episodio (`Intervention.appliesOneTimePayoffsOn`, en los cuatro listeners); anuales ignorados con aviso (`OSDiIntervention`).
+  - Tests D04–D08 (`TestDESInterventionTarget`), con valores a mano: D04 (todos con ManX en el tiempo 0; coste por paciente 200 + 1000 o 1100 × años vividos; ManY desde ManX: 1 − 0,8^5 = 0,67232; aviso de la proporción supuesta), D05 (proporción inicial 0,5: `Malformed`), D06 (episodio en el tiempo 0; episodios medios 1 + 5 ln 2 = 4,4657 y, con HR 0,5, 1 + 2,5 ln 2 = 2,7329; coste 2000 o 2300 por episodio; aviso de los pagos anuales), D07 (frecuencia 2/año: 11 episodios) y D08 (desarrollo: `Unsupported`). Antes del cambio fallaron los 8 (p. ej., `expected: <5200.0> but was: <3079.45…>`, `Mean episodes ==> expected: <11.0> but was: <0.0>`, y D05 y D08 sin excepción).
+
+**Decidido:**
+- En un análisis de coste-efectividad o coste-utilidad, el tiempo 0 es el momento en que se aplica la intervención: no se activa a mitad de la simulación, y no hace falta replanificar eventos. La población describe a los pacientes en ese momento.
+- Con T aguda, los pagos de una vez de la intervención se aplican en cada episodio (cada episodio se trata). El árbol, que representa un episodio, los aplica una vez.
+- `hasFrequency` solo se lee en el DES para una T aguda; si T declara también un riesgo, el riesgo se ignora con aviso.
+- En el DES se rechazan como objetivo los desarrollos, las etapas, las manifestaciones propias de un desarrollo y los objetivos con restricción temporal.
+
+**Pendiente:**
+- El árbol mantiene la restricción temporal (edad de inicio o fin) del nodo objetivo, lo que contradice que todos presenten T en el tiempo 0.
+- `OSDiDetectionIntervention` no programa pruebas: en el DES de OSDi no hay eventos `SCREEN`, así que la sensibilidad, la especificidad y los pagos de una vez de las intervenciones de detección no se usan nunca.
+- El DES no simula las estrategias de tratamiento: la estrategia sustituida no se aplica en cada episodio de una T aguda.
+- El DES no lee la probabilidad de muerte de las progresiones (tampoco la de T en su aparición).
+- El texto de D1 («se aplica en cada aparición del objetivo») debería precisarse con la semántica del tiempo 0.
+- Puntos 2 (D2: sustituciones en el DES) y 3 (costes de las estrategias de detección) de la fase.

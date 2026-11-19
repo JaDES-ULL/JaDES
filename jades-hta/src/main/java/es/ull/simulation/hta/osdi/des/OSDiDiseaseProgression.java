@@ -155,12 +155,26 @@ public class OSDiDiseaseProgression extends DiseaseProgression {
 			paramMapping.put(StandardParameter.DISEASE_PROGRESSION_INITIAL_PROPORTION, initialProportionParam);
 		}
 	}
-	
+
+	/**
+	 * Returns true if every patient starts with this progression because it is the target of the interventions (decision D1) and the population
+	 * does not declare its initial proportion, which is then assumed to be 1 (see {@link DESInterventionTarget}). If the population declares it,
+	 * {@link DESInterventionTarget} has already checked that it is 1.
+	 * @return true if the initial proportion of this progression is assumed to be 1 because it is the target of the interventions
+	 */
+	private boolean isTargetWithAssumedInitialProportion() {
+		return getModel().isTarget(progressionWrapper) && !paramMapping.containsKey(StandardParameter.DISEASE_PROGRESSION_INITIAL_PROPORTION);
+	}
+
 	@Override
 	public void createParameters() {
 		for (ParameterTemplate paramDesc : paramMapping.keySet()) {
 			final ParameterWrapper param = paramMapping.get(paramDesc);
 			addUsedParameter(paramDesc, ParameterFactory.getParameterInstance(getModel(), param, paramDesc.getGroup()));
+		}
+		// A chronic target of the interventions is present in every patient at time 0 (D1)
+		if (!DiseaseProgression.Type.ACUTE_MANIFESTATION.equals(getType()) && isTargetWithAssumedInitialProportion()) {
+			addUsedParameter(StandardParameter.DISEASE_PROGRESSION_INITIAL_PROPORTION, "Initial proportion of the target of the interventions", "Assumption (D1)", 1.0);
 		}
 	}
 	
