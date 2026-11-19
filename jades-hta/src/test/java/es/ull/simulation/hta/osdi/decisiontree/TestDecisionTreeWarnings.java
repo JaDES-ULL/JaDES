@@ -1,6 +1,7 @@
 package es.ull.simulation.hta.osdi.decisiontree;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,16 @@ public class TestDecisionTreeWarnings {
         try (LogCapture log = LogCapture.start()) {
             DecisionTreeTestSupport.loadModel(DecisionTreeCatalog.PAYOFFS, "TT_P40_Experiment").getTree();
             assertFalse(log.containsWarning("Guideline-based strategies are not supported yet"), "Outdated warning found: " + log.getMessages());
+        }
+    }
+
+    @Test
+    @DisplayName("An intervention without target (P62) is assumed to target the disease, with a warning (D1)")
+    void warnsAboutInterventionWithoutTarget() throws Exception {
+        try (LogCapture log = LogCapture.start()) {
+            DecisionTreeTestSupport.loadModel(DecisionTreeCatalog.PAYOFFS, "TT_P62_Experiment").getTree();
+            assertTrue(log.containsWarning("The intervention TT_P62_InterventionTreat does not define its target (isInterventionOf or hasIntervention) in the model. It is assumed to target the disease TT_P62_Disease."),
+                "Warning not found: " + log.getMessages());
         }
     }
 }

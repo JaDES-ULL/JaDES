@@ -594,6 +594,11 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P61_Experiment", "The strategy fails when a development appears at 40 years (failsIf a health condition with an onset age, D5)",
                 leaves("TT_P61_", leaf(0.3, "DevA", "L1_Failure"), leaf(0.7, "L1_Success")),
                 outcomes(94150.0, 62.0, 51.65), outcomes(87950.0, 62.0, 51.65)));
+        // P62 (phase 13): the assessed intervention does not declare its target, so it targets the disease, with a warning (see TestDecisionTreeWarnings).
+        // Comparator: 65000; assessed: 65 * (1000 + 100) = 71500
+        cases.add(tc(PAYOFFS, "TT_P62_Experiment", "Intervention without target in the model: it is assumed to target the disease, with a warning",
+                leaves("TT_P62_", leaf(1.0)),
+                outcomes(71500.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
