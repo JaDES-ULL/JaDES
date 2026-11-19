@@ -42,7 +42,7 @@ Paquete `jades-hta/src/test/java/es/ull/simulation/hta/osdi/decisiontree/`:
  
 - `DecisionTreeCatalog`: catálogo de casos (`TreeCase`, `MalformedCase`) y enum `KnownIssue`.
 - `DecisionTreeTestSupport`: carga de modelos, lectura de hojas y lectura de resultados del Excel.
-- `TestDecisionTreeStructure`, `TestDecisionTreeOutcomes`, `TestDecisionTreeMalformedModels`.
+- `TestDecisionTreeStructure`, `TestDecisionTreeOutcomes`, `TestDecisionTreeMalformedModels`, `TestDecisionTreeWarnings` (avisos del generador, capturados con `es.ull.simulation.hta.osdi.LogCapture`).
 Ontologías de prueba en `jades-hta/src/test/resources/`:
  
 | Fichero | Casos |

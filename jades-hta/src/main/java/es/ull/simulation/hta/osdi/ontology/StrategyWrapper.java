@@ -14,7 +14,7 @@ import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 /**
  * Wrapper interface for OSDi Strategy elements.
  * TODO: Extend with methods to access strategy-specific properties as needed. Currently only cost and utility retrieval is supported.
- * In the case of costs, conditional strategies, chained strategies, and guideline-based strategies are not supported yet and will return an empty cost list.
+ * Conditional strategies (hasConditionExpression) are not supported yet, and chained strategies (followedByStrategy) are only used by the outcomes of a strategy (see {@link #getOutcomes()}). The costs of guidelines are computed by the decision trees (see StrategyCosts).
  */
 public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemWithCostWrapper, IModelItemWithUtilityWrapper {
     private final static OSDiLogger log = OSDiLogger.getLogger(StrategyWrapper.class);
@@ -35,7 +35,7 @@ public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemW
         log.warn(!modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.HAS_CONDITION_EXPRESSION).isEmpty(), individualIRI, OSDiObjectProperty.HAS_CONDITION_EXPRESSION, "Conditional strategies are not supported yet. They will be ignored");
         // The next strategy is only used by the outcomes of the strategy (see getOutcomes), or to confirm the positive results of a detection strategy
         log.warn(!modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.FOLLOWED_BY_STRATEGY).isEmpty() && !hasOutcomes() && !(this instanceof DetectionStrategyWrapper),individualIRI, OSDiObjectProperty.FOLLOWED_BY_STRATEGY, "Chained strategies without outcomes are not supported yet. They will be ignored");
-        log.warn(!modelWrapper.getWrappersForProperty(individualIRI, OSDiObjectProperty.HAS_GUIDELINE).isEmpty(), individualIRI, OSDiObjectProperty.HAS_GUIDELINE, "Guideline-based strategies are not supported yet. They will be ignored");    
+        // Guidelines are supported in decision trees since phase 5 (see StrategyCosts); the unsupported cases are rejected there
     }
 
     @Override
