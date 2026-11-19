@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -212,7 +214,40 @@ final class DecisionTreeTestSupport {
     }
 
     /**
-     * Generates the Excel model of a decision tree, in memory or, if {@link #WRITE_EXCEL_PROPERTY} is set, written to a file and read back
+     * Sheets of the template of the generator that do not take part in the deterministic results: the generator does not write in them, and no
+     * formula of the rest of sheets refers to them. They are removed from the template used in memory (see {@link #getReducedTemplate()}).
+     */
+    private static final List<String> SHEETS_NOT_IN_RESULTS = List.of("EVPI", "Results", "Cost-effectiveness", "Acceptability curves", "Impact of uncertainty",
+        "One-way sensitivity", "Two-way sensitivity", "Budget impact", "Weights Spain", "Heights Spain", "Mortality Spain");
+    /** The reduced template, created once from the template of the generator (see {@link #getReducedTemplate()}) */
+    private static byte[] reducedTemplate = null;
+
+    /**
+     * Returns a copy of the template of the generator without the sheets that do not take part in the deterministic results
+     * ({@link #SHEETS_NOT_IN_RESULTS}). Reading the template is the most expensive step of generating an Excel model in memory, and the reduced
+     * template takes about a third of the time. It is created once, from the template of the generator, so it follows its changes.
+     * @return The reduced template
+     * @throws Exception If the template cannot be read or written
+     */
+    private static synchronized byte[] getReducedTemplate() throws Exception {
+        if (reducedTemplate == null) {
+            try (InputStream in = HTAExcelModelFactory.getTemplate(); XSSFWorkbook template = new XSSFWorkbook(in)) {
+                for (String name : SHEETS_NOT_IN_RESULTS) {
+                    final int index = template.getSheetIndex(name);
+                    assertTrue(index >= 0, "The template of the generator has no sheet '" + name + "': update SHEETS_NOT_IN_RESULTS");
+                    template.removeSheetAt(index);
+                }
+                final ByteArrayOutputStream out = new ByteArrayOutputStream();
+                template.write(out);
+                reducedTemplate = out.toByteArray();
+            }
+        }
+        return reducedTemplate;
+    }
+
+    /**
+     * Generates the Excel model of a decision tree. By default, it is generated in memory from the reduced template (see {@link #getReducedTemplate()});
+     * if {@link #WRITE_EXCEL_PROPERTY} is set, it is generated from the template of the generator, written to a file and read back.
      * @param model A decision tree model
      * @param excelFile The file to generate, if the Excel files are written to disk
      * @return The workbook with the Excel model; the caller must close it
@@ -220,7 +255,7 @@ final class DecisionTreeTestSupport {
      */
     static Workbook generateExcel(SingleDiseaseAndPopulationModel model, Path excelFile) throws Exception {
         if (!writeExcelFiles()) {
-            return HTAExcelModelFactory.createWorkbook(model);
+            return HTAExcelModelFactory.createWorkbook(model, new ByteArrayInputStream(getReducedTemplate()));
         }
         HTAExcelModelFactory.build(excelFile.toString(), model);
         assertTrue(Files.exists(excelFile) && Files.size(excelFile) > 0, "Excel was not generated: " + excelFile);

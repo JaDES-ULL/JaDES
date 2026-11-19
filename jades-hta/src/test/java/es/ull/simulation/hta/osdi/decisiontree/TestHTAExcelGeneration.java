@@ -8,31 +8,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
-import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import es.ull.simulation.hta.osdi.ontology.ExperimentWrapper;
 import es.ull.simulation.hta.osdi.ontology.OSDiTest;
-import es.ull.simulation.hta.osdi.ontology.OSDiWrapper;
 import es.ull.simulation.hta.CamelCaseDisplayNameGenerator;
 import es.ull.simulation.hta.osdi.decisiontree.excelport.HTAExcelModelFactory;
-import es.ull.simulation.hta.osdi.decisiontree.factories.CentralModelFactory;
 import es.ull.simulation.hta.osdi.decisiontree.factories.SimpleModel;
 import es.ull.simulation.hta.osdi.decisiontree.nbsdecisiontree.NBSModel;
 import es.ull.simulation.utils.ExcelTools;
@@ -136,38 +130,46 @@ public class TestHTAExcelGeneration {
         );
     }
 
+    /**
+     * Experiments whose Excel file is always written to disk and read back, to check the writing of the file. The rest of the Excel models are
+     * generated in memory from the template of the generator, unless the property jades.tests.excel (or keepExcel) is set.
+     */
+    private static final Set<String> WRITTEN_TO_DISK = Set.of("TEST_Experiment1", "PBD_ExperimentBase");
+
     @TempDir
     Path tempDir;
-
-    @BeforeAll
-    void setup() {
-        CentralModelFactory.register(NBSModel.getFactory());
-        CentralModelFactory.register(SimpleModel.getFactory());
-    }
 
     @ParameterizedTest(name = "[{index}] generate {0}")
     @MethodSource("cases")
     @OSDiTest
     @DisplayName("HTA Excel creation test")
     void generateExcels(DecisionTreeExcelCase tc) throws Exception {
-        OWLOntologyDocumentSource source = new StreamDocumentSource(Objects.requireNonNull(
-                getClass().getResourceAsStream(tc.ontologyResource()), "Ontology file not found in resources: " + tc.ontologyResource()));
-        final OSDiWrapper wrapper = new OSDiWrapper.Builder().build(source);
-        final ExperimentWrapper experimentWrapper = wrapper.buildExperiment(wrapper.toIRI(tc.modelName()));
-        Model tempModel = CentralModelFactory.create(experimentWrapper);
-        assertTrue(tempModel instanceof SingleDiseaseAndPopulationModel, "The model created is not of the expected type SingleDiseaseAndPopulationModel. Found: " + tempModel.getClass().getSimpleName());
-        assertTrue(tc.expectedClass().isInstance(tempModel), "The model is expected to be an instance of " + tc.expectedClass().getSimpleName() + ", but got " + tempModel.getClass().getSimpleName());
-        SingleDiseaseAndPopulationModel model = (SingleDiseaseAndPopulationModel) tempModel;
-        Path out = tempDir.resolve(tc.excelFileName());
-        assertDoesNotThrow(() -> HTAExcelModelFactory.build(out.toString(), model));
-        assertTrue(Files.exists(out), "Excel was not generated: " + out);
-        assertTrue(Files.size(out) > 0, "Excel is empty: " + out);
-        maybeKeepForManualReview(out, tc.excelFileName());
-        try (InputStream fis = Files.newInputStream(out); XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
+        // The ontologies are loaded once (see DecisionTreeTestSupport.loadModel)
+        final SingleDiseaseAndPopulationModel model = DecisionTreeTestSupport.loadModel(tc.ontologyResource(), tc.modelName());
+        assertTrue(tc.expectedClass().isInstance(model), "The model is expected to be an instance of " + tc.expectedClass().getSimpleName() + ", but got " + model.getClass().getSimpleName());
+        try (XSSFWorkbook workbook = generateWorkbook(tc, model)) {
             final FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
             for (ToCheckExcel check : tc.checks()) {
                 check.checkValue(workbook, evaluator);
             }
+        }
+    }
+
+    /**
+     * Generates the Excel model of a case from the template of the generator: written to disk and read back for the experiments of
+     * {@link #WRITTEN_TO_DISK}, or for all of them if the property jades.tests.excel or keepExcel is set; in memory otherwise.
+     */
+    private XSSFWorkbook generateWorkbook(DecisionTreeExcelCase tc, SingleDiseaseAndPopulationModel model) throws Exception {
+        if (!WRITTEN_TO_DISK.contains(tc.modelName()) && !DecisionTreeTestSupport.writeExcelFiles() && !Boolean.getBoolean("keepExcel")) {
+            return (XSSFWorkbook) HTAExcelModelFactory.createWorkbook(model);
+        }
+        final Path out = tempDir.resolve(tc.excelFileName());
+        assertDoesNotThrow(() -> HTAExcelModelFactory.build(out.toString(), model));
+        assertTrue(Files.exists(out), "Excel was not generated: " + out);
+        assertTrue(Files.size(out) > 0, "Excel is empty: " + out);
+        maybeKeepForManualReview(out, tc.excelFileName());
+        try (InputStream fis = Files.newInputStream(out)) {
+            return new XSSFWorkbook(fis);
         }
     }
 

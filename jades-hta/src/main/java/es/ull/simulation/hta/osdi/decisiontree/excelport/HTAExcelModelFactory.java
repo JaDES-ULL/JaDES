@@ -86,18 +86,39 @@ public class HTAExcelModelFactory {
     private final int treeDepth;
 
     /**
-     * Creates the workbook of the HTA model from the template, and fills its sheets. The workbook is kept in memory: it is written to a file by
-     * {@link #build(String, SingleDiseaseAndPopulationModel)}.
+     * Creates the workbook of the HTA model from the template of the generator, and fills its sheets. The workbook is kept in memory: it is
+     * written to a file by {@link #build(String, SingleDiseaseAndPopulationModel)}.
      * @param model The OSDiTreeModel to be used.
      * @throws IOException If there is an error reading the template.
      * @throws UnsupportedOSDiFeatureException
      * @throws MalformedOSDiModelException
      */
     private HTAExcelModelFactory(SingleDiseaseAndPopulationModel model) throws IOException, MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
-        try (InputStream in = getClass().getResourceAsStream(PATH_TO_TEMPLATE)) {
-            if (in == null) {
-                throw new IllegalStateException("Resource not found: " + PATH_TO_TEMPLATE);
-            }
+        this(model, openTemplate());
+    }
+
+    /**
+     * Opens the template of the generator.
+     * @return The stream of the template; the caller must close it
+     */
+    private static InputStream openTemplate() {
+        final InputStream in = HTAExcelModelFactory.class.getResourceAsStream(PATH_TO_TEMPLATE);
+        if (in == null) {
+            throw new IllegalStateException("Resource not found: " + PATH_TO_TEMPLATE);
+        }
+        return in;
+    }
+
+    /**
+     * Creates the workbook of the HTA model from a template, and fills its sheets. The workbook is kept in memory.
+     * @param model The OSDiTreeModel to be used.
+     * @param template The template; it is closed after reading it.
+     * @throws IOException If there is an error reading the template.
+     * @throws UnsupportedOSDiFeatureException
+     * @throws MalformedOSDiModelException
+     */
+    private HTAExcelModelFactory(SingleDiseaseAndPopulationModel model, InputStream template) throws IOException, MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        try (InputStream in = template) {
             this.workbook = new XSSFWorkbook(in);
         }
         try {
@@ -251,5 +272,29 @@ public class HTAExcelModelFactory {
      */
     public static Workbook createWorkbook(SingleDiseaseAndPopulationModel model) throws IOException, MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         return new HTAExcelModelFactory(model).getWorkbook();
+    }
+
+    /**
+     * Generates the Excel model for the HTA decision tree in memory from another template, without writing it to a file. The template must contain
+     * the sheets and named ranges that the generator fills (Control, Style templates, Parameters, Model, Process and the CPI table); e.g., the tests
+     * use a copy of the template of the generator without the sheets that do not take part in the deterministic results, since reading the
+     * template is the most expensive step of {@link #createWorkbook(SingleDiseaseAndPopulationModel)}. The caller must close the workbook.
+     * @param model The decision tree model
+     * @param template The template; it is closed after reading it
+     * @return The workbook with the Excel model, ready to evaluate its formulas
+     * @throws IOException If there is an error reading the template
+     * @throws MalformedOSDiModelException If the OSDi model is malformed
+     * @throws UnsupportedOSDiFeatureException If the OSDi model uses features not supported by decision trees
+     */
+    public static Workbook createWorkbook(SingleDiseaseAndPopulationModel model, InputStream template) throws IOException, MalformedSimulationModelException, MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        return new HTAExcelModelFactory(model, template).getWorkbook();
+    }
+
+    /**
+     * Returns the template of the generator, to be used, e.g., as the base of another template (see {@link #createWorkbook(SingleDiseaseAndPopulationModel, InputStream)}).
+     * @return The stream of the template; the caller must close it
+     */
+    public static InputStream getTemplate() {
+        return openTemplate();
     }
 }

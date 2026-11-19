@@ -20,7 +20,7 @@ mvn -pl jades-hta -am test -DexcludedGroups=known-issue
 mvn -pl jades-hta -am test -Djades.tests.excel=true
 ```
 
-Los tests de árboles cargan cada ontología una sola vez (`DecisionTreeTestSupport.loadModel`) y evalúan el Excel en memoria (`HTAExcelModelFactory.createWorkbook`): las fórmulas son las mismas, pero no se escribe ni se relee el fichero, que era lo más lento. `TestHTAExcelGeneration` sigue escribiendo los ficheros, como prueba de la escritura.
+Los tests de árboles cargan cada ontología una sola vez (`DecisionTreeTestSupport.loadModel`) y evalúan el Excel en memoria (`HTAExcelModelFactory.createWorkbook`), sin escribir ni releer el fichero. Por defecto usan una copia reducida de la plantilla, generada una vez a partir de la de producción sin las hojas que no intervienen en los resultados deterministas (`DecisionTreeTestSupport.SHEETS_NOT_IN_RESULTS`: EVPI, gráficos, sensibilidad, impacto presupuestario y tablas de población), porque leer la plantilla completa era lo más lento. Con `-Djades.tests.excel=true` se usa la plantilla completa y se escriben los ficheros. `TestHTAExcelGeneration` usa siempre la plantilla completa y escribe a disco dos casos (`TEST_Experiment1` y `PBD_ExperimentBase`; todos con la propiedad o con `-DkeepExcel=true`). Tras cambiar la plantilla (`model_template.xlsm`), ejecutar también los tests con `-Djades.tests.excel=true`.
  
 ## Cómo trabajar
  
