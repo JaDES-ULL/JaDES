@@ -389,4 +389,13 @@ public class EffectWrapper extends BaseModelItemWrapper {
     public Optional<ParameterWrapper> getCost() {
         return cost;
     }
+
+	/**
+	 * Returns the name of the effect, so that the messages that list effects are readable
+	 * @return The short name of the effect
+	 */
+	@Override
+	public String toString() {
+		return getShortName();
+	}
 }

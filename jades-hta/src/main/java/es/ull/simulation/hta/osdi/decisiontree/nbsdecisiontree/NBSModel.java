@@ -37,6 +37,9 @@ import es.ull.simulation.ontology.OWLOntologyWrapper.InstanceCheckMode;
  * Currently, it supports exactly two interventions: one for screening and one for no screening, i.e., clinical diagnosis.
  */
 public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationModel {
+
+    /** The base utility assumed if the population does not declare one (1), created the first time it is needed (see {@link #getBaseUtility()}) */
+    private ParameterWrapper defaultBaseUtility = null;
     /**
      * Newborn screening models represent newborns: if the population does not declare an age, an initial age of 0 is assumed (exception to decision D10,
      * which assumes 18 years in the rest of models).
@@ -107,6 +110,8 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
         else {
             this.lifeExpectancyParameter = lifeExpectancyParamOpt.get();
         }
+        // The default base utility, if needed, is created now, so that it is registered before the parameters are written in the Excel file
+        getBaseUtility();
         
         diseaseWrapper = modelWrapper.getDiseaseIndividuals().iterator().next();
         diseaseGenerator = new DiseaseSubTreeGenerator(this, diseaseWrapper);
@@ -294,9 +299,13 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
         final Set<ParameterWrapper> utilityParams = populationWrapper.getUtilities();
         ParameterWrapper utilityParam = null;
         if (utilityParams.isEmpty()) {
-            log.warn("No utility parameter defined for the population of the model. A synthetic parameter will be created for it.");
-            utilityParam = new ParameterWrapper.SyntheticBuilder(getModelWrapper(), "FakePopulationUtility", new DeterministicParameterData(1)).build();
-            getModelWrapper().registerSyntheticModelItem(utilityParam);
+            // A population without base utility is assumed to be in perfect health (base utility 1). The synthetic parameter is created only once
+            if (defaultBaseUtility == null) {
+                log.warn("No utility parameter defined for the population of the model. A base utility of 1 is assumed.");
+                defaultBaseUtility = new ParameterWrapper.SyntheticBuilder(getModelWrapper(), "DefaultBaseUtility", new DeterministicParameterData(1.0)).buildAsUtility(false, false);
+                getModelWrapper().registerSyntheticModelItem(defaultBaseUtility);
+            }
+            return defaultBaseUtility;
         }
         else if (utilityParams.size() > 1) {
             log.warn("More than one utility parameter defined for the population of the model. The following parameters were found: " + utilityParams + ". Only the first will be used.");

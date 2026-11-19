@@ -607,6 +607,10 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P62_Experiment", "Intervention without target in the model: it is assumed to target the disease, with a warning",
                 leaves("TT_P62_", leaf(1.0)),
                 outcomes(71500.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
+        // P63: the population does not declare a base utility, so a base utility of 1 is assumed, with a warning. Comparator: 65000; QALYs 65. Assessed: 71500
+        cases.add(tc(PAYOFFS, "TT_P63_Experiment", "Population without base utility: a base utility of 1 is assumed, with a warning",
+                leaves("TT_P63_", leaf(1.0)),
+                outcomes(71500.0, 65.0, 65.0), outcomes(65000.0, 65.0, 65.0)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.

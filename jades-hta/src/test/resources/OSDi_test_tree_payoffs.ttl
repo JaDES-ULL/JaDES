@@ -8615,4 +8615,54 @@ osdi:TT_P62_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P62. Intervention without target in the model: it is assumed to target the disease, with a warning." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P63_Population
+osdi:TT_P63_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TT_PopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasLifeExpectancy osdi:TT_LifeExpectancy ;
+    osdi:hasSex osdi:TT_PopulationSex ;
+    osdi:hasDescription "Population of 20 years old with 65 remaining years of life and without base utility" ;
+    osdi:includedByModel osdi:TT_P63_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P63_Disease
+osdi:TT_P63_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P63_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P63_Experiment
+osdi:TT_P63_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P63_Model ;
+    osdi:hasDescription "Population without base utility: a base utility of 1 is assumed, with a warning." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P63_Model
+osdi:TT_P63_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P63_Population ,
+        osdi:TT_P63_Disease ;
+    osdi:hasDescription "P63. Population without base utility: a base utility of 1 is assumed, with a warning." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees
