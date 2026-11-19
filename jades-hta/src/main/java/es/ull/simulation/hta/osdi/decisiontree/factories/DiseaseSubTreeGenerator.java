@@ -2,8 +2,6 @@ package es.ull.simulation.hta.osdi.decisiontree.factories;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,8 +23,7 @@ import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.HealthConditionWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWrapper;
-import es.ull.simulation.hta.osdi.ontology.InterventionWrapper;
-import es.ull.simulation.hta.osdi.ontology.ModelWrapper;
+import es.ull.simulation.hta.osdi.ontology.InterventionTargets;
 import es.ull.simulation.hta.osdi.ontology.OSDiClass;
 import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
 import es.ull.simulation.hta.osdi.ontology.OSDiObjectProperty;
@@ -38,6 +35,7 @@ import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleType;
 import es.ull.simulation.hta.osdi.ontology.ProgressionCombinationRuleWrapper;
 import es.ull.simulation.hta.osdi.ontology.ResourceUsageSKOSCategory;
+import es.ull.simulation.hta.osdi.ontology.StrategyReplacements;
 import es.ull.simulation.hta.osdi.ontology.StrategyWrapper;
 import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
 
@@ -118,85 +116,20 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
     }
 
     /**
-     * Resolves the common target of the interventions of the model (D1 in docs/osdi-1.3-diseno.md): the health condition to which they are applied.
-     * <p>
-     * The target of an intervention is read from isInterventionOf and from its inverse, hasIntervention, since the reasoner does not infer inverse
-     * properties. Only the targets included in the model are considered: the ontology states that every intervention has exactly one target, but
-     * the same intervention individual may be shared by several models. Hence:
-     * <ul>
-     * <li>An intervention without target in the model is assumed to target the disease of the model, with a warning.</li>
-     * <li>An intervention with more than one target in the model is malformed.</li>
-     * <li>The target must be the disease of the model or one of its progressions; otherwise, the model is malformed.</li>
-     * <li>The compared interventions must have the same target; otherwise, the model is malformed.</li>
-     * </ul>
-     * Stages and manifestations that depend on a development are not supported as targets in decision trees: a patient that presents a manifestation
-     * of a development also presents the development, but the manifestation may depend on several developments.
-     * </p>
+     * Resolves the common target of the interventions of the model (D1 in docs/osdi-1.3-diseno.md) with {@link InterventionTargets#resolve}, and
+     * checks that decision trees support it. Stages and manifestations that depend on a development are not supported as targets in decision trees:
+     * a patient that presents a manifestation of a development also presents the development, but the manifestation may depend on several developments.
      * @return The clinical progression element that the interventions target, or an empty optional if they target the disease.
      * @throws MalformedOSDiModelException If an intervention has more than one target, its target does not belong to the disease of the model, or the
      * interventions have different targets.
      * @throws UnsupportedOSDiFeatureException If the target is a stage or a manifestation that depends on a development.
      */
     private Optional<ClinicalProgressionWrapper> resolveInterventionTarget() throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
-        final ModelWrapper modelWrapper = parentTreeModel.getExperimentWrapper().getModelWrapper();
-        final IRI diseaseIRI = diseaseWrapper.getIndividualIRI();
-        // The health conditions that may be targeted: the disease and its progressions
-        final Map<IRI, ClinicalProgressionWrapper> progressions = new LinkedHashMap<>();
-        for (ClinicalProgressionWrapper progression : diseaseWrapper.getDevelopments()) {
-            progressions.put(progression.getIndividualIRI(), progression);
+        final Optional<ClinicalProgressionWrapper> resolved = InterventionTargets.resolve(parentTreeModel.getExperimentWrapper().getModelWrapper(), diseaseWrapper);
+        if (resolved.isEmpty()) {
+            return resolved;
         }
-        for (ClinicalProgressionWrapper progression : diseaseWrapper.getManifestations()) {
-            progressions.put(progression.getIndividualIRI(), progression);
-        }
-        for (ClinicalProgressionWrapper progression : diseaseWrapper.getStages()) {
-            progressions.put(progression.getIndividualIRI(), progression);
-        }
-        final List<IRI> healthConditions = new ArrayList<>();
-        healthConditions.add(diseaseIRI);
-        healthConditions.addAll(progressions.keySet());
-
-        IRI commonTarget = null;
-        InterventionWrapper firstIntervention = null;
-        for (InterventionWrapper intervention : new TreeSet<>(modelWrapper.getInterventionIndividuals())) {
-            final IRI interventionIRI = intervention.getIndividualIRI();
-            final Set<IRI> targets = new LinkedHashSet<>();
-            for (IModelItemWrapper target : modelWrapper.getWrappersForProperty(interventionIRI, OSDiObjectProperty.IS_INTERVENTION_OF)) {
-                targets.add(target.getIndividualIRI());
-            }
-            for (IRI healthCondition : healthConditions) {
-                for (IModelItemWrapper item : modelWrapper.getWrappersForProperty(healthCondition, OSDiObjectProperty.HAS_INTERVENTION)) {
-                    if (item.getIndividualIRI().equals(interventionIRI)) {
-                        targets.add(healthCondition);
-                    }
-                }
-            }
-            final IRI target;
-            if (targets.isEmpty()) {
-                log.warn("The intervention " + intervention.getShortName() + " does not define its target (isInterventionOf or hasIntervention) in the model. It is assumed to target the disease " + diseaseWrapper.getShortName() + ".");
-                target = diseaseIRI;
-            }
-            else if (targets.size() > 1) {
-                throw new MalformedOSDiModelException("The intervention " + intervention.getShortName() + " defines more than one target in the model: " + targets + ". Every intervention must have exactly one target.");
-            }
-            else {
-                target = targets.iterator().next();
-            }
-            if (!target.equals(diseaseIRI) && !progressions.containsKey(target)) {
-                throw new MalformedOSDiModelException("The target " + target + " of the intervention " + intervention.getShortName() + " is neither the disease " + diseaseWrapper.getShortName() + " nor one of its progressions.");
-            }
-            if (commonTarget == null) {
-                commonTarget = target;
-                firstIntervention = intervention;
-            }
-            else if (!commonTarget.equals(target)) {
-                throw new MalformedOSDiModelException("The compared interventions must have the same target, but " + firstIntervention.getShortName() + " targets " + commonTarget
-                    + " and " + intervention.getShortName() + " targets " + target + ".");
-            }
-        }
-        if (commonTarget == null || commonTarget.equals(diseaseIRI)) {
-            return Optional.empty();
-        }
-        final ClinicalProgressionWrapper target = progressions.get(commonTarget);
+        final ClinicalProgressionWrapper target = resolved.get();
         if (ClinicalProgressionType.STAGE.equals(target.getClinicalProgressionType())) {
             throw new UnsupportedOSDiFeatureException("The interventions of the model target the stage " + target.getShortName() + ". Stages are not supported in decision trees.");
         }
@@ -206,7 +139,7 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
                     + ". A manifestation that depends on a development is not supported as the target of the interventions in decision trees.");
             }
         }
-        return Optional.of(target);
+        return resolved;
     }
 
     @Override
@@ -254,55 +187,15 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
     /**
      * Returns the strategies of a health condition in the current arm of the tree. A strategy replacement of the intervention of the arm acts by type
      * of strategy (detection, i.e. screening or diagnosis; follow-up; or treatment): each replacement strategy replaces the strategies of its type
-     * that the health condition declares, or it is assigned to the health condition if it had none of that type. The strategies of other types are kept.
+     * that the health condition declares, or it is assigned to the health condition if it had none of that type. The strategies of other types are kept
+     * (see {@link StrategyReplacements#replaceByType(Set, Set)}).
      * @param healthCondition A health condition (the disease or one of its progressions)
      * @return The strategies of the health condition in the current arm.
      * @throws MalformedOSDiModelException If the OSDi model is malformed
      * @throws UnsupportedOSDiFeatureException If an unsupported OSDi feature is encountered
      */
     private Set<StrategyWrapper> getArmStrategies(HealthConditionWrapper healthCondition) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
-        return replaceByType(healthCondition.getStrategies(), armReplacements.get(healthCondition.getIndividualIRI()));
-    }
-
-    /**
-     * Applies a strategy replacement by type of strategy (detection, i.e. screening or diagnosis; follow-up; or treatment): each replacement
-     * strategy replaces the strategies of its type, or it is added if there was none of that type. The strategies of other types are kept.
-     * @param originalStrategies The strategies of a health condition
-     * @param replacement The replacement strategies, or null if there is no replacement
-     * @return The strategies after the replacement
-     */
-    public static Set<StrategyWrapper> replaceByType(Set<StrategyWrapper> originalStrategies, Set<StrategyWrapper> replacement) {
-        final Set<StrategyWrapper> strategies = new TreeSet<>(originalStrategies);
-        if (replacement == null) {
-            return strategies;
-        }
-        final Set<StrategyKind> replacedKinds = new TreeSet<>();
-        for (StrategyWrapper strategy : replacement) {
-            replacedKinds.add(StrategyKind.of(strategy));
-        }
-        strategies.removeIf(strategy -> replacedKinds.contains(StrategyKind.of(strategy)));
-        strategies.addAll(replacement);
-        return strategies;
-    }
-
-    /**
-     * The types of strategy used to decide which strategies a strategy replacement replaces.
-     */
-    private enum StrategyKind {
-        DETECTION, FOLLOW_UP, TREATMENT;
-
-        static StrategyKind of(StrategyWrapper strategy) {
-            switch (strategy.getStrategyType()) {
-                case DIAGNOSIS_STRATEGY:
-                case SCREENING_STRATEGY:
-                    return DETECTION;
-                case FOLLOW_UP_STRATEGY:
-                    return FOLLOW_UP;
-                case LINE_OF_THERAPY:
-                default:
-                    return TREATMENT;
-            }
-        }
+        return StrategyReplacements.replaceByType(healthCondition.getStrategies(), armReplacements.get(healthCondition.getIndividualIRI()));
     }
 
     /**

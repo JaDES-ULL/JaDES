@@ -11,8 +11,6 @@ import org.semanticweb.owlapi.model.IRI;
 import es.ull.simulation.hta.osdi.decisiontree.BranchDestinationNode;
 import es.ull.simulation.hta.osdi.decisiontree.StrategyCosts;
 import es.ull.simulation.hta.osdi.decisiontree.StrategyCosts.GuidelineCost;
-import es.ull.simulation.hta.osdi.decisiontree.factories.DiseaseSubTreeGenerator;
-import es.ull.simulation.hta.osdi.decisiontree.factories.SimpleInterventionGenerator;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.DetectionInterventionWrapper;
@@ -21,6 +19,7 @@ import es.ull.simulation.hta.osdi.ontology.DiseaseWrapper;
 import es.ull.simulation.hta.osdi.ontology.InterventionType;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.ResourceUsageSKOSCategory;
+import es.ull.simulation.hta.osdi.ontology.StrategyReplacements;
 import es.ull.simulation.hta.osdi.ontology.StrategyType;
 import es.ull.simulation.hta.osdi.ontology.StrategyWrapper;
 
@@ -28,7 +27,7 @@ import es.ull.simulation.hta.osdi.ontology.StrategyWrapper;
  * The detection strategies of an arm of a newborn screening model, and the costs they produce (decision D2 of docs/osdi-1.3-diseno.md).
  * <p>
  * The detection strategies of an arm are those of the disease after applying the strategy replacements of the intervention of the arm, by type of
- * strategy (see {@link DiseaseSubTreeGenerator#replaceByType(Set, Set)}). A screening intervention usually replaces the detection strategies of the
+ * strategy (see {@link StrategyReplacements#replaceByType(Set, Set)}). A screening intervention usually replaces the detection strategies of the
  * disease with a group of a screening strategy and a diagnosis strategy. An arm may have at most one screening strategy and one diagnosis strategy,
  * and the arm without screening cannot have a screening strategy. A detection strategy that declares the disease it detects (detects) must detect the
  * disease of the model.
@@ -73,8 +72,8 @@ public final class NBSDetectionArm {
      */
     NBSDetectionArm(NBSModel model, DetectionInterventionWrapper intervention, Set<ParameterWrapper> ownDiagnosisCosts) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         final DiseaseWrapper disease = model.getDiseaseWrapper();
-        this.replacements = SimpleInterventionGenerator.getStrategyReplacements(intervention);
-        final Set<StrategyWrapper> strategies = DiseaseSubTreeGenerator.replaceByType(disease.getStrategies(), replacements.get(disease.getIndividualIRI()));
+        this.replacements = StrategyReplacements.of(intervention);
+        final Set<StrategyWrapper> strategies = StrategyReplacements.replaceByType(disease.getStrategies(), replacements.get(disease.getIndividualIRI()));
         this.screeningStrategy = getDetectionStrategy(intervention, disease, strategies, StrategyType.SCREENING_STRATEGY);
         this.diagnosisStrategy = getDetectionStrategy(intervention, disease, strategies, StrategyType.DIAGNOSIS_STRATEGY);
         this.ownDiagnosisCosts = ownDiagnosisCosts;
