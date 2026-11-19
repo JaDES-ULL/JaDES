@@ -204,3 +204,7 @@ The DES does not simulate developments or combination rules yet. A possible corr
 - The payoffs of a development are annual payoffs while the patient has it.
 - The risk of a manifestation of a development only applies to patients with such development.
 - A manifestation without risk has an initial proportion of 1 in its context.
+
+## jades-hta: Update of costs in decision trees
+
+The Excel file updates each cost to the year of the study with the CPI table of the template (`ROUND(1000*CPI(study)/CPI(year), 0)/1000`). A cost of the year of the study is not updated, since its factor is 1 (`ParamSheet.updateCost`). The CPI table of the template is the Spanish one, from 2002 to 2026: a study of another year can only be built if all its costs are of that year (P57, costs in Canadian dollars of 1997), and updating costs in another currency is only approximate.

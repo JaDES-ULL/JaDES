@@ -7918,4 +7918,76 @@ osdi:TT_P56_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P56. Acute manifestation characterized only by a frequency (2 episodes per year, horizon of 5 years): always present, with the expected number of episodes." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P57_DiseaseCost
+osdi:TT_P57_DiseaseCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_CanadianDollar ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the disease (CAD of 1997)" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "1997"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P57_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P57_TreatCost
+osdi:TT_P57_TreatCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_CanadianDollar ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the intervention (CAD of 1997)" ;
+    osdi:hasExpectedValue "100.0"^^xsd:double ;
+    osdi:hasYear "1997"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P57_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P57_InterventionTreat
+osdi:TT_P57_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_P57_TreatCost ;
+    osdi:hasDescription "Intervention with costs in CAD of 1997" ;
+    osdi:includedByModel osdi:TT_P57_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P57_Disease
+osdi:TT_P57_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_P57_DiseaseCost ;
+    osdi:hasIntervention osdi:TT_P57_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P57_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P57_Experiment
+osdi:TT_P57_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P57_Model ;
+    osdi:hasDescription "Costs in Canadian dollars of 1997, the year of the study: they are not updated with the CPI." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "1997"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P57_Model
+osdi:TT_P57_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P57_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_InterventionNone ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_P57_DiseaseCost ,
+        osdi:TT_P57_TreatCost ,
+        osdi:TT_P57_InterventionTreat ,
+        osdi:TT_P57_Disease ;
+    osdi:hasDescription "P57. Costs in Canadian dollars of 1997, the year of the study: they are not updated with the CPI." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

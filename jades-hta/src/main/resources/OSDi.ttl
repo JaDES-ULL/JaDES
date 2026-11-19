@@ -3987,6 +3987,15 @@ osdi:Constant_Specificity1 rdf:type owl:NamedIndividual ,
                            osdi:hasExpectedValue "1.0"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#Currency_CanadianDollar
+osdi:Currency_CanadianDollar rdf:type owl:NamedIndividual ,
+                                      osdi:Currency ;
+                             osdi:hasDescription "Official currency of Canada" ;
+                             osdi:hasRefToWikidata "wiki:Q1104069" ;
+                             osdi:hasUnit "C$" ;
+                             rdfs:label "Canadian dollar"@en ,
+                                        "Dólar canadiense"@es .
+
 ###  https://w3id.org/ontologies-ULL/OSDi#Currency_Dollar
 osdi:Currency_Dollar rdf:type owl:NamedIndividual ,
                               osdi:Currency ;

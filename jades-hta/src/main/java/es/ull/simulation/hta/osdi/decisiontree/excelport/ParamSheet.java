@@ -213,7 +213,7 @@ public class ParamSheet implements SheetWrapper {
                     liveValueFormula = newRow.getCell(ColumnNames.DETERMINISTIC_VALUE.getColIndex()).getReference();
                 }
                 if (ParameterGroup.COST.equals(type)) {
-                    liveValueFormula = FormulaLibrary.UPDATE_COST.getFormula(liveValueFormula, newRow.getCell(ColumnNames.YEAR.getColIndex()).getReference());
+                    liveValueFormula = updateCost(liveValueFormula, param, newRow);
                 }
                 ColumnNames.LIVE_VALUE.getOrCreateCell(newRow).setCellFormula(liveValueFormula);
                 break;
@@ -227,7 +227,7 @@ public class ParamSheet implements SheetWrapper {
                 ColumnNames.DIST_PARAM2.getOrCreateCell(newRow).setBlank();
                 liveValueFormula = newRow.getCell(ColumnNames.DETERMINISTIC_VALUE.getColIndex()).getReference();
                 if (ParameterGroup.COST.equals(type)) {
-                    liveValueFormula = FormulaLibrary.UPDATE_COST.getFormula(liveValueFormula, newRow.getCell(ColumnNames.YEAR.getColIndex()).getReference());
+                    liveValueFormula = updateCost(liveValueFormula, param, newRow);
                 }
                 ColumnNames.LIVE_VALUE.getOrCreateCell(newRow).setCellFormula(liveValueFormula);
                 break;
@@ -254,6 +254,23 @@ public class ParamSheet implements SheetWrapper {
         }
         nameLiveValueCell(newRow);
         firstAvailableParamRow++;   
+    }
+
+    /**
+     * Returns the formula of a cost updated to the year of the study with the consumer price index (CPI table of the template). A cost of the year
+     * of the study is not updated, since its factor is 1: this way, a study whose year is not in the CPI table (e.g., 1997) can be built if all
+     * its costs are of that year. The CPI table of the template is the Spanish one, so updating costs in another currency is only approximate.
+     * @param liveValueFormula The formula of the value of the cost
+     * @param param The cost parameter
+     * @param row The row of the parameter
+     * @return The formula of the updated cost
+     */
+    private String updateCost(String liveValueFormula, ParameterWrapper param, XSSFRow row) {
+        final int year = ((SpecificInformationForCost) param.getSpecificInformation()).year();
+        if (year == modelBuilder.getModel().getStudyYear()) {
+            return liveValueFormula;
+        }
+        return FormulaLibrary.UPDATE_COST.getFormula(liveValueFormula, row.getCell(ColumnNames.YEAR.getColIndex()).getReference());
     }
 
     /**

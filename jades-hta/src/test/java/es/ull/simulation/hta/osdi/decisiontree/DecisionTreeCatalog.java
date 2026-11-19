@@ -565,6 +565,11 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P56_Experiment", "Acute manifestation characterized only by a frequency (2 episodes per year, horizon of 5 years): always present, with the expected number of episodes",
                 leaves("TT_P56_", leaf(1.0, "ManA")),
                 outcomes(8500.0, 5.0, 4.25), outcomes(8000.0, 5.0, 4.25)));
+        // P57: costs in Canadian dollars of 1997, the year of the study (phase 12): they are not updated (the CPI table of the template starts in 2002).
+        // Comparator: 65 * 1000 = 65000; assessed: 65 * (1000 + 100) = 71500. No discount.
+        cases.add(tc(PAYOFFS, "TT_P57_Experiment", "Costs in Canadian dollars of 1997, the year of the study: they are not updated with the CPI",
+                leaves("TT_P57_", leaf(1.0)),
+                outcomes(71500.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.

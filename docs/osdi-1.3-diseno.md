@@ -367,3 +367,9 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
   - Antes del cambio fallaron con `Unexpected cost (comparator). Expected 67600.0 but found 65400.0` (P30), `Expected 11326.0 but found 10044.2` (P55) y el rechazo «defines a frequency … but no risk» (P56).
 - `OSDi.ttl` (sin cambiar la versión): el comentario de `hasFrequency`, en inglés y en español, describe su uso en los árboles.
 - Pendiente: los efectos de una aguda (muerte, LER) no se multiplican por los episodios.
+
+### Fase 12: Evans et al. (1997), sumatriptán frente a cafeína/ergotamina (2026-11-19)
+
+**Hecho:**
+- Comprobaciones previas: una pérdida de AVAC negativa en un resultado se acepta sin recortes (clon temporal de P43 con −0,5: 55,45 AVAC); el árbol no admitía un grupo como estrategia siguiente (no hay wrapper de `Group` ni se lee `hasProportionWithinGroup`); la tabla CPI de la plantilla solo cubre 2002–2026 (IPC español), así que un coste de 1997 daba `#N/A`; OSDi no tenía dólar canadiense.
+- Costes de 1997 en dólares canadienses: `Currency_CanadianDollar` en `OSDi.ttl` (sin cambiar la versión) y en `OSDiDataItemType`; un coste del año del estudio no se actualiza con el IPC (`ParamSheet.updateCost`; su factor ya era 1, así que los casos existentes no cambian). Test P57 (costes en CAD de 1997), que antes fallaba con `The cell with the cost (assessed) does not contain a number: #N/A`.

@@ -49,7 +49,7 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P56 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal; P53–P54: tiempo hasta el evento con horizonte; P55–P56 y P30: frecuencia de una aguda) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P57 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal; P53–P54: tiempo hasta el evento con horizonte; P55–P56 y P30: frecuencia de una aguda; P57: costes en dólares canadienses de 1997) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
 | `OSDi_test_tree_malformed.ttl` | N01–N05, N07–N12, N14–N32 (casos que deben lanzar excepción; N13 volvió a ser P26 y N06, P56) |
@@ -170,4 +170,4 @@ Convenciones:
 - OWL API 5.5.0 con `StructuralReasoner`; Apache POI 5.4.1 para el Excel.
 - `OSDiWrapper` resuelve las importaciones de SKOS y OWL-Time con copias locales (`SimpleIRIMapper`) para no depender de w3.org (error HTTP 429).
 - `OSDiWrapper.Builder.build` mapea la `owl:versionIRI` declarada en la copia local de `OSDi.ttl` al núcleo ya cargado. Si se cambia esa versión, hay que actualizar a la vez los `owl:imports` de las ontologías de prueba, o se intentará descargar la versión antigua.
-- Convención de descuento del Excel: anualidad vencida; actualización de costes con IPC: `ROUND(1000*CPI(estudio)/CPI(año), 0)/1000`.
+- Convención de descuento del Excel: anualidad vencida; actualización de costes con IPC: `ROUND(1000*CPI(estudio)/CPI(año), 0)/1000`, salvo si el año del coste es el del estudio (no se actualiza; `ParamSheet.updateCost`). La tabla CPI de la plantilla es el IPC español de 2002 a 2026: un estudio de otro año solo funciona si todos sus costes son de ese año (P57), y actualizar costes en otra moneda es aproximado.

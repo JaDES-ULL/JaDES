@@ -10,6 +10,7 @@ import org.semanticweb.owlapi.model.IRI;
  *
  */
 public enum OSDiDataItemType implements IOSDiComponentWrapper {
+	CURRENCY_CANADIAN_DOLLAR("Currency_CanadianDollar", 0.0),
 	CURRENCY_DOLLAR("Currency_Dollar", 0.0),
 	CURRENCY_EURO("Currency_Euro", 0.0),
 	CURRENCY_POUND("Currency_Pound", 0.0),
