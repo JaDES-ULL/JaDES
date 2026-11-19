@@ -49,7 +49,7 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P59 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal; P53–P54: tiempo hasta el evento con horizonte; P55–P56 y P30: frecuencia de una aguda; P57: costes en dólares canadienses de 1997; P58: grupo de estrategias alternativas como estrategia siguiente; P59: población sin edad ni sexo, D10) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P60 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal; P53–P54: tiempo hasta el evento con horizonte; P55–P56 y P30: frecuencia de una aguda; P57: costes en dólares canadienses de 1997; P58: grupo de estrategias alternativas como estrategia siguiente; P59: población sin edad ni sexo, D10; P60: población sin esperanza de vida) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I05 (I03–I04: objetivo de las intervenciones en una progresión; I05: Evans et al. (1997), sumatriptán frente a cafeína/ergotamina) |
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
 | `OSDi_test_tree_malformed.ttl` | N01–N05, N07–N12, N14–N34 (casos que deben lanzar excepción; N13 volvió a ser P26 y N06, P56) |
@@ -92,7 +92,7 @@ Convenciones:
  
 **Horizonte temporal (árbol):** `hasTimeHorizon` del experimento, en años y sin redondear (`ExperimentWrapper.getDeclaredTimeHorizon`), se escribe en el rango `timeHorizon` del Excel (`ControlSheet`). Los años de vida de cada hoja son MIN(LE de la hoja, horizonte), y con ellos se limitan los pagos anuales, los AVAC y los pagos de una vez posteriores (P51; P52: 24 horas). Sin horizonte, la vida entera (la plantilla mantiene 150). Un horizonte no positivo es `Malformed`. El DES lo redondea a años enteros (con aviso).
 
-**Población sin edad o sexo (D10):** se avisa y se suponen 18 años y un 50 % de mujeres (`PopulationWrapper.DEFAULT_AGE` y `DEFAULT_PROPORTION_OF_WOMEN`). En el árbol, la edad solo interpreta las edades de inicio y fin (P59) y el sexo no se usa (solo el aviso); el cribado neonatal supone 0 años (`NBSModel.getDefaultInitialAge`). En el DES, edad constante de 18 y sexo Bernoulli(0,5) (D02).
+**Población sin edad o sexo (D10):** se avisa y se suponen 18 años y un 50 % de mujeres (`PopulationWrapper.DEFAULT_AGE` y `DEFAULT_PROPORTION_OF_WOMEN`). En el árbol, la edad solo interpreta las edades de inicio y fin (P59) y el sexo no se usa (solo el aviso); el cribado neonatal supone 0 años (`NBSModel.getDefaultInitialAge`). En el DES, edad constante de 18 y sexo Bernoulli(0,5) (D02). Sin esperanza de vida, el árbol supone 100 años con aviso (parámetro sintético `DefaultLifeExpectancy`, P60).
 
 **Ventanas temporales:**
 - `hasOnsetAge` y `hasEndAge` son edades, no tiempos desde el inicio. Con Age0 = edad inicial de la población (si no la define, 18 con aviso, D10; 0 en el cribado neonatal) y LY = años de vida de la hoja:

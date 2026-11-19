@@ -101,7 +101,7 @@ public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationMod
         Optional<ParameterWrapper> lifeExpectancyParamOpt = populationWrapper.getLifeExpectancy();
         if (lifeExpectancyParamOpt.isEmpty()) {
             log.warn("No life expectancy parameter defined for the population of the model. A synthetic parameter will be created for it.");
-            this.lifeExpectancyParameter = new ParameterWrapper.SyntheticBuilder(modelWrapper, "FakePopulationAge", new DeterministicParameterData(100)).build();
+            this.lifeExpectancyParameter = new ParameterWrapper.SyntheticBuilder(modelWrapper, "DefaultLifeExpectancy", new DeterministicParameterData(100)).build();
             modelWrapper.registerSyntheticModelItem(lifeExpectancyParameter);
         }
         else {

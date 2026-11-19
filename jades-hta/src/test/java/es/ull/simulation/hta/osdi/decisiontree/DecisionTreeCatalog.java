@@ -583,6 +583,11 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P59_Experiment", "Population without age or sex (D10): an initial age of 18 years is assumed to interpret the onset age of a manifestation",
                 leaves("TT_P59_", leaf(0.5, "ManY"), leaf(0.5)),
                 outcomes(79125.0, 65.0, 55.25), outcomes(72625.0, 65.0, 55.25)));
+        // P60: the population does not declare a life expectancy, so a synthetic one of 100 years is assumed, with a warning. It must be written in the Excel
+        // file, like any other parameter. Comparator: 100 * 1000 = 100000; life years 100; QALYs 100 * 0.85 = 85. Assessed: + 100 * 100
+        cases.add(tc(PAYOFFS, "TT_P60_Experiment", "Population without life expectancy: a default life expectancy of 100 years is assumed, with a warning",
+                leaves("TT_P60_", leaf(1.0)),
+                outcomes(110000.0, 100.0, 85.0), outcomes(100000.0, 100.0, 85.0)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.

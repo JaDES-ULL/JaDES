@@ -285,6 +285,11 @@ public class ModelWrapper implements IIndividualWrapper {
 	 */
 	public void registerSyntheticModelItem(IModelItemWrapper item) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
 		this.registry.registerSyntheticModelItem(item);
+		// The list of parameters is built when the model is created: a synthetic parameter registered later must be added to it, so that it is
+		// written in the Excel file of a decision tree (e.g., the default life expectancy of a population that does not declare one)
+		if (item instanceof ParameterWrapper param) {
+			parameters.add(param);
+		}
 	}
 
     /**
