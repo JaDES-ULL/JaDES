@@ -66,6 +66,15 @@ public class OSDiDetectionIntervention extends OSDiIntervention {
 		return Optional.empty();
 	}
 
+	/**
+	 * The one-time payoffs (cost and disutility) of a detection intervention are applied with each test, not when the patient starts the simulation.
+	 * TODO: This class does not schedule detection events yet (see docs/osdi-1.3-diseno.md, phase 14), so such payoffs are never applied.
+	 */
+	@Override
+	public boolean appliesOneTimePayoffsAtStart() {
+		return false;
+	}
+
 	public OSDiDESModel getModel() {
 		return (OSDiDESModel) super.getModel();
 	}

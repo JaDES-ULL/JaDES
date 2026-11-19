@@ -102,6 +102,16 @@ public abstract class Intervention extends HTAModelComponent implements Comparab
 		return discountRate.applyDiscount(getUsedParameterValue(StandardParameter.ANNUAL_COST, pat), initYear, endYear);
 	}
 
+	/**
+	 * Returns true if the one-time payoffs of this intervention (its one-time cost, {@link #getStartingCost}, and its one-time disutility,
+	 * {@link #getStartingDisutility}) are applied once, when the patient starts the simulation. Detection interventions return false, since they
+	 * apply them with each test they perform ({@link es.ull.simulation.hta.info.PatientInfo.Type#SCREEN}).
+	 * @return true if the one-time payoffs of this intervention are applied when the patient starts the simulation
+	 */
+	public boolean appliesOneTimePayoffsAtStart() {
+		return true;
+	}
+
 	@Override
 	public double getStartingCost(Patient pat, double time, Discount discountRate) {
 		return discountRate.applyPunctualDiscount(getUsedParameterValue(StandardParameter.ONSET_COST, pat), time);

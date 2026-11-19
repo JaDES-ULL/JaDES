@@ -87,8 +87,13 @@ public class BudgetImpactListener extends BasicHTAListener {
 						break;
 					case START_MANIF:
 						update(pat.getnIntervention(), pInfo.getDiseaseProgression().getStartingCost(pat, endYear, Discount.ZERO_DISCOUNT), endYear);
-					case DEATH:
+						break;
 					case START:
+						// The one-time cost of the intervention is charged once, unless it is charged with each test (detection interventions)
+						if (pat.getIntervention().appliesOneTimePayoffsAtStart())
+							update(pat.getnIntervention(), pat.getIntervention().getStartingCost(pat, endYear, Discount.ZERO_DISCOUNT), endYear);
+						break;
+					case DEATH:
 						break;
 					default:
 						break;

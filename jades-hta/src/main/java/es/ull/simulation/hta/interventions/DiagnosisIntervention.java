@@ -35,6 +35,14 @@ public abstract class DiagnosisIntervention extends Intervention implements Defi
 		super(model, name, description, strategy);
 	}
 	
+	/**
+	 * The one-time payoffs (cost and disutility) of a diagnosis intervention are applied with each test
+	 */
+	@Override
+	public boolean appliesOneTimePayoffsAtStart() {
+		return false;
+	}
+
 	@Override
 	public ArrayList<DiscreteEvent> getEvents(Patient pat) {
 		final ArrayList<DiscreteEvent> eventList = new ArrayList<>();

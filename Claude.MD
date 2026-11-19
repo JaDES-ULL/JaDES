@@ -61,7 +61,7 @@ Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OS
 | `OSDi_test.ttl` | `TestOSDiCompliance`, `TestOntology`, `TestHTAExcelGeneration`, `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration` |
 | `PBD.ttl` | `TestOntology`, `TestHTAExcelGeneration` (árbol de cribado neonatal), `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration` |
 | `T1DM.ttl` | `TestOntology`, `TestLoadOntology` (DES; único modelo de prueba con `Pathway`, `requires` y `Group`) |
-| `OSDi_test_des.ttl` | `TestDESRisksAndEffects` (DES: D01, riesgos de manifestaciones y valores de los efectos de una intervención sobre ellos) y `TestDESPopulationDefaults` (D02: población sin edad ni sexo, D10) |
+| `OSDi_test_des.ttl` | `TestDESRisksAndEffects` (DES: D01, riesgos de manifestaciones y valores de los efectos de una intervención sobre ellos) `TestDESPopulationDefaults` (D02: población sin edad ni sexo, D10) y `TestDESInterventionPayoffs` (D03: coste y utilidad de una vez de una intervención terapéutica) |
 | `BD.ttl` | Ningún test la carga (no tiene experimentos; está a medias). Importa OSDi 1.2 desde la fase 13 |
 
 `TestOSDiCompliance` exige que cada constante "core" de `OSDiClass`, `OSDiObjectProperty` y `OSDiDataProperty` exista en `OSDi.ttl`: renombrar o eliminar un término de la ontología obliga a actualizar esos enums.
@@ -154,6 +154,7 @@ Convenciones:
 - `Pathway` (con `requires`) solo se admite en el DES; el árbol lo rechaza.
 - Manifestaciones agudas: el árbol cuenta un episodio y el DES todos los que ocurran; con varios pagos de una vez, el árbol los suma y el DES usa el primero (con aviso).
 - El DES no lee el objetivo de las intervenciones: siempre se aplican desde el inicio de la simulación.
+- Pagos de una vez de una intervención en el DES (coste y utilidad, que es una pérdida de AVAC como en D7): una intervención que no es de detección los aplica una vez, al inicio de la simulación (`Intervention.appliesOneTimePayoffsAtStart`, D03), como en el árbol. Las de detección los aplican con cada prueba (`SCREEN`); `OSDiDetectionIntervention` todavía no programa pruebas, así que no los aplica nunca.
 - Trabajo futuro (DES con desarrollos): grupo de alternativas = sorteo categórico al inicio; coexistente con riesgo p = sorteo independiente; desarrollo sin riesgo = siempre presente; pagos del desarrollo = anuales mientras lo tenga; manifestación propia = riesgo solo para pacientes con ese desarrollo; manifestación sin riesgo = proporción inicial 1 en su contexto.
 ## Limitaciones y TODO pendientes
  

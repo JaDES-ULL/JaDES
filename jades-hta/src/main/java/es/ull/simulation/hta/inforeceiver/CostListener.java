@@ -47,8 +47,13 @@ public class CostListener extends OutcomeListener {
 				break;
 			case START_MANIF:
 			value = pInfo.getDiseaseProgression().getStartingCost(pat, ts, discountRate);
-			case DEATH:
+				break;
 			case START:
+				// The one-time cost of the intervention is charged once, unless it is charged with each test (detection interventions)
+				if (pat.getIntervention().appliesOneTimePayoffsAtStart())
+					value = pat.getIntervention().getStartingCost(pat, ts, discountRate);
+				break;
+			case DEATH:
 				break;
 			default:
 				break;			

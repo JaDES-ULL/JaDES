@@ -44,6 +44,8 @@ public class QALYListener extends OutcomeListener {
 				value = -pat.getDisease().getStartingDisutility(pat);
 				break;
 			case SCREEN:
+				// Detection interventions apply their one-time disutility with each test
+				value = -pat.getIntervention().getStartingDisutility(pat);
 				break;
 			case START_MANIF:
 				value = -pInfo.getDiseaseProgression().getStartingDisutility(pat);
@@ -51,6 +53,9 @@ public class QALYListener extends OutcomeListener {
 			case DEATH:
 				break;
 			case START:
+				// The one-time disutility of the intervention is applied once, unless it is applied with each test (detection interventions)
+				if (pat.getIntervention().appliesOneTimePayoffsAtStart())
+					value = -pat.getIntervention().getStartingDisutility(pat);
 				break;
 			default:
 				break;			
