@@ -570,6 +570,13 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P57_Experiment", "Costs in Canadian dollars of 1997, the year of the study: they are not updated with the CPI",
                 leaves("TT_P57_", leaf(1.0)),
                 outcomes(71500.0, 65.0, 55.25), outcomes(65000.0, 65.0, 55.25)));
+        // P58 (phase 12): a group of alternative strategies as the next strategy of an outcome. Acute episode (2000), always present, treated with T (20):
+        // success 0.6 (resolves) or failure 0.4 (0.1 QALYs), followed by the group {R1 (0.7; 50), R2 (the rest; 300)}; R2 fails with 0.1, followed by H (1000).
+        // Comparator: 65000 + 2000 + 20 + 0.4 * (0.7 * 50 + 0.3 * (300 + 0.1 * 1000)) = 67082; QALYs 55.25 - 0.4 * 0.1 = 55.21. Assessed: + 6500
+        cases.add(tc(PAYOFFS, "TT_P58_Experiment", "Group of alternative rescue strategies after the failure of a treatment: R1 (0.7) or R2 (the rest), which has its own outcomes",
+                leaves("TT_P58_", leaf(0.6, "ManA", "T_Success"), leaf(0.28, "ManA", "T_Failure", "R1"), leaf(0.108, "ManA", "T_Failure", "R2", "R2_Success"),
+                    leaf(0.012, "ManA", "T_Failure", "R2", "R2_Failure")),
+                outcomes(73582.0, 65.0, 55.21), outcomes(67082.0, 65.0, 55.21)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
@@ -704,7 +711,10 @@ public final class DecisionTreeCatalog {
             // The risk of an adverse event is mandatory (D8).
             new MalformedCase(MALFORMED, "TT_N31_Experiment", "Adverse event without risk", MalformedOSDiModelException.class),
             // The risk of an adverse event is a probability per application of the strategy in decision trees (D6, D8).
-            new MalformedCase(MALFORMED, "TT_N32_Experiment", "Adverse event whose risk is a time to event (not supported in decision trees)", UnsupportedOSDiFeatureException.class)
+            new MalformedCase(MALFORMED, "TT_N32_Experiment", "Adverse event whose risk is a time to event (not supported in decision trees)", UnsupportedOSDiFeatureException.class),
+            // A group of strategies as the next strategy is a choice among alternatives: its members must declare their proportions (phase 12).
+            new MalformedCase(MALFORMED, "TT_N33_Experiment", "Group of strategies without proportions as the next strategy of an outcome", UnsupportedOSDiFeatureException.class),
+            new MalformedCase(MALFORMED, "TT_N34_Experiment", "Group of alternative strategies whose proportions do not add up to 1, without a member without proportion", MalformedOSDiModelException.class)
         );
     }
 }

@@ -25,7 +25,7 @@ public class StrategyOutcomeWrapper extends BaseModelItemWrapper implements IMod
     private Optional<ParameterWrapper> riskIfDiseased = Optional.empty();
     private Optional<ParameterWrapper> riskIfNotDiseased = Optional.empty();
     private Optional<ParameterWrapper> evaluationTime = Optional.empty();
-    private Optional<StrategyWrapper> nextStrategy = Optional.empty();
+    private NextStrategy next = NextStrategy.NONE;
     private boolean resolves = false;
 
     public StrategyOutcomeWrapper(ModelWrapper modelWrapper, IRI individualIRI) {
@@ -40,7 +40,7 @@ public class StrategyOutcomeWrapper extends BaseModelItemWrapper implements IMod
         riskIfDiseased = modelWrapper.getWrapperForPropertyAs(iri, OSDiObjectProperty.HAS_RISK_IF_DISEASED, ParameterWrapper.class);
         riskIfNotDiseased = modelWrapper.getWrapperForPropertyAs(iri, OSDiObjectProperty.HAS_RISK_IF_NOT_DISEASED, ParameterWrapper.class);
         evaluationTime = modelWrapper.getWrapperForPropertyAs(iri, OSDiObjectProperty.HAS_EVALUATION_TIME, ParameterWrapper.class);
-        nextStrategy = modelWrapper.getAndInitializeWrapperForPropertyAs(iri, OSDiObjectProperty.FOLLOWED_BY_STRATEGY, StrategyWrapper.class);
+        next = NextStrategy.read(modelWrapper, iri, OSDiObjectProperty.FOLLOWED_BY_STRATEGY);
         resolves = getOSDiWrapper().getBooleanValue(iri, OSDiDataProperty.RESOLVES_HEALTH_CONDITION).orElse(false);
     }
 
@@ -98,8 +98,20 @@ public class StrategyOutcomeWrapper extends BaseModelItemWrapper implements IMod
         return evaluationTime;
     }
 
+    /**
+     * Returns the strategy that follows this outcome, if it is a single strategy (see {@link #getNext()}).
+     * @return The strategy that follows this outcome, if it is a single strategy; empty if there is none or if it is a group of alternatives
+     */
     public Optional<StrategyWrapper> getNextStrategy() {
-        return nextStrategy;
+        return next.single();
+    }
+
+    /**
+     * Returns the strategy, or the group of alternative strategies, that follows this outcome (followedByStrategy).
+     * @return The strategy, or the group of alternative strategies, that follows this outcome
+     */
+    public NextStrategy getNext() {
+        return next;
     }
 
     public boolean resolvesHealthCondition() {

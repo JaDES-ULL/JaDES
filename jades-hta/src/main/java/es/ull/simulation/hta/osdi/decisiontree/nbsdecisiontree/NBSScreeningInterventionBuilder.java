@@ -23,6 +23,7 @@ import es.ull.simulation.hta.osdi.ontology.DetectionStrategyWrapper;
 import es.ull.simulation.hta.osdi.ontology.DetectionStrategyWrapper.DetectionOutcome;
 import es.ull.simulation.hta.osdi.ontology.DiseaseWrapper;
 import es.ull.simulation.hta.osdi.ontology.ModelWrapper;
+import es.ull.simulation.hta.osdi.ontology.NextStrategy;
 import es.ull.simulation.hta.osdi.ontology.OSDiObjectProperty;
 import es.ull.simulation.hta.osdi.ontology.ParameterNatureType;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
@@ -126,7 +127,7 @@ public class NBSScreeningInterventionBuilder extends InterventionGenerator {
         ShortForm shortForm = shortForms.get(strategy.getIndividualIRI());
         if (shortForm == null) {
             final ModelWrapper modelWrapper = strategy.getModelWrapper();
-            final Optional<StrategyWrapper> next = modelWrapper.getAndInitializeWrapperForPropertyAs(strategy.getIndividualIRI(), OSDiObjectProperty.FOLLOWED_BY_STRATEGY, StrategyWrapper.class);
+            final Optional<StrategyWrapper> next = DetectionStrategyWrapper.requireSingle(NextStrategy.read(modelWrapper, strategy.getIndividualIRI(), OSDiObjectProperty.FOLLOWED_BY_STRATEGY), strategy.getShortName());
             shortForm = createShortForm(modelWrapper, name, strategy.getSensitivityParameter(), strategy.getSpecificityParameter(), next);
             shortForms.put(strategy.getIndividualIRI(), shortForm);
         }

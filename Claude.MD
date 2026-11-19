@@ -49,10 +49,10 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 |---|---|
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
-| `OSDi_test_tree_payoffs.ttl` | P01–P57 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal; P53–P54: tiempo hasta el evento con horizonte; P55–P56 y P30: frecuencia de una aguda; P57: costes en dólares canadienses de 1997) |
+| `OSDi_test_tree_payoffs.ttl` | P01–P58 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal; P53–P54: tiempo hasta el evento con horizonte; P55–P56 y P30: frecuencia de una aguda; P57: costes en dólares canadienses de 1997; P58: grupo de estrategias alternativas como estrategia siguiente) |
 | `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión) |
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
-| `OSDi_test_tree_malformed.ttl` | N01–N05, N07–N12, N14–N32 (casos que deben lanzar excepción; N13 volvió a ser P26 y N06, P56) |
+| `OSDi_test_tree_malformed.ttl` | N01–N05, N07–N12, N14–N34 (casos que deben lanzar excepción; N13 volvió a ser P26 y N06, P56) |
 
 Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
 
@@ -125,6 +125,7 @@ Convenciones:
 - Momento T = inicio de la estrategia + `hasEvaluationTime` (inicio, con aviso, si falta). Los pagos anuales de la estrategia van hasta T si el resultado tiene estrategia siguiente o resuelve; si no, hasta el final del nodo. La siguiente empieza en T. Pagos del resultado: una vez en T (anuales ignorados con aviso). «Resuelve»: los pagos anuales de la condición paran en T; sus efectos sobre la LE se mantienen, con aviso.
 - Riesgo de tiempo hasta el evento T de un resultado: 1 − e^(−τ/T), con τ su `hasEvaluationTime` o, si falta, el horizonte (P54).
 - Rechazos: ciclos (N23) y riesgo de tiempo hasta el evento sin tiempo de evaluación ni horizonte (N24), `Unsupported`; dos resultados sin riesgo (N25) y `failsIf` con resultados explícitos (N26), `Malformed`. Estrategias con resultados cuyos costes siguen una pauta: `Unsupported`.
+- Grupo de estrategias alternativas como estrategia siguiente (fase 12, `NextStrategy`): de un resultado (`followedByStrategy`), de `followedOnFailureBy`/`followedOnSuccessBy` o de la estrategia. Cada paciente recibe un miembro con su `hasProportionWithinGroup` (como mucho uno sin proporción, que se lleva el resto); una rama `STRATEGY: …` por miembro (P58). Grupo sin proporciones (N33, `Unsupported`; en una sustitución, un grupo significa «todas a la vez»), varios miembros sin proporción o proporciones deterministas que no suman 1 sin miembro por defecto (N34, `Malformed`). En las cadenas de detección del NBS, `Unsupported`.
 - Recaída tras la respuesta (D9, sin vocabulario nuevo): el éxito va seguido (`followedOnSuccessBy` o el `followedByStrategy` de su `SuccessOutcome`) de una `FollowUpStrategy` cuyo fracaso es la recaída (probabilidad entre quienes respondieron), seguido del tratamiento de la recaída (P50). Una recurrencia a largo plazo es un nuevo episodio de la misma aguda (fase 11).
 
 **Efectos adversos (D8, árbol):** `AdverseEvent` (subclase de `HealthCondition`, disjunta de `Disease` y `ClinicalProgressionElement`), `hasAdverseEvent` / `isAdverseEventOf` (de `Strategy`) e `isOccurrenceOf` (solo identifica la condición; no activa su estructura). Regla para quien modela: problema de la evolución natural cuyo riesgo cambia la estrategia → `Effect`; problema provocado por la estrategia → `AdverseEvent`.
@@ -157,7 +158,7 @@ Convenciones:
 - El árbol ignora `supersedesClinicalProgression` y `hasDuration`; `hasFrequency` solo se lee en las manifestaciones agudas (véase «Manifestaciones agudas»).
 - `SequentialCombinationRule` se trata como coexistente sin aviso en el árbol; no se leen `hasFirst` ni `hasNext`. El DES ignora todas las reglas con aviso.
 - Estrategias en el árbol: no se leen `followedByStrategy` de estrategias sin resultados (con aviso), `hasConditionExpression` de la estrategia ni `failsIf`. Las pautas con subpautas, `hasConditionExpression` o edades de aplicación se rechazan (`UnsupportedOSDiFeatureException`, N19); TODO: soportarlas. `hasDose` no se usa. Falsos negativos del cribado: no pagan diagnóstico; pendiente de decidir (según la enfermedad, diagnóstico clínico tardío o muerte sin diagnóstico).
-- `Group` no tiene wrapper; no se leen `hasGroupItem` ni `hasProportionWithinGroup`.
+- `Group` no tiene wrapper. Los grupos de estrategias se leen en las sustituciones (todas a la vez) y como estrategia siguiente (alternativas con `hasProportionWithinGroup`, `NextStrategy`); los demás grupos no se leen en el árbol.
 - Riesgo `DI_TimeToEvent` T de una progresión en el árbol (D6): probabilidad del evento dentro del horizonte, 1 − e^(−H/T) (exponencial; P53); sin horizonte, la anual, 1 − e^(−1/T), con aviso (P26). Se calcula en la fórmula de cada rama con T modificado por los efectos de la ruta (`AbstractModelFactory.getTimeToEventProbability`); el parámetro sintético `P_…` no se escribe en el Excel. El RR sobre un tiempo sigue rechazado (N12); el riesgo de un efecto adverso no puede ser un tiempo (N32).
 - Las operaciones lineales (Factor, Ratio, MeanDifference) sobre una probabilidad no se recortan a [0, 1]; solo se avisa si los dos valores son deterministas.
 - MAX aplicado a totales de toda la vida: no es correcto si los elementos tienen ventanas temporales distintas.

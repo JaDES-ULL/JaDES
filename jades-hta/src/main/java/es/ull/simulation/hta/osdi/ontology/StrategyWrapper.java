@@ -54,12 +54,12 @@ public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemW
      * @param risk The probability or time to event of the outcome; empty for the default outcome, or if it depends on a health condition
      * @param failureCondition The health condition whose appearance produces this outcome (failsIf a health condition), if any
      * @param evaluationTime The time when the outcome is evaluated, since the start of the strategy, if any
-     * @param nextStrategy The strategy that follows the outcome: its own, or that of the strategy (followedByStrategy), if any
+     * @param next The strategy, or the group of alternative strategies, that follows the outcome: its own, or that of the strategy (followedByStrategy), if any
      * @param resolves Whether the outcome resolves the health condition
      * @param wrapper The wrapper of the explicit outcome, which defines its costs, utilities and effects; empty for the short form
      */
     public record Outcome(String name, Optional<ParameterWrapper> risk, Optional<HealthConditionWrapper> failureCondition, Optional<ParameterWrapper> evaluationTime,
-            Optional<StrategyWrapper> nextStrategy, boolean resolves, Optional<StrategyOutcomeWrapper> wrapper) {}
+            NextStrategy next, boolean resolves, Optional<StrategyOutcomeWrapper> wrapper) {}
 
     /**
      * Returns true if this strategy has outcomes, either explicit (hasStrategyOutcome) or through the short form (failsIf).
@@ -94,7 +94,7 @@ public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemW
         if (this instanceof DetectionStrategyWrapper) {
             throw new UnsupportedOSDiFeatureException("The detection strategy " + getShortName() + " defines outcomes. The outcomes of detection strategies are only supported in the detection arms of newborn screening models.");
         }
-        final Optional<StrategyWrapper> strategyNext = modelWrapper.getAndInitializeWrapperForPropertyAs(iri, OSDiObjectProperty.FOLLOWED_BY_STRATEGY, StrategyWrapper.class);
+        final NextStrategy strategyNext = NextStrategy.read(modelWrapper, iri, OSDiObjectProperty.FOLLOWED_BY_STRATEGY);
         final Set<IModelItemWrapper> failsIf = modelWrapper.getWrappersForProperty(iri, OSDiObjectProperty.FAILS_IF);
         final Set<IModelItemWrapper> explicit = modelWrapper.getWrappersForProperty(iri, OSDiObjectProperty.HAS_STRATEGY_OUTCOME);
         if (!failsIf.isEmpty()) {
@@ -110,11 +110,11 @@ public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemW
             if (risk.isEmpty() && healthCondition.isEmpty()) {
                 throw new MalformedOSDiModelException("The failure condition (failsIf) " + condition.getShortName() + " of the strategy " + getShortName() + " is neither a parameter nor a health condition.");
             }
-            final Optional<StrategyWrapper> onFailure = modelWrapper.getAndInitializeWrapperForPropertyAs(iri, OSDiObjectProperty.FOLLOWED_ON_FAILURE_BY, StrategyWrapper.class);
-            final Optional<StrategyWrapper> onSuccess = modelWrapper.getAndInitializeWrapperForPropertyAs(iri, OSDiObjectProperty.FOLLOWED_ON_SUCCESS_BY, StrategyWrapper.class);
+            final NextStrategy onFailure = NextStrategy.read(modelWrapper, iri, OSDiObjectProperty.FOLLOWED_ON_FAILURE_BY);
+            final NextStrategy onSuccess = NextStrategy.read(modelWrapper, iri, OSDiObjectProperty.FOLLOWED_ON_SUCCESS_BY);
             final boolean resolvesOnSuccess = getOSDiWrapper().getBooleanValue(iri, OSDiDataProperty.RESOLVES_ON_SUCCESS).orElse(false);
-            outcomes.add(new Outcome(getShortName() + "_Failure", risk, healthCondition, Optional.empty(), onFailure.or(() -> strategyNext), false, Optional.empty()));
-            outcomes.add(new Outcome(getShortName() + "_Success", Optional.empty(), Optional.empty(), Optional.empty(), onSuccess.or(() -> strategyNext), resolvesOnSuccess, Optional.empty()));
+            outcomes.add(new Outcome(getShortName() + "_Failure", risk, healthCondition, Optional.empty(), onFailure.or(strategyNext), false, Optional.empty()));
+            outcomes.add(new Outcome(getShortName() + "_Success", Optional.empty(), Optional.empty(), Optional.empty(), onSuccess.or(strategyNext), resolvesOnSuccess, Optional.empty()));
             return outcomes;
         }
         int withoutRisk = 0;
@@ -126,7 +126,7 @@ public class StrategyWrapper extends BaseModelItemWrapper implements IModelItemW
             if (outcome.getRisk().isEmpty()) {
                 withoutRisk++;
             }
-            outcomes.add(new Outcome(outcome.getShortName(), outcome.getRisk(), Optional.empty(), outcome.getEvaluationTime(), outcome.getNextStrategy().or(() -> strategyNext),
+            outcomes.add(new Outcome(outcome.getShortName(), outcome.getRisk(), Optional.empty(), outcome.getEvaluationTime(), outcome.getNext().or(strategyNext),
                 outcome.resolvesHealthCondition(), Optional.of(outcome)));
         }
         if (withoutRisk > 1) {

@@ -4271,4 +4271,402 @@ osdi:TT_N32_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "N32. Adverse event whose risk is a time to event (not supported in decision trees)." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_R1_Cost
+osdi:TT_N33_R1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of R1" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_R1
+osdi:TT_N33_R1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_N33_R1_Cost ;
+    osdi:hasDescription "Rescue strategy R1" ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_R2_Cost
+osdi:TT_N33_R2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of R2" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_R2
+osdi:TT_N33_R2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_N33_R2_Cost ;
+    osdi:hasDescription "Rescue strategy R2" ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_Rescue
+osdi:TT_N33_Rescue rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TT_N33_R1 ,
+        osdi:TT_N33_R2 ;
+    osdi:hasDescription "Alternative rescue strategies" ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_T_SuccessRisk
+osdi:TT_N33_T_SuccessRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability of success of T" ;
+    osdi:hasExpectedValue "0.6"^^xsd:double ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_T_Success
+osdi:TT_N33_T_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasOutcomeRisk osdi:TT_N33_T_SuccessRisk ;
+    osdi:resolvesHealthCondition "true"^^xsd:boolean ;
+    osdi:hasDescription "The episode is resolved" ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_T_FailureLoss
+osdi:TT_N33_T_FailureLoss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the failure of T" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_T_Failure
+osdi:TT_N33_T_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_N33_Rescue ;
+    osdi:hasUtility osdi:TT_N33_T_FailureLoss ;
+    osdi:hasDescription "The treatment fails: one of the rescue strategies" ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_T_Cost
+osdi:TT_N33_T_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of T" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_T
+osdi:TT_N33_T rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_N33_T_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_N33_T_Success ,
+        osdi:TT_N33_T_Failure ;
+    osdi:hasDescription "Treatment of the episode" ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_ManA_Cost
+osdi:TT_N33_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the episode" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_ManA
+osdi:TT_N33_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_N33_ManA_Cost ;
+    osdi:hasStrategy osdi:TT_N33_T ;
+    osdi:hasDescription "Acute episode, always present" ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_Disease
+osdi:TT_N33_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_N33_ManA ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_N33_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_Experiment
+osdi:TT_N33_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N33_Model ;
+    osdi:hasDescription "Group of strategies without proportions as the next strategy of an outcome." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N33_Model
+osdi:TT_N33_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_N33_R1_Cost ,
+        osdi:TT_N33_R1 ,
+        osdi:TT_N33_R2_Cost ,
+        osdi:TT_N33_R2 ,
+        osdi:TT_N33_Rescue ,
+        osdi:TT_N33_T_SuccessRisk ,
+        osdi:TT_N33_T_Success ,
+        osdi:TT_N33_T_FailureLoss ,
+        osdi:TT_N33_T_Failure ,
+        osdi:TT_N33_T_Cost ,
+        osdi:TT_N33_T ,
+        osdi:TT_N33_ManA_Cost ,
+        osdi:TT_N33_ManA ,
+        osdi:TT_N33_Disease ;
+    osdi:hasDescription "N33. Group of strategies without proportions as the next strategy of an outcome." .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_R1_Proportion
+osdi:TT_N34_R1_Proportion rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:hasDescription "Proportion of patients who receive R1" ;
+    osdi:hasExpectedValue "0.7"^^xsd:double ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_R1_Cost
+osdi:TT_N34_R1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of R1" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_R1
+osdi:TT_N34_R1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_N34_R1_Cost ;
+    osdi:hasProportionWithinGroup osdi:TT_N34_R1_Proportion ;
+    osdi:hasDescription "Rescue strategy R1" ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_R2_Proportion
+osdi:TT_N34_R2_Proportion rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:hasDescription "Proportion of patients who receive R2" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_R2_Cost
+osdi:TT_N34_R2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of R2" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_R2
+osdi:TT_N34_R2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_N34_R2_Cost ;
+    osdi:hasProportionWithinGroup osdi:TT_N34_R2_Proportion ;
+    osdi:hasDescription "Rescue strategy R2" ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_Rescue
+osdi:TT_N34_Rescue rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TT_N34_R1 ,
+        osdi:TT_N34_R2 ;
+    osdi:hasDescription "Alternative rescue strategies" ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_T_SuccessRisk
+osdi:TT_N34_T_SuccessRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability of success of T" ;
+    osdi:hasExpectedValue "0.6"^^xsd:double ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_T_Success
+osdi:TT_N34_T_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasOutcomeRisk osdi:TT_N34_T_SuccessRisk ;
+    osdi:resolvesHealthCondition "true"^^xsd:boolean ;
+    osdi:hasDescription "The episode is resolved" ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_T_FailureLoss
+osdi:TT_N34_T_FailureLoss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "QALY loss of the failure of T" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_T_Failure
+osdi:TT_N34_T_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_N34_Rescue ;
+    osdi:hasUtility osdi:TT_N34_T_FailureLoss ;
+    osdi:hasDescription "The treatment fails: one of the rescue strategies" ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_T_Cost
+osdi:TT_N34_T_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of T" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_T
+osdi:TT_N34_T rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_N34_T_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_N34_T_Success ,
+        osdi:TT_N34_T_Failure ;
+    osdi:hasDescription "Treatment of the episode" ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_ManA_Cost
+osdi:TT_N34_ManA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the episode" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_ManA
+osdi:TT_N34_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TT_N34_ManA_Cost ;
+    osdi:hasStrategy osdi:TT_N34_T ;
+    osdi:hasDescription "Acute episode, always present" ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_Disease
+osdi:TT_N34_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_N34_ManA ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_N34_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_Experiment
+osdi:TT_N34_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N34_Model ;
+    osdi:hasDescription "Group of alternative strategies whose proportions do not add up to 1, without a member without proportion." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N34_Model
+osdi:TT_N34_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_N34_R1_Proportion ,
+        osdi:TT_N34_R1_Cost ,
+        osdi:TT_N34_R1 ,
+        osdi:TT_N34_R2_Proportion ,
+        osdi:TT_N34_R2_Cost ,
+        osdi:TT_N34_R2 ,
+        osdi:TT_N34_Rescue ,
+        osdi:TT_N34_T_SuccessRisk ,
+        osdi:TT_N34_T_Success ,
+        osdi:TT_N34_T_FailureLoss ,
+        osdi:TT_N34_T_Failure ,
+        osdi:TT_N34_T_Cost ,
+        osdi:TT_N34_T ,
+        osdi:TT_N34_ManA_Cost ,
+        osdi:TT_N34_ManA ,
+        osdi:TT_N34_Disease ;
+    osdi:hasDescription "N34. Group of alternative strategies whose proportions do not add up to 1, without a member without proportion." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

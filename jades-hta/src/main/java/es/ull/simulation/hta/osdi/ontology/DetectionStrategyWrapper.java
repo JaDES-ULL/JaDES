@@ -90,6 +90,22 @@ public class DetectionStrategyWrapper extends StrategyWrapper {
     }
 
     /**
+     * Returns the next strategy of a detection strategy or of one of its outcomes, which must be a single strategy.
+     * TODO: Support groups of alternative strategies in the chains of detection strategies of newborn screening models
+     * @param next The next strategy
+     * @param source The name of the detection strategy or outcome, for the messages
+     * @return The next strategy, if any
+     * @throws UnsupportedOSDiFeatureException If the next strategy is a group of alternative strategies
+     */
+    public static Optional<StrategyWrapper> requireSingle(NextStrategy next, String source) throws UnsupportedOSDiFeatureException {
+        if (next.isGroup()) {
+            throw new UnsupportedOSDiFeatureException(source + " is followed by the group of alternative strategies " + next.name()
+                + ". Groups of alternative strategies are not supported yet in the chains of detection strategies of newborn screening models.");
+        }
+        return next.single();
+    }
+
+    /**
      * Returns the explicit outcomes of this detection strategy (decision D6), sorted as positive, inconclusive and negative results. Each outcome
      * has a risk for the individuals with the disease (hasRiskIfDiseased) and another for those without it (hasRiskIfNotDiseased). For each
      * status, at most one outcome may lack a risk: it takes the remaining probability. A positive outcome without its own next strategy is followed
@@ -108,7 +124,7 @@ public class DetectionStrategyWrapper extends StrategyWrapper {
             throw new MalformedOSDiModelException("The detection strategy " + getShortName() + " combines the short form (sensitivity and specificity) with explicit outcomes (hasStrategyOutcome).");
         }
         final ModelWrapper modelWrapper = getModelWrapper();
-        final Optional<StrategyWrapper> strategyNext = modelWrapper.getAndInitializeWrapperForPropertyAs(getIndividualIRI(), OSDiObjectProperty.FOLLOWED_BY_STRATEGY, StrategyWrapper.class);
+        final Optional<StrategyWrapper> strategyNext = requireSingle(NextStrategy.read(modelWrapper, getIndividualIRI(), OSDiObjectProperty.FOLLOWED_BY_STRATEGY), getShortName());
         final Set<IModelItemWrapper> explicit = modelWrapper.getWrappersForProperty(getIndividualIRI(), OSDiObjectProperty.HAS_STRATEGY_OUTCOME);
         int withoutRiskIfDiseased = 0;
         int withoutRiskIfNotDiseased = 0;
@@ -126,7 +142,8 @@ public class DetectionStrategyWrapper extends StrategyWrapper {
             if (outcome.getRiskIfNotDiseased().isEmpty()) {
                 withoutRiskIfNotDiseased++;
             }
-            final Optional<StrategyWrapper> next = DetectionResult.POSITIVE.equals(result.get()) ? outcome.getNextStrategy().or(() -> strategyNext) : outcome.getNextStrategy();
+            final Optional<StrategyWrapper> outcomeNext = requireSingle(outcome.getNext(), outcome.getShortName());
+            final Optional<StrategyWrapper> next = DetectionResult.POSITIVE.equals(result.get()) ? outcomeNext.or(() -> strategyNext) : outcomeNext;
             outcomes.add(new DetectionOutcome(outcome.getShortName(), result.get(), outcome.getRiskIfDiseased(), outcome.getRiskIfNotDiseased(), next, outcome));
         }
         if (withoutRiskIfDiseased > 1) {

@@ -24,6 +24,7 @@ import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.AdverseEventWrapper;
 import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
+import es.ull.simulation.hta.osdi.ontology.NextStrategy;
 import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.StrategyWrapper;
@@ -159,25 +160,57 @@ final class StrategyOutcomeExpander {
             else {
                 leaf.link(node);
             }
-            final List<Pending> newPending = new ArrayList<>();
-            if (outcome.nextStrategy().isPresent()) {
-                final StrategyWrapper next = outcome.nextStrategy().get();
-                if (current.chain().contains(next.getIndividualIRI())) {
-                    throw new UnsupportedOSDiFeatureException("The chain of strategies that follows the outcome " + outcome.name() + " goes back to the strategy " + next.getShortName()
-                        + ". Cycles are not supported in decision trees: a repetition must be modeled as another strategy.");
+            final NextStrategy next = outcome.next();
+            if (!next.isGroup()) {
+                final List<Pending> newPending = new ArrayList<>();
+                if (next.isPresent()) {
+                    applyNextStrategy(node, current, outcome, next.alternatives().get(0).strategy(), newPending);
                 }
-                final List<ParameterWrapper> nextStart = getOutcomeTime(current, outcome);
-                if (!next.hasOutcomes()) {
-                    addStrategyPayoffs(node, next, new PayoffWindow(current.owner(), nextStart, Optional.empty()));
-                }
-                if (next.hasOutcomes() || next.hasAdverseEvents()) {
-                    final Set<IRI> chain = new HashSet<>(current.chain());
-                    chain.add(next.getIndividualIRI());
-                    newPending.add(new Pending(next, current.owner(), nextStart, chain));
+                newPending.addAll(rest);
+                expandLeaf(node, newPending, active);
+            }
+            else {
+                // A group of alternative strategies: a branch per strategy, with its proportion (the strategy without proportion takes the rest)
+                for (NextStrategy.Alternative alternative : next.alternatives()) {
+                    final BranchDestinationNode branch = new BranchDestinationNode(model, "STRATEGY: " + alternative.strategy().getShortName());
+                    if (alternative.proportion().isPresent()) {
+                        node.link(branch, alternative.proportion().get());
+                    }
+                    else {
+                        node.link(branch);
+                    }
+                    final List<Pending> newPending = new ArrayList<>();
+                    applyNextStrategy(branch, current, outcome, alternative.strategy(), newPending);
+                    newPending.addAll(rest);
+                    expandLeaf(branch, newPending, active);
                 }
             }
-            newPending.addAll(rest);
-            expandLeaf(node, newPending, active);
+        }
+    }
+
+    /**
+     * Applies the strategy that follows an outcome, from the time of the outcome: its payoffs are added to the node if it has no outcomes, and it is
+     * added to the pending strategies if it has outcomes or adverse events.
+     * @param node The node of the outcome (or of the alternative of a group) from which the strategy applies
+     * @param current The strategy whose outcome is followed by the next strategy
+     * @param outcome The outcome
+     * @param next The next strategy
+     * @param newPending The pending strategies, to which the next strategy is added
+     * @throws UnsupportedOSDiFeatureException If the chain of strategies goes back to a strategy already applied
+     */
+    private void applyNextStrategy(BranchDestinationNode node, Pending current, Outcome outcome, StrategyWrapper next, List<Pending> newPending) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        if (current.chain().contains(next.getIndividualIRI())) {
+            throw new UnsupportedOSDiFeatureException("The chain of strategies that follows the outcome " + outcome.name() + " goes back to the strategy " + next.getShortName()
+                + ". Cycles are not supported in decision trees: a repetition must be modeled as another strategy.");
+        }
+        final List<ParameterWrapper> nextStart = getOutcomeTime(current, outcome);
+        if (!next.hasOutcomes()) {
+            addStrategyPayoffs(node, next, new PayoffWindow(current.owner(), nextStart, Optional.empty()));
+        }
+        if (next.hasOutcomes() || next.hasAdverseEvents()) {
+            final Set<IRI> chain = new HashSet<>(current.chain());
+            chain.add(next.getIndividualIRI());
+            newPending.add(new Pending(next, current.owner(), nextStart, chain));
         }
     }
 
@@ -289,7 +322,7 @@ final class StrategyOutcomeExpander {
     private BranchDestinationNode createOutcomeNode(Pending current, Outcome outcome) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         final BranchDestinationNode node = new BranchDestinationNode(model, "OUTCOME: " + outcome.name());
         final List<ParameterWrapper> time = getOutcomeTime(current, outcome);
-        final boolean stops = outcome.nextStrategy().isPresent() || outcome.resolves();
+        final boolean stops = outcome.next().isPresent() || outcome.resolves();
         addStrategyPayoffs(node, current.strategy(), new PayoffWindow(current.owner(), current.start(), stops ? Optional.of(time) : Optional.empty()));
         if (outcome.wrapper().isPresent()) {
             final PayoffWindow atOutcome = new PayoffWindow(current.owner(), time, Optional.empty());
