@@ -28,7 +28,7 @@ import simkit.random.RandomVariateFactory;
 public class OSDiPopulation extends StdPopulation {
 	private final static OSDiLogger log = OSDiLogger.getLogger(OSDiPopulation.class);
 	private final RandomVariate ageVariate;
-	/** The parameter that defines the sex of the patients: the proportion of women, or a first-order discrete distribution */
+	/** The parameter that defines the sex of the patients: the proportion of women, or a first-order discrete distribution; null if the population does not declare it */
 	private final ParameterWrapper sexWrapper;
 	/** The distribution of the sex when the sex parameter is first-order; null otherwise (see {@link #getSexVariate(Patient)}) */
 	private final DiscreteRandomVariate sexVariate;
@@ -54,10 +54,20 @@ public class OSDiPopulation extends StdPopulation {
 		}
 		 // TODO: Currently we are only defining initially assigned attributes, i.e., attributes whose value does not change during the simulation 
 		// Process population age
-		final ParameterWrapper ageWrapper = populationWrapper.getAgeParameter().orElseThrow(() -> new MalformedOSDiModelException("Population " + populationWrapper.getShortName() + " does not have a valid age parameter."));
-		ageVariate = ParameterFactory.getRandomVariateInstance(ageWrapper);
-		// Process population sex
-		this.sexWrapper = populationWrapper.getSexParameter().orElseThrow(() -> new MalformedOSDiModelException("Population " + populationWrapper.getShortName() + " does not have a valid sex parameter."));
+		// Decision D10: if the population does not declare an age, an initial age of 18 years is assumed, with a warning
+		final java.util.Optional<ParameterWrapper> ageWrapper = populationWrapper.getAgeParameter();
+		if (ageWrapper.isPresent()) {
+			ageVariate = ParameterFactory.getRandomVariateInstance(ageWrapper.get());
+		}
+		else {
+			log.warn("The population " + populationWrapper.getShortName() + " does not define an age. An initial age of " + PopulationWrapper.DEFAULT_AGE + " is assumed.");
+			ageVariate = RandomVariateFactory.getInstance("ConstantVariate", PopulationWrapper.DEFAULT_AGE);
+		}
+		// Process population sex. Decision D10: if the population does not declare its sex, a proportion of women of 0.5 is assumed, with a warning
+		this.sexWrapper = populationWrapper.getSexParameter().orElse(null);
+		if (sexWrapper == null) {
+			log.warn("The population " + populationWrapper.getShortName() + " does not define its sex. A proportion of women of " + PopulationWrapper.DEFAULT_PROPORTION_OF_WOMEN + " is assumed.");
+		}
 		this.sexVariate = initializeSexVariate(populationWrapper.getShortName());
 		
 		this.utilityParam = getAndCheckUtilityParam(populationWrapper);
@@ -89,6 +99,9 @@ public class OSDiPopulation extends StdPopulation {
 	 * is not between 0 and 1
 	 */
 	private DiscreteRandomVariate initializeSexVariate(String populationName) throws MalformedOSDiModelException {
+		if (sexWrapper == null) {
+			return RandomVariateFactory.getDiscreteRandomVariateInstance("BernoulliVariate", getCommonRandomNumber(), PopulationWrapper.DEFAULT_PROPORTION_OF_WOMEN);
+		}
 		if (ParameterNatureType.FIRST_ORDER.equals(sexWrapper.getNature())) {
 			if (ParameterFactory.getRandomVariateInstance(sexWrapper) instanceof DiscreteRandomVariate discrete) {
 				return discrete;

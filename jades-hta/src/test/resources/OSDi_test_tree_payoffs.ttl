@@ -8243,4 +8243,111 @@ osdi:TT_P58_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P58. Group of alternative rescue strategies after the failure of a treatment: R1 (0.7) or R2 (the rest), which has its own outcomes." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P59_Population
+osdi:TT_P59_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasLifeExpectancy osdi:TT_LifeExpectancy ;
+    osdi:hasUtility osdi:TT_PopulationBaseUtility ;
+    osdi:hasDescription "Population without age or sex, with 65 remaining years of life and a base utility of 0.85" ;
+    osdi:includedByModel osdi:TT_P59_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P59_ManY_Risk
+osdi:TT_P59_ManY_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability of ManY" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P59_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P59_ManY_OnsetAge
+osdi:TT_P59_ManY_OnsetAge rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:hasDescription "Age 30" ;
+    osdi:hasExpectedValue "30.0"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P59_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P59_ManY_OneTimeCost
+osdi:TT_P59_ManY_OneTimeCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "One-time cost of ManY at its onset" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P59_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P59_ManY_Cost
+osdi:TT_P59_ManY_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of ManY" ;
+    osdi:hasExpectedValue "250.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P59_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P59_ManY
+osdi:TT_P59_ManY rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasCost osdi:TT_P59_ManY_OneTimeCost ,
+        osdi:TT_P59_ManY_Cost ;
+    osdi:hasOnsetAge osdi:TT_P59_ManY_OnsetAge ;
+    osdi:hasRiskCharacterization osdi:TT_P59_ManY_Risk ;
+    osdi:hasDescription "Chronic manifestation from 30 years" ;
+    osdi:includedByModel osdi:TT_P59_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P59_Disease
+osdi:TT_P59_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P59_ManY ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P59_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P59_Experiment
+osdi:TT_P59_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P59_Model ;
+    osdi:hasDescription "Population without age or sex (D10): an initial age of 18 years is assumed to interpret the onset age of a manifestation." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P59_Model
+osdi:TT_P59_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P59_Population ,
+        osdi:TT_P59_ManY_Risk ,
+        osdi:TT_P59_ManY_OnsetAge ,
+        osdi:TT_P59_ManY_OneTimeCost ,
+        osdi:TT_P59_ManY_Cost ,
+        osdi:TT_P59_ManY ,
+        osdi:TT_P59_Disease ;
+    osdi:hasDescription "P59. Population without age or sex (D10): an initial age of 18 years is assumed to interpret the onset age of a manifestation." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

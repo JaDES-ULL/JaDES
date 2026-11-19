@@ -15,6 +15,7 @@ import es.ull.simulation.hta.osdi.ontology.OSDiWrapper;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.outcomes.CostCombinationMethod;
 import es.ull.simulation.hta.outcomes.DisutilityCombinationMethod;
+import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.hta.outcomes.LifeExpectancyReductionCombinationMethod;
 import es.ull.simulation.hta.outcomes.MortalityRateCombinationMethod;
 import es.ull.simulation.hta.params.ParameterGroup;
@@ -131,6 +132,14 @@ public interface Model {
      */
     public default MortalityRateCombinationMethod getMortalityRateCombinationMethod() {
         return getExperimentWrapper().getMortalityRateCombinationMethod();
+    }
+
+    /**
+     * Returns the initial age assumed when the population does not declare one (decision D10): {@link PopulationWrapper#DEFAULT_AGE} years.
+     * @return The initial age assumed when the population does not declare one
+     */
+    public default double getDefaultInitialAge() {
+        return PopulationWrapper.DEFAULT_AGE;
     }
 
     /**

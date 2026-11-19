@@ -124,8 +124,14 @@ public class ModelSheet implements SheetWrapper {
             this.populationAgeName = ageParam.get().getShortName();
         }
         else {
-            log.warn("The population " + population.getShortName() + " does not define an age. An initial age of 0 is assumed to interpret the onset and end ages of the progressions.");
-            this.populationAgeName = "0";
+            // Decision D10: an initial age of 18 years (0 in newborn screening models) is assumed
+            final double defaultAge = modelBuilder.getModel().getDefaultInitialAge();
+            log.warn("The population " + population.getShortName() + " does not define an age. An initial age of " + defaultAge + " is assumed to interpret the onset and end ages of the progressions.");
+            this.populationAgeName = Double.toString(defaultAge);
+        }
+        if (population.getSexParameter().isEmpty()) {
+            log.warn("The population " + population.getShortName() + " does not define its sex. A proportion of women of " + PopulationWrapper.DEFAULT_PROPORTION_OF_WOMEN
+                + " is assumed, which does not affect decision trees, since they do not use the sex.");
         }
     }
     

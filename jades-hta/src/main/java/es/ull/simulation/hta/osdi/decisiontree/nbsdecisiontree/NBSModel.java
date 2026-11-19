@@ -37,6 +37,15 @@ import es.ull.simulation.ontology.OWLOntologyWrapper.InstanceCheckMode;
  * Currently, it supports exactly two interventions: one for screening and one for no screening, i.e., clinical diagnosis.
  */
 public class NBSModel extends BaseModel implements SingleDiseaseAndPopulationModel {
+    /**
+     * Newborn screening models represent newborns: if the population does not declare an age, an initial age of 0 is assumed (exception to decision D10,
+     * which assumes 18 years in the rest of models).
+     */
+    @Override
+    public double getDefaultInitialAge() {
+        return 0.0;
+    }
+
     private final static OSDiLogger log = OSDiLogger.getLogger(NBSModel.class);
     /**
      * The birth prevalence parameter defined in the population of this model.

@@ -19,6 +19,10 @@ public class PopulationWrapper extends BaseModelItemWrapper implements IModelIte
      * The logger for this class
      */
     private final static OSDiLogger log = OSDiLogger.getLogger(PopulationWrapper.class);
+    /** Initial age assumed, with a warning, when the population does not declare one (decision D10 of docs/osdi-1.3-diseno.md) */
+    public final static double DEFAULT_AGE = 18.0;
+    /** Proportion of women assumed, with a warning, when the population does not declare its sex (decision D10 of docs/osdi-1.3-diseno.md) */
+    public final static double DEFAULT_PROPORTION_OF_WOMEN = 0.5;
     /**
      * The epidemiological parameters related to the population. These parameters are used to characterize the disease in the population, 
      * and they are expected to be related to both the population and the disease. 

@@ -577,6 +577,12 @@ public final class DecisionTreeCatalog {
                 leaves("TT_P58_", leaf(0.6, "ManA", "T_Success"), leaf(0.28, "ManA", "T_Failure", "R1"), leaf(0.108, "ManA", "T_Failure", "R2", "R2_Success"),
                     leaf(0.012, "ManA", "T_Failure", "R2", "R2_Failure")),
                 outcomes(73582.0, 65.0, 55.21), outcomes(67082.0, 65.0, 55.21)));
+        // P59 (phase 13, D10): the population declares neither age nor sex, so an initial age of 18 years is assumed (sex is not used by decision trees).
+        // ManY (0.5) starts at 30 years, i.e., 12 years after the start; it lasts 53 years (life expectancy 65): 0.5 * (2000 + 53 * 250) = 7625. No discount.
+        // Comparator: 65000 + 7625 = 72625 (70375 with the former initial age of 0: 0.5 * (2000 + 35 * 250)). Assessed: + 6500
+        cases.add(tc(PAYOFFS, "TT_P59_Experiment", "Population without age or sex (D10): an initial age of 18 years is assumed to interpret the onset age of a manifestation",
+                leaves("TT_P59_", leaf(0.5, "ManY"), leaf(0.5)),
+                outcomes(79125.0, 65.0, 55.25), outcomes(72625.0, 65.0, 55.25)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
