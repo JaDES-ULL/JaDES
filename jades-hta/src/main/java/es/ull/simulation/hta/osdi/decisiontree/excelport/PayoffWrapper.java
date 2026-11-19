@@ -678,15 +678,18 @@ public class PayoffWrapper {
      * @throws MalformedOSDiModelException If more than one effect of the path replaces the same parameter.
      */
     private String addTimes(String base, List<ParameterWrapper> times) throws MalformedOSDiModelException {
-        if (times.isEmpty()) {
-            return base;
-        }
-        final ArrayList<String> terms = new ArrayList<>();
-        terms.add(base);
+        String formula = base;
         for (ParameterWrapper time : times) {
-            terms.add(getParameterTextFormula(time));
+            // A mark of a time that cannot be earlier than an age (e.g., the onset of a health condition that makes a strategy fail, D5)
+            final Optional<ParameterWrapper> age = BranchDestinationNode.getNotBeforeAge(time);
+            if (age.isPresent()) {
+                formula = ExcelFormulaLibrary.MAX.getFormula(formula + ", " + getParameterTextFormula(age.get()) + " - " + populationAgeName);
+            }
+            else {
+                formula = "(" + formula + " + " + getParameterTextFormula(time) + ")";
+            }
         }
-        return "(" + String.join(" + ", terms) + ")";
+        return formula;
     }
 
     /**

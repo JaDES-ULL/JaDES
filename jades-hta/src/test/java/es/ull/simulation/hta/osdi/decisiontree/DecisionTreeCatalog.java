@@ -588,6 +588,12 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P60_Experiment", "Population without life expectancy: a default life expectancy of 100 years is assumed, with a warning",
                 leaves("TT_P60_", leaf(1.0)),
                 outcomes(110000.0, 100.0, 85.0), outcomes(100000.0, 100.0, 85.0)));
+        // P61 (phase 13, D5): P45 with DevA from 40 years (20 years after the start). L1 fails when DevA appears: at T = MAX(start of L1, 40 - 20) = 20.
+        // DevA (0.3): LE 55; 55 * 1000 + 35 * 500 (DevA from 20 to 55) + 20 * 300 (L1 until 20) + 35 * 500 (L2 from 20) = 96000; QALYs 55 * 0.85 - 35 * 0.1 = 43.25.
+        // No DevA (0.7): 84500; 65; 55.25. Comparator: 87950; life years 62; QALYs 51.65. Assessed: + 0.3 * 5500 + 0.7 * 6500 = 6200
+        cases.add(tc(PAYOFFS, "TT_P61_Experiment", "The strategy fails when a development appears at 40 years (failsIf a health condition with an onset age, D5)",
+                leaves("TT_P61_", leaf(0.3, "DevA", "L1_Failure"), leaf(0.7, "L1_Success")),
+                outcomes(94150.0, 62.0, 51.65), outcomes(87950.0, 62.0, 51.65)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.

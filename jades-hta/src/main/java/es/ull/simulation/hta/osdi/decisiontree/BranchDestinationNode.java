@@ -18,6 +18,7 @@ import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.HealthConditionWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWithEffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.IModelItemWithStrategyWrapper;
+import es.ull.simulation.hta.osdi.ontology.ExpressionLanguageType;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.ResourceUsageSKOSCategory;
 import es.ull.simulation.hta.osdi.ontology.StrategyWrapper;
@@ -158,6 +159,35 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
      * @param to The times whose sum gives the end of the period, since the start of the owner; empty if the period lasts until the end of the owner
      */
     public record PayoffWindow(BranchDestinationNode owner, List<ParameterWrapper> from, Optional<List<ParameterWrapper>> to) {}
+
+    /** Expression of the synthetic parameters that mark a time that cannot be earlier than an age (see {@link #notBeforeAge(ParameterWrapper)}) */
+    private static final String NOT_BEFORE_AGE = "NOT_BEFORE_AGE";
+
+    /**
+     * Returns a mark for a list of times of a {@link PayoffWindow} or a {@link Resolution}: the time accumulated so far cannot be earlier than the
+     * time when the patient reaches an age, i.e., time = MAX(time, age - initial age of the population). It is used, e.g., for the failure of a
+     * strategy when a health condition with an onset age appears (decision D5). The mark is a synthetic parameter that is not registered in the model.
+     * @param age The age
+     * @return The mark
+     */
+    public static ParameterWrapper notBeforeAge(ParameterWrapper age) {
+        final ArrayList<ParameterWrapper> dependants = new ArrayList<>();
+        dependants.add(age);
+        return new ParameterWrapper.SyntheticBuilder(age.getModelWrapper(), "NotBefore_" + age.getShortName(),
+            new ParameterWrapper.CalculatedParameterData(NOT_BEFORE_AGE, dependants, new ArrayList<>(), ExpressionLanguageType.EXCEL)).build();
+    }
+
+    /**
+     * Returns the age of a mark created by {@link #notBeforeAge(ParameterWrapper)}.
+     * @param time A time of a list of times
+     * @return The age of the mark; empty if the time is not a mark
+     */
+    public static Optional<ParameterWrapper> getNotBeforeAge(ParameterWrapper time) {
+        if (time.isSynthetic() && time.getParameterNatureData() instanceof ParameterWrapper.CalculatedParameterData data && NOT_BEFORE_AGE.equals(data.expression())) {
+            return Optional.of(data.dependantParameters().get(0));
+        }
+        return Optional.empty();
+    }
     /**
      * A cost or utility that applies within a period (see {@link PayoffWindow}).
      * @param parameter The cost or utility

@@ -22,12 +22,14 @@ import es.ull.simulation.hta.osdi.decisiontree.StrategyCosts.GuidelineCost;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.AdverseEventWrapper;
+import es.ull.simulation.hta.osdi.ontology.ClinicalProgressionWrapper;
 import es.ull.simulation.hta.osdi.ontology.EffectType;
 import es.ull.simulation.hta.osdi.ontology.EffectWrapper;
 import es.ull.simulation.hta.osdi.ontology.NextStrategy;
 import es.ull.simulation.hta.osdi.ontology.OSDiDataItemType;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.StrategyWrapper;
+import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
 import es.ull.simulation.hta.osdi.ontology.StrategyWrapper.Outcome;
 
 /**
@@ -374,6 +376,13 @@ final class StrategyOutcomeExpander {
         }
         else if (outcome.failureCondition().isEmpty()) {
             log.warn("The outcome " + outcome.name() + " does not define an evaluation time. It is assumed to happen at the start of the strategy " + current.strategy().getShortName() + ".");
+        }
+        // Decision D5: the failure produced by a health condition happens when the condition appears, i.e., not before its onset age
+        if (outcome.failureCondition().isPresent() && outcome.failureCondition().get() instanceof ClinicalProgressionWrapper condition) {
+            final Optional<ParameterWrapper> onsetAge = condition.getTemporalConstraintForProgression().flatMap(TemporalConstraint::startTime);
+            if (onsetAge.isPresent()) {
+                time.add(BranchDestinationNode.notBeforeAge(onsetAge.get()));
+            }
         }
         return time;
     }

@@ -8400,4 +8400,172 @@ osdi:TT_P60_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P60. Population without life expectancy: a default life expectancy of 100 years is assumed, with a warning." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_DevA_OnsetAge
+osdi:TT_P61_DevA_OnsetAge rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:hasDescription "DevA appears at 40 years (20 years after the start)" ;
+    osdi:hasExpectedValue "40.0"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P61_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_L1
+osdi:TT_P61_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P61_L1_Cost ;
+    osdi:failsIf osdi:TT_P61_DevA ;
+    osdi:followedOnFailureBy osdi:TT_P61_L2 ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:hasDescription "First line of therapy, which fails if DevA appears" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_L1_Cost
+osdi:TT_P61_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_L2
+osdi:TT_P61_L2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P61_L2_Cost ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:hasDescription "Second line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_L2_Cost
+osdi:TT_P61_L2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L2" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_DevA
+osdi:TT_P61_DevA rdf:type owl:NamedIndividual ,
+        osdi:Development ;
+    osdi:hasCost osdi:TT_P61_DevA_Cost ;
+    osdi:hasEffect osdi:TT_P61_DevA_LER ;
+    osdi:hasOnsetAge osdi:TT_P61_DevA_OnsetAge ;
+    osdi:hasRiskCharacterization osdi:TT_P61_DevA_Risk ;
+    osdi:hasUtility osdi:TT_P61_DevA_Disutility ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:hasDescription "DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_DevA_Cost
+osdi:TT_P61_DevA_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of DevA" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_DevA_Risk
+osdi:TT_P61_DevA_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:hasDescription "Probability of DevA" ;
+    osdi:hasExpectedValue "0.3"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_DevA_Disutility
+osdi:TT_P61_DevA_Disutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of DevA" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_DevA_LER
+osdi:TT_P61_DevA_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P61_DevA_LERMagnitude ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:hasDescription "Life expectancy reduction due to DevA" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_DevA_LERMagnitude
+osdi:TT_P61_DevA_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:hasDescription "Years of life lost due to DevA" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_Disease
+osdi:TT_P61_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_P61_DevA ;
+    osdi:hasStrategy osdi:TT_P61_L1 ;
+    osdi:includedByModel osdi:TT_P61_Model ;
+    osdi:hasDescription "Disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_Experiment
+osdi:TT_P61_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P61_Model ;
+    osdi:hasDescription "The strategy fails when a development appears at 40 years (failsIf a health condition with an onset age, D5)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P61_Model
+osdi:TT_P61_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_P61_DevA_OnsetAge ,
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P61_L1 ,
+        osdi:TT_P61_L1_Cost ,
+        osdi:TT_P61_L2 ,
+        osdi:TT_P61_L2_Cost ,
+        osdi:TT_P61_DevA ,
+        osdi:TT_P61_DevA_Cost ,
+        osdi:TT_P61_DevA_Risk ,
+        osdi:TT_P61_DevA_Disutility ,
+        osdi:TT_P61_DevA_LER ,
+        osdi:TT_P61_DevA_LERMagnitude ,
+        osdi:TT_P61_Disease ;
+    osdi:hasDescription "P61. The strategy fails when a development appears at 40 years (failsIf a health condition with an onset age, D5)." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees
