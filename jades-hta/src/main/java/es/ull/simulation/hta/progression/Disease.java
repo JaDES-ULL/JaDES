@@ -298,6 +298,28 @@ public class Disease extends HTAModelComponent implements Comparable<Disease>, P
 	}
 
 	/**
+	 * Returns the one-time cost that this disease applies when the patient starts the simulation (e.g., the one-time costs of its strategies). By
+	 * default, 0. The diagnosis cost is applied when the patient is diagnosed instead (see {@link #getStartingCost(Patient, double, Discount)}).
+	 * @param pat A patient
+	 * @param time Specific time when the cost is applied (in years)
+	 * @param discountRate The discount rate to apply to the cost
+	 * @return the one-time cost that this disease applies when the patient starts the simulation
+	 */
+	public double getStartOfSimulationCost(Patient pat, double time, Discount discountRate) {
+		return 0.0;
+	}
+
+	/**
+	 * Returns the one-time disutility (QALY loss) that this disease applies when the patient starts the simulation (e.g., the one-time utilities of
+	 * its strategies). By default, 0.
+	 * @param pat A patient
+	 * @return the one-time disutility that this disease applies when the patient starts the simulation
+	 */
+	public double getStartOfSimulationDisutility(Patient pat) {
+		return 0.0;
+	}
+
+	/**
 	 * Returns the diagnosis cost for this disease
 	 * @param pat A patient
 	 * @param time Specific time when the cost is applied (in years)

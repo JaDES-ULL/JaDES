@@ -44,6 +44,10 @@ public class OSDiDESModel extends HTAModel {
 	 * The clinical progression element that the interventions target, or an empty optional if they target the disease (see {@link DESInterventionTarget})
 	 */
 	private final Optional<ClinicalProgressionWrapper> target;
+	/**
+	 * The payoffs of the strategies of the health conditions in each arm (decision D2, see {@link DESStrategyPayoffs})
+	 */
+	private final DESStrategyPayoffs strategyPayoffs;
 	
 	/**
 	 * Constructor to initialize the OSDiDESModel with the specified HTA experiment, path to the ontology, model ID, and instance prefix.
@@ -71,6 +75,8 @@ public class OSDiDESModel extends HTAModel {
 		for (InterventionWrapper interventionWrapper : interventions) {
 			InterventionFactory.getInterventionInstance(this, interventionWrapper);
 		}
+		// The strategies of each arm depend on the strategy replacements of its intervention (D2)
+		this.strategyPayoffs = DESStrategyPayoffs.build(this, diseaseWrapper);
 		// TODO: Adapt the rest to use the wrapper
 
 		
@@ -91,6 +97,14 @@ public class OSDiDESModel extends HTAModel {
 	 */
 	public Optional<ClinicalProgressionWrapper> getTarget() {
 		return target;
+	}
+
+	/**
+	 * Returns the payoffs of the strategies of the health conditions in each arm (decision D2)
+	 * @return The payoffs of the strategies of the health conditions in each arm
+	 */
+	public DESStrategyPayoffs getStrategyPayoffs() {
+		return strategyPayoffs;
 	}
 
 	/**

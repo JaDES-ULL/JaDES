@@ -55,6 +55,8 @@ public class CostListener extends OutcomeListener {
 				// The one-time cost of the intervention is charged once, unless it is charged with each test (detection interventions) or with each onset of a progression
 				if (pat.getIntervention().appliesOneTimePayoffsAtStart())
 					value = pat.getIntervention().getStartingCost(pat, ts, discountRate);
+				// ...plus the one-time cost that the disease applies at the start (e.g., that of its strategies)
+				value += pat.getDisease().getStartOfSimulationCost(pat, ts, discountRate);
 				break;
 			case DEATH:
 				break;

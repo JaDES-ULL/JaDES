@@ -95,6 +95,8 @@ public class BudgetImpactListener extends BasicHTAListener {
 						// The one-time cost of the intervention is charged once, unless it is charged with each test (detection interventions) or with each onset of a progression
 						if (pat.getIntervention().appliesOneTimePayoffsAtStart())
 							update(pat.getnIntervention(), pat.getIntervention().getStartingCost(pat, endYear, Discount.ZERO_DISCOUNT), endYear);
+						// ...plus the one-time cost that the disease applies at the start (e.g., that of its strategies)
+						update(pat.getnIntervention(), pat.getDisease().getStartOfSimulationCost(pat, endYear, Discount.ZERO_DISCOUNT), endYear);
 						break;
 					case DEATH:
 						break;

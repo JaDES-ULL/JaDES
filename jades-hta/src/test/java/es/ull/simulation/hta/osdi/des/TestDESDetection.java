@@ -11,6 +11,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import es.ull.simulation.hta.Patient;
 import es.ull.simulation.hta.osdi.des.DESTestSupport.Run;
+import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.OSDiTest;
 import es.ull.simulation.hta.params.StandardParameter;
 
@@ -21,6 +22,7 @@ import es.ull.simulation.hta.params.StandardParameter;
  * <ul>
  * <li>D12: the disease has a diagnosis strategy (sensitivity 0.7, without specificity). The screening arm replaces the detection strategies by a
  * group with a screening test (sensitivity 0.9, specificity 0.95) and the diagnosis.</li>
+ * <li>D13: two screening strategies in the same arm.</li>
  * </ul>
  */
 @OSDiTest
@@ -47,5 +49,11 @@ public class TestDESDetection {
             () -> assertEquals(0.95, d12.assessed().getUsedParameterValue(StandardParameter.SPECIFICITY, assessedPatient), TOLERANCE, "Specificity of the screening arm"),
             () -> assertEquals(0.7, d12.comparator().getUsedParameterValue(StandardParameter.SENSITIVITY, comparatorPatient), TOLERANCE, "Sensitivity of the arm without screening"),
             () -> assertEquals(1.0, d12.comparator().getUsedParameterValue(StandardParameter.SPECIFICITY, comparatorPatient), TOLERANCE, "Specificity of the arm without screening"));
+    }
+
+    @Test
+    @DisplayName("D13. Two screening strategies in the same arm are not supported")
+    public void rejectsTwoScreeningStrategiesInAnArm() throws Exception {
+        DESTestSupport.assertRejected("D13", UnsupportedOSDiFeatureException.class, "has 2 screening strategies");
     }
 }

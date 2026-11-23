@@ -435,4 +435,23 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
 - El DES no simula las estrategias de tratamiento: la estrategia sustituida no se aplica en cada episodio de una T aguda.
 - El DES no lee la probabilidad de muerte de las progresiones (tampoco la de T en su aparición).
 - (Hecho en la fase 14.) El texto de D1 («se aplica en cada aparición del objetivo») debería precisarse con la semántica del tiempo 0. Se cambió por «la intervención se aplica en el tiempo 0, cuando los pacientes presentan el objetivo; si es una manifestación aguda, en cada episodio», pero esta semántica habrá que revisarla más adelante.
-- Puntos 2 (D2: sustituciones en el DES) y 3 (costes de las estrategias de detección) de la fase.
+- (Hecho en la fase 14.) Punto 2 de la fase (D2: sustituciones en el DES).
+- Punto 3 de la fase (costes de las estrategias de detección), que necesita que `OSDiDetectionIntervention` programe pruebas.
+
+**Hecho (continuación):**
+- Defecto previo (commit aparte): `OSDiDetectionIntervention` suponía sensibilidad o especificidad perfectas con `addUsedParameter(plantilla, descripción, fuente, 1.0)`, que solo añade el parámetro si estaba registrado; no lo estaba, así que el valor supuesto se perdía y quedaba `NaN`. Ahora se registran en el constructor. Test D12 (`TestDESDetection`): la especificidad del brazo sin cribado, cuya estrategia de diagnóstico no la define, es 1; antes fallaba con `expected: <1.0> but was: <NaN>`.
+- D2 en el DES (aprobado con las recomendaciones):
+  - `DESStrategyPayoffs` calcula, al construir el modelo, las estrategias de cada condición en cada brazo con `StrategyReplacements.replaceByType` y reúne los pagos de las de tratamiento y seguimiento (categorías `TreatmentCat` o `FollowUpCat`, como el árbol): costes propios, costes de sus tecnologías y utilidades, todos.
+  - `OSDiDisease` y `OSDiDiseaseProgression` suman esos pagos a los suyos con el calendario de la condición. Para los pagos de una vez de la enfermedad en el tiempo 0 se añaden `Disease.getStartOfSimulationCost` y `getStartOfSimulationDisutility` (0 por defecto), que los cuatro listeners usan en `START`.
+  - `OSDiDetectionIntervention` toma la estrategia de detección del brazo tras la sustitución por tipo (antes cogía la primera de las sustituciones o de cualquier enfermedad); más de una del mismo tipo es `Unsupported`.
+  - `OSDiIntervention` ya no avisa de que ignora las sustituciones.
+  - Se rechazan (`Unsupported`) las estrategias de tratamiento o seguimiento con resultados (`hasStrategyOutcome`, `failsIf`), efectos adversos o pautas (de la estrategia o de sus tecnologías). Las sustituciones de un desarrollo se ignoran con aviso.
+  - Tests nuevos, con valores a mano: D09 (coste por paciente 100 + 350 × años vividos y 400 + 850 × años vividos; diferencia de AVAC −0,1 × años vividos), D10 (2100 y 2400 por episodio; aviso de los pagos anuales de la estrategia), D11 (100 + 20 × (años vividos − aparición de ManX)), D12 (sensibilidad 0,9 y especificidad 0,95 en el brazo con cribado; 0,7 y 1 en el otro), D13 (dos estrategias de cribado: `Unsupported`), D14 (resultados: `Unsupported`) y D15 (pauta: `Unsupported`). Antes del cambio fallaron todos menos las sensibilidades de D12, que ya se leían bien (p. ej., `expected: <1850.0> but was: <0.0>`, `expected: <-0.5> but was: <0.0>`).
+  - Nueva utilidad de tests `DESTestSupport` (simula los dos brazos con listeners de costes y AVAC), que también usa `TestDESInterventionTarget`.
+
+**Decidido (continuación):**
+- Las estrategias con resultados, efectos adversos o pautas se rechazan en el DES en lugar de aplicar solo sus pagos propios: no se dan resultados engañosos.
+- Los pagos de las estrategias siguen el calendario de su condición, sin ventanas propias.
+
+**Pendiente (continuación):**
+- Sin test: costes de las tecnologías de una estrategia en el DES y sustituciones sobre un desarrollo.

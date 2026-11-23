@@ -98,6 +98,8 @@ public class BreakdownCostListener extends BasicHTAListener {
 				// The one-time cost of the intervention is charged once, unless it is charged with each test (detection interventions) or with each onset of a progression
 				if (pat.getIntervention().appliesOneTimePayoffsAtStart())
 					interventionCost[pat.getnIntervention()][(int) endYear] += pat.getIntervention().getStartingCost(pat, endYear, discount);
+				// ...plus the one-time cost that the disease applies at the start (e.g., that of its strategies)
+				diseaseCost[pat.getnIntervention()][pat.getDisease().ordinal()][(int) endYear] += pat.getDisease().getStartOfSimulationCost(pat, endYear, discount);
 				break;
 			case DEATH:
 				break;

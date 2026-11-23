@@ -45,13 +45,11 @@ public class OSDiIntervention extends Intervention {
 	public OSDiIntervention(OSDiDESModel model, InterventionWrapper interventionWrapper) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
 		super(model, interventionWrapper.getShortName(), interventionWrapper.getDescription().orElse(interventionWrapper.getShortName()));
 		this.interventionWrapper = interventionWrapper;
-		// The DES does not simulate strategies, so strategy replacement effects (decision D2) are ignored
+		// Strategy replacement effects (decision D2) do not modify parameters: they change the strategies of the arm (see DESStrategyPayoffs and
+		// OSDiDetectionIntervention)
 		this.effects = new TreeSet<>();
 		for (EffectWrapper effect : interventionWrapper.getEffects()) {
-			if (EffectType.STRATEGY_REPLACEMENT_EFFECT.equals(effect.getEffectType())) {
-				log.warn("The strategy replacement effect " + effect.getShortName() + " of the intervention " + interventionWrapper.getShortName() + " is ignored by the DES, which does not simulate strategies.");
-			}
-			else {
+			if (!EffectType.STRATEGY_REPLACEMENT_EFFECT.equals(effect.getEffectType())) {
 				this.effects.add(effect);
 			}
 		}

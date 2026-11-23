@@ -59,6 +59,8 @@ public class QALYListener extends OutcomeListener {
 				// The one-time disutility of the intervention is applied once, unless it is applied with each test (detection interventions) or with each onset of a progression
 				if (pat.getIntervention().appliesOneTimePayoffsAtStart())
 					value = -pat.getIntervention().getStartingDisutility(pat);
+				// ...plus the one-time disutility that the disease applies at the start (e.g., that of its strategies)
+				value -= pat.getDisease().getStartOfSimulationDisutility(pat);
 				break;
 			default:
 				break;			

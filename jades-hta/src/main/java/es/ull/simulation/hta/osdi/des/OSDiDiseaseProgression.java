@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import es.ull.simulation.hta.Patient;
 import es.ull.simulation.hta.osdi.OSDiLogger;
 import es.ull.simulation.hta.osdi.des.factories.CostParametersHandler;
 import es.ull.simulation.hta.osdi.des.factories.ParameterFactory;
@@ -16,6 +17,7 @@ import es.ull.simulation.hta.osdi.ontology.ParameterWrapper;
 import es.ull.simulation.hta.osdi.ontology.PopulationWrapper;
 import es.ull.simulation.hta.osdi.ontology.TemporalConstraint;
 import es.ull.simulation.hta.osdi.ontology.ParameterWrapper.SpecificInformationForUtility;
+import es.ull.simulation.hta.params.Discount;
 import es.ull.simulation.hta.params.ParameterTemplate;
 import es.ull.simulation.hta.params.StandardParameter;
 import es.ull.simulation.hta.progression.Disease;
@@ -176,6 +178,50 @@ public class OSDiDiseaseProgression extends DiseaseProgression {
 		if (!DiseaseProgression.Type.ACUTE_MANIFESTATION.equals(getType()) && isTargetWithAssumedInitialProportion()) {
 			addUsedParameter(StandardParameter.DISEASE_PROGRESSION_INITIAL_PROPORTION, "Initial proportion of the target of the interventions", "Assumption (D1)", 1.0);
 		}
+	}
+
+	/**
+	 * Returns the payoffs of the strategies of this progression in the arm of a patient (decision D2, see {@link DESStrategyPayoffs})
+	 */
+	private DESStrategyPayoffs.Payoffs getStrategyPayoffs(Patient pat) {
+		return getModel().getStrategyPayoffs().get(pat.getIntervention(), progressionWrapper.getIndividualIRI());
+	}
+
+	/**
+	 * Adds the annual costs of the strategies of the progression in the arm of the patient, while the patient has the progression (D2)
+	 */
+	@Override
+	public double getCostWithinPeriod(Patient pat, double initYear, double endYear, Discount discountRate) {
+		return super.getCostWithinPeriod(pat, initYear, endYear, discountRate) + getStrategyPayoffs(pat).getCostWithinPeriod(pat, initYear, endYear, discountRate);
+	}
+
+	@Override
+	public double[] getAnnualizedCostWithinPeriod(Patient pat, double initYear, double endYear, Discount discountRate) {
+		return getStrategyPayoffs(pat).getAnnualizedCostWithinPeriod(pat, initYear, endYear, discountRate, super.getAnnualizedCostWithinPeriod(pat, initYear, endYear, discountRate));
+	}
+
+	/**
+	 * Adds the one-time costs of the strategies of the progression in the arm of the patient, at its onset or with each episode (D2)
+	 */
+	@Override
+	public double getStartingCost(Patient pat, double time, Discount discountRate) {
+		return super.getStartingCost(pat, time, discountRate) + getStrategyPayoffs(pat).getStartingCost(pat, time, discountRate);
+	}
+
+	/**
+	 * Adds the annual disutilities of the strategies of the progression in the arm of the patient (D2)
+	 */
+	@Override
+	public double getAnnualDisutility(Patient pat) {
+		return super.getAnnualDisutility(pat) + getStrategyPayoffs(pat).getAnnualDisutility(pat);
+	}
+
+	/**
+	 * Adds the one-time disutilities of the strategies of the progression in the arm of the patient, at its onset or with each episode (D2)
+	 */
+	@Override
+	public double getStartingDisutility(Patient pat) {
+		return super.getStartingDisutility(pat) + getStrategyPayoffs(pat).getStartingDisutility(pat);
 	}
 	
 }

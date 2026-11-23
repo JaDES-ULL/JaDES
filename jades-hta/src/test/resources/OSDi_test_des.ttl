@@ -1143,6 +1143,537 @@ osdi:TD_D08_DevA_Risk rdf:type owl:NamedIndividual ,
     osdi:hasDescription "Probability of DevA" ;
     osdi:hasExpectedValue "0.5"^^xsd:double .
 
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Experiment
+osdi:TD_D09_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TD_D09_Model ;
+    osdi:hasDescription "D09. Strategies of the disease: the assessed intervention replaces the treatment strategy by type, and the follow-up is kept." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasNumberOfSimulatedIndividuals 5000 ;
+    osdi:hasTimeHorizon "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Model
+osdi:TD_D09_Model rdf:type owl:NamedIndividual ,
+        osdi:DiscreteEventSimulationModel ;
+    osdi:hasAssessedIntervention osdi:TD_D09_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TD_D09_InterventionNone ;
+    osdi:includesModelItem osdi:TD_D09_Disease ,
+        osdi:TD_D09_FollowUp ,
+        osdi:TD_D09_FollowUp_AnnualCost ,
+        osdi:TD_D09_InterventionNone ,
+        osdi:TD_D09_InterventionTreat ,
+        osdi:TD_D09_Population ,
+        osdi:TD_D09_PopulationAge ,
+        osdi:TD_D09_PopulationBaseUtility ,
+        osdi:TD_D09_PopulationSex ,
+        osdi:TD_D09_Replacement ,
+        osdi:TD_D09_Treatment1 ,
+        osdi:TD_D09_Treatment1_AnnualCost ,
+        osdi:TD_D09_Treatment1_OneTimeCost ,
+        osdi:TD_D09_Treatment2 ,
+        osdi:TD_D09_Treatment2_AnnualCost ,
+        osdi:TD_D09_Treatment2_AnnualDisutility ,
+        osdi:TD_D09_Treatment2_OneTimeCost ;
+    osdi:hasDescription "D09. Strategies of the disease: the assessed intervention replaces the treatment strategy by type, and the follow-up is kept." .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Population
+osdi:TD_D09_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TD_D09_PopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasSex osdi:TD_D09_PopulationSex ;
+    osdi:hasUtility osdi:TD_D09_PopulationBaseUtility ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:hasDescription "Everyone has the disease and starts at 20 years old" ;
+    osdi:hasGeographicalContext "Spain" ;
+    osdi:hasMaxAge "100.0"^^xsd:double ;
+    osdi:hasMinAge "18.0"^^xsd:double ;
+    osdi:hasSize 5000 .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_PopulationAge
+osdi:TD_D09_PopulationAge rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Other ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Age ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_PopulationSex
+osdi:TD_D09_PopulationSex rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Sex ;
+    osdi:hasDescription "Proportion of women" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_PopulationBaseUtility
+osdi:TD_D09_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Base utility for the studied population" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double ;
+    osdi:isDisutility "false"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Disease
+osdi:TD_D09_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasStrategy osdi:TD_D09_FollowUp ,
+        osdi:TD_D09_Treatment1 ;
+    osdi:includedByModel osdi:TD_D09_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_InterventionNone
+osdi:TD_D09_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:isInterventionOf osdi:TD_D09_Disease ;
+    osdi:hasDescription "Comparator: the strategies of the disease" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_InterventionTreat
+osdi:TD_D09_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasEffect osdi:TD_D09_Replacement ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:isInterventionOf osdi:TD_D09_Disease ;
+    osdi:hasDescription "Replaces the treatment of the disease" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Replacement
+osdi:TD_D09_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TD_D09_Disease ;
+    osdi:hasReplacementStrategy osdi:TD_D09_Treatment2 ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:hasDescription "Replaces the treatment strategy of the disease by Treatment2 (the follow-up is kept)" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_FollowUp
+osdi:TD_D09_FollowUp rdf:type owl:NamedIndividual ,
+        osdi:FollowUpStrategy ;
+    osdi:hasCategory osdi:FollowUpCat ;
+    osdi:hasCost osdi:TD_D09_FollowUp_AnnualCost ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:hasDescription "Follow-up strategy of the disease" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_FollowUp_AnnualCost
+osdi:TD_D09_FollowUp_AnnualCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the follow-up" ;
+    osdi:hasExpectedValue "50.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Treatment1
+osdi:TD_D09_Treatment1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TD_D09_Treatment1_AnnualCost ,
+        osdi:TD_D09_Treatment1_OneTimeCost ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:hasDescription "Treatment strategy of the disease" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Treatment1_AnnualCost
+osdi:TD_D09_Treatment1_AnnualCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Treatment1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Treatment1_OneTimeCost
+osdi:TD_D09_Treatment1_OneTimeCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "One-time cost of Treatment1" ;
+    osdi:hasExpectedValue "100.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Treatment2
+osdi:TD_D09_Treatment2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TD_D09_Treatment2_AnnualCost ,
+        osdi:TD_D09_Treatment2_OneTimeCost ;
+    osdi:hasUtility osdi:TD_D09_Treatment2_AnnualDisutility ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:hasDescription "New treatment strategy" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Treatment2_AnnualCost
+osdi:TD_D09_Treatment2_AnnualCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of Treatment2" ;
+    osdi:hasExpectedValue "800.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Treatment2_OneTimeCost
+osdi:TD_D09_Treatment2_OneTimeCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "One-time cost of Treatment2" ;
+    osdi:hasExpectedValue "400.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D09_Treatment2_AnnualDisutility
+osdi:TD_D09_Treatment2_AnnualDisutility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TD_D09_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual disutility of Treatment2" ;
+    osdi:hasExpectedValue "0.1"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Experiment
+osdi:TD_D10_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TD_D10_Model ;
+    osdi:hasDescription "D10. Interventions whose target is an acute manifestation, whose treatment strategy is replaced: the strategy applies with each episode." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasNumberOfSimulatedIndividuals 5000 ;
+    osdi:hasTimeHorizon "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Model
+osdi:TD_D10_Model rdf:type owl:NamedIndividual ,
+        osdi:DiscreteEventSimulationModel ;
+    osdi:hasAssessedIntervention osdi:TD_D10_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TD_D10_InterventionNone ;
+    osdi:includesModelItem osdi:TD_D10_Disease ,
+        osdi:TD_D10_InterventionNone ,
+        osdi:TD_D10_InterventionTreat ,
+        osdi:TD_D10_ManC ,
+        osdi:TD_D10_ManC_Cost ,
+        osdi:TD_D10_ManC_Risk ,
+        osdi:TD_D10_Population ,
+        osdi:TD_D10_PopulationAge ,
+        osdi:TD_D10_PopulationBaseUtility ,
+        osdi:TD_D10_PopulationSex ,
+        osdi:TD_D10_Replacement ,
+        osdi:TD_D10_Treatment1 ,
+        osdi:TD_D10_Treatment1_Cost ,
+        osdi:TD_D10_Treatment2 ,
+        osdi:TD_D10_Treatment2_AnnualCost ,
+        osdi:TD_D10_Treatment2_Cost ;
+    osdi:hasDescription "D10. Interventions whose target is an acute manifestation, whose treatment strategy is replaced: the strategy applies with each episode." .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Population
+osdi:TD_D10_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TD_D10_PopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasSex osdi:TD_D10_PopulationSex ;
+    osdi:hasUtility osdi:TD_D10_PopulationBaseUtility ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:hasDescription "Everyone has the disease and starts at 20 years old" ;
+    osdi:hasGeographicalContext "Spain" ;
+    osdi:hasMaxAge "100.0"^^xsd:double ;
+    osdi:hasMinAge "18.0"^^xsd:double ;
+    osdi:hasSize 5000 .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_PopulationAge
+osdi:TD_D10_PopulationAge rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Other ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Age ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_PopulationSex
+osdi:TD_D10_PopulationSex rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Sex ;
+    osdi:hasDescription "Proportion of women" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_PopulationBaseUtility
+osdi:TD_D10_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Base utility for the studied population" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double ;
+    osdi:isDisutility "false"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Disease
+osdi:TD_D10_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasProgressionElement osdi:TD_D10_ManC ;
+    osdi:includedByModel osdi:TD_D10_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_InterventionNone
+osdi:TD_D10_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:isInterventionOf osdi:TD_D10_ManC ;
+    osdi:hasDescription "Comparator: the usual treatment of each episode" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_InterventionTreat
+osdi:TD_D10_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasEffect osdi:TD_D10_Replacement ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:isInterventionOf osdi:TD_D10_ManC ;
+    osdi:hasDescription "Replaces the treatment of each episode" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Replacement
+osdi:TD_D10_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TD_D10_ManC ;
+    osdi:hasReplacementStrategy osdi:TD_D10_Treatment2 ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:hasDescription "Replaces the treatment of the episodes of ManC by Treatment2" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_ManC
+osdi:TD_D10_ManC rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasCost osdi:TD_D10_ManC_Cost ;
+    osdi:hasRiskCharacterization osdi:TD_D10_ManC_Risk ;
+    osdi:hasStrategy osdi:TD_D10_Treatment1 ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:hasDescription "Acute manifestation C, the target of the interventions" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_ManC_Cost
+osdi:TD_D10_ManC_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each episode of ManC" ;
+    osdi:hasExpectedValue "2000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_ManC_Risk
+osdi:TD_D10_ManC_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:hasDescription "Annual probability of an episode of ManC" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Treatment1
+osdi:TD_D10_Treatment1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TD_D10_Treatment1_Cost ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:hasDescription "Usual treatment of each episode" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Treatment1_Cost
+osdi:TD_D10_Treatment1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the usual treatment of an episode" ;
+    osdi:hasExpectedValue "100.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Treatment2
+osdi:TD_D10_Treatment2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TD_D10_Treatment2_Cost ,
+        osdi:TD_D10_Treatment2_AnnualCost ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:hasDescription "New treatment of each episode" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Treatment2_Cost
+osdi:TD_D10_Treatment2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of the new treatment of an episode" ;
+    osdi:hasExpectedValue "400.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D10_Treatment2_AnnualCost
+osdi:TD_D10_Treatment2_AnnualCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D10_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the new treatment (ignored, since ManC is acute)" ;
+    osdi:hasExpectedValue "30.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_Experiment
+osdi:TD_D11_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TD_D11_Model ;
+    osdi:hasDescription "D11. Treatment strategy of a chronic manifestation: one-time payoffs at its onset and annual payoffs while the patient has it." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasNumberOfSimulatedIndividuals 5000 ;
+    osdi:hasTimeHorizon "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_Model
+osdi:TD_D11_Model rdf:type owl:NamedIndividual ,
+        osdi:DiscreteEventSimulationModel ;
+    osdi:hasAssessedIntervention osdi:TD_D11_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TD_D11_InterventionNone ;
+    osdi:includesModelItem osdi:TD_D11_Disease ,
+        osdi:TD_D11_InterventionNone ,
+        osdi:TD_D11_InterventionTreat ,
+        osdi:TD_D11_ManX ,
+        osdi:TD_D11_ManX_Risk ,
+        osdi:TD_D11_Population ,
+        osdi:TD_D11_PopulationAge ,
+        osdi:TD_D11_PopulationBaseUtility ,
+        osdi:TD_D11_PopulationSex ,
+        osdi:TD_D11_Treatment ,
+        osdi:TD_D11_Treatment_AnnualCost ,
+        osdi:TD_D11_Treatment_OneTimeCost ;
+    osdi:hasDescription "D11. Treatment strategy of a chronic manifestation: one-time payoffs at its onset and annual payoffs while the patient has it." .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_Population
+osdi:TD_D11_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TD_D11_PopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasSex osdi:TD_D11_PopulationSex ;
+    osdi:hasUtility osdi:TD_D11_PopulationBaseUtility ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:hasDescription "Everyone has the disease and starts at 20 years old" ;
+    osdi:hasGeographicalContext "Spain" ;
+    osdi:hasMaxAge "100.0"^^xsd:double ;
+    osdi:hasMinAge "18.0"^^xsd:double ;
+    osdi:hasSize 5000 .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_PopulationAge
+osdi:TD_D11_PopulationAge rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Other ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Age ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_PopulationSex
+osdi:TD_D11_PopulationSex rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Sex ;
+    osdi:hasDescription "Proportion of women" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_PopulationBaseUtility
+osdi:TD_D11_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Base utility for the studied population" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double ;
+    osdi:isDisutility "false"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_Disease
+osdi:TD_D11_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasProgressionElement osdi:TD_D11_ManX ;
+    osdi:includedByModel osdi:TD_D11_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_InterventionNone
+osdi:TD_D11_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:isInterventionOf osdi:TD_D11_Disease ;
+    osdi:hasDescription "Comparator: do nothing" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_InterventionTreat
+osdi:TD_D11_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:isInterventionOf osdi:TD_D11_Disease ;
+    osdi:hasDescription "Intervention without effects" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_ManX
+osdi:TD_D11_ManX rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasRiskCharacterization osdi:TD_D11_ManX_Risk ;
+    osdi:hasStrategy osdi:TD_D11_Treatment ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:hasDescription "Chronic manifestation X" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_ManX_Risk
+osdi:TD_D11_ManX_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:hasDescription "Annual probability of ManX" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_Treatment
+osdi:TD_D11_Treatment rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TD_D11_Treatment_OneTimeCost ,
+        osdi:TD_D11_Treatment_AnnualCost ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:hasDescription "Treatment of ManX" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_Treatment_OneTimeCost
+osdi:TD_D11_Treatment_OneTimeCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "One-time cost of the treatment of ManX" ;
+    osdi:hasExpectedValue "100.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D11_Treatment_AnnualCost
+osdi:TD_D11_Treatment_AnnualCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D11_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Annual cost of the treatment of ManX" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Experiment
 osdi:TD_D12_Experiment rdf:type owl:NamedIndividual ,
         osdi:Experiment ;
@@ -1297,3 +1828,404 @@ osdi:TD_D12_ArmStrategies rdf:type owl:NamedIndividual ,
         osdi:TD_D12_Diagnosis ;
     osdi:includedByModel osdi:TD_D12_Model ;
     osdi:hasDescription "Detection strategies of the disease in the screening arm" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Experiment
+osdi:TD_D13_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TD_D13_Model ;
+    osdi:hasDescription "D13. Two screening strategies in the same arm: not supported." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasNumberOfSimulatedIndividuals 5000 ;
+    osdi:hasTimeHorizon "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Model
+osdi:TD_D13_Model rdf:type owl:NamedIndividual ,
+        osdi:DiscreteEventSimulationModel ;
+    osdi:hasAssessedIntervention osdi:TD_D13_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TD_D13_InterventionNone ;
+    osdi:includesModelItem osdi:TD_D13_ArmStrategies ,
+        osdi:TD_D13_Diagnosis ,
+        osdi:TD_D13_Diagnosis_Sensitivity ,
+        osdi:TD_D13_Disease ,
+        osdi:TD_D13_InterventionNone ,
+        osdi:TD_D13_InterventionTreat ,
+        osdi:TD_D13_Population ,
+        osdi:TD_D13_PopulationAge ,
+        osdi:TD_D13_PopulationBaseUtility ,
+        osdi:TD_D13_PopulationSex ,
+        osdi:TD_D13_Replacement ,
+        osdi:TD_D13_Screening ,
+        osdi:TD_D13_Screening2 ,
+        osdi:TD_D13_Screening_Sensitivity ,
+        osdi:TD_D13_Screening_Specificity ;
+    osdi:hasDescription "D13. Two screening strategies in the same arm: not supported." .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Population
+osdi:TD_D13_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TD_D13_PopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasSex osdi:TD_D13_PopulationSex ;
+    osdi:hasUtility osdi:TD_D13_PopulationBaseUtility ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:hasDescription "Everyone has the disease and starts at 20 years old" ;
+    osdi:hasGeographicalContext "Spain" ;
+    osdi:hasMaxAge "100.0"^^xsd:double ;
+    osdi:hasMinAge "18.0"^^xsd:double ;
+    osdi:hasSize 5000 .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_PopulationAge
+osdi:TD_D13_PopulationAge rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Other ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Age ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_PopulationSex
+osdi:TD_D13_PopulationSex rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Sex ;
+    osdi:hasDescription "Proportion of women" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_PopulationBaseUtility
+osdi:TD_D13_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Base utility for the studied population" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double ;
+    osdi:isDisutility "false"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Disease
+osdi:TD_D13_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasStrategy osdi:TD_D13_Diagnosis ;
+    osdi:includedByModel osdi:TD_D13_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_InterventionNone
+osdi:TD_D13_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisIntervention ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:isInterventionOf osdi:TD_D13_Disease ;
+    osdi:hasDescription "No screening: clinical detection" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_InterventionTreat
+osdi:TD_D13_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:ScreeningIntervention ;
+    osdi:hasEffect osdi:TD_D13_Replacement ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:isInterventionOf osdi:TD_D13_Disease ;
+    osdi:hasDescription "Screening" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Replacement
+osdi:TD_D13_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TD_D13_Disease ;
+    osdi:hasReplacementStrategy osdi:TD_D13_ArmStrategies ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:hasDescription "Detection strategies of the disease in the screening arm" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Diagnosis
+osdi:TD_D13_Diagnosis rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisStrategy ;
+    osdi:hasCategory osdi:DiagnosisCat ;
+    osdi:hasSensitivity osdi:TD_D13_Diagnosis_Sensitivity ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:hasDescription "Clinical diagnosis" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Diagnosis_Sensitivity
+osdi:TD_D13_Diagnosis_Sensitivity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Sensitivity ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:hasDescription "Sensitivity of the clinical diagnosis" ;
+    osdi:hasExpectedValue "0.7"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Screening
+osdi:TD_D13_Screening rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:hasSensitivity osdi:TD_D13_Screening_Sensitivity ;
+    osdi:hasSpecificity osdi:TD_D13_Screening_Specificity ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:hasDescription "Screening test" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Screening_Sensitivity
+osdi:TD_D13_Screening_Sensitivity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Sensitivity ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:hasDescription "Sensitivity of the screening test" ;
+    osdi:hasExpectedValue "0.9"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Screening_Specificity
+osdi:TD_D13_Screening_Specificity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Specificity ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:hasDescription "Specificity of the screening test" ;
+    osdi:hasExpectedValue "0.95"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_ArmStrategies
+osdi:TD_D13_ArmStrategies rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TD_D13_Screening ,
+        osdi:TD_D13_Screening2 ,
+        osdi:TD_D13_Diagnosis ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:hasDescription "Two screening tests and the diagnosis" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D13_Screening2
+osdi:TD_D13_Screening2 rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:includedByModel osdi:TD_D13_Model ;
+    osdi:hasDescription "Second screening test" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_Experiment
+osdi:TD_D14_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TD_D14_Model ;
+    osdi:hasDescription "D14. A treatment strategy with outcomes: not supported in discrete event simulation models." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasNumberOfSimulatedIndividuals 5000 ;
+    osdi:hasTimeHorizon "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_Model
+osdi:TD_D14_Model rdf:type owl:NamedIndividual ,
+        osdi:DiscreteEventSimulationModel ;
+    osdi:hasAssessedIntervention osdi:TD_D14_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TD_D14_InterventionNone ;
+    osdi:includesModelItem osdi:TD_D14_Disease ,
+        osdi:TD_D14_InterventionNone ,
+        osdi:TD_D14_InterventionTreat ,
+        osdi:TD_D14_Population ,
+        osdi:TD_D14_PopulationAge ,
+        osdi:TD_D14_PopulationBaseUtility ,
+        osdi:TD_D14_PopulationSex ,
+        osdi:TD_D14_Treatment ,
+        osdi:TD_D14_Treatment_Failure ;
+    osdi:hasDescription "D14. A treatment strategy with outcomes: not supported in discrete event simulation models." .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_Population
+osdi:TD_D14_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TD_D14_PopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasSex osdi:TD_D14_PopulationSex ;
+    osdi:hasUtility osdi:TD_D14_PopulationBaseUtility ;
+    osdi:includedByModel osdi:TD_D14_Model ;
+    osdi:hasDescription "Everyone has the disease and starts at 20 years old" ;
+    osdi:hasGeographicalContext "Spain" ;
+    osdi:hasMaxAge "100.0"^^xsd:double ;
+    osdi:hasMinAge "18.0"^^xsd:double ;
+    osdi:hasSize 5000 .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_PopulationAge
+osdi:TD_D14_PopulationAge rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Other ;
+    osdi:includedByModel osdi:TD_D14_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Age ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_PopulationSex
+osdi:TD_D14_PopulationSex rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TD_D14_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Sex ;
+    osdi:hasDescription "Proportion of women" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_PopulationBaseUtility
+osdi:TD_D14_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TD_D14_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Base utility for the studied population" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double ;
+    osdi:isDisutility "false"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_Disease
+osdi:TD_D14_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasStrategy osdi:TD_D14_Treatment ;
+    osdi:includedByModel osdi:TD_D14_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_InterventionNone
+osdi:TD_D14_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:includedByModel osdi:TD_D14_Model ;
+    osdi:isInterventionOf osdi:TD_D14_Disease ;
+    osdi:hasDescription "Comparator: do nothing" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_InterventionTreat
+osdi:TD_D14_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:includedByModel osdi:TD_D14_Model ;
+    osdi:isInterventionOf osdi:TD_D14_Disease ;
+    osdi:hasDescription "Intervention without effects" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_Treatment
+osdi:TD_D14_Treatment rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:failsIf osdi:TD_D14_Treatment_Failure ;
+    osdi:includedByModel osdi:TD_D14_Model ;
+    osdi:hasDescription "Treatment that may fail" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D14_Treatment_Failure
+osdi:TD_D14_Treatment_Failure rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:includedByModel osdi:TD_D14_Model ;
+    osdi:hasDescription "Probability of failure of the treatment" ;
+    osdi:hasExpectedValue "0.3"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_Experiment
+osdi:TD_D15_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TD_D15_Model ;
+    osdi:hasDescription "D15. A treatment strategy with a guideline: not supported in discrete event simulation models." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasNumberOfSimulatedIndividuals 5000 ;
+    osdi:hasTimeHorizon "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_Model
+osdi:TD_D15_Model rdf:type owl:NamedIndividual ,
+        osdi:DiscreteEventSimulationModel ;
+    osdi:hasAssessedIntervention osdi:TD_D15_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TD_D15_InterventionNone ;
+    osdi:includesModelItem osdi:TD_D15_Disease ,
+        osdi:TD_D15_Guideline ,
+        osdi:TD_D15_Guideline_Count ,
+        osdi:TD_D15_InterventionNone ,
+        osdi:TD_D15_InterventionTreat ,
+        osdi:TD_D15_Population ,
+        osdi:TD_D15_PopulationAge ,
+        osdi:TD_D15_PopulationBaseUtility ,
+        osdi:TD_D15_PopulationSex ,
+        osdi:TD_D15_Treatment ,
+        osdi:TD_D15_Treatment_Cost ;
+    osdi:hasDescription "D15. A treatment strategy with a guideline: not supported in discrete event simulation models." .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_Population
+osdi:TD_D15_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TD_D15_PopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasSex osdi:TD_D15_PopulationSex ;
+    osdi:hasUtility osdi:TD_D15_PopulationBaseUtility ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:hasDescription "Everyone has the disease and starts at 20 years old" ;
+    osdi:hasGeographicalContext "Spain" ;
+    osdi:hasMaxAge "100.0"^^xsd:double ;
+    osdi:hasMinAge "18.0"^^xsd:double ;
+    osdi:hasSize 5000 .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_PopulationAge
+osdi:TD_D15_PopulationAge rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Other ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Age ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_PopulationSex
+osdi:TD_D15_PopulationSex rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Sex ;
+    osdi:hasDescription "Proportion of women" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_PopulationBaseUtility
+osdi:TD_D15_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Base utility for the studied population" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double ;
+    osdi:isDisutility "false"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_Disease
+osdi:TD_D15_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasStrategy osdi:TD_D15_Treatment ;
+    osdi:includedByModel osdi:TD_D15_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_InterventionNone
+osdi:TD_D15_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:isInterventionOf osdi:TD_D15_Disease ;
+    osdi:hasDescription "Comparator: do nothing" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_InterventionTreat
+osdi:TD_D15_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:isInterventionOf osdi:TD_D15_Disease ;
+    osdi:hasDescription "Intervention without effects" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_Treatment
+osdi:TD_D15_Treatment rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TD_D15_Treatment_Cost ;
+    osdi:hasGuideline osdi:TD_D15_Guideline ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:hasDescription "Treatment with a guideline" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_Treatment_Cost
+osdi:TD_D15_Treatment_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of each application" ;
+    osdi:hasExpectedValue "100.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_Guideline
+osdi:TD_D15_Guideline rdf:type owl:NamedIndividual ,
+        osdi:Guideline ;
+    osdi:hasCount osdi:TD_D15_Guideline_Count ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:hasDescription "Three applications" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D15_Guideline_Count
+osdi:TD_D15_Guideline_Count rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:includedByModel osdi:TD_D15_Model ;
+    osdi:hasDescription "Number of applications" ;
+    osdi:hasExpectedValue "3.0"^^xsd:double .
