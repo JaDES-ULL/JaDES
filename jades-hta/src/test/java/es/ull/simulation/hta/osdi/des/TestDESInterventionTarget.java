@@ -2,38 +2,21 @@ package es.ull.simulation.hta.osdi.des;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Objects;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.semanticweb.owlapi.io.StreamDocumentSource;
 
-import es.ull.simulation.hta.DiseaseProgressionSimulation;
-import es.ull.simulation.hta.MalformedSimulationModelException;
 import es.ull.simulation.hta.Patient;
-import es.ull.simulation.hta.config.BaseHTAOutputConfigProvider;
-import es.ull.simulation.hta.inforeceiver.CostCollector;
-import es.ull.simulation.hta.inforeceiver.CostListener;
-import es.ull.simulation.hta.interventions.Intervention;
-import es.ull.simulation.hta.osdi.LogCapture;
-import es.ull.simulation.hta.osdi.OSDiExperimentConfigurationProvider;
-import es.ull.simulation.hta.osdi.cliargs.RunDESOsdiArgs;
+import es.ull.simulation.hta.osdi.des.DESTestSupport.Run;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.OSDiTest;
-import es.ull.simulation.hta.osdi.ontology.OSDiWrapper;
-import es.ull.simulation.hta.params.Discount;
 import es.ull.simulation.hta.progression.DiseaseProgression;
-import es.ull.simulation.model.TimeUnit;
 
 /**
  * Checks the target of the interventions in the discrete event simulation (decision D1 of docs/osdi-1.3-diseno.md; ontology OSDi_test_des.ttl).
@@ -55,91 +38,17 @@ import es.ull.simulation.model.TimeUnit;
 @DisplayName("Target of the interventions in the discrete event simulation (D1)")
 @TestInstance(Lifecycle.PER_CLASS)
 public class TestDESInterventionTarget {
-    private static final String OWL_PATH = "/OSDi_test_des.ttl";
     private static final double TOLERANCE = 1e-6;
 
-    /**
-     * The result of simulating both arms of an experiment
-     * @param model The model
-     * @param comparator The comparator intervention
-     * @param assessed The assessed intervention
-     * @param comparatorPatients The patients of the comparator arm
-     * @param assessedPatients The patients of the assessed arm (clones of the comparator ones)
-     * @param costs The cost of each patient, indexed by the order of the intervention and the identifier of the patient
-     * @param warnings The messages logged while building the model
-     */
-    private record Run(OSDiDESModel model, Intervention comparator, Intervention assessed, Patient[] comparatorPatients, Patient[] assessedPatients,
-            double[][] costs, List<String> warnings) {
-    }
-
-    private OSDiWrapper wrapper;
     private Run d04;
     private Run d06;
     private Run d07;
 
     @BeforeAll
     public void setUp() throws Exception {
-        wrapper = new OSDiWrapper.Builder().build(new StreamDocumentSource(Objects.requireNonNull(
-                getClass().getResourceAsStream(OWL_PATH), "Ontology file not found in resources: " + OWL_PATH)));
-        d04 = run("D04");
-        d06 = run("D06");
-        d07 = run("D07");
-    }
-
-    private OSDiExperiment createExperiment(String code) throws Exception {
-        final RunDESOsdiArgs args = new RunDESOsdiArgs();
-        args.osdiExperiment = "TD_" + code + "_Experiment";
-        return new OSDiExperiment(new OSDiExperimentConfigurationProvider(args, wrapper), new BaseHTAOutputConfigProvider());
-    }
-
-    /**
-     * Builds the model of a case and simulates both arms with the same procedure as HTAExperiment (common random numbers)
-     */
-    private Run run(String code) throws Exception {
-        final OSDiExperiment experiment = createExperiment(code);
-        final List<String> messages;
-        try (LogCapture log = LogCapture.start()) {
-            experiment.initializeModel();
-            messages = List.copyOf(log.getMessages());
-        }
-        final OSDiDESModel model = (OSDiDESModel) experiment.getModel();
-        final Intervention comparator = model.getIntervention("TD_" + code + "_InterventionNone");
-        final Intervention assessed = model.getIntervention("TD_" + code + "_InterventionTreat");
-        assertNotNull(comparator, "The comparator intervention must be registered");
-        assertNotNull(assessed, "The assessed intervention must be registered");
-        final CostListener costListener = new CostListener(experiment, new CostCollector(experiment, true, "Costs", Discount.ZERO_DISCOUNT), Discount.ZERO_DISCOUNT);
-        final long timeHorizon = model.getSimulationTimeUnit().convert(experiment.getYearsHorizon(), TimeUnit.YEAR);
-        DiseaseProgressionSimulation simul = new DiseaseProgressionSimulation(0, comparator, model);
-        simul.registerListener(costListener);
-        simul.run(timeHorizon);
-        final Patient[] comparatorPatients = simul.getGeneratedPatients();
-        simul = new DiseaseProgressionSimulation(simul, assessed);
-        simul.registerListener(costListener);
-        simul.run(timeHorizon);
-        return new Run(model, comparator, assessed, comparatorPatients, simul.getGeneratedPatients(), costListener.getValues(), messages);
-    }
-
-    /**
-     * Returns the years that a patient lived within the time horizon of 5 years
-     */
-    private static double yearsLived(OSDiDESModel model, Patient pat) {
-        final long death = pat.getTimeToDeath();
-        if (death == Long.MAX_VALUE) {
-            return 5.0;
-        }
-        return Math.min(5.0, model.simulationTimeToYears(TimeUnit.DAY.convert(death, pat.getSimulation().getTimeUnit())));
-    }
-
-    private static double meanEpisodes(Patient[] patients, DiseaseProgression progression) {
-        double total = 0.0;
-        for (Patient pat : patients) {
-            total += pat.getNDiseaseProgressions(progression);
-        }
-        return total / patients.length;
-    }
-
-    private static boolean containsWarning(List<String> messages, String text) {
-        return messages.stream().anyMatch(message -> message.startsWith("WARN ") && message.contains(text));
+        d04 = DESTestSupport.run("D04");
+        d06 = DESTestSupport.run("D06");
+        d07 = DESTestSupport.run("D07");
     }
 
     @Test
@@ -147,7 +56,7 @@ public class TestDESInterventionTarget {
     public void everyPatientStartsWithChronicTarget() {
         final DiseaseProgression manX = d04.model().getDiseaseProgression("TD_D04_ManX");
         assertNotNull(manX);
-        assertTrue(containsWarning(d04.warnings(), "does not declare the initial proportion of TD_D04_ManX"), "Warning not found: " + d04.warnings());
+        assertTrue(d04.containsWarning("does not declare the initial proportion of TD_D04_ManX"), "Warning not found: " + d04.messages());
         assertAll("Every patient presents ManX from time 0",
             () -> {
                 for (Patient pat : d04.comparatorPatients()) {
@@ -164,13 +73,13 @@ public class TestDESInterventionTarget {
         assertAll("Cost of each patient",
             () -> {
                 for (Patient pat : d04.comparatorPatients()) {
-                    final double expected = 200.0 + 1000.0 * yearsLived(d04.model(), pat);
+                    final double expected = 200.0 + 1000.0 * DESTestSupport.yearsLived(d04.model(), pat);
                     assertEquals(expected, d04.costs()[d04.comparator().ordinal()][pat.getIdentifier()], TOLERANCE, "Cost of patient " + pat.getIdentifier() + " without intervention");
                 }
             },
             () -> {
                 for (Patient pat : d04.assessedPatients()) {
-                    final double expected = 200.0 + 1100.0 * yearsLived(d04.model(), pat);
+                    final double expected = 200.0 + 1100.0 * DESTestSupport.yearsLived(d04.model(), pat);
                     assertEquals(expected, d04.costs()[d04.assessed().ordinal()][pat.getIdentifier()], TOLERANCE, "Cost of patient " + pat.getIdentifier() + " with the intervention");
                 }
             });
@@ -194,10 +103,7 @@ public class TestDESInterventionTarget {
     @Test
     @DisplayName("D05. An initial proportion of the target different from 1 contradicts the target of the interventions")
     public void rejectsInitialProportionOfTargetDifferentFromOne() throws Exception {
-        final OSDiExperiment experiment = createExperiment("D05");
-        final MalformedSimulationModelException exception = assertThrows(MalformedSimulationModelException.class, experiment::initializeModel);
-        assertInstanceOf(MalformedOSDiModelException.class, exception.getCause(), "Unexpected cause: " + exception.getCause());
-        assertTrue(exception.getCause().getMessage().contains("declares an initial proportion of 0.5 for TD_D05_ManX"), "Unexpected message: " + exception.getCause().getMessage());
+        DESTestSupport.assertRejected("D05", MalformedOSDiModelException.class, "declares an initial proportion of 0.5 for TD_D05_ManX");
     }
 
     @Test
@@ -218,8 +124,8 @@ public class TestDESInterventionTarget {
                     assertTrue(pat.getNDiseaseProgressions(manC) >= 1, "Patient " + pat.getIdentifier() + " without the episode at time 0 with the intervention");
                 }
             },
-            () -> assertEquals(4.465736, meanEpisodes(d06.comparatorPatients(), manC), 0.1, "Mean episodes without intervention"),
-            () -> assertEquals(2.732868, meanEpisodes(d06.assessedPatients(), manC), 0.1, "Mean episodes with the intervention"));
+            () -> assertEquals(4.465736, DESTestSupport.meanEpisodes(d06.comparatorPatients(), manC), 0.1, "Mean episodes without intervention"),
+            () -> assertEquals(2.732868, DESTestSupport.meanEpisodes(d06.assessedPatients(), manC), 0.1, "Mean episodes with the intervention"));
     }
 
     @Test
@@ -227,8 +133,8 @@ public class TestDESInterventionTarget {
     public void chargesInterventionWithEachEpisodeOfAcuteTarget() {
         // Comparator: 2000 per episode; assessed: 2000 + 300 per episode (the annual cost of 100 is ignored)
         final DiseaseProgression manC = d06.model().getDiseaseProgression("TD_D06_ManC");
-        assertTrue(containsWarning(d06.warnings(), "The intervention TD_D06_InterventionTreat, whose target is an acute manifestation, defines annual costs or utilities"),
-            "Warning not found: " + d06.warnings());
+        assertTrue(d06.containsWarning("The intervention TD_D06_InterventionTreat, whose target is an acute manifestation, defines annual costs or utilities"),
+            "Warning not found: " + d06.messages());
         assertAll("Cost of each patient",
             () -> {
                 for (Patient pat : d06.comparatorPatients()) {
@@ -255,15 +161,12 @@ public class TestDESInterventionTarget {
                     assertEquals(2000.0 * pat.getNDiseaseProgressions(manC), d07.costs()[d07.comparator().ordinal()][pat.getIdentifier()], TOLERANCE, "Cost of patient " + pat.getIdentifier());
                 }
             },
-            () -> assertEquals(11.0, meanEpisodes(d07.comparatorPatients(), manC), 0.15, "Mean episodes"));
+            () -> assertEquals(11.0, DESTestSupport.meanEpisodes(d07.comparatorPatients(), manC), 0.15, "Mean episodes"));
     }
 
     @Test
     @DisplayName("D08. A development as the target of the interventions is not supported in discrete event simulation models")
     public void rejectsDevelopmentAsTarget() throws Exception {
-        final OSDiExperiment experiment = createExperiment("D08");
-        final MalformedSimulationModelException exception = assertThrows(MalformedSimulationModelException.class, experiment::initializeModel);
-        assertInstanceOf(UnsupportedOSDiFeatureException.class, exception.getCause(), "Unexpected cause: " + exception.getCause());
-        assertTrue(exception.getCause().getMessage().contains("target the development TD_D08_DevA"), "Unexpected message: " + exception.getCause().getMessage());
+        DESTestSupport.assertRejected("D08", UnsupportedOSDiFeatureException.class, "target the development TD_D08_DevA");
     }
 }

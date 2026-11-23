@@ -1142,3 +1142,158 @@ osdi:TD_D08_DevA_Risk rdf:type owl:NamedIndividual ,
     osdi:includedByModel osdi:TD_D08_Model ;
     osdi:hasDescription "Probability of DevA" ;
     osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Experiment
+osdi:TD_D12_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TD_D12_Model ;
+    osdi:hasDescription "D12. Detection strategies of each arm: the screening arm replaces the detection strategies of the disease by the screening test and the diagnosis." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasNumberOfSimulatedIndividuals 5000 ;
+    osdi:hasTimeHorizon "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Model
+osdi:TD_D12_Model rdf:type owl:NamedIndividual ,
+        osdi:DiscreteEventSimulationModel ;
+    osdi:hasAssessedIntervention osdi:TD_D12_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TD_D12_InterventionNone ;
+    osdi:includesModelItem osdi:TD_D12_ArmStrategies ,
+        osdi:TD_D12_Diagnosis ,
+        osdi:TD_D12_Diagnosis_Sensitivity ,
+        osdi:TD_D12_Disease ,
+        osdi:TD_D12_InterventionNone ,
+        osdi:TD_D12_InterventionTreat ,
+        osdi:TD_D12_Population ,
+        osdi:TD_D12_PopulationAge ,
+        osdi:TD_D12_PopulationBaseUtility ,
+        osdi:TD_D12_PopulationSex ,
+        osdi:TD_D12_Replacement ,
+        osdi:TD_D12_Screening ,
+        osdi:TD_D12_Screening_Sensitivity ,
+        osdi:TD_D12_Screening_Specificity ;
+    osdi:hasDescription "D12. Detection strategies of each arm: the screening arm replaces the detection strategies of the disease by the screening test and the diagnosis." .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Population
+osdi:TD_D12_Population rdf:type owl:NamedIndividual ,
+        osdi:Population ;
+    osdi:hasAge osdi:TD_D12_PopulationAge ;
+    osdi:hasEpidemiologicalParameter osdi:Constant_Prevalence1 ;
+    osdi:hasSex osdi:TD_D12_PopulationSex ;
+    osdi:hasUtility osdi:TD_D12_PopulationBaseUtility ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:hasDescription "Everyone has the disease and starts at 20 years old" ;
+    osdi:hasGeographicalContext "Spain" ;
+    osdi:hasMaxAge "100.0"^^xsd:double ;
+    osdi:hasMinAge "18.0"^^xsd:double ;
+    osdi:hasSize 5000 .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_PopulationAge
+osdi:TD_D12_PopulationAge rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Other ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Age ;
+    osdi:hasExpectedValue "20.0"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_PopulationSex
+osdi:TD_D12_PopulationSex rdf:type owl:NamedIndividual ,
+        osdi:AttributeValueParameter ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Proportion ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:isValueOfAttribute osdi:Attribute_Sex ;
+    osdi:hasDescription "Proportion of women" ;
+    osdi:hasExpectedValue "0.5"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_PopulationBaseUtility
+osdi:TD_D12_PopulationBaseUtility rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Base utility for the studied population" ;
+    osdi:hasExpectedValue "0.85"^^xsd:double ;
+    osdi:isDisutility "false"^^xsd:boolean .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Disease
+osdi:TD_D12_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasStrategy osdi:TD_D12_Diagnosis ;
+    osdi:includedByModel osdi:TD_D12_Model .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_InterventionNone
+osdi:TD_D12_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisIntervention ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:isInterventionOf osdi:TD_D12_Disease ;
+    osdi:hasDescription "No screening: clinical detection" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_InterventionTreat
+osdi:TD_D12_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:ScreeningIntervention ;
+    osdi:hasEffect osdi:TD_D12_Replacement ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:isInterventionOf osdi:TD_D12_Disease ;
+    osdi:hasDescription "Screening" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Replacement
+osdi:TD_D12_Replacement rdf:type owl:NamedIndividual ,
+        osdi:StrategyReplacementEffect ;
+    osdi:affects osdi:TD_D12_Disease ;
+    osdi:hasReplacementStrategy osdi:TD_D12_ArmStrategies ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:hasDescription "Detection strategies of the disease in the screening arm" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Diagnosis
+osdi:TD_D12_Diagnosis rdf:type owl:NamedIndividual ,
+        osdi:DiagnosisStrategy ;
+    osdi:hasCategory osdi:DiagnosisCat ;
+    osdi:hasSensitivity osdi:TD_D12_Diagnosis_Sensitivity ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:hasDescription "Clinical diagnosis" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Diagnosis_Sensitivity
+osdi:TD_D12_Diagnosis_Sensitivity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Sensitivity ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:hasDescription "Sensitivity of the clinical diagnosis" ;
+    osdi:hasExpectedValue "0.7"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Screening
+osdi:TD_D12_Screening rdf:type owl:NamedIndividual ,
+        osdi:ScreeningStrategy ;
+    osdi:hasCategory osdi:ScreeningCat ;
+    osdi:hasSensitivity osdi:TD_D12_Screening_Sensitivity ;
+    osdi:hasSpecificity osdi:TD_D12_Screening_Specificity ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:hasDescription "Screening test" .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Screening_Sensitivity
+osdi:TD_D12_Screening_Sensitivity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Sensitivity ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:hasDescription "Sensitivity of the screening test" ;
+    osdi:hasExpectedValue "0.9"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_Screening_Specificity
+osdi:TD_D12_Screening_Specificity rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Specificity ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:hasDescription "Specificity of the screening test" ;
+    osdi:hasExpectedValue "0.95"^^xsd:double .
+
+###  https://w3id.org/ontologies-ULL/OSDi#TD_D12_ArmStrategies
+osdi:TD_D12_ArmStrategies rdf:type owl:NamedIndividual ,
+        osdi:Group ;
+    osdi:hasGroupItem osdi:TD_D12_Screening ,
+        osdi:TD_D12_Diagnosis ;
+    osdi:includedByModel osdi:TD_D12_Model ;
+    osdi:hasDescription "Detection strategies of the disease in the screening arm" .

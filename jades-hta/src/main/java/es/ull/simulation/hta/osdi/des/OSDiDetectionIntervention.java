@@ -32,6 +32,10 @@ public class OSDiDetectionIntervention extends OSDiIntervention {
 
 	public OSDiDetectionIntervention(OSDiDESModel model, DetectionInterventionWrapper interventionWrapper) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
 		super(model, interventionWrapper);
+		// The sensitivity and specificity must be registered, so that the values assumed if the strategy does not define them are added to the model
+		// (see createParameters)
+		registerUsedParameter(StandardParameter.SENSITIVITY);
+		registerUsedParameter(StandardParameter.SPECIFICITY);
 		this.detectionStrategy = findDetectionStrategy(interventionWrapper);
 		// TODO: Support explicit detection outcomes in the DES (see docs/known-limitations.md)
 		if (detectionStrategy.isPresent() && detectionStrategy.get().hasExplicitOutcomes()) {
