@@ -5,11 +5,11 @@ El número de versión de la copia no cambia hasta que los cambios se trasladen 
 
 ## Decisiones acordadas
 
-Las decisiones tal como quedaron al implementarlas, según el registro hasta la fase 14. Todas están implementadas en los árboles. En el DES están implementadas D1 y D2 (fase 14), D3 (fases 2 y 8), D10 (fase 13) y, en parte, D11 (la sensibilidad y la especificidad se leen de las estrategias de detección; las pruebas quedan para la fase 15). El DES no implementa D4–D8: rechaza las estrategias con resultados o efectos adversos y los riesgos de tiempo hasta el evento (D6).
+Las decisiones tal como quedaron al implementarlas, según el registro hasta la fase 14. Todas están implementadas en los árboles. En el DES están implementadas D1 y D2 (fase 14), D3 (fases 2 y 8), D10 (fase 13) y, en parte, D11 (la sensibilidad y la especificidad se leen de las estrategias de detección; las pruebas quedan para la fase 23). El DES no implementa D4–D8: rechaza las estrategias con resultados o efectos adversos y los riesgos de tiempo hasta el evento (D6).
 
 | Id | Decisión | Cambio en la ontología |
 | --- | --- | --- |
-| D1 | La intervención declara su objetivo: la enfermedad o un elemento de su progresión. La intervención se aplica en el tiempo 0, cuando los pacientes presentan el objetivo; si es una manifestación aguda, en cada episodio (semántica pendiente de revisar, véase la fase 16 en «Fases pendientes»). Las intervenciones comparadas tienen el mismo objetivo. Con el objetivo en un elemento, el árbol empieza en él con probabilidad 1. El objetivo de una intervención de detección es la enfermedad que detecta. No pueden ser objetivo las etapas ni las manifestaciones propias de un desarrollo. | `hasIntervention` / `isInterventionOf` entre `HealthCondition` e `Intervention`, exactamente un objetivo por intervención. |
+| D1 | La intervención declara su objetivo: la enfermedad o un elemento de su progresión. El tiempo 0 es el momento en que se aplica: todos los pacientes presentan el objetivo y la intervención está activa toda la simulación. Con un objetivo agudo, todos empiezan con un episodio; el árbol evalúa ese episodio y el DES también los siguientes, tratando cada uno (divergencia documentada). Las intervenciones comparadas tienen el mismo objetivo. El objetivo de una intervención de detección es la enfermedad que detecta, y se aplica a la población en riesgo. No pueden ser objetivo las etapas, las manifestaciones propias de un desarrollo ni los objetivos con restricción temporal; en el DES, tampoco los desarrollos. | `hasIntervention` / `isInterventionOf` entre `HealthCondition` e `Intervention`, exactamente un objetivo por intervención. |
 | D2 | Las estrategias de una intervención son efectos de sustitución. En su brazo, cada estrategia nueva sustituye a las del mismo tipo (detección, seguimiento, tratamiento) de la condición afectada, o se asigna si no había; las de otros tipos se mantienen. Dos sustituciones sobre la misma condición en un brazo son un error. Los costes y utilidades de las estrategias se suman a los del elemento. | `StrategyReplacementEffect` (subclase de `Effect`, sin magnitud) y `hasReplacementStrategy`. `affects` admite `HealthCondition`. `hasStrategy` sale de `Intervention` (dominio: `HealthCondition` y `Strategy`). |
 | D3 | La aplicación da la semántica según el `DataItemType` de la magnitud y el del parámetro afectado. Un factor multiplica. Un riesgo relativo o un hazard ratio sobre una probabilidad actúan sobre la tasa equivalente, 1 − (1 − p)^m. Un hazard ratio sobre un tiempo lo divide (si no hay distribución, se supone exponencial con aviso). Un odds ratio actúa sobre las odds, y una diferencia de medias se resta. Un tipo relativo siempre opera. Una magnitud del mismo tipo que el parámetro, o `DI_Continuous_Variable`, lo sustituye. Varios efectos se aplican en el orden sustituir, multiplicar, restar, y dos sustituciones son un error. | Comentarios de `Effect` y `hasEffectMagnitude`. Individuos `DI_HazardRatio` y `DI_OddsRatio`. |
 | D4 | Una estrategia tiene resultados mutuamente excluyentes: de tratamiento (éxito o fracaso) o de detección (positivo, negativo o no concluyente). Cada resultado lleva su riesgo (en detección, uno por estado del paciente), si resuelve la condición, la estrategia siguiente, sus efectos, sus pagos (de una vez) y su momento de evaluación. `failsIf`, por un lado, y la sensibilidad y la especificidad, por otro, son formas abreviadas. Se rechazan los ciclos: una repetición se modela como otra estrategia. | Jerarquía `StrategyOutcome` (`TreatmentOutcome` con `SuccessOutcome` y `FailureOutcome`; `DetectionOutcome` con sus tres resultados). `hasStrategyOutcome`, `hasOutcomeRisk` (con `hasRiskIfDiseased` y `hasRiskIfNotDiseased`), `hasEvaluationTime`, `followedOnSuccessBy`, `followedOnFailureBy`, `resolvesHealthCondition` y `resolvesOnSuccess`. `followedByStrategy` es la secuencia programada. |
@@ -17,14 +17,15 @@ Las decisiones tal como quedaron al implementarlas, según el registro hasta la 
 | D6 | La eficacia la expresa el `DataItemType`: probabilidad por episodio (árbol) o tiempo hasta el evento (simulación). «Resuelve» detiene los pagos anuales de la condición. En árboles, un riesgo de tiempo hasta el evento T se convierte en la probabilidad del evento dentro de un periodo, 1 − e^(−periodo/T), con T modificado por los efectos de la ruta: en una progresión, el horizonte del experimento (sin él, un año, con aviso); en un resultado de estrategia, su tiempo de evaluación o, si falta, el horizonte. El de un efecto adverso se rechaza. | Comentarios de `failsIf`, `hasDuration` y `StrategyOutcome`. |
 | D7 | Las utilidades por episodio son pérdidas de AVAC de una vez, que se suman al aplicar una estrategia o un resultado, o al aparecer una manifestación aguda. Los pagos anuales de una aguda se ignoran con aviso. | Comentarios de `appliesOneTime` e `isDisutility`. |
 | D8 | Efectos adversos. Si el problema forma parte de la evolución natural de la enfermedad y el tratamiento solo cambia su riesgo, se usa un Effect de la estrategia sobre ese riesgo. Si lo provoca el tratamiento, se declara un AdverseEvent: el acontecimiento (por ejemplo, «hipoglucemia por insulina»), causado por una estrategia, con su riesgo, sus pagos de una vez (D7) y sus estrategias. Apunta al problema de salud, que puede ser una manifestación de la enfermedad o un problema ajeno a ella. Los casos complejos (dosis, combinaciones) se expresan con hasConditionExpression. Puede provocar el fracaso de la estrategia (failsIf, D5) o la muerte. En la primera versión no activa la estructura de la enfermedad: el enlace solo identifica el problema. | Nueva clase AdverseEvent ⊑ HealthCondition, disjunta de Disease y de ClinicalProgressionElement. Nuevas propiedades hasAdverseEvent (de Strategy a AdverseEvent), con su inversa isAdverseEventOf, e isOccurrenceOf (de AdverseEvent a HealthCondition). hasRiskCharacterization admite AdverseEvent, con un riesgo obligatorio. |
-| D9 | Recaídas y recurrencias, sin vocabulario nuevo. Una recaída tras la respuesta es un resultado del tratamiento: el éxito va seguido (followedOnSuccessBy) de una estrategia de seguimiento cuyo fracaso es la recaída, con su probabilidad entre quienes respondieron, y ese fracaso va seguido del tratamiento de la recaída (fase 10). Una recurrencia a largo plazo es un nuevo episodio de la misma manifestación aguda: la intervención se aplica en cada aparición (D1) y los efectos pueden cambiar su riesgo; se modela en el árbol cuando haya horizonte (fase 11). La secuencia (hasNext) queda para la progresión. Si una recaída necesitara ser un elemento clínico con evolución propia, se valoraría que una ruta pueda requerir un resultado de estrategia. | Ninguno; comentarios de FollowUpStrategy y followedOnSuccessBy con el patrón de recaída. |
+| D9 | Recaídas y recurrencias, sin vocabulario nuevo. Una recaída tras la respuesta es el fracaso de una estrategia de seguimiento que sigue al éxito (`followedOnSuccessBy`), con su probabilidad entre quienes respondieron, seguido del tratamiento de la recaída. Los episodios repetidos de una aguda no son estructura del árbol: su frecuencia multiplica los pagos de una vez del episodio por los episodios esperados dentro del horizonte; el DES los simula uno a uno. La secuencia (`hasNext`) queda para la progresión. | Ninguno. Comentarios de `FollowUpStrategy`, `followedOnSuccessBy` y `hasFrequency`. |
 | D10 | Si la población no declara edad o sexo, la aplicación avisa al construir el modelo y supone 18 años y un 50 % de mujeres. Si ningún parámetro depende de ellos, el aviso basta. Sustituye el valor por defecto anterior de JaDES (edad 0 con aviso). En el cribado neonatal se suponen 0 años. | Ninguno: las restricciones de `Population` se mantienen. |
 | D11 | Las propiedades de detección (`detects`, sensibilidad, especificidad y umbral temporal) son de las estrategias de detección, no de las intervenciones. Las estrategias de diagnóstico son confirmaciones perfectas. | Dominio de `detects`, `hasSensitivity`, `hasSpecificity` y `hasTemporaryThreshold` en `DetectionStrategy` (umbral, en `ScreeningStrategy`); rango de `isDetectedBy` en `DetectionStrategy`. |
 
 **Pendientes de decidir:**
 
-- Qué ocurre con los falsos negativos del cribado: diagnóstico clínico tardío, muerte sin diagnóstico o falsa sensación de seguridad. Hoy no pagan diagnóstico. Bloquea la detección en el DES (fase 15).
-- Detección en el DES (fase 15): las decisiones abiertas se describen en «Fases pendientes».
+- Qué ocurre con los falsos negativos del cribado: diagnóstico clínico tardío, muerte sin diagnóstico o falsa sensación de seguridad. Hoy no pagan diagnóstico. Bloquea la fase 23.
+- Las siete decisiones de la detección en el DES (fase 23), descritas en «Fases pendientes».
+- Si se añade otro caso de validación además de Evans (fase 18); el candidato natural es la otitis de Coco (2007), esbozada en P47.
 - Los cribados de varias enfermedades (paneles), que no caben porque cada intervención tiene un solo objetivo.
 - El objetivo en una manifestación propia de uno o varios desarrollos: qué desarrollos presenta el paciente.
 
@@ -32,9 +33,54 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
 
 ## Fases pendientes
 
-Fases propuestas a partir de lo que quedó abierto hasta la fase 14. El orden no está decidido.
+Fases acordadas tras la fase 15, en orden: de la 16 a la 19 se cierra el árbol y se publica OSDi 1.3, validada con árboles de decisión; de la 20 a la 23 se completa el DES. Cada fase termina con la suite de `jades-hta` pasando, sus cambios en commits y su entrada en el registro. Si una fase descubre trabajo no previsto, lo propone como fase nueva en el registro.
 
-### Fase 15: detección en el DES (punto 3 de la fase 14)
+Quedan fuera, como trabajo futuro: pautas con subpautas, condiciones o edades de aplicación; pautas en estrategias con resultados; la confirmación imperfecta (estrategias de diagnóstico con resultados explícitos); `hasConditionExpression` en las estrategias; grupos en las cadenas de detección del cribado neonatal; actualizar costes fuera del IPC español de 2002 a 2026; y el análisis de impacto presupuestario.
+
+### Fase 16: defectos del árbol con resultados erróneos (D7, D8)
+
+1. La muerte por un efecto adverso (`InstantDeathEffect`) ocurre al inicio del modelo aunque la estrategia que lo provoca empiece más tarde (fase 9). Debe ocurrir al inicio de esa estrategia, con los años de vida y los pagos recortados en ese momento. Se confirma con un test que falle y valores a mano.
+2. Los efectos de una aguda con frecuencia (muerte, reducción de la esperanza de vida) no se multiplican por los episodios (fase 11). Proponer la semántica (por ejemplo, la probabilidad de morir en alguno de los episodios esperados) o, si no hay una razonable, rechazar con `Unsupported` la combinación de frecuencia y esos efectos. Requiere aprobación.
+
+### Fase 17: consistencia con un razonador completo
+
+1. Las intervenciones compartidas de las ontologías de prueba (`TT_InterventionTreat`, `TT_InterventionNone`) incumplen la cardinalidad «exactamente un objetivo» (fase 4): un razonador completo inferiría que las enfermedades son el mismo individuo. Proponer cómo corregirlo sin cambiar valores esperados (por ejemplo, intervenciones propias de cada modelo). Requiere aprobación.
+2. Un test que cargue `OSDi.ttl` y cada ontología de prueba, `BD.ttl` y `PBD.ttl` incluidas, con un razonador completo (HermiT u otro compatible con OWL API 5.5) y compruebe que son consistentes.
+
+### Fase 18: ejemplos de validación
+
+Ejemplos de validación de OSDi y JaDES, distintos de los tests: cada uno representa un estudio publicado y comprueba que se reproducen sus resultados.
+
+1. Estructura, con la forma que tendrá en el repositorio de OSDi (fase 19): carpeta `examples/` con un README de índice (referencia, problema de salud, tipos de modelo validados, partes de OSDi que ejercita y estado) y una carpeta por caso con su `.ttl`, su README (cita, decisiones de representación, supuestos explícitos y diferencias conocidas) y un fichero de resultados esperados que distinga los valores publicados, con su tolerancia, de los calculados a mano. Requiere aprobación de la ubicación y el formato.
+2. Evans et al. (1997) como primer caso, a partir de I05, sin la esperanza de vida de la población si no cambia los resultados. I05 sale de `OSDi_test_tree_scenarios.ttl`, comprobando que lo que cubría sigue cubierto por tests P.
+3. Suite de validación separada de los tests (perfil de Maven, tests de integración o módulo propio), con un informe del valor publicado, el de JaDES y la diferencia por caso.
+4. `genExcel` de `OSDiMain`: registrar las factorías de árboles (`SimpleModel.getFactory()`, `NBSModel.getFactory()`) y aceptar rutas de fichero sin exigir `file:///`.
+
+### Fase 19: traslado a OSDi 1.3
+
+Preparar en `docs/osdi-1.3-traslado.md`: los cambios de la copia de `OSDi.ttl` respecto a OSDi 1.2, agrupados por decisión; `examples/` con las importaciones de la versión 1.3 y un catálogo local; lo pendiente (como los códigos STATO de `DI_HazardRatio` y `DI_OddsRatio`); las notas de la versión 1.3 (validada con árboles; lo que el DES aún no implementa y las divergencias documentadas, como los episodios de un objetivo agudo); y qué copia de la ontología será la de referencia después. Requiere decisión.
+
+### Fase 20: DES, defectos y limitaciones menores
+
+1. En la combinación probabilidad + RR, el RR se ignora si la probabilidad aparece primero (`TimeToEventCalculatorFactory`, rama `PROBABILITY_RR`).
+2. El horizonte se redondea a años enteros: 24 horas quedan en 0. Proponer horizontes fraccionarios.
+3. Solo se aceptan riesgos `DI_Probability`, `DI_Proportion` y probabilidad con `DI_RelativeRisk`: añadir `DI_Incidence` y `DI_TimeToEvent`, con los efectos de D3.
+4. La edad de la población no distingue la heterogeneidad de la incertidumbre paramétrica (fase 8), como ya se hizo con el sexo.
+5. Tests que faltan: costes de las tecnologías de una estrategia y sustituciones sobre un desarrollo.
+
+### Fase 21: DES, estrategias con resultados, efectos adversos y recaídas (D4–D9)
+
+Hoy el DES rechaza las estrategias con resultados (`hasStrategyOutcome`, `failsIf`), efectos adversos o pautas. Proponer cómo simularlos (resultados como eventos que compiten, pagos anuales hasta el resultado, estrategia siguiente con grupos, efectos adversos, fracaso por una condición de salud y recaídas como fracaso del seguimiento), de forma que coincida con el árbol en valor esperado cuando el árbol pueda representarlo, e implementarlo por partes. Evans se añade a la validación en el DES.
+
+### Fase 22: DES, desarrollos, muerte de las progresiones y varios pagos
+
+1. Desarrollos y reglas de combinación (propuesta en `docs/known-limitations.md`, «Future work: developments in the DES»), incluido un desarrollo como objetivo, que hoy se rechaza.
+2. Probabilidad de muerte de las progresiones (comentada en `OSDiDiseaseProgression`), también la del objetivo en su aparición.
+3. Varios costes o utilidades por tipo en condiciones e intervenciones: hoy se usa el primero (con aviso en `OSDiDiseaseProgression` y `OSDiIntervention`, sin aviso en `OSDiDisease`); deben sumarse, como en el árbol y en las estrategias.
+
+### Fase 23: DES, detección y falsos negativos (D11)
+
+Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendientes de decidir»).
 
 **Situación:**
 - `OSDiDetectionIntervention` extiende `OSDiIntervention` y no programa pruebas: en el DES de OSDi no hay eventos `SCREEN`, así que la sensibilidad, la especificidad y los pagos de una vez de las intervenciones de detección no se usan nunca. Tampoco hay diagnóstico clínico, porque el DES no lee la probabilidad de diagnóstico de las progresiones.
@@ -59,36 +105,6 @@ Fases propuestas a partir de lo que quedó abierto hasta la fase 14. El orden no
 5. Coste de diagnóstico de los falsos positivos (defecto del núcleo): corregirlo en esta fase o documentarlo.
 6. Costes de la intervención de detección que no son de `ScreeningCat`: una vez en el tiempo 0, como los de una intervención terapéutica, o ignorados con aviso.
 7. Qué ocurre con los falsos negativos (véase «Pendientes de decidir»).
-
-### Fase 16: revisión de la semántica del objetivo (D1)
-
-- Revisar «la intervención se aplica en el tiempo 0, cuando los pacientes presentan el objetivo; si es una manifestación aguda, en cada episodio» (fase 14).
-- Objetivo agudo: el árbol representa un episodio e ignora la frecuencia con aviso; el DES simula el episodio del tiempo 0 y los siguientes (frecuencia o riesgo) y aplica los pagos de una vez de la intervención en cada uno. Reanalizar la frecuencia del objetivo agudo en el árbol (marcado en la fase 11).
-- El árbol mantiene la restricción temporal (edad de inicio o fin) del nodo objetivo, que contradice que todos presenten el objetivo en el tiempo 0; el DES la rechaza.
-- Objetivo en una manifestación propia de uno o varios desarrollos (véase «Pendientes de decidir»).
-
-### Fase 17: ejemplos en OSDi
-
-- Trasladar los ejemplos validados (p. ej., Evans et al. 1997, I05 en `OSDi_test_tree_scenarios.ttl`) a OSDi, para poder revisarlos y generar su Excel fuera de los tests.
-- Relacionado: el comando `genExcel` de `OSDiMain` falla con `Could not find a suitable decision tree factory`, porque no registra las factorías (`SimpleModel.getFactory()`, `NBSModel.getFactory()`), que solo registran los tests (p. ej., `DecisionTreeTestSupport.registerFactories` y `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration`). Además, `OntologyLoader` interpreta cualquier ruta sin espacios como un URI, así que hay que pasar `file:///…`. No se corrige hasta decidir cómo se publican los ejemplos.
-
-### Fase 18: el DES con desarrollos y otras progresiones
-
-- Desarrollos y reglas de combinación en el DES (propuesta de correspondencia en `docs/known-limitations.md`, «Future work: developments in the DES»).
-- Probabilidad de muerte de las progresiones (comentada en `OSDiDiseaseProgression`), también la del objetivo en su aparición.
-- Un solo coste o utilidad por tipo en las condiciones y en las intervenciones del DES: se usa el primero, con aviso en `OSDiDiseaseProgression` y `OSDiIntervention` y sin aviso en `OSDiDisease` (solo un `FIXME`); las estrategias ya suman todos.
-
-### Fase 19: defectos y limitaciones menores
-
-- DES: el horizonte se redondea a años enteros (24 horas quedan en 0).
-- DES: solo se aceptan riesgos `DI_Probability`, `DI_Proportion` y probabilidad con `DI_RelativeRisk`.
-- DES: en la combinación probabilidad + RR, el RR se ignora si la probabilidad aparece primero (`TimeToEventCalculatorFactory`).
-- Árbol: la muerte por un efecto adverso ocurre en el tiempo 0 aunque la estrategia empiece más tarde.
-- Árbol y DES: `hasConditionExpression` de las estrategias se ignora con aviso (`StrategyWrapper`: «Conditional strategies are not supported yet. They will be ignored»).
-- Árbol: grupos de estrategias en las cadenas de detección del NBS (`Unsupported`).
-- Plantilla: la tabla CPI solo tiene el IPC español de 2002 a 2026.
-- Posibles avisos duplicados de `getBaseUtility`.
-- Sin test en el DES: costes de las tecnologías de una estrategia y sustituciones sobre un desarrollo.
 
 ## Registro
 
@@ -520,3 +536,22 @@ Fases propuestas a partir de lo que quedó abierto hasta la fase 14. El orden no
 **Cierre (2026-11-23):**
 - Commits: refactorización del objetivo y las sustituciones (commit 0), pagos de una vez de las intervenciones, D1 en el DES, texto de D1, registro de la sensibilidad y especificidad, y D2 en el DES. Suite final: 340 tests, 0 fallos, 1 omitido.
 - El punto 3 (costes de las estrategias de detección) no se implementó: al plantearlo se vio que el núcleo de JaDES ya tiene intervenciones de cribado y diagnóstico con pruebas, y que hay decisiones previas. Pasa a la fase 15 (véase «Fases pendientes»), con el resto de lo que quedó abierto.
+
+### Fase 15: semántica del objetivo en el árbol y sincronización (D1, D9) (2026-11-24)
+
+**Hecho:**
+- Sincronización del diseño: los textos de D1 y D9 y la sección «Fases pendientes» se sustituyen por los del plan de fases 15 a 23 (la detección en el DES pasa a ser la fase 23, con su situación, su propuesta y sus siete decisiones pendientes). Al aprobarse el punto 2, D1 dice que tampoco pueden ser objetivo los que tienen restricción temporal, en el árbol y en el DES.
+- Objetivo agudo (commit `db77c84`): el árbol evalúa un único episodio, el del tiempo 0, e ignora la frecuencia del objetivo con un aviso que lo dice («…which is ignored: the decision tree evaluates a single episode, the one that every patient suffers at time 0 (a discrete event simulation also simulates the next episodes).»). Divergencia aceptada con el DES, que simula también los episodios siguientes y trata cada uno; documentada en CLAUDE.md y `docs/known-limitations.md`. Se quita el TODO de `DiseaseSubTreeGenerator.getEpisodeFrequency`.
+  - Test P64 (P56 con ManA como objetivo de dos intervenciones propias; horizonte de 5 años): comparador 5 × 1000 + 300 = 5300, evaluado + 50 de una vez = 5350; 5 años de vida y 4,25 AVAC. Con la frecuencia serían 8000 y 8050. Test del aviso en `TestDecisionTreeWarnings`, que antes del cambio falló con el texto anterior («…which is ignored, since it is the target of the interventions: the tree starts with an episode.»). Los resultados de P64 ya pasaban: la frecuencia ya se ignoraba.
+- Objetivo con restricción temporal (aprobado; commit `2027dd4`): el árbol lo rechaza (`Unsupported`, `DiseaseSubTreeGenerator.resolveInterventionTarget`), como el DES, porque todos presentan el objetivo en el tiempo 0. Ningún test existente cambia (ningún objetivo de las ontologías de prueba tiene edad de inicio o fin). Test N35 (ManX desde los 30 años como objetivo), que antes del cambio falló con «Expected UnsupportedOSDiFeatureException to be thrown, but nothing was thrown». Se quita la divergencia de CLAUDE.md y el TODO de `docs/known-limitations.md`.
+- `OSDi.ttl` (aprobado; commit `feffb5b`, sin cambiar la versión): el comentario de `hasIntervention`, en inglés y en español, dice lo mismo que D1: el tiempo 0 es el momento en que se aplica la intervención; todos los pacientes presentan el objetivo y la intervención está activa toda la simulación; con un objetivo agudo, todos empiezan con un episodio. Se quitan «se aplica en cada aparición», las etapas como objetivo y la frase sobre el árbol. Lo propio de JaDES (episodios en árbol y DES, rechazos) queda en el Javadoc y en `docs/`. El de `isInterventionOf` no cambia: remite a `hasIntervention`.
+- Suite final: 345 tests, 0 fallos, 1 omitido.
+
+**Decidido:**
+- Con un objetivo agudo, el árbol evalúa un único episodio y el DES todos: divergencia aceptada.
+- Un objetivo con restricción temporal se rechaza en el árbol y en el DES.
+
+**Pendiente:**
+- El aviso de la frecuencia de un objetivo agudo se emite dos veces por modelo (ya ocurría antes).
+- El objetivo en una manifestación propia de uno o varios desarrollos sigue en «Pendientes de decidir».
+- Maven necesita `JAVA_HOME` apuntando a un JDK 25 (el del entorno es el 21), como dice CLAUDE.md.
