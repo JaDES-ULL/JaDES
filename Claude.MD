@@ -14,7 +14,10 @@ mvn -pl jades-hta -am test
 mvn -pl jades-hta -am test -Dtest='TestDecisionTreeOutcomes,TestDecisionTreeStructure,TestDecisionTreeMalformedModels,TestHTAExcelGeneration' -Dsurefire.failIfNoSpecifiedTests=false
  
 # Excluir los defectos conocidos (cuando vuelva a haberlos)
-mvn -pl jades-hta -am test -DexcludedGroups=known-issue
+mvn -pl jades-hta -am test -DexcludedGroups=known-issue,validation
+
+# Suite de validación: ejemplos de jades-hta/examples (excluida por defecto; informe en jades-hta/target/validation/report.md)
+mvn -pl jades-hta -am test -Pvalidation
 
 # Escribir a disco los Excel de los tests de árboles (por defecto se evalúan en memoria)
 mvn -pl jades-hta -am test -Djades.tests.excel=true
@@ -36,6 +39,14 @@ Los tests de árboles cargan cada ontología una sola vez (`DecisionTreeTestSupp
 
 La copia de OSDi de `jades-hta` y el código que la lee evolucionan por fases hacia OSDi 1.3. Las decisiones, los puntos pendientes y el registro de cada fase están en [docs/osdi-1.3-diseno.md](docs/osdi-1.3-diseno.md). Las fases se aplican una a una: al terminar cada una, anota en su «Registro» qué se hizo, qué se decidió y qué quedó pendiente. El número de versión de `OSDi.ttl` no cambia hasta trasladar los cambios a OSDi.
 
+## Ejemplos de validación
+
+`jades-hta/examples/` (fase 18; se trasladará al repositorio de OSDi en la fase 19): un ejemplo por estudio publicado, cada uno en su carpeta con su `.ttl` (importa OSDi; individuos en el espacio de nombres de OSDi), su `README.md` (cita, representación, supuestos explícitos, diferencias conocidas) y `expected-results.json` (valores `published`, con su tolerancia y dónde aparecen, o `hand`, calculados a mano, con tolerancia relativa 1e-8). El índice está en `examples/README.md`. `TestValidationExamples` (etiqueta `validation`, excluida de la compilación normal con la propiedad `excludedGroups` del pom; se ejecuta con el perfil `validation`) genera el modelo de cada ejemplo y escribe el informe. `TestOntologyConsistency` comprueba también la coherencia de los ejemplos. Para añadir un ejemplo hace falta tu aprobación.
+
+| Ejemplo | Contenido |
+|---|---|
+| `evans1997-migraine` | Evans et al. (1997), sumatriptán frente a cafeína/ergotamina para la crisis de migraña (antes I05) |
+
 ## Tests de árboles de decisión
  
 Paquete `jades-hta/src/test/java/es/ull/simulation/hta/osdi/decisiontree/`:
@@ -50,7 +61,7 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 | `OSDi_test_tree_developments.ttl` | S01–S10, S20–S24 |
 | `OSDi_test_tree_manifestations.ttl` | S11–S19 |
 | `OSDi_test_tree_payoffs.ttl` | P01–P69 (P26: HR sobre un riesgo de tiempo hasta el evento; P28–P32: manifestaciones agudas; P33–P41: estrategias y pautas; P42–P46: resultados de estrategias; P47–P49: efectos adversos; P50: recaída tras la respuesta; P51–P52: horizonte temporal; P53–P54: tiempo hasta el evento con horizonte; P55–P56 y P30: frecuencia de una aguda; P57: costes en dólares canadienses de 1997; P58: grupo de estrategias alternativas como estrategia siguiente; P59: población sin edad ni sexo, D10; P60: población sin esperanza de vida; P61: fracaso por una condición con edad de inicio, D5; P62: intervención sin objetivo; P63: población sin utilidad basal; P64: objetivo agudo con frecuencia, que se ignora; P65: efecto adverso mortal de una estrategia que empieza a los 10 años; P66: muerte inmediata en la aparición de una manifestación; P67: objetivo crónico con muerte inmediata, que se ignora; P68: objetivo agudo con muerte inmediata, en el tiempo 0; P69: pérdida de AVAC negativa en un resultado) |
-| `OSDi_test_tree_scenarios.ttl` | I01–I05 (I03–I04: objetivo de las intervenciones en una progresión; I05: Evans et al. (1997), sumatriptán frente a cafeína/ergotamina) |
+| `OSDi_test_tree_scenarios.ttl` | I01–I04 (I03–I04: objetivo de las intervenciones en una progresión; I05, Evans et al. (1997), pasó a ser un ejemplo de validación en la fase 18) |
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
 | `OSDi_test_tree_malformed.ttl` | N01–N05, N07–N12, N14–N36 (casos que deben lanzar excepción; N13 volvió a ser P26 y N06, P56) |
 

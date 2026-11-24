@@ -159,6 +159,28 @@ public class TestOntologyConsistency {
         assertConsistent(loadTestOntology(manager, file), file);
     }
 
+    /** The ontologies of the validation examples (examples/&lt;case&gt;/*.ttl, phase 18) */
+    static java.util.stream.Stream<java.nio.file.Path> examples() throws Exception {
+        final java.nio.file.Path dir = java.nio.file.Paths.get(System.getProperty("jades.examples.dir", "examples"));
+        assertTrue(java.nio.file.Files.isDirectory(dir), "The folder of the validation examples does not exist: " + dir.toAbsolutePath());
+        final List<java.nio.file.Path> files = new ArrayList<>();
+        try (java.util.stream.Stream<java.nio.file.Path> paths = java.nio.file.Files.walk(dir, 2)) {
+            paths.filter(p -> p.toString().endsWith(".ttl")).sorted().forEach(files::add);
+        }
+        assertTrue(!files.isEmpty(), "No validation example found in " + dir.toAbsolutePath());
+        return files.stream();
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @org.junit.jupiter.params.provider.MethodSource("examples")
+    @DisplayName("Each validation example is consistent with OSDi, and its diseases are different individuals")
+    void exampleIsConsistent(java.nio.file.Path file) throws Exception {
+        final OWLOntologyManager manager = createManager();
+        try (InputStream stream = java.nio.file.Files.newInputStream(file)) {
+            assertConsistent(manager.loadOntologyFromOntologyDocument(stream), file.toString());
+        }
+    }
+
     @Test
     @DisplayName("Each case of the malformed models is consistent with OSDi, except those that are inconsistent on purpose (N15, N20, N22)")
     void malformedCasesAreConsistent() throws Exception {
