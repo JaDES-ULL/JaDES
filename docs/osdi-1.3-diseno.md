@@ -560,12 +560,17 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 - Defecto encontrado y corregido (aprobado; commit `cde76d4`): la muerte inmediata de una progresión se añadía como efecto de su nodo, así que toda hoja con la progresión tenía esperanza de vida 0, sin tener en cuenta la probabilidad ni la edad de inicio. Ahora el nodo la guarda aparte (`BranchDestinationNode.updateEffectsOfProgression`) y `ProgressionDeathExpander` abre bajo cada hoja donde está activo una rama de muerte con la probabilidad de la magnitud, en la aparición de la progresión (MAX(0, edad de inicio − Age0), o 0), y otra de supervivencia. `StrategyOutcomeExpander` no expande nada bajo esas muertes. La muerte de la enfermedad no cambia (S10, I02).
   - Test P66: ManX (0,2) desde los 40 años, 150 al año, muerte con 0,1 en su aparición (T = 20). Comparador 65315; 64,1; 54,485; evaluado 71725. Antes falló con `Unexpected life years (comparator). Expected 64.1 but found 52.0`.
 - Documentación: Javadoc, CLAUDE.md y `docs/known-limitations.md` (sección nueva «Instant death of a progression in decision trees»).
-- Suite final: 349 tests, 0 fallos, 1 omitido.
+- Suite tras los tres commits: 349 tests, 0 fallos, 1 omitido.
 
 **Decidido:**
 - La muerte por un efecto adverso ocurre al inicio de su estrategia, y la de una progresión, en su aparición; si el paciente muere antes, no llega a ocurrir.
 - No se multiplican por los episodios los efectos de una aguda sobre la esperanza de vida: la combinación con la frecuencia se rechaza. Se descartó la probabilidad de morir en alguno de los episodios esperados, 1 − e^(−λD) con λ = −f·ln(1 − p), porque la probabilidad de la rama dependería de los años de vida de la hoja.
 
 **Pendiente:**
-- Si las intervenciones tienen como objetivo una progresión con muerte inmediata, la muerte ocurre en el tiempo 0 (todos presentan el objetivo entonces). Con un objetivo crónico se podría argumentar, como con la enfermedad, que los pacientes ya sobrevivieron a su aparición. Sin test; por decidir.
+- (Resuelto en la fase 16: véase «Revisión».) Muerte inmediata del objetivo.
 - El DES no lee la muerte inmediata de las progresiones (fase 22).
+
+**Revisión (2026-11-24):**
+- Decidido: con un objetivo que es un desarrollo o una manifestación crónica, su muerte inmediata se ignora con aviso, como la de la enfermedad: todos presentan el objetivo en el tiempo 0, así que ya sobrevivieron a su aparición. Con un objetivo agudo, el episodio ocurre en el tiempo 0, dentro del modelo, y su muerte se aplica entonces (sin test).
+- `DiseaseSubTreeGenerator.generateTargetSubTree` descarta las muertes del nodo objetivo con aviso. Test P67 (ManX crónica con muerte 0,1 como objetivo: comparador 74750; 65; 55,25; evaluado 81250) y su aviso en `TestDecisionTreeWarnings`. Antes falló con `Unexpected life years (comparator). Expected 65.0 but found 58.5` y una hoja `DEATH` de más.
+- Suite final: 352 tests, 0 fallos, 1 omitido.

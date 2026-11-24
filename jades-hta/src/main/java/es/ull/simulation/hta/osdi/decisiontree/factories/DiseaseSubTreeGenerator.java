@@ -337,7 +337,8 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
      * <li>The node of T is the only (default) branch of the disease node, with probability 1, and it contributes its payoffs and effects. The risk of
      * T and the combination rules that affect it are ignored.</li>
      * <li>The payoffs and effects of the disease still apply, since the patients have the disease, except for its instant death, which happens at
-     * the onset of the disease (see {@link #generate(String)}).</li>
+     * the onset of the disease (see {@link #generate(String)}). For the same reason, the instant death of T is ignored with a warning if T is a
+     * development or a chronic manifestation (P67); if T is acute, its episode happens at time 0, so its instant death applies at time 0.</li>
      * <li>Only the progressions that depend on T are included: if T is a development, its own manifestations (hasSubProgression), with their
      * combination rules; if T is a manifestation, nothing else.</li>
      * </ul>
@@ -353,6 +354,15 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             log.info("The interventions of the model target " + target.getShortName() + ", so the tree starts with the patients that present it: its risk and the combination rules that affect it are ignored.");
         }
         final BranchDestinationNode targetNode = generateNode(target);
+        // The patients present a chronic target at time 0, so they survived its onset, as that of the disease. The episode of an acute target happens at
+        // time 0, within the model, so its instant death applies
+        if (!ClinicalProgressionType.ACUTE_MANIFESTATION.equals(target.getClinicalProgressionType())) {
+            for (EffectWrapper death : targetNode.getOnsetDeathEffects()) {
+                log.warn("The instant death " + death.getShortName() + " of " + target.getShortName() + ", the target of the interventions, is ignored:"
+                    + " every patient presents the target at time 0, so they survived its onset.");
+            }
+            targetNode.getOnsetDeathEffects().clear();
+        }
         diseaseNode.link(targetNode);
         if (ClinicalProgressionType.DEVELOPMENT.equals(target.getClinicalProgressionType())) {
             final Set<ClinicalProgressionWrapper> pendingManifestations = new TreeSet<>(diseaseWrapper.getManifestationsLinkedToDevelopment(target));

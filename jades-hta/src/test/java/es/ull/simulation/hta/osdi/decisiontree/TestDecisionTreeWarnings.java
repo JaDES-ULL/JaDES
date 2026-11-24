@@ -45,4 +45,15 @@ public class TestDecisionTreeWarnings {
                 "Warning not found: " + log.getMessages());
         }
     }
+
+    @Test
+    @DisplayName("The instant death of a chronic target (P67) is ignored: the patients survived its onset, as that of the disease")
+    void warnsThatTheDeathOfAChronicTargetIsIgnored() throws Exception {
+        try (LogCapture log = LogCapture.start()) {
+            DecisionTreeTestSupport.loadModel(DecisionTreeCatalog.PAYOFFS, "TT_P67_Experiment").getTree();
+            assertTrue(log.containsWarning("The instant death TT_P67_ManX_Death of TT_P67_ManX, the target of the interventions, is ignored:"
+                + " every patient presents the target at time 0, so they survived its onset."),
+                "Warning not found: " + log.getMessages());
+        }
+    }
 }
