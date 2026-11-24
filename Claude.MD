@@ -62,7 +62,9 @@ Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OS
 | `PBD.ttl` | `TestOntology`, `TestHTAExcelGeneration` (árbol de cribado neonatal), `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration` |
 | `T1DM.ttl` | `TestOntology`, `TestLoadOntology` (DES; único modelo de prueba con `Pathway`, `requires` y `Group`) |
 | `OSDi_test_des.ttl` | `TestDESRisksAndEffects` (DES: D01, riesgos de manifestaciones y valores de los efectos de una intervención sobre ellos) `TestDESPopulationDefaults` (D02: población sin edad ni sexo, D10) `TestDESInterventionPayoffs` (D03: coste y utilidad de una vez de una intervención terapéutica) `TestDESInterventionTarget` (D04–D08: objetivo de las intervenciones en el DES, D1), `TestDESStrategies` (D09–D11, D14, D15: estrategias y sustituciones en el DES, D2) y `TestDESDetection` (D12–D13: estrategia de detección de cada brazo); `DESTestSupport` simula los dos brazos con listeners de costes y AVAC |
-| `BD.ttl` | Ningún test la carga (no tiene experimentos; está a medias). Importa OSDi 1.2 desde la fase 13 |
+| `BD.ttl` | Solo `TestOntologyConsistency` (no tiene experimentos; está a medias). Importa OSDi 1.2 desde la fase 13 |
+
+`TestOntologyConsistency` (fase 17) carga con HermiT `OSDi.ttl` y todas las ontologías de prueba anteriores, tal como están escritas: deben ser coherentes y el razonador no debe deducir que dos enfermedades distintas son el mismo individuo (pasaría, p. ej., con una intervención compartida por modelos de enfermedades distintas, porque tiene exactamente un objetivo). `OSDi_test_tree_malformed.ttl` se comprueba caso a caso: N15, N20 y N22 son incoherentes a propósito (el razonador detecta el mismo error que JaDES rechaza) y los demás deben ser coherentes. Tras cambiar `OSDi.ttl` o una ontología de prueba, este test es el que detecta los errores que el `StructuralReasoner` no ve.
 
 `TestOSDiCompliance` exige que cada constante "core" de `OSDiClass`, `OSDiObjectProperty` y `OSDiDataProperty` exista en `OSDi.ttl`: renombrar o eliminar un término de la ontología obliga a actualizar esos enums.
  
@@ -176,7 +178,7 @@ Convenciones:
  
 - El proyecto compila con `release 25`: si Maven usa otro JDK, ejecutar con `JAVA_HOME` apuntando a un JDK 25.
 - El IDE también compila en `target/`: no editar las fuentes mientras se ejecutan los tests, y si aparecen errores `Unresolved compilation problem` o clases no encontradas, ejecutar `mvn -pl jades-hta -am clean test`.
-- OWL API 5.5.0 con `StructuralReasoner`; Apache POI 5.4.1 para el Excel.
+- OWL API 5.5.0 con `StructuralReasoner` (no comprueba la coherencia); HermiT 1.4.5.519 solo en `TestOntologyConsistency`, con `ignoreUnsupportedDatatypes` por OWL-Time. owlexplanation 5.0.0 falla con un `NullPointerException` interno al explicar una incoherencia: para localizarla, reducir los asertos hasta un conjunto mínimo incoherente comprobando con HermiT (fase 17). Apache POI 5.4.1 para el Excel.
 - `OSDiWrapper` resuelve las importaciones de SKOS y OWL-Time con copias locales (`SimpleIRIMapper`) para no depender de w3.org (error HTTP 429).
 - `OSDiWrapper.Builder.build` mapea la `owl:versionIRI` declarada en la copia local de `OSDi.ttl` al núcleo ya cargado. Si se cambia esa versión, hay que actualizar a la vez los `owl:imports` de las ontologías de prueba, o se intentará descargar la versión antigua.
 - Convención de descuento del Excel: anualidad vencida; actualización de costes con IPC: `ROUND(1000*CPI(estudio)/CPI(año), 0)/1000`, salvo si el año del coste es el del estudio (no se actualiza; `ParamSheet.updateCost`). La tabla CPI de la plantilla es el IPC español de 2002 a 2026: un estudio de otro año solo funciona si todos sus costes son de ese año (P57), y actualizar costes en otra moneda es aproximado.
