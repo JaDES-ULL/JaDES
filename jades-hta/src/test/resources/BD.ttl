@@ -836,9 +836,7 @@ osdi:PBD_ModelTree rdf:type owl:NamedIndividual ,
                                           osdi:PBD_UtilityManifestationMentalDelay ,
                                           osdi:PBD_UtilityManifestationMentalDelay_ParamUncertainty ,
                                           osdi:PBD_UtilityManifestationSeizure ,
-                                          osdi:PBD_UtilityManifestationSeizure_ParamUncertainty ;
-                   osdi:hasDisutilityCombinationMethod "ADD" ;
-                   osdi:hasYear "2025"^^xsd:short .
+                                          osdi:PBD_UtilityManifestationSeizure_ParamUncertainty .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_ModelTreeDebug
@@ -882,8 +880,7 @@ osdi:PBD_ModelTreeDebug rdf:type owl:NamedIndividual ,
                                                osdi:PBD_ScreeningTemporaryThreshold ,
                                                osdi:PBD_TreatmentStrategy ,
                                                osdi:PBD_UtilityManifestationHearingProblems ,
-                                               osdi:PBD_UtilityManifestationHearingProblems_ParamUncertainty ;
-                        osdi:hasDisutilityCombinationMethod "ADD" .
+                                               osdi:PBD_UtilityManifestationHearingProblems_ParamUncertainty .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_ModelTreeFake
