@@ -99,11 +99,11 @@ osdi:TEST_DecisionTreeModel2 rdf:type owl:NamedIndividual ,
                                                     osdi:TEST_CoexistentDevelopment2 ,
                                                     osdi:TEST_CoexistentDevelopment2Disutility ,
                                                     osdi:TEST_Disease2 ,
-                                                    osdi:TEST_InterventionEffective ,
+                                                    osdi:TEST_InterventionEffective2 ,
                                                     osdi:TEST_InterventionEffectiveCost ,
                                                     osdi:TEST_InterventionEffectiveEffect ,
                                                     osdi:TEST_InterventionEffectiveEffectMagnitude ,
-                                                    osdi:TEST_InterventionIneffective ,
+                                                    osdi:TEST_InterventionIneffective2 ,
                                                     osdi:TEST_LifeExpectancy ,
                                                     osdi:TEST_LifeExpectancyReduction ,
                                                     osdi:TEST_LifeExpectancyReductionMagnitude ,
@@ -114,8 +114,8 @@ osdi:TEST_DecisionTreeModel2 rdf:type owl:NamedIndividual ,
                                                     osdi:TEST_SevereAnnualTreatmentCost ,
                                                     osdi:TEST_SevereDevelopmentDisutility ,
                                                     osdi:TEST_SevereDevelopmentIncidence ;
-                             osdi:hasAssessedIntervention osdi:TEST_InterventionEffective ;
-                             osdi:hasComparatorIntervention osdi:TEST_InterventionIneffective ;
+                             osdi:hasAssessedIntervention osdi:TEST_InterventionEffective2 ;
+                             osdi:hasComparatorIntervention osdi:TEST_InterventionIneffective2 ;
                              osdi:hasDescription "Test model 2. A tree that compares a 'do nothing' versus a fully effective intervention. The disease defines two coexistent developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a development with no negative effects apart from a slight reduction on QOL. The population is a dummy population." .
 
 
@@ -128,11 +128,11 @@ osdi:TEST_DecisionTreeModel3 rdf:type owl:NamedIndividual ,
                                                     osdi:TEST_CoexistentDevelopment2Disutility ,
                                                     osdi:TEST_DevelopmentSet ,
                                                     osdi:TEST_Disease3 ,
-                                                    osdi:TEST_InterventionEffective ,
+                                                    osdi:TEST_InterventionEffective3 ,
                                                     osdi:TEST_InterventionEffectiveCost ,
                                                     osdi:TEST_InterventionEffectiveEffect ,
                                                     osdi:TEST_InterventionEffectiveEffectMagnitude ,
-                                                    osdi:TEST_InterventionIneffective ,
+                                                    osdi:TEST_InterventionIneffective3 ,
                                                     osdi:TEST_LifeExpectancy ,
                                                     osdi:TEST_LifeExpectancyReduction ,
                                                     osdi:TEST_LifeExpectancyReductionMagnitude ,
@@ -145,8 +145,8 @@ osdi:TEST_DecisionTreeModel3 rdf:type owl:NamedIndividual ,
                                                     osdi:TEST_SevereDevelopment ,
                                                     osdi:TEST_SevereDevelopmentDisutility ,
                                                     osdi:TEST_SevereDevelopmentIncidence ;
-                             osdi:hasAssessedIntervention osdi:TEST_InterventionEffective ;
-                             osdi:hasComparatorIntervention osdi:TEST_InterventionIneffective ;
+                             osdi:hasAssessedIntervention osdi:TEST_InterventionEffective3 ;
+                             osdi:hasComparatorIntervention osdi:TEST_InterventionIneffective3 ;
                              osdi:hasDescription "Test model 3. A tree that compares a 'do nothing' versus a fully effective intervention. The disease defines two coexistent developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a development with no negative effects apart from a slight reduction on QOL; and two alternative developments: one with severe symptoms (characterized by a lifetime reduction of 20 years and a disutility of 0.4) and a normal development, with no negative effects. The population is a dummy population." .
 
 
@@ -176,8 +176,8 @@ osdi:TEST_Disease1 rdf:type owl:NamedIndividual ,
 osdi:TEST_Disease2 rdf:type owl:NamedIndividual ,
                             osdi:Disease ;
                    osdi:hasCost osdi:TEST_BaseAnnualTreatmentCost ;
-                   osdi:hasIntervention osdi:TEST_InterventionEffective ,
-                                        osdi:TEST_InterventionIneffective ;
+                   osdi:hasIntervention osdi:TEST_InterventionEffective2 ,
+                                        osdi:TEST_InterventionIneffective2 ;
                    osdi:hasProgressionElement osdi:TEST_CoexistentDevelopment1 ,
                                               osdi:TEST_CoexistentDevelopment2 ;
                    osdi:includedByModel osdi:TEST_DecisionTreeModel2 .
@@ -187,8 +187,8 @@ osdi:TEST_Disease2 rdf:type owl:NamedIndividual ,
 osdi:TEST_Disease3 rdf:type owl:NamedIndividual ,
                             osdi:Disease ;
                    osdi:hasCost osdi:TEST_BaseAnnualTreatmentCost ;
-                   osdi:hasIntervention osdi:TEST_InterventionEffective ,
-                                        osdi:TEST_InterventionIneffective ;
+                   osdi:hasIntervention osdi:TEST_InterventionEffective3 ,
+                                        osdi:TEST_InterventionIneffective3 ;
                    osdi:hasProgressionElement osdi:TEST_CoexistentDevelopment1 ,
                                               osdi:TEST_CoexistentDevelopment2 ,
                                               osdi:TEST_DevelopmentSet ,
@@ -202,10 +202,31 @@ osdi:TEST_InterventionEffective rdf:type owl:NamedIndividual ,
                                          osdi:TherapeuticIntervention ;
                                 osdi:hasCost osdi:TEST_InterventionEffectiveCost ;
                                 osdi:hasEffect osdi:TEST_InterventionEffectiveEffect ;
-                                osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
-                                                     osdi:TEST_DecisionTreeModel2 ,
-                                                     osdi:TEST_DecisionTreeModel3 ,
-                                                     osdi:TEST_DecisionTreeModel4 .
+                                osdi:includedByModel osdi:TEST_DecisionTreeModel1 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionEffective2
+osdi:TEST_InterventionEffective2 rdf:type owl:NamedIndividual ,
+                                         osdi:TherapeuticIntervention ;
+                                osdi:hasCost osdi:TEST_InterventionEffectiveCost ;
+                                osdi:hasEffect osdi:TEST_InterventionEffectiveEffect ;
+                                osdi:includedByModel osdi:TEST_DecisionTreeModel2 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionEffective3
+osdi:TEST_InterventionEffective3 rdf:type owl:NamedIndividual ,
+                                         osdi:TherapeuticIntervention ;
+                                osdi:hasCost osdi:TEST_InterventionEffectiveCost ;
+                                osdi:hasEffect osdi:TEST_InterventionEffectiveEffect ;
+                                osdi:includedByModel osdi:TEST_DecisionTreeModel3 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionEffective4
+osdi:TEST_InterventionEffective4 rdf:type owl:NamedIndividual ,
+                                         osdi:TherapeuticIntervention ;
+                                osdi:hasCost osdi:TEST_InterventionEffectiveCost ;
+                                osdi:hasEffect osdi:TEST_InterventionEffectiveEffect ;
+                                osdi:includedByModel osdi:TEST_DecisionTreeModel4 .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionEffectiveCost
@@ -249,10 +270,25 @@ osdi:TEST_InterventionEffectiveEffectMagnitude rdf:type owl:NamedIndividual ,
 ###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionIneffective
 osdi:TEST_InterventionIneffective rdf:type owl:NamedIndividual ,
                                            osdi:TherapeuticIntervention ;
-                                  osdi:includedByModel osdi:TEST_DecisionTreeModel1 ,
-                                                       osdi:TEST_DecisionTreeModel2 ,
-                                                       osdi:TEST_DecisionTreeModel3 ,
-                                                       osdi:TEST_DecisionTreeModel4 .
+                                  osdi:includedByModel osdi:TEST_DecisionTreeModel1 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionIneffective2
+osdi:TEST_InterventionIneffective2 rdf:type owl:NamedIndividual ,
+                                           osdi:TherapeuticIntervention ;
+                                  osdi:includedByModel osdi:TEST_DecisionTreeModel2 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionIneffective3
+osdi:TEST_InterventionIneffective3 rdf:type owl:NamedIndividual ,
+                                           osdi:TherapeuticIntervention ;
+                                  osdi:includedByModel osdi:TEST_DecisionTreeModel3 .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TEST_InterventionIneffective4
+osdi:TEST_InterventionIneffective4 rdf:type owl:NamedIndividual ,
+                                           osdi:TherapeuticIntervention ;
+                                  osdi:includedByModel osdi:TEST_DecisionTreeModel4 .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#TEST_LifeExpectancy
@@ -441,11 +477,11 @@ osdi:TEST_DecisionTreeModel4 rdf:type owl:NamedIndividual ,
                                       osdi:DecisionTreeModel ;
                              osdi:includesModelItem osdi:TEST_BaseAnnualTreatmentCost,
                                                     osdi:TEST_Disease4,
-                                                    osdi:TEST_InterventionEffective,
+                                                    osdi:TEST_InterventionEffective4,
                                                     osdi:TEST_InterventionEffectiveCost,
                                                     osdi:TEST_InterventionEffectiveEffect,
                                                     osdi:TEST_InterventionEffectiveEffectMagnitude,
-                                                    osdi:TEST_InterventionIneffective,
+                                                    osdi:TEST_InterventionIneffective4,
                                                     osdi:TEST_LifeExpectancy,
                                                     osdi:TEST_LifeExpectancyReduction,
                                                     osdi:TEST_LifeExpectancyReductionMagnitude,
@@ -460,8 +496,8 @@ osdi:TEST_DecisionTreeModel4 rdf:type owl:NamedIndividual ,
                                                     osdi:TEST_PopulationBaseUtility,
                                                     osdi:TEST_PopulationSex,
                                                     osdi:TEST_SevereDevelopmentIncidence ;
-                             osdi:hasAssessedIntervention osdi:TEST_InterventionEffective ;
-                             osdi:hasComparatorIntervention osdi:TEST_InterventionIneffective ;
+                             osdi:hasAssessedIntervention osdi:TEST_InterventionEffective4 ;
+                             osdi:hasComparatorIntervention osdi:TEST_InterventionIneffective4 ;
                              osdi:hasDescription "Test model 4. A tree that compares a 'do nothing' versus a fully effective intervention. The disease defines two coexistent developments that increase the mortality rate (x2 and x1.25); the second one also reduces the life expectancy in 20 years. No additional costs or disutilities. Used to check how mortality rates and life expectancy reductions are combined." .
 
 
@@ -469,8 +505,8 @@ osdi:TEST_DecisionTreeModel4 rdf:type owl:NamedIndividual ,
 osdi:TEST_Disease4 rdf:type owl:NamedIndividual ,
                             osdi:Disease ;
                    osdi:hasCost osdi:TEST_BaseAnnualTreatmentCost ;
-                   osdi:hasIntervention osdi:TEST_InterventionEffective ,
-                                        osdi:TEST_InterventionIneffective ;
+                   osdi:hasIntervention osdi:TEST_InterventionEffective4 ,
+                                        osdi:TEST_InterventionIneffective4 ;
                    osdi:hasProgressionElement osdi:TEST_MortalityDevelopment1 ,
                                               osdi:TEST_MortalityDevelopment2 ;
                    osdi:includedByModel osdi:TEST_DecisionTreeModel4 .

@@ -33,12 +33,13 @@ public class TestSingleDiseaseAndPopulationDecisionTreeModelGeneration {
                 new String[] {"PBD_InterventionScreening", "PBD_InterventionNoScreening"}, NBSDecisionTreeModel.class, 8),*/
             Arguments.of("/OSDi_test.ttl", "TEST_Experiment1", "TEST_Disease1", "TEST_Population", 
                 new String[] {"TEST_InterventionEffective", "TEST_InterventionIneffective"}, SimpleModel.class, 2),
-            Arguments.of("/OSDi_test.ttl", "TEST_Experiment2", "TEST_Disease2", "TEST_Population", 
-                new String[] {"TEST_InterventionEffective", "TEST_InterventionIneffective"}, SimpleModel.class, 3),
-            Arguments.of("/OSDi_test.ttl", "TEST_Experiment3", "TEST_Disease3", "TEST_Population", 
-                new String[] {"TEST_InterventionEffective", "TEST_InterventionIneffective"}, SimpleModel.class, 4),
-            Arguments.of("/OSDi_test.ttl", "TEST_Experiment4Max", "TEST_Disease4", "TEST_Population", 
-                new String[] {"TEST_InterventionEffective", "TEST_InterventionIneffective"}, SimpleModel.class, 3),
+            // Each model has its own interventions, since every intervention has exactly one target (phase 17)
+            Arguments.of("/OSDi_test.ttl", "TEST_Experiment2", "TEST_Disease2", "TEST_Population",
+                new String[] {"TEST_InterventionEffective2", "TEST_InterventionIneffective2"}, SimpleModel.class, 3),
+            Arguments.of("/OSDi_test.ttl", "TEST_Experiment3", "TEST_Disease3", "TEST_Population",
+                new String[] {"TEST_InterventionEffective3", "TEST_InterventionIneffective3"}, SimpleModel.class, 4),
+            Arguments.of("/OSDi_test.ttl", "TEST_Experiment4Max", "TEST_Disease4", "TEST_Population",
+                new String[] {"TEST_InterventionEffective4", "TEST_InterventionIneffective4"}, SimpleModel.class, 3),
             Arguments.of("/PBD.ttl", "PBD_ExperimentBase", "PBD_ProfoundBiotinidaseDeficiency", "PBD_BasePopulation", 
                 new String[] {"PBD_InterventionNoScreening", "PBD_InterventionScreening"}, NBSModel.class, 9)
         );
