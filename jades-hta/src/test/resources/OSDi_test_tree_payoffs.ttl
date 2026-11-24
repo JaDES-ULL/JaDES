@@ -8767,4 +8767,188 @@ osdi:TT_P64_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P64. Acute manifestation with a frequency (2 episodes per year, horizon of 5 years) that is the target of the interventions: the tree evaluates a single episode, and the frequency is ignored with a warning." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_L1_Cost
+osdi:TT_P65_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L1" ;
+    osdi:hasExpectedValue "20.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_L1
+osdi:TT_P65_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P65_L1_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_P65_L1_Success ,
+        osdi:TT_P65_L1_Failure ;
+    osdi:hasDescription "First line of therapy" ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_EvaluationTime
+osdi:TT_P65_EvaluationTime rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:hasDescription "The response to L1 is evaluated at 10 years" ;
+    osdi:hasExpectedValue "10.0"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_FailureRisk
+osdi:TT_P65_FailureRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:hasDescription "Probability of failure of L1" ;
+    osdi:hasExpectedValue "0.4"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_L1_Success
+osdi:TT_P65_L1_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasEvaluationTime osdi:TT_P65_EvaluationTime ;
+    osdi:hasDescription "Success of L1" ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_L1_Failure
+osdi:TT_P65_L1_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_P65_R ;
+    osdi:hasEvaluationTime osdi:TT_P65_EvaluationTime ;
+    osdi:hasOutcomeRisk osdi:TT_P65_FailureRisk ;
+    osdi:hasDescription "Failure of L1" ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_R_Cost
+osdi:TT_P65_R_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of R" ;
+    osdi:hasExpectedValue "200.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_R
+osdi:TT_P65_R rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P65_R_Cost ;
+    osdi:hasAdverseEvent osdi:TT_P65_Anaphylaxis ;
+    osdi:hasDescription "Rescue treatment after the failure of L1, which starts at 10 years" ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_Anaphylaxis_Risk
+osdi:TT_P65_Anaphylaxis_Risk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Risk of Anaphylaxis per application of R" ;
+    osdi:hasExpectedValue "0.05"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_Anaphylaxis_Cost
+osdi:TT_P65_Anaphylaxis_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Cost of Anaphylaxis" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_AnaphylaxisDeathProbability
+osdi:TT_P65_AnaphylaxisDeathProbability rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Probability ;
+    osdi:hasDescription "Probability of dying from anaphylaxis" ;
+    osdi:hasExpectedValue "0.2"^^xsd:double ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_AnaphylaxisDeath
+osdi:TT_P65_AnaphylaxisDeath rdf:type owl:NamedIndividual ,
+        osdi:InstantDeathEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_P65_AnaphylaxisDeathProbability ;
+    osdi:hasDescription "Death from anaphylaxis" ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_Anaphylaxis
+osdi:TT_P65_Anaphylaxis rdf:type owl:NamedIndividual ,
+        osdi:AdverseEvent ;
+    osdi:hasRiskCharacterization osdi:TT_P65_Anaphylaxis_Risk ;
+    osdi:hasCost osdi:TT_P65_Anaphylaxis_Cost ;
+    osdi:hasEffect osdi:TT_P65_AnaphylaxisDeath ;
+    osdi:hasDescription "Adverse event Anaphylaxis of R" ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_Disease
+osdi:TT_P65_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P65_L1 ;
+    osdi:hasDescription "Disease" ;
+    osdi:includedByModel osdi:TT_P65_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_Experiment
+osdi:TT_P65_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P65_Model ;
+    osdi:hasDescription "Fatal adverse event of a strategy that starts at 10 years (rescue after the failure of the first line): the death happens at the start of the strategy." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P65_Model
+osdi:TT_P65_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P65_L1_Cost ,
+        osdi:TT_P65_L1 ,
+        osdi:TT_P65_EvaluationTime ,
+        osdi:TT_P65_FailureRisk ,
+        osdi:TT_P65_L1_Success ,
+        osdi:TT_P65_L1_Failure ,
+        osdi:TT_P65_R_Cost ,
+        osdi:TT_P65_R ,
+        osdi:TT_P65_Anaphylaxis_Risk ,
+        osdi:TT_P65_Anaphylaxis_Cost ,
+        osdi:TT_P65_AnaphylaxisDeathProbability ,
+        osdi:TT_P65_AnaphylaxisDeath ,
+        osdi:TT_P65_Anaphylaxis ,
+        osdi:TT_P65_Disease ;
+    osdi:hasDescription "P65. Fatal adverse event of a strategy that starts at 10 years (rescue after the failure of the first line): the death happens at the start of the strategy." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

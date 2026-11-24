@@ -51,8 +51,9 @@ import es.ull.simulation.hta.osdi.ontology.StrategyWrapper.Outcome;
  * <ul>
  * <li>Each adverse event is an independent branch with its risk (a probability per application) and a branch without it.</li>
  * <li>Its payoffs apply once, at the start of the strategy; annual ones are ignored with a warning (D7). Its effects apply to the leaf, and an
- * InstantDeathEffect splits the branch into death (with the probability of the magnitude of the effect, and a life expectancy of 0) and survival.
- * Nothing else is expanded after the death.</li>
+ * InstantDeathEffect splits the branch into death (with the probability of the magnitude of the effect) and survival. The death happens at the
+ * start of the strategy: the life years of its leaf are MIN(start of the strategy, life expectancy without the death), and the payoffs are cut
+ * there (phase 16). Nothing else is expanded after the death.</li>
  * <li>The strategies of the adverse event are applied in its branch.</li>
  * <li>The adverse event is active in its branch, so a strategy that fails if the adverse event appears (failsIf) fails only there.</li>
  * <li>The adverse event does not activate the structure of the health condition it represents (isOccurrenceOf).</li>
@@ -245,12 +246,10 @@ final class StrategyOutcomeExpander {
         BranchDestinationNode alive = happens;
         for (EffectWrapper effect : adverseEvent.getEffects()) {
             if (EffectType.INSTANT_DEATH_EFFECT.equals(effect.getEffectType())) {
-                if (!current.start().isEmpty()) {
-                    log.warn("The adverse event " + adverseEvent.getShortName() + " of the strategy " + current.strategy().getShortName() + " may cause death, but the strategy starts after the start of "
-                        + current.owner().name() + ". Decision trees assume that the death happens at the start of the model (life expectancy 0).");
-                }
                 final BranchDestinationNode death = new BranchDestinationNode(model, "Death from " + adverseEvent.getShortName());
                 death.updateEffects(adverseEvent, EffectType.INSTANT_DEATH_EFFECT);
+                // The death happens at the start of the strategy
+                death.setDeathTime(new PayoffWindow(current.owner(), current.start(), Optional.empty()));
                 happens.link(death, effect.getEffectMagnitude());
                 if (alive == happens) {
                     alive = new BranchDestinationNode(model, "Alive with " + adverseEvent.getShortName());

@@ -618,6 +618,15 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P64_Experiment", "Acute manifestation with a frequency that is the target of the interventions: the tree evaluates a single episode",
                 leaves("TT_P64_", leaf(1.0, "ManA")),
                 outcomes(5350.0, 5.0, 4.25), outcomes(5300.0, 5.0, 4.25)));
+        // P65 (phase 16): fatal adverse event of a strategy that starts later. No discount. L1 (20, once): failure 0.4, evaluated at 10 years and followed
+        // by R (200, once), whose anaphylaxis (0.05; 500, once) is fatal with probability 0.2; success, the default. The death happens at the start of R (T = 10).
+        // Success (0.6): 65020; 65; 55.25. Failure without anaphylaxis (0.38): 65220. Anaphylaxis, alive (0.016): 65720.
+        // Anaphylaxis, death (0.004): 10 * 1000 + 20 + 200 + 500 = 10720; life years 10; QALYs 8.5.
+        // Comparator: 39012 + 24783.6 + 1051.52 + 42.88 = 64890; life years 0.996 * 65 + 0.004 * 10 = 64.78; QALYs 0.996 * 55.25 + 0.004 * 8.5 = 55.063.
+        // Assessed: + 100 * 64.78 = 71368
+        cases.add(tc(PAYOFFS, "TT_P65_Experiment", "Fatal adverse event of a strategy that starts at 10 years: the death happens at the start of the strategy",
+                leaves("TT_P65_", death(0.004), leaf(0.016, "L1_Failure", "Anaphylaxis"), leaf(0.38, "L1_Failure"), leaf(0.6, "L1_Success")),
+                outcomes(71368.0, 64.78, 55.063), outcomes(64890.0, 64.78, 55.063)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.

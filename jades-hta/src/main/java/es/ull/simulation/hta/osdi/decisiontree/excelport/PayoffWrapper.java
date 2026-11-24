@@ -73,6 +73,10 @@ public class PayoffWrapper {
      */
     private final ArrayList<Resolution> resolutions;
     /**
+     * The moments of the instant deaths along the path that do not happen at the start of the model (see {@link BranchDestinationNode#getDeathTime()}).
+     */
+    private final ArrayList<PayoffWindow> deathTimes;
+    /**
      * The list of probabilities associated with this node, which is used to calculate the expected value of the decision represented by this node.
      */
     private final ArrayList<CellReference> probabilities;
@@ -117,6 +121,7 @@ public class PayoffWrapper {
         this.costEntries = new ArrayList<>();
         this.guidelineEntries = new ArrayList<>();
         this.resolutions = new ArrayList<>();
+        this.deathTimes = new ArrayList<>();
         this.disutilityEntries = new ArrayList<>();
         this.effects = new TreeSet<>();
         this.effectEntries = new ArrayList<>();
@@ -133,6 +138,7 @@ public class PayoffWrapper {
         this.costEntries = new ArrayList<>(original.costEntries);
         this.guidelineEntries = new ArrayList<>(original.guidelineEntries);
         this.resolutions = new ArrayList<>(original.resolutions);
+        this.deathTimes = new ArrayList<>(original.deathTimes);
         this.disutilityEntries = new ArrayList<>(original.disutilityEntries);
         this.effects = new TreeSet<>(original.effects);
         this.effectEntries = new ArrayList<>(original.effectEntries);
@@ -243,6 +249,7 @@ public class PayoffWrapper {
             this.disutilityEntries.add(new ParameterEntry(payoff.parameter(), payoff.window().owner().getTemporalConstraint(), payoff.window().owner(), payoff.window()));
         }
         node.getResolution().ifPresent(resolutions::add);
+        node.getDeathTime().ifPresent(deathTimes::add);
         // Add the costs that apply according to a guideline
         for (GuidelineCost cost : node.getGuidelineCosts()) {
             this.guidelineEntries.add(new GuidelineEntry(cost, constraint));
@@ -517,6 +524,11 @@ public class PayoffWrapper {
      * Returns the undiscounted life expectancy formula for the parameters in this wrapper. The base life expectancy is first divided by the combined 
      * increased mortality rate (if any), and then the combined life expectancy reduction (if any) is subtracted. The result is never negative.
      * This is the same order used by the discrete-event simulation death submodels.
+     * <p>
+     * An instant death (InstantDeathEffect) of the disease happens at the start of the model, so the life expectancy is 0. The death caused by an
+     * adverse event happens at the start of its strategy T, so the life expectancy is MIN(T, life expectancy without the death): the life years and
+     * the payoffs of the leaf are cut at T (phase 16 of docs/osdi-1.3-diseno.md). If the patient dies earlier, the adverse event does not happen.
+     * </p>
      * @param baseLifeExpectancyParam The base (population's) life expectancy parameter for which the undiscounted life expectancy formula is calculated.
      * @param lerMethod The method to combine the life expectancy reductions of the nodes along the path.
      * @param imrMethod The method to combine the increased mortality rates of the nodes along the path.
@@ -529,11 +541,11 @@ public class PayoffWrapper {
         final ArrayList<String> mortalityRateTexts = new ArrayList<>();
         final Set<String> lerKeys = new TreeSet<>();
 
-        boolean hasInstantDeathEffect = false;
+        int instantDeaths = 0;
         for (EffectWrapper effect : effectEntries) {
             switch (effect.getEffectType()) {
                 case INSTANT_DEATH_EFFECT:
-                    hasInstantDeathEffect = true;
+                    instantDeaths++;
                     break;
                 case LIFE_EXPECTANCY_REDUCTION_EFFECT: {
                     // The magnitude parameter identifies the reduction
@@ -553,10 +565,32 @@ public class PayoffWrapper {
                     break;
             }
         }
-        if (hasInstantDeathEffect) {
-            // TODO: Consider that death may occur later
-            return "0"; // If there is an instant death effect, the life expectancy is 0
+        // An instant death at the start of the model (e.g., that of the disease) leaves a life expectancy of 0
+        if (instantDeaths > deathTimes.size()) {
+            return "0";
         }
+        final String lifeExpectancy = getUndiscountedLEFormula(baseLifeExpectancyParam, lerMethod, imrMethod, lifetimeReductionTexts, mortalityRateTexts);
+        if (instantDeaths == 0) {
+            return lifeExpectancy;
+        }
+        // An instant death at the start of a strategy (adverse event): the patient lives until then, unless he dies earlier
+        final ArrayList<String> ends = new ArrayList<>();
+        for (PayoffWindow deathTime : deathTimes) {
+            final TemporalConstraint constraint = deathTime.owner().getTemporalConstraint();
+            final Optional<ParameterWrapper> onsetAge = (constraint == null) ? Optional.empty() : constraint.startTime();
+            final String start0 = onsetAge.isPresent() ? ExcelFormulaLibrary.MAX.getFormula("0, " + onsetAge.get().getShortName() + " - " + populationAgeName) : "0";
+            ends.add(addTimes(start0, deathTime.from()));
+        }
+        ends.add(lifeExpectancy);
+        return ExcelFormulaLibrary.MIN.getFormula(String.join(", ", ends));
+    }
+
+    /**
+     * Returns the undiscounted life expectancy formula without instant deaths: the base life expectancy divided by the combined increased mortality
+     * rate (if any), minus the combined life expectancy reduction (if any), never negative.
+     */
+    private String getUndiscountedLEFormula(ParameterWrapper baseLifeExpectancyParam, LifeExpectancyReductionCombinationMethod lerMethod, MortalityRateCombinationMethod imrMethod,
+            List<String> lifetimeReductionTexts, List<String> mortalityRateTexts) {
         String txtFormula = baseLifeExpectancyParam.getShortName();
         // Increased mortality rates are applied first, by dividing the life expectancy by the combined rate ratio
         if (mortalityRateTexts.size() == 1) {

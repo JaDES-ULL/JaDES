@@ -272,6 +272,23 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
         this.resolution = Optional.of(resolution);
     }
 
+    /** The moment of the instant death represented by this node, if it does not happen at the start of the model (see {@link #getDeathTime()}) */
+    private Optional<PayoffWindow> deathTime = Optional.empty();
+
+    /**
+     * Returns the moment of the instant death represented by this node, if it does not happen at the start of the model: the start of the period
+     * (the start of the node of its owner plus the "from" times). It is used for the death caused by an adverse event of a strategy, which happens
+     * at the start of the strategy (phase 16 of docs/osdi-1.3-diseno.md). Without it, the death happens at the start of the model.
+     * @return The moment of the instant death represented by this node, if any
+     */
+    public Optional<PayoffWindow> getDeathTime() {
+        return deathTime;
+    }
+
+    public void setDeathTime(PayoffWindow deathTime) {
+        this.deathTime = Optional.of(deathTime);
+    }
+
     /**
      * Returns the costs of the health technologies of the strategies of this node that apply according to a guideline.
      * @return The costs that apply according to a guideline.
