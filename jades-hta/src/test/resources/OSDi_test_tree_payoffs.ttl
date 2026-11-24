@@ -9977,4 +9977,176 @@ osdi:TT_P68_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "P68. Acute manifestation with an instant death that is the target of the interventions: every patient suffers an episode at time 0, within the model, so its instant death applies at time 0." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_L1
+osdi:TT_P69_L1 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P69_L1_Cost ;
+    osdi:hasStrategyOutcome osdi:TT_P69_L1_Success ,
+        osdi:TT_P69_L1_Failure ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:hasDescription "First line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_L1_Cost
+osdi:TT_P69_L1_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L1" ;
+    osdi:hasExpectedValue "300.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_L1_Success
+osdi:TT_P69_L1_Success rdf:type owl:NamedIndividual ,
+        osdi:SuccessOutcome ;
+    osdi:hasEvaluationTime osdi:TT_P69_EvaluationTime ;
+    osdi:hasOutcomeRisk osdi:TT_P69_SuccessRisk ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:hasDescription "Success of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_SuccessRisk
+osdi:TT_P69_SuccessRisk rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Incidence ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:hasDescription "Probability of success of L1" ;
+    osdi:hasExpectedValue "0.6"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_L1_Failure
+osdi:TT_P69_L1_Failure rdf:type owl:NamedIndividual ,
+        osdi:FailureOutcome ;
+    osdi:followedByStrategy osdi:TT_P69_L2 ;
+    osdi:hasEvaluationTime osdi:TT_P69_EvaluationTime ;
+    osdi:hasCost osdi:TT_P69_FailureCost ;
+    osdi:hasUtility osdi:TT_P69_FailureLoss ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:hasDescription "Failure of L1" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_EvaluationTime
+osdi:TT_P69_EvaluationTime rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:hasDescription "The response to L1 is evaluated at 2 years" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_L2
+osdi:TT_P69_L2 rdf:type owl:NamedIndividual ,
+        osdi:LineOfTherapy ;
+    osdi:hasCategory osdi:TreatmentCat ;
+    osdi:hasCost osdi:TT_P69_L2_Cost ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:hasDescription "Second line of therapy" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_L2_Cost
+osdi:TT_P69_L2_Cost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:appliesOneTime "false"^^xsd:boolean ;
+    osdi:hasDescription "Cost of L2" ;
+    osdi:hasExpectedValue "500.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_FailureCost
+osdi:TT_P69_FailureCost rdf:type owl:NamedIndividual ,
+        osdi:Cost ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:Currency_Euro ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "One-time cost of the failure of L1" ;
+    osdi:hasExpectedValue "1000.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_FailureLoss
+osdi:TT_P69_FailureLoss rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ,
+        osdi:Utility ;
+    osdi:hasDataItemType osdi:DI_Generic_Utility ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:appliesOneTime "true"^^xsd:boolean ;
+    osdi:hasDescription "Negative QALY loss (a gain) of the failure of L1" ;
+    osdi:hasExpectedValue "-0.5"^^xsd:double ;
+    osdi:isDisutility "true"^^xsd:boolean .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_Disease
+osdi:TT_P69_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_P69_InterventionTreat ,
+        osdi:TT_P69_InterventionNone ;
+    osdi:hasStrategy osdi:TT_P69_L1 ;
+    osdi:includedByModel osdi:TT_P69_Model ;
+    osdi:hasDescription "Disease" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_Experiment
+osdi:TT_P69_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_P69_Model ;
+    osdi:hasDescription "Strategy outcome with a negative one-time QALY loss, which is a gain (P43 with -0.5)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_InterventionNone
+osdi:TT_P69_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_P69_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_InterventionTreat
+osdi:TT_P69_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_P69_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_P69_Model
+osdi:TT_P69_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_P69_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_P69_InterventionNone ;
+    osdi:includesModelItem 
+        osdi:TT_BaseAnnualCost ,
+        osdi:TT_P69_InterventionNone ,
+        osdi:TT_P69_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_P69_L1 ,
+        osdi:TT_P69_L1_Cost ,
+        osdi:TT_P69_L1_Success ,
+        osdi:TT_P69_SuccessRisk ,
+        osdi:TT_P69_L1_Failure ,
+        osdi:TT_P69_EvaluationTime ,
+        osdi:TT_P69_L2 ,
+        osdi:TT_P69_L2_Cost ,
+        osdi:TT_P69_FailureCost ,
+        osdi:TT_P69_FailureLoss ,
+        osdi:TT_P69_Disease ;
+    osdi:hasDescription "P69. Strategy outcome with a negative one-time QALY loss, which is a gain (P43 with -0.5)." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

@@ -645,6 +645,11 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P68_Experiment", "Acute target with an instant death: the episode happens at time 0, so the death applies at time 0",
                 leaves("TT_P68_", death(0.1), leaf(0.9, "ManA")),
                 outcomes(58850.0, 58.5, 49.725), outcomes(58800.0, 58.5, 49.725)));
+        // P69 (phase 18): P43 with a QALY loss of -0.5 in the failure, which is a gain, accepted without clipping (phase 12; it was only covered by I05).
+        // Costs as in P43; QALYs = 55.25 + 0.4 * 0.5 = 55.45
+        cases.add(tc(PAYOFFS, "TT_P69_Experiment", "Strategy outcome with a negative one-time QALY loss, which is a gain",
+                leaves("TT_P69_", leaf(0.6, "L1_Success"), leaf(0.4, "L1_Failure")),
+                outcomes(96440.0, 65.0, 55.45), outcomes(89940.0, 65.0, 55.45)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
