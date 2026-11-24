@@ -33,14 +33,9 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
 
 ## Fases pendientes
 
-Fases acordadas tras la fase 15, en orden: de la 16 a la 19 se cierra el árbol y se publica OSDi 1.3, validada con árboles de decisión; de la 20 a la 23 se completa el DES. Cada fase termina con la suite de `jades-hta` pasando, sus cambios en commits y su entrada en el registro. Si una fase descubre trabajo no previsto, lo propone como fase nueva en el registro.
+Fases acordadas tras la fase 16, en orden: de la 17 a la 19 se cierra el árbol y se publica OSDi 1.3, validada con árboles de decisión; de la 20 a la 23 se completa el DES. Cada fase termina con la suite de `jades-hta` pasando, sus cambios en commits y su entrada en el registro. Si una fase descubre trabajo no previsto, lo propone como fase nueva en el registro.
 
 Quedan fuera, como trabajo futuro: pautas con subpautas, condiciones o edades de aplicación; pautas en estrategias con resultados; la confirmación imperfecta (estrategias de diagnóstico con resultados explícitos); `hasConditionExpression` en las estrategias; grupos en las cadenas de detección del cribado neonatal; actualizar costes fuera del IPC español de 2002 a 2026; y el análisis de impacto presupuestario.
-
-### Fase 16: defectos del árbol con resultados erróneos (D7, D8)
-
-1. La muerte por un efecto adverso (`InstantDeathEffect`) ocurre al inicio del modelo aunque la estrategia que lo provoca empiece más tarde (fase 9). Debe ocurrir al inicio de esa estrategia, con los años de vida y los pagos recortados en ese momento. Se confirma con un test que falle y valores a mano.
-2. Los efectos de una aguda con frecuencia (muerte, reducción de la esperanza de vida) no se multiplican por los episodios (fase 11). Proponer la semántica (por ejemplo, la probabilidad de morir en alguno de los episodios esperados) o, si no hay una razonable, rechazar con `Unsupported` la combinación de frecuencia y esos efectos. Requiere aprobación.
 
 ### Fase 17: consistencia con un razonador completo
 
@@ -555,3 +550,22 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 - El aviso de la frecuencia de un objetivo agudo se emite dos veces por modelo (ya ocurría antes).
 - El objetivo en una manifestación propia de uno o varios desarrollos sigue en «Pendientes de decidir».
 - Maven necesita `JAVA_HOME` apuntando a un JDK 25 (el del entorno es el 21), como dice CLAUDE.md.
+
+### Fase 16: defectos del árbol con resultados erróneos (D7, D8) (2026-11-24)
+
+**Hecho:**
+- Muerte por un efecto adverso (commit `f67607f`): ocurría al inicio del modelo aunque la estrategia empezara más tarde. El nodo de muerte guarda ahora el inicio T de la estrategia (`BranchDestinationNode.getDeathTime`) y la esperanza de vida de su hoja es MIN(T, la de la hoja sin la muerte) (`PayoffWrapper.getUndiscountedLEFormula`): los años de vida y los pagos se recortan en T. Se quita el aviso. P49 (T = 0) no cambia.
+  - Test P65: L1 (20) fracasa con 0,4, evaluado a los 10 años, seguido de R (200), cuya anafilaxia (0,05; 500) es mortal con 0,2. Muerte (0,004): 10 años de vida, 10 × 1000 + 20 + 200 + 500 = 10720, 8,5 AVAC. Comparador 64890; 64,78; 55,063; evaluado 71368. Antes falló con `Unexpected cost (comparator). Expected 64890.0 but found 64847.2` y `Expected 64.78 but found 64.74`.
+- Agudas con frecuencia y efectos sobre la esperanza de vida (aprobado; commit `4fd0425`): se rechazan (`Unsupported`, `DiseaseSubTreeGenerator.getEpisodeFrequency`) si la frecuencia se usa y la aguda tiene una muerte inmediata, una reducción de la esperanza de vida o una tasa de mortalidad aumentada. Si la aguda es el objetivo, la frecuencia se ignora y no se rechaza. Ningún test existente cambia. Test N36 (frecuencia 2 y LER 1), que antes falló con «Expected UnsupportedOSDiFeatureException to be thrown, but nothing was thrown».
+- Defecto encontrado y corregido (aprobado; commit `cde76d4`): la muerte inmediata de una progresión se añadía como efecto de su nodo, así que toda hoja con la progresión tenía esperanza de vida 0, sin tener en cuenta la probabilidad ni la edad de inicio. Ahora el nodo la guarda aparte (`BranchDestinationNode.updateEffectsOfProgression`) y `ProgressionDeathExpander` abre bajo cada hoja donde está activo una rama de muerte con la probabilidad de la magnitud, en la aparición de la progresión (MAX(0, edad de inicio − Age0), o 0), y otra de supervivencia. `StrategyOutcomeExpander` no expande nada bajo esas muertes. La muerte de la enfermedad no cambia (S10, I02).
+  - Test P66: ManX (0,2) desde los 40 años, 150 al año, muerte con 0,1 en su aparición (T = 20). Comparador 65315; 64,1; 54,485; evaluado 71725. Antes falló con `Unexpected life years (comparator). Expected 64.1 but found 52.0`.
+- Documentación: Javadoc, CLAUDE.md y `docs/known-limitations.md` (sección nueva «Instant death of a progression in decision trees»).
+- Suite final: 349 tests, 0 fallos, 1 omitido.
+
+**Decidido:**
+- La muerte por un efecto adverso ocurre al inicio de su estrategia, y la de una progresión, en su aparición; si el paciente muere antes, no llega a ocurrir.
+- No se multiplican por los episodios los efectos de una aguda sobre la esperanza de vida: la combinación con la frecuencia se rechaza. Se descartó la probabilidad de morir en alguno de los episodios esperados, 1 − e^(−λD) con λ = −f·ln(1 − p), porque la probabilidad de la rama dependería de los años de vida de la hoja.
+
+**Pendiente:**
+- Si las intervenciones tienen como objetivo una progresión con muerte inmediata, la muerte ocurre en el tiempo 0 (todos presentan el objetivo entonces). Con un objetivo crónico se podría argumentar, como con la enfermedad, que los pacientes ya sobrevivieron a su aparición. Sin test; por decidir.
+- El DES no lee la muerte inmediata de las progresiones (fase 22).
