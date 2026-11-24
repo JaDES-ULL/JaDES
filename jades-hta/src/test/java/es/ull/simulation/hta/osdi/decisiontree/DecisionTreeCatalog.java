@@ -815,7 +815,10 @@ public final class DecisionTreeCatalog {
                 "and none of them takes the rest"),
             // Every patient presents the target of the interventions at time 0 (D1, phase 15), so the target cannot define an onset or end age (as in the DES).
             new MalformedCase(MALFORMED, "TT_N35_Experiment", "Interventions whose target defines a temporal constraint (onset age)", UnsupportedOSDiFeatureException.class,
-                "The interventions of the model target TT_N35_ManX, which defines a temporal constraint (onset or end age)")
+                "The interventions of the model target TT_N35_ManX, which defines a temporal constraint (onset or end age)"),
+            // The effects of an acute manifestation on the life expectancy are not multiplied by its expected number of episodes (phase 16).
+            new MalformedCase(MALFORMED, "TT_N36_Experiment", "Acute manifestation with a frequency and a life expectancy reduction", UnsupportedOSDiFeatureException.class,
+                "The acute manifestation TT_N36_ManA defines a frequency (TT_N36_ManA_Frequency) and an effect on the life expectancy (TT_N36_ManA_LER)")
         );
     }
 }

@@ -4742,4 +4742,84 @@ osdi:TT_N35_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "N35. Interventions whose target (ManX) defines an onset age. Every patient presents the target of the interventions at time 0 (D1), so a temporal constraint of the target is not supported and the generation of the tree must fail, as in the DES." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N36_ManA_Frequency
+osdi:TT_N36_ManA_Frequency rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:hasDescription "Episodes of ManA per year" ;
+    osdi:hasExpectedValue "2.0"^^xsd:double ;
+    osdi:includedByModel osdi:TT_N36_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N36_ManA_LERMagnitude
+osdi:TT_N36_ManA_LERMagnitude rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Continuous_Variable ;
+    osdi:hasDescription "Years of life lost due to ManA" ;
+    osdi:hasExpectedValue "1.0"^^xsd:double ;
+    osdi:includedByModel osdi:TT_N36_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N36_ManA_LER
+osdi:TT_N36_ManA_LER rdf:type owl:NamedIndividual ,
+        osdi:LifeExpectancyReductionEffect ;
+    osdi:affects osdi:Attribute_LifeExpectancy ;
+    osdi:hasEffectMagnitude osdi:TT_N36_ManA_LERMagnitude ;
+    osdi:hasDescription "Life expectancy reduction due to ManA" ;
+    osdi:includedByModel osdi:TT_N36_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N36_ManA
+osdi:TT_N36_ManA rdf:type owl:NamedIndividual ,
+        osdi:AcuteManifestation ;
+    osdi:hasFrequency osdi:TT_N36_ManA_Frequency ;
+    osdi:hasEffect osdi:TT_N36_ManA_LER ;
+    osdi:hasDescription "Acute manifestation with a frequency and a life expectancy reduction" ;
+    osdi:includedByModel osdi:TT_N36_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N36_Disease
+osdi:TT_N36_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasIntervention osdi:TT_InterventionTreat ,
+        osdi:TT_InterventionNone ;
+    osdi:hasProgressionElement osdi:TT_N36_ManA ;
+    osdi:includedByModel osdi:TT_N36_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N36_Experiment
+osdi:TT_N36_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N36_Model ;
+    osdi:hasDescription "Acute manifestation with a frequency and an effect on the life expectancy (not supported: the effects are not multiplied by the episodes)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasTimeHorizon "5.0"^^xsd:double ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N36_Model
+osdi:TT_N36_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_InterventionNone ,
+        osdi:TT_InterventionTreat ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ,
+        osdi:TT_N36_ManA_Frequency ,
+        osdi:TT_N36_ManA_LERMagnitude ,
+        osdi:TT_N36_ManA_LER ,
+        osdi:TT_N36_ManA ,
+        osdi:TT_N36_Disease ;
+    osdi:hasDescription "N36. Acute manifestation with a frequency (2 episodes per year) and a life expectancy reduction. The tree multiplies the one-time payoffs of an acute manifestation by the expected number of episodes, but there is no reasonable semantics for its effects on the life expectancy (instant death, life expectancy reduction, increased mortality rate), so the generation of the tree must fail." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

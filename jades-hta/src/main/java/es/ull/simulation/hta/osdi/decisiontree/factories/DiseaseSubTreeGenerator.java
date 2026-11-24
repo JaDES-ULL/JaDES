@@ -370,9 +370,15 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
      * single episode: its frequency is ignored with a warning (P64). This is an accepted divergence with discrete event simulation models, which also
      * simulate the next episodes and treat each of them (phase 15 of docs/osdi-1.3-diseno.md).
      * </p>
+     * <p>
+     * The effects of the acute manifestation on the life expectancy (instant death, life expectancy reduction, increased mortality rate) cannot be
+     * multiplied by the expected number of episodes, which depends on the life years of the leaf, so they are not supported together with a frequency
+     * that is used (N36, phase 16).
+     * </p>
      * @param manifestation An acute manifestation
      * @return The frequency of the episodes of the acute manifestation, if it is used
      * @throws MalformedOSDiModelException If the frequency of the acute manifestation is not a valid parameter
+     * @throws UnsupportedOSDiFeatureException If the frequency is used and the acute manifestation has an effect on the life expectancy
      */
     private Optional<ParameterWrapper> getEpisodeFrequency(ClinicalProgressionWrapper manifestation) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         final Optional<ParameterWrapper> frequency = manifestation.getModelWrapper().getWrapperForPropertyAs(manifestation.getIndividualIRI(), OSDiObjectProperty.HAS_FREQUENCY, ParameterWrapper.class);
@@ -380,6 +386,16 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
             log.warn("The acute manifestation " + manifestation.getShortName() + ", the target of the interventions, defines a frequency (" + frequency.get().getShortName()
                 + "), which is ignored: the decision tree evaluates a single episode, the one that every patient suffers at time 0 (a discrete event simulation also simulates the next episodes).");
             return Optional.empty();
+        }
+        if (frequency.isPresent()) {
+            for (EffectWrapper effect : manifestation.getEffects()) {
+                final EffectType type = effect.getEffectType();
+                if (EffectType.INSTANT_DEATH_EFFECT.equals(type) || EffectType.LIFE_EXPECTANCY_REDUCTION_EFFECT.equals(type) || EffectType.MORTALITY_RATE_EFFECT.equals(type)) {
+                    throw new UnsupportedOSDiFeatureException("The acute manifestation " + manifestation.getShortName() + " defines a frequency (" + frequency.get().getShortName()
+                        + ") and an effect on the life expectancy (" + effect.getShortName() + "). Decision trees multiply the one-time payoffs of the episodes by the expected"
+                        + " number of episodes, but not such effects, which are not supported together with a frequency.");
+                }
+            }
         }
         return frequency;
     }
