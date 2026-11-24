@@ -33,18 +33,9 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
 
 ## Fases pendientes
 
-Fases acordadas tras la fase 17, en orden: de la 18 a la 19 se cierra el árbol y se publica OSDi 1.3, validada con árboles de decisión; de la 20 a la 23 se completa el DES. Cada fase termina con la suite de `jades-hta` pasando, sus cambios en commits y su entrada en el registro. Si una fase descubre trabajo no previsto, lo propone como fase nueva en el registro.
+Fases acordadas tras la fase 18, en orden: con la 19 se cierra el árbol y se publica OSDi 1.3, validada con árboles de decisión; de la 20 a la 23 se completa el DES. Cada fase termina con la suite de `jades-hta` pasando, sus cambios en commits y su entrada en el registro. Si una fase descubre trabajo no previsto, lo propone como fase nueva en el registro.
 
 Quedan fuera, como trabajo futuro: pautas con subpautas, condiciones o edades de aplicación; pautas en estrategias con resultados; la confirmación imperfecta (estrategias de diagnóstico con resultados explícitos); `hasConditionExpression` en las estrategias; grupos en las cadenas de detección del cribado neonatal; actualizar costes fuera del IPC español de 2002 a 2026; y el análisis de impacto presupuestario.
-
-### Fase 18: ejemplos de validación
-
-Ejemplos de validación de OSDi y JaDES, distintos de los tests: cada uno representa un estudio publicado y comprueba que se reproducen sus resultados.
-
-1. Estructura, con la forma que tendrá en el repositorio de OSDi (fase 19): carpeta `examples/` con un README de índice (referencia, problema de salud, tipos de modelo validados, partes de OSDi que ejercita y estado) y una carpeta por caso con su `.ttl`, su README (cita, decisiones de representación, supuestos explícitos y diferencias conocidas) y un fichero de resultados esperados que distinga los valores publicados, con su tolerancia, de los calculados a mano. Requiere aprobación de la ubicación y el formato.
-2. Evans et al. (1997) como primer caso, a partir de I05, sin la esperanza de vida de la población si no cambia los resultados. I05 sale de `OSDi_test_tree_scenarios.ttl`, comprobando que lo que cubría sigue cubierto por tests P.
-3. Suite de validación separada de los tests (perfil de Maven, tests de integración o módulo propio), con un informe del valor publicado, el de JaDES y la diferencia por caso.
-4. `genExcel` de `OSDiMain`: registrar las factorías de árboles (`SimpleModel.getFactory()`, `NBSModel.getFactory()`) y aceptar rutas de fichero sin exigir `file:///`.
 
 ### Fase 19: traslado a OSDi 1.3
 
@@ -592,3 +583,23 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 **Pendiente:**
 - El test no cubre las ontologías que se creen fuera de `src/test/resources` (p. ej., los ejemplos de la fase 18): convendrá añadirlas.
 - Algunas progresiones se comparten entre enfermedades de `OSDi_test.ttl` (p. ej., `TEST_CoexistentDevelopment1`); no producen incoherencia, pero si OSDi restringiera algún día `hasProgressionElement`, habría que separarlas.
+
+### Fase 18: ejemplos de validación (2026-11-24)
+
+**Hecho:**
+- `genExcel` de `OSDiMain` (punto 4; commit `81eebb3`): no registraba las factorías de árboles, y `OntologyLoader.getOntologyDocumentSourceFromString` trataba como IRI cualquier cadena que `java.net.URI` aceptara, incluidas las rutas relativas y `C:/…`. Ahora registra las factorías (`CentralModelFactory.registerDefaultFactories`; `register` ignora una factoría de una clase ya registrada) y carga primero un fichero existente; si no, exige un IRI absoluto con esquema de más de una letra. Test `TestOSDiMainGenExcel` (ruta absoluta con barras y ruta relativa, sin `file:///`), que antes falló con `OWLOntologyFactoryNotFoundException` y con `Could not find a suitable decision tree factory`. El cambio toca `jades-utils`.
+- Estructura (punto 1, aprobada): `jades-hta/examples/`, con un `README.md` de índice y una carpeta por caso con su `.ttl`, su `README.md` y `expected-results.json` (valores `published`, con tolerancia y dónde aparecen, o `hand`, con tolerancia relativa 1e-8; medidas por brazo `cost`, `lifeYears`, `qalys` y comparativas `incrementalCost`, `incrementalQalys`, `icer`).
+- Evans et al. (1997) (punto 2; commits `8c72da0` y `e7933ef`): `examples/evans1997-migraine`, a partir de I05, con individuos `EVANS_…`. Se quitó la esperanza de vida de la población: los resultados no cambian (horizonte de 24 horas; se suponen 100 años con aviso). I05 sale de `OSDi_test_tree_scenarios.ttl` y del catálogo. Lo que cubría sigue cubierto: grupo como estrategia siguiente (P58), recaída tras el seguimiento (P50) y costes en CAD del año del estudio (P57); la pérdida de AVAC negativa en un resultado solo la cubría I05, así que se añadió P69 (P43 con −0,5: AVAC 55,45; commit `27ba75b`), que pasó a la primera.
+- Suite de validación (punto 3, aprobada: etiqueta y perfil): `TestValidationExamples` (etiqueta `validation`; la propiedad `excludedGroups` del pom de `jades-hta` la excluye por defecto y el perfil `validation` solo ejecuta esa etiqueta) carga cada ejemplo, genera su Excel en memoria, compara cada valor y escribe `target/validation/report.md`. Evans: los 10 valores pasan; RCEI 29 363,02 frente a 29 366 publicada (diferencia −2,98; tolerancia relativa 0,001). La clase se llamó primero `ValidationSuite`, pero surefire solo recoge `Test*`, `*Test`, `*Tests` y `*TestCase`.
+- `TestOntologyConsistency` comprueba también los ejemplos (pendiente de la fase 17).
+- Documentación: CLAUDE.md (comandos, sección de ejemplos, `genExcel`, tabla de scenarios) y los README de `examples/`.
+- Suite final: 369 tests en `jades-hta`, 0 fallos, 1 omitido; validación: 1 test, 10 valores, 0 fallos.
+
+**Decidido:**
+- Los ejemplos van en `jades-hta/examples/` hasta el traslado; los resultados, en JSON; la validación, con etiqueta y perfil.
+- Con `-DexcludedGroups=…` en la línea de órdenes hay que mantener `validation` en la lista (p. ej., `known-issue,validation`), porque sustituye a la propiedad del pom.
+
+**Pendiente:**
+- Comprobar en el artículo la tabla de la RCEI publicada y, si se quiere, añadir otros valores publicados (costes y AVAC por brazo).
+- Los individuos de los ejemplos están en el espacio de nombres de OSDi porque JaDES busca el experimento por su nombre corto en él; para publicarlos en el repositorio de OSDi convendría un espacio de nombres propio (fase 19).
+- Si se añade otro caso (el candidato es la otitis de Coco, 2007, esbozada en P47), hace falta tu aprobación.
