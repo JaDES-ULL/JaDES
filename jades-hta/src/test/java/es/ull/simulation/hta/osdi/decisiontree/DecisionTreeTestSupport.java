@@ -119,6 +119,23 @@ final class DecisionTreeTestSupport {
     }
 
     /**
+     * Creates the decision tree model for an experiment of an ontology stored in a file (e.g., a validation example), which is loaded each time
+     * @param ontology The file with the ontology
+     * @param experiment The name of the experiment
+     * @return The decision tree model
+     * @throws Exception If the ontology cannot be loaded or the model cannot be created
+     */
+    static SingleDiseaseAndPopulationModel loadModelFromFile(Path ontology, String experiment) throws Exception {
+        registerFactories();
+        final OSDiWrapper wrapper = new OSDiWrapper.Builder().build(new org.semanticweb.owlapi.io.FileDocumentSource(ontology.toFile()));
+        final ExperimentWrapper experimentWrapper = wrapper.buildExperiment(wrapper.toIRI(experiment));
+        final Model model = CentralModelFactory.create(experimentWrapper);
+        assertTrue(model instanceof SingleDiseaseAndPopulationModel,
+            "The model created is not a SingleDiseaseAndPopulationModel. Found: " + model.getClass().getSimpleName());
+        return (SingleDiseaseAndPopulationModel) model;
+    }
+
+    /**
      * Reads the sub-tree of an intervention as a set of leaves. Each leaf is identified by the developments and manifestations that are
      * active in the path from the intervention to the leaf, whatever the order in which the tree branches (see {@link DecisionTreeCatalog#leafKey(List)}).
      * The probability of a leaf is the product of the probabilities of the branches of its path, computed from the deterministic
