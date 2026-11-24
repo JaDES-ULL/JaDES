@@ -611,6 +611,13 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P63_Experiment", "Population without base utility: a base utility of 1 is assumed, with a warning",
                 leaves("TT_P63_", leaf(1.0)),
                 outcomes(71500.0, 65.0, 65.0), outcomes(65000.0, 65.0, 65.0)));
+        // P64 (phase 15): P56 with ManA as the target of the interventions. The tree evaluates a single episode, the one at time 0, and ignores the
+        // frequency with a warning (see TestDecisionTreeWarnings); the DES also simulates the next episodes (accepted divergence).
+        // Horizon of 5 years: comparator 5 * 1000 + 300 = 5300; life years 5; QALYs 4.25. Assessed: + 50 (one-time cost of the intervention).
+        // With the frequency (10 episodes), the comparator would be 8000, as in P56.
+        cases.add(tc(PAYOFFS, "TT_P64_Experiment", "Acute manifestation with a frequency that is the target of the interventions: the tree evaluates a single episode",
+                leaves("TT_P64_", leaf(1.0, "ManA")),
+                outcomes(5350.0, 5.0, 4.25), outcomes(5300.0, 5.0, 4.25)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.

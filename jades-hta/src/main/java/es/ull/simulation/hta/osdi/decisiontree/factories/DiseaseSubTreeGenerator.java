@@ -360,8 +360,9 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
      * patients who suffer its episodes (with the probability of its risk or, if it has no risk, always in its context), and its one-time payoffs
      * are multiplied by the expected number of episodes (see {@link BranchDestinationNode#getEpisodeFrequency()}).
      * <p>
-     * If the acute manifestation is the target of the interventions, the tree starts with an episode (D1), so its frequency is ignored with a warning.
-     * TODO: Reanalyze the frequency of an acute manifestation that is the target of the interventions.
+     * If the acute manifestation is the target of the interventions, every patient starts with an episode at time 0 (D1), and the tree evaluates that
+     * single episode: its frequency is ignored with a warning (P64). This is an accepted divergence with discrete event simulation models, which also
+     * simulate the next episodes and treat each of them (phase 15 of docs/osdi-1.3-diseno.md).
      * </p>
      * @param manifestation An acute manifestation
      * @return The frequency of the episodes of the acute manifestation, if it is used
@@ -370,8 +371,8 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
     private Optional<ParameterWrapper> getEpisodeFrequency(ClinicalProgressionWrapper manifestation) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         final Optional<ParameterWrapper> frequency = manifestation.getModelWrapper().getWrapperForPropertyAs(manifestation.getIndividualIRI(), OSDiObjectProperty.HAS_FREQUENCY, ParameterWrapper.class);
         if (frequency.isPresent() && targetProgression.isPresent() && targetProgression.get().getIndividualIRI().equals(manifestation.getIndividualIRI())) {
-            log.warn("The acute manifestation " + manifestation.getShortName() + " defines a frequency (" + frequency.get().getShortName()
-                + "), which is ignored, since it is the target of the interventions: the tree starts with an episode.");
+            log.warn("The acute manifestation " + manifestation.getShortName() + ", the target of the interventions, defines a frequency (" + frequency.get().getShortName()
+                + "), which is ignored: the decision tree evaluates a single episode, the one that every patient suffers at time 0 (a discrete event simulation also simulates the next episodes).");
             return Optional.empty();
         }
         return frequency;

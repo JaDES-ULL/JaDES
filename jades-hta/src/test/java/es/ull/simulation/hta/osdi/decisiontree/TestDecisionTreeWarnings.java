@@ -34,4 +34,15 @@ public class TestDecisionTreeWarnings {
                 "Warning not found: " + log.getMessages());
         }
     }
+
+    @Test
+    @DisplayName("The frequency of an acute manifestation that is the target of the interventions (P64) is ignored: the tree evaluates a single episode (D1)")
+    void warnsThatAnAcuteTargetIsASingleEpisode() throws Exception {
+        try (LogCapture log = LogCapture.start()) {
+            DecisionTreeTestSupport.loadModel(DecisionTreeCatalog.PAYOFFS, "TT_P64_Experiment").getTree();
+            assertTrue(log.containsWarning("The acute manifestation TT_P64_ManA, the target of the interventions, defines a frequency (TT_P64_ManA_Frequency), which is ignored:"
+                + " the decision tree evaluates a single episode, the one that every patient suffers at time 0 (a discrete event simulation also simulates the next episodes)."),
+                "Warning not found: " + log.getMessages());
+        }
+    }
 }
