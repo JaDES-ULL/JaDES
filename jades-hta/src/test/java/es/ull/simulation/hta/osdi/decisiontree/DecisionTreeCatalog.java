@@ -627,6 +627,12 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P65_Experiment", "Fatal adverse event of a strategy that starts at 10 years: the death happens at the start of the strategy",
                 leaves("TT_P65_", death(0.004), leaf(0.016, "L1_Failure", "Anaphylaxis"), leaf(0.38, "L1_Failure"), leaf(0.6, "L1_Success")),
                 outcomes(71368.0, 64.78, 55.063), outcomes(64890.0, 64.78, 55.063)));
+        // P66 (phase 16): ManX (0.2), from 40 years (T = 40 - 20 = 20), 150 per year, with an instant death of probability 0.1 at its onset. No discount.
+        // No ManX (0.8): 65000; 65; 55.25. ManX, alive (0.18): 65000 + 150 * 45 = 71750; 65; 55.25. ManX, death (0.02): life years MIN(20, 65) = 20; 20000; QALYs 17.
+        // Comparator: 52000 + 12915 + 400 = 65315; life years 0.98 * 65 + 0.02 * 20 = 64.1; QALYs 54.145 + 0.34 = 54.485. Assessed: + 100 * 64.1 = 71725
+        cases.add(tc(PAYOFFS, "TT_P66_Experiment", "Instant death at the onset of a chronic manifestation from 40 years: the life years are cut at its onset",
+                leaves("TT_P66_", death(0.02), leaf(0.18, "ManX"), leaf(0.8)),
+                outcomes(71725.0, 64.1, 54.485), outcomes(65315.0, 64.1, 54.485)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.

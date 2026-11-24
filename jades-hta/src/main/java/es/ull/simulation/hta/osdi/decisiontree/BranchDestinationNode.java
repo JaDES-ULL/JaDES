@@ -289,6 +289,38 @@ public class BranchDestinationNode implements Named, DecisionTreeNode {
         this.deathTime = Optional.of(deathTime);
     }
 
+    /** The instant deaths at the onset of the clinical progression represented by this node (see {@link #getOnsetDeathEffects()}) */
+    private final List<EffectWrapper> onsetDeathEffects = new ArrayList<>();
+
+    /**
+     * Returns the instant deaths (InstantDeathEffect) of the clinical progression represented by this node. They are not effects of the node: each
+     * one becomes a branch of death below the leaves where the node is active, with the probability of its magnitude, at the onset of the
+     * progression (see ProgressionDeathExpander, phase 16 of docs/osdi-1.3-diseno.md).
+     * @return The instant deaths at the onset of the clinical progression represented by this node
+     */
+    public List<EffectWrapper> getOnsetDeathEffects() {
+        return onsetDeathEffects;
+    }
+
+    /**
+     * Adds the effects of a clinical progression to this node, except its instant deaths, which are kept apart (see {@link #getOnsetDeathEffects()}).
+     * @param progression The clinical progression represented by this node
+     */
+    public void updateEffectsOfProgression(IModelItemWithEffectWrapper progression) throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
+        for (EffectWrapper effect : progression.getEffects()) {
+            if (EffectType.INSTANT_DEATH_EFFECT.equals(effect.getEffectType())) {
+                onsetDeathEffects.add(effect);
+            }
+            else {
+                addEffect(effect);
+            }
+            final Optional<ParameterWrapper> effectCost = effect.getCost();
+            if (effectCost.isPresent()) {
+                addCostParameter(effectCost.get());
+            }
+        }
+    }
+
     /**
      * Returns the costs of the health technologies of the strategies of this node that apply according to a guideline.
      * @return The costs that apply according to a guideline.

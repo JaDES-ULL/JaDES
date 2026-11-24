@@ -24,6 +24,12 @@ A development or chronic manifestation without risk characterization (`hasRiskCh
 
 The discrete-event simulation should interpret progressions without risk in the same way, but it currently does not: `DiseaseProgressionRiskFactory.getPathwayInstances` creates no pathway for a progression without risk, so it never happens, unless the population assigns it an initial proportion (`hasInitialProportion`). `DiseaseFactory` logs a warning for each manifestation that will never occur (see the conformance table below).
 
+## jades-hta: Instant death of a progression in decision trees
+
+An `InstantDeathEffect` of a clinical progression (a development or a manifestation) happens at its onset, T = MAX(0, onset age − initial age), or at the start of the model if it has no onset age (phase 16). It is not an effect of the node of the progression: below each leaf where that node is active, `ProgressionDeathExpander` splits the branch into death, with the probability of the magnitude of the effect, and survival. The life expectancy of the death leaf is MIN(T, its life expectancy without the death), so its life years and payoffs are cut at T; if the patient would die earlier, the death does not happen. Nothing else (outcomes or adverse events of the strategies) is expanded after the death. Several progressions with an instant death along a path are expanded in the order of the path. Test: P66 (chronic manifestation from 40 years, death with probability 0.1).
+
+Before phase 16, the instant death was added to the node, so every leaf with the progression had a life expectancy of 0, regardless of the probability of the effect and of the onset age. The instant death of the disease is not affected: it happens at its onset, at the start of the model (S10, I02). If the interventions target a progression with an instant death, every patient presents it at time 0, so the death branch happens at time 0. The DES does not read the instant death of the progressions yet (phase 22 of `docs/osdi-1.3-diseno.md`).
+
 ## jades-hta: Acute manifestations in decision trees
 
 In a decision tree, an acute manifestation represents a **single episode** between the initial age of the population and death (the undiscounted life years of the leaf), or, if it defines a frequency, its repeated episodes. `DiseaseSubTreeGenerator` builds its node as for a chronic manifestation, so it can belong to coexistent or alternative combination rules, depend on a development, and carry effects (instant death, life expectancy reduction, increased mortality rate) that apply to the leaf:

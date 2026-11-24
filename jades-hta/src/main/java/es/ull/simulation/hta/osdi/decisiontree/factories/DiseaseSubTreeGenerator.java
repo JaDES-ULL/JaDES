@@ -323,7 +323,9 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         else if (!pendingManifestations.isEmpty()) {
             generateManifestationsSubTree(diseaseNode, defaultCoexistentManifestations, new TreeSet<>(pendingManifestations));
         }
-        // The outcomes of the strategies are expanded below the leaves (decision D4)
+        // The instant deaths of the progressions are expanded below the leaves, at the onset of each progression (phase 16)
+        ProgressionDeathExpander.expand(parentTreeModel, rootNode);
+        // The outcomes of the strategies are expanded below the leaves (decision D4), except below a death
         StrategyOutcomeExpander.expand(parentTreeModel, rootNode);
         return rootNode;
     }
@@ -663,7 +665,8 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
         }
         node.updateCosts(progression, getArmStrategies(progression), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT), true);
         node.updateUtility(progression, getArmStrategies(progression), Set.of(ResourceUsageSKOSCategory.FOLLOW_UP, ResourceUsageSKOSCategory.TREATMENT));
-        node.updateEffects(progression);
+        // The instant deaths of the progression are branches of their own, at its onset (see ProgressionDeathExpander)
+        node.updateEffectsOfProgression(progression);
         if (ClinicalProgressionType.ACUTE_MANIFESTATION.equals(progression.getClinicalProgressionType())) {
             final String owner = "The acute manifestation " + progression.getShortName();
             removeAnnualPayoffs(owner, node.getCostParameters());

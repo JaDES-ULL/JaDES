@@ -105,6 +105,10 @@ final class StrategyOutcomeExpander {
     }
 
     private static void collectLeaves(BranchDestinationNode node, List<Pending> pending, Set<IRI> active, List<Leaf> leaves) {
+        // Nothing is expanded after the death at the onset of a progression (see ProgressionDeathExpander)
+        if (node.getDeathTime().isPresent()) {
+            return;
+        }
         final List<Pending> newPending = new ArrayList<>(pending);
         for (StrategyWrapper strategy : node.getOutcomeStrategies()) {
             newPending.add(new Pending(strategy, node, List.of(), Set.of(strategy.getIndividualIRI())));
