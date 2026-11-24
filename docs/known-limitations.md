@@ -48,7 +48,7 @@ Divergences with the discrete-event simulation: the simulation counts every epis
 
 Every intervention declares its target (decision D1 of `docs/osdi-1.3-diseno.md`): the health condition to which it is applied, either the disease or an element of its progression (`isInterventionOf`, or its inverse `hasIntervention`). Time 0 is the moment when the intervention is applied: if the target is an element T, the model starts with the patients that present T.
 
-`InterventionTargets.resolve` (shared by decision trees and the DES) reads the target of each intervention of the model in both directions, since the reasoner does not infer inverse properties. The ontology states that every intervention has exactly one target, but the same intervention individual may be shared by several models (as in the test ontologies), so only the targets included in the model are considered:
+`InterventionTargets.resolve` (shared by decision trees and the DES) reads the target of each intervention of the model in both directions, since the reasoner does not infer inverse properties. The ontology states that every intervention has exactly one target, but an ontology may contain several models, so only the targets included in the model are considered (sharing an intervention between models of different diseases makes a complete reasoner infer that the diseases are the same individual; the test ontologies do not do it since phase 17):
 
 - An intervention without target in the model is assumed to target the disease, with a warning.
 - An intervention with more than one target in the model (N15), a target that is neither the disease of the model nor one of its progressions, and compared interventions with different targets (N14) are rejected with a `MalformedOSDiModelException`.

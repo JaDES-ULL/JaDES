@@ -38,41 +38,6 @@ osdi:TT_BaseAnnualCost rdf:type owl:NamedIndividual ,
                        osdi:hasYear "2026"^^xsd:short .
 
 
-###  https://w3id.org/ontologies-ULL/OSDi#TT_InterventionNone
-osdi:TT_InterventionNone rdf:type owl:NamedIndividual ,
-                                  osdi:TherapeuticIntervention ;
-                         osdi:includedByModel osdi:TT_S11_Model ,
-                                              osdi:TT_S12_Model ,
-                                              osdi:TT_S13_Model ,
-                                              osdi:TT_S14_Model ,
-                                              osdi:TT_S15_Model ,
-                                              osdi:TT_S16_Model ,
-                                              osdi:TT_S17_Model ,
-                                              osdi:TT_S18_Model ,
-                                              osdi:TT_S19_Model ,
-                                              osdi:TT_S22_Model ,
-                                              osdi:TT_S23_Model ;
-                         osdi:hasDescription "Comparator: do nothing" .
-
-
-###  https://w3id.org/ontologies-ULL/OSDi#TT_InterventionTreat
-osdi:TT_InterventionTreat rdf:type owl:NamedIndividual ,
-                                   osdi:TherapeuticIntervention ;
-                          osdi:hasCost osdi:TT_TreatAnnualCost ;
-                          osdi:includedByModel osdi:TT_S11_Model ,
-                                               osdi:TT_S12_Model ,
-                                               osdi:TT_S13_Model ,
-                                               osdi:TT_S14_Model ,
-                                               osdi:TT_S15_Model ,
-                                               osdi:TT_S16_Model ,
-                                               osdi:TT_S17_Model ,
-                                               osdi:TT_S18_Model ,
-                                               osdi:TT_S19_Model ,
-                                               osdi:TT_S22_Model ,
-                                               osdi:TT_S23_Model ;
-                          osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" .
-
-
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_LifeExpectancy
 osdi:TT_LifeExpectancy rdf:type owl:NamedIndividual ,
                                 osdi:AttributeValueParameter ,
@@ -185,8 +150,8 @@ osdi:TT_PopulationSex rdf:type owl:NamedIndividual ,
 osdi:TT_S11_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S11_InterventionTreat ,
+                                         osdi:TT_S11_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S11_ManX ,
                                                osdi:TT_S11_ManY ;
                     osdi:includedByModel osdi:TT_S11_Model .
@@ -306,14 +271,29 @@ osdi:TT_S11_ManY_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.5"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_InterventionNone
+osdi:TT_S11_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S11_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_InterventionTreat
+osdi:TT_S11_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S11_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S11_Model
 osdi:TT_S11_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S11_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S11_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S11_InterventionNone ,
+                                         osdi:TT_S11_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -347,8 +327,8 @@ osdi:TT_S12_AlternativeMans rdf:type owl:NamedIndividual ,
 osdi:TT_S12_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S12_InterventionTreat ,
+                                         osdi:TT_S12_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S12_ManY ,
                                                osdi:TT_S12_ManZ ,
                                                osdi:TT_S12_AlternativeMans ;
@@ -469,14 +449,29 @@ osdi:TT_S12_ManZ_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.3"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_InterventionNone
+osdi:TT_S12_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S12_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_InterventionTreat
+osdi:TT_S12_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S12_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S12_Model
 osdi:TT_S12_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S12_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S12_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S12_InterventionNone ,
+                                         osdi:TT_S12_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -511,8 +506,8 @@ osdi:TT_S13_AlternativeMans rdf:type owl:NamedIndividual ,
 osdi:TT_S13_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S13_InterventionTreat ,
+                                         osdi:TT_S13_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S13_ManX ,
                                                osdi:TT_S13_ManY ,
                                                osdi:TT_S13_ManZ ,
@@ -676,14 +671,29 @@ osdi:TT_S13_ManZ_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.3"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_InterventionNone
+osdi:TT_S13_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S13_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_InterventionTreat
+osdi:TT_S13_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S13_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S13_Model
 osdi:TT_S13_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S13_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S13_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S13_InterventionNone ,
+                                         osdi:TT_S13_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -775,8 +785,8 @@ osdi:TT_S14_DevA_Risk rdf:type owl:NamedIndividual ,
 osdi:TT_S14_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S14_InterventionTreat ,
+                                         osdi:TT_S14_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S14_DevA ,
                                                osdi:TT_S14_ManY ;
                     osdi:includedByModel osdi:TT_S14_Model .
@@ -854,14 +864,29 @@ osdi:TT_S14_ManY_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.5"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_InterventionNone
+osdi:TT_S14_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S14_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_InterventionTreat
+osdi:TT_S14_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S14_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S14_Model
 osdi:TT_S14_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S14_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S14_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S14_InterventionNone ,
+                                         osdi:TT_S14_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -1012,8 +1037,8 @@ osdi:TT_S15_DevB_Risk rdf:type owl:NamedIndividual ,
 osdi:TT_S15_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S15_InterventionTreat ,
+                                         osdi:TT_S15_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S15_DevA ,
                                                osdi:TT_S15_DevB ,
                                                osdi:TT_S15_ManY ,
@@ -1135,14 +1160,29 @@ osdi:TT_S15_ManZ_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.4"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_InterventionNone
+osdi:TT_S15_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S15_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_InterventionTreat
+osdi:TT_S15_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S15_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S15_Model
 osdi:TT_S15_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S15_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S15_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S15_InterventionNone ,
+                                         osdi:TT_S15_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -1302,8 +1342,8 @@ osdi:TT_S16_DevB_LERMagnitude rdf:type owl:NamedIndividual ,
 osdi:TT_S16_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S16_InterventionTreat ,
+                                         osdi:TT_S16_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S16_DevA ,
                                                osdi:TT_S16_DevB ,
                                                osdi:TT_S16_ManY ,
@@ -1426,14 +1466,29 @@ osdi:TT_S16_ManZ_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.4"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_InterventionNone
+osdi:TT_S16_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S16_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_InterventionTreat
+osdi:TT_S16_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S16_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S16_Model
 osdi:TT_S16_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S16_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S16_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S16_InterventionNone ,
+                                         osdi:TT_S16_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -1532,8 +1587,8 @@ osdi:TT_S17_DevA_Risk rdf:type owl:NamedIndividual ,
 osdi:TT_S17_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S17_InterventionTreat ,
+                                         osdi:TT_S17_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S17_DevA ,
                                                osdi:TT_S17_ManX ,
                                                osdi:TT_S17_ManY ;
@@ -1654,14 +1709,29 @@ osdi:TT_S17_ManY_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.5"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_InterventionNone
+osdi:TT_S17_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S17_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_InterventionTreat
+osdi:TT_S17_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S17_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S17_Model
 osdi:TT_S17_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S17_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S17_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S17_InterventionNone ,
+                                         osdi:TT_S17_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -1816,8 +1886,8 @@ osdi:TT_S18_DevB_Risk rdf:type owl:NamedIndividual ,
 osdi:TT_S18_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S18_InterventionTreat ,
+                                         osdi:TT_S18_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S18_DevA ,
                                                osdi:TT_S18_DevB ,
                                                osdi:TT_S18_ManZ ;
@@ -1877,14 +1947,29 @@ osdi:TT_S18_ManZ_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.4"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_InterventionNone
+osdi:TT_S18_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S18_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_InterventionTreat
+osdi:TT_S18_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S18_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S18_Model
 osdi:TT_S18_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S18_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S18_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S18_InterventionNone ,
+                                         osdi:TT_S18_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -2047,8 +2132,8 @@ osdi:TT_S19_DevB_LERMagnitude rdf:type owl:NamedIndividual ,
 osdi:TT_S19_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S19_InterventionTreat ,
+                                         osdi:TT_S19_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S19_DevA ,
                                                osdi:TT_S19_DevB ,
                                                osdi:TT_S19_ManY ,
@@ -2172,14 +2257,29 @@ osdi:TT_S19_ManZ_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.3"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_InterventionNone
+osdi:TT_S19_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S19_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_InterventionTreat
+osdi:TT_S19_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S19_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S19_Model
 osdi:TT_S19_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S19_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S19_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S19_InterventionNone ,
+                                         osdi:TT_S19_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -2269,8 +2369,8 @@ osdi:TT_S22_DevA_LERMagnitude rdf:type owl:NamedIndividual ,
 osdi:TT_S22_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S22_InterventionTreat ,
+                                         osdi:TT_S22_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S22_DevA ,
                                                osdi:TT_S22_ManY ;
                     osdi:includedByModel osdi:TT_S22_Model .
@@ -2348,14 +2448,29 @@ osdi:TT_S22_ManY_Risk rdf:type owl:NamedIndividual ,
                       osdi:hasExpectedValue "0.5"^^xsd:double .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S22_InterventionNone
+osdi:TT_S22_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S22_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S22_InterventionTreat
+osdi:TT_S22_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S22_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S22_Model
 osdi:TT_S22_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S22_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S22_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S22_InterventionNone ,
+                                         osdi:TT_S22_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
@@ -2443,8 +2558,8 @@ osdi:TT_S23_DevB_Risk rdf:type owl:NamedIndividual ,
 osdi:TT_S23_Disease rdf:type owl:NamedIndividual ,
                              osdi:Disease ;
                     osdi:hasCost osdi:TT_BaseAnnualCost ;
-                    osdi:hasIntervention osdi:TT_InterventionTreat ,
-                                         osdi:TT_InterventionNone ;
+                    osdi:hasIntervention osdi:TT_S23_InterventionTreat ,
+                                         osdi:TT_S23_InterventionNone ;
                     osdi:hasProgressionElement osdi:TT_S23_DevB ,
                                                osdi:TT_S23_ManX ;
                     osdi:includedByModel osdi:TT_S23_Model .
@@ -2493,14 +2608,29 @@ osdi:TT_S23_ManX_Disutility rdf:type owl:NamedIndividual ,
                             osdi:isDisutility "true"^^xsd:boolean .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S23_InterventionNone
+osdi:TT_S23_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasDescription "Comparator: do nothing" ;
+    osdi:includedByModel osdi:TT_S23_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_S23_InterventionTreat
+osdi:TT_S23_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "Assessed intervention: it only adds an annual cost of 100" ;
+    osdi:includedByModel osdi:TT_S23_Model .
+
+
 ###  https://w3id.org/ontologies-ULL/OSDi#TT_S23_Model
 osdi:TT_S23_Model rdf:type owl:NamedIndividual ,
                            osdi:DecisionTreeModel ;
-                  osdi:hasAssessedIntervention osdi:TT_InterventionTreat ;
-                  osdi:hasComparatorIntervention osdi:TT_InterventionNone ;
+                  osdi:hasAssessedIntervention osdi:TT_S23_InterventionTreat ;
+                  osdi:hasComparatorIntervention osdi:TT_S23_InterventionNone ;
                   osdi:includesModelItem osdi:TT_BaseAnnualCost ,
-                                         osdi:TT_InterventionNone ,
-                                         osdi:TT_InterventionTreat ,
+                                         osdi:TT_S23_InterventionNone ,
+                                         osdi:TT_S23_InterventionTreat ,
                                          osdi:TT_LifeExpectancy ,
                                          osdi:TT_Population ,
                                          osdi:TT_PopulationAge ,
