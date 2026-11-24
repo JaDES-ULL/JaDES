@@ -571,6 +571,7 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 - El DES no lee la muerte inmediata de las progresiones (fase 22).
 
 **Revisión (2026-11-24):**
-- Decidido: con un objetivo que es un desarrollo o una manifestación crónica, su muerte inmediata se ignora con aviso, como la de la enfermedad: todos presentan el objetivo en el tiempo 0, así que ya sobrevivieron a su aparición. Con un objetivo agudo, el episodio ocurre en el tiempo 0, dentro del modelo, y su muerte se aplica entonces (sin test).
+- Decidido: con un objetivo que es un desarrollo o una manifestación crónica, su muerte inmediata se ignora con aviso, como la de la enfermedad: todos presentan el objetivo en el tiempo 0, así que ya sobrevivieron a su aparición. Con un objetivo agudo, el episodio ocurre en el tiempo 0, dentro del modelo, y su muerte se aplica entonces.
 - `DiseaseSubTreeGenerator.generateTargetSubTree` descarta las muertes del nodo objetivo con aviso. Test P67 (ManX crónica con muerte 0,1 como objetivo: comparador 74750; 65; 55,25; evaluado 81250) y su aviso en `TestDecisionTreeWarnings`. Antes falló con `Unexpected life years (comparator). Expected 65.0 but found 58.5` y una hoja `DEATH` de más.
-- Suite final: 352 tests, 0 fallos, 1 omitido.
+- Test P68 (ManA aguda con muerte 0,1 como objetivo, 300 por episodio y 50 de una vez de la intervención): muerte en el tiempo 0 con 0 años de vida y solo los pagos de una vez; comparador 58800; 58,5; 49,725; evaluado 58850. Pasó a la primera: añade cobertura.
+- Suite final: 354 tests, 0 fallos, 1 omitido.

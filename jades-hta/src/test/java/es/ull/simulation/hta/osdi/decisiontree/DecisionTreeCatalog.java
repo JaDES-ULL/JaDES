@@ -639,6 +639,12 @@ public final class DecisionTreeCatalog {
         cases.add(tc(PAYOFFS, "TT_P67_Experiment", "Chronic target with an instant death: the patients survived its onset, so the death is ignored",
                 leaves("TT_P67_", leaf(1.0, "ManX")),
                 outcomes(81250.0, 65.0, 55.25), outcomes(74750.0, 65.0, 55.25)));
+        // P68 (phase 16): ManA, acute, with an instant death (0.1), is the target of the interventions. Every patient suffers the episode at time 0, within
+        // the model, so the death applies at T = 0. Alive (0.9): 65 * 1000 + 300 = 65300; 65; 55.25. Death (0.1): life years 0; 300 (the one-time cost of the
+        // episode, at time 0); QALYs 0. Comparator: 58770 + 30 = 58800; life years 58.5; QALYs 49.725. Assessed: + 50 (one-time cost of the intervention) = 58850
+        cases.add(tc(PAYOFFS, "TT_P68_Experiment", "Acute target with an instant death: the episode happens at time 0, so the death applies at time 0",
+                leaves("TT_P68_", death(0.1), leaf(0.9, "ManA")),
+                outcomes(58850.0, 58.5, 49.725), outcomes(58800.0, 58.5, 49.725)));
 
         // ---- Scenarios: several features together ----
         // DevA (0.6) or DevB (default). DevA may lead to ManY; ManX may always appear. DevA and ManY share the cost of the follow-up visits (counted once). Disutilities take the maximum.
