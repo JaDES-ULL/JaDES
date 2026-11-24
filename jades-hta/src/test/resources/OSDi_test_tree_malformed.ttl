@@ -4669,4 +4669,77 @@ osdi:TT_N34_Model rdf:type owl:NamedIndividual ,
     osdi:hasDescription "N34. Group of alternative strategies whose proportions do not add up to 1, without a member without proportion." .
 
 
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N35_ManX_OnsetAge
+osdi:TT_N35_ManX_OnsetAge rdf:type owl:NamedIndividual ,
+        osdi:DeterministicParameter ;
+    osdi:hasDataItemType osdi:DI_Count ;
+    osdi:hasDescription "Age 30" ;
+    osdi:hasExpectedValue "30.0"^^xsd:double ;
+    osdi:includedByModel osdi:TT_N35_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N35_ManX
+osdi:TT_N35_ManX rdf:type owl:NamedIndividual ,
+        osdi:ChronicManifestation ;
+    osdi:hasOnsetAge osdi:TT_N35_ManX_OnsetAge ;
+    osdi:hasDescription "Chronic manifestation from 30 years, target of the interventions" ;
+    osdi:includedByModel osdi:TT_N35_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N35_Disease
+osdi:TT_N35_Disease rdf:type owl:NamedIndividual ,
+        osdi:Disease ;
+    osdi:hasCost osdi:TT_BaseAnnualCost ;
+    osdi:hasProgressionElement osdi:TT_N35_ManX ;
+    osdi:includedByModel osdi:TT_N35_Model .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N35_InterventionNone
+osdi:TT_N35_InterventionNone rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:isInterventionOf osdi:TT_N35_ManX ;
+    osdi:includedByModel osdi:TT_N35_Model ;
+    osdi:hasDescription "Comparator, whose target is ManX" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N35_InterventionTreat
+osdi:TT_N35_InterventionTreat rdf:type owl:NamedIndividual ,
+        osdi:TherapeuticIntervention ;
+    osdi:hasCost osdi:TT_TreatAnnualCost ;
+    osdi:isInterventionOf osdi:TT_N35_ManX ;
+    osdi:includedByModel osdi:TT_N35_Model ;
+    osdi:hasDescription "Assessed intervention, whose target is ManX" .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N35_Experiment
+osdi:TT_N35_Experiment rdf:type owl:NamedIndividual ,
+        osdi:Experiment ;
+    osdi:usesModel osdi:TT_N35_Model ;
+    osdi:hasDescription "Interventions whose target defines a temporal constraint (not supported: every patient presents the target at time 0)." ;
+    osdi:hasDiscountForCosts "0.0"^^xsd:double ;
+    osdi:hasDiscountForEffects "0.0"^^xsd:double ;
+    osdi:hasDisutilityCombinationMethod "ADD" ;
+    osdi:hasYear "2026"^^xsd:short .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#TT_N35_Model
+osdi:TT_N35_Model rdf:type owl:NamedIndividual ,
+        osdi:DecisionTreeModel ;
+    osdi:hasAssessedIntervention osdi:TT_N35_InterventionTreat ;
+    osdi:hasComparatorIntervention osdi:TT_N35_InterventionNone ;
+    osdi:includesModelItem osdi:TT_BaseAnnualCost ,
+        osdi:TT_LifeExpectancy ,
+        osdi:TT_N35_ManX_OnsetAge ,
+        osdi:TT_N35_ManX ,
+        osdi:TT_N35_Disease ,
+        osdi:TT_N35_InterventionNone ,
+        osdi:TT_N35_InterventionTreat ,
+        osdi:TT_Population ,
+        osdi:TT_PopulationAge ,
+        osdi:TT_PopulationBaseUtility ,
+        osdi:TT_PopulationSex ,
+        osdi:TT_TreatAnnualCost ;
+    osdi:hasDescription "N35. Interventions whose target (ManX) defines an onset age. Every patient presents the target of the interventions at time 0 (D1), so a temporal constraint of the target is not supported and the generation of the tree must fail, as in the DES." .
+
+
 ###  Generated from the test specification of JaDES-HTA decision trees

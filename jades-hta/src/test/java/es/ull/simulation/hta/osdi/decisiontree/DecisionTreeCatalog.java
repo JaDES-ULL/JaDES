@@ -803,7 +803,10 @@ public final class DecisionTreeCatalog {
             new MalformedCase(MALFORMED, "TT_N33_Experiment", "Group of strategies without proportions as the next strategy of an outcome", UnsupportedOSDiFeatureException.class,
                 "but its strategies do not declare their proportions (hasProportionWithinGroup)"),
             new MalformedCase(MALFORMED, "TT_N34_Experiment", "Group of alternative strategies whose proportions do not add up to 1, without a member without proportion", MalformedOSDiModelException.class,
-                "and none of them takes the rest")
+                "and none of them takes the rest"),
+            // Every patient presents the target of the interventions at time 0 (D1, phase 15), so the target cannot define an onset or end age (as in the DES).
+            new MalformedCase(MALFORMED, "TT_N35_Experiment", "Interventions whose target defines a temporal constraint (onset age)", UnsupportedOSDiFeatureException.class,
+                "The interventions of the model target TT_N35_ManX, which defines a temporal constraint (onset or end age)")
         );
     }
 }

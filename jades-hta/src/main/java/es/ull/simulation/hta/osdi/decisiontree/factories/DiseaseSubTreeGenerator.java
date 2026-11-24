@@ -119,10 +119,12 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
      * Resolves the common target of the interventions of the model (D1 in docs/osdi-1.3-diseno.md) with {@link InterventionTargets#resolve}, and
      * checks that decision trees support it. Stages and manifestations that depend on a development are not supported as targets in decision trees:
      * a patient that presents a manifestation of a development also presents the development, but the manifestation may depend on several developments.
+     * A target with a temporal constraint (onset or end age) is not supported either, since every patient presents the target at time 0 (phase 15 of
+     * docs/osdi-1.3-diseno.md, N35), as in discrete event simulation models.
      * @return The clinical progression element that the interventions target, or an empty optional if they target the disease.
      * @throws MalformedOSDiModelException If an intervention has more than one target, its target does not belong to the disease of the model, or the
      * interventions have different targets.
-     * @throws UnsupportedOSDiFeatureException If the target is a stage or a manifestation that depends on a development.
+     * @throws UnsupportedOSDiFeatureException If the target is a stage, a manifestation that depends on a development, or defines a temporal constraint.
      */
     private Optional<ClinicalProgressionWrapper> resolveInterventionTarget() throws MalformedOSDiModelException, UnsupportedOSDiFeatureException {
         final Optional<ClinicalProgressionWrapper> resolved = InterventionTargets.resolve(parentTreeModel.getExperimentWrapper().getModelWrapper(), diseaseWrapper);
@@ -138,6 +140,10 @@ public class DiseaseSubTreeGenerator implements SubTreeGenerator {
                 throw new UnsupportedOSDiFeatureException("The interventions of the model target the manifestation " + target.getShortName() + ", which depends on the development " + development.getShortName()
                     + ". A manifestation that depends on a development is not supported as the target of the interventions in decision trees.");
             }
+        }
+        if (target.getTemporalConstraintForProgression().isPresent()) {
+            throw new UnsupportedOSDiFeatureException("The interventions of the model target " + target.getShortName() + ", which defines a temporal constraint (onset or end age)."
+                + " Every patient presents the target of the interventions at time 0, so such constraint is not supported in decision trees.");
         }
         return resolved;
     }

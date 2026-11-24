@@ -46,7 +46,7 @@ Every intervention declares its target (decision D1 of `docs/osdi-1.3-diseno.md`
 
 - An intervention without target in the model is assumed to target the disease, with a warning.
 - An intervention with more than one target in the model (N15), a target that is neither the disease of the model nor one of its progressions, and compared interventions with different targets (N14) are rejected with a `MalformedOSDiModelException`.
-- In decision trees (`DiseaseSubTreeGenerator.resolveInterventionTarget`), stages and manifestations that depend on a development (N16) are rejected as targets with an `UnsupportedOSDiFeatureException`: a patient that presents a manifestation of a development also presents the development, but the manifestation may depend on several developments.
+- In decision trees (`DiseaseSubTreeGenerator.resolveInterventionTarget`), stages and manifestations that depend on a development (N16) are rejected as targets with an `UnsupportedOSDiFeatureException`: a patient that presents a manifestation of a development also presents the development, but the manifestation may depend on several developments. A target with a temporal constraint (onset or end age) is also rejected with an `UnsupportedOSDiFeatureException` (N35, phase 15), since every patient presents the target at time 0; the DES rejects it too.
 
 If the target is the disease, the tree is the same as before. If it is a clinical progression element T, the tree starts with the patients that present T (`DiseaseSubTreeGenerator.generateTargetSubTree`):
 
@@ -55,7 +55,6 @@ If the target is the disease, the tree is the same as before. If it is a clinica
 - Only the progressions that depend on T are included: the own manifestations of a development (I04), with their combination rules; nothing else for a manifestation (I03).
 - The payoffs of the intervention are computed as before, from the start of the tree. If T is an acute manifestation, the annual costs and utilities of the intervention are ignored with a warning (`SimpleInterventionGenerator.generate`), as those of the acute manifestation itself.
 - If T is an acute manifestation, every patient starts with an episode at time 0, and the tree evaluates that single episode: the frequency of T is ignored with a warning that says so (P64), and the one-time payoffs of the intervention apply once. **Accepted divergence** with the DES, which simulates the episode at time 0 and the next ones, and applies the one-time payoffs of the intervention with each of them (see below).
-- The onset and end ages of T keep the usual rules. TODO: this contradicts that every patient presents T at time 0; the DES rejects a target with a temporal constraint.
 
 Newborn screening models (`NBSModel`) only support the disease as target.
 
