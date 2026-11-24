@@ -139,9 +139,14 @@ osdi:affectsProgressionElement rdf:type owl:ObjectProperty ;
 ###  https://w3id.org/ontologies-ULL/OSDi#causesFailOf
 osdi:causesFailOf rdf:type owl:ObjectProperty ;
                   owl:inverseOf osdi:failsIf ;
-                  rdfs:domain osdi:Parameter ;
-                  rdfs:range osdi:LineOfTherapy ;
-                  rdfs:comment "Defines the condition (expressed as any type of parameter) upon which certain strategy fails and must progress to the next step"@en ;
+                  rdfs:domain [ rdf:type owl:Class ;
+                                owl:unionOf ( osdi:HealthCondition
+                                              osdi:Parameter
+                                            )
+                              ] ;
+                  rdfs:range osdi:Strategy ;
+                  rdfs:comment "The health condition or parameter that makes a strategy fail (inverse of failsIf, which describes its semantics)."@en ,
+                               "La condición de salud o el parámetro que hace fracasar una estrategia (inversa de failsIf, que describe su semántica)."@es ;
                   rdfs:label "causa el fallo de"@es ,
                              "causes fail of"@en .
 
