@@ -33,14 +33,9 @@ Ya no están pendientes los nombres ni el momento de evaluación de los resultad
 
 ## Fases pendientes
 
-Fases acordadas tras la fase 16, en orden: de la 17 a la 19 se cierra el árbol y se publica OSDi 1.3, validada con árboles de decisión; de la 20 a la 23 se completa el DES. Cada fase termina con la suite de `jades-hta` pasando, sus cambios en commits y su entrada en el registro. Si una fase descubre trabajo no previsto, lo propone como fase nueva en el registro.
+Fases acordadas tras la fase 17, en orden: de la 18 a la 19 se cierra el árbol y se publica OSDi 1.3, validada con árboles de decisión; de la 20 a la 23 se completa el DES. Cada fase termina con la suite de `jades-hta` pasando, sus cambios en commits y su entrada en el registro. Si una fase descubre trabajo no previsto, lo propone como fase nueva en el registro.
 
 Quedan fuera, como trabajo futuro: pautas con subpautas, condiciones o edades de aplicación; pautas en estrategias con resultados; la confirmación imperfecta (estrategias de diagnóstico con resultados explícitos); `hasConditionExpression` en las estrategias; grupos en las cadenas de detección del cribado neonatal; actualizar costes fuera del IPC español de 2002 a 2026; y el análisis de impacto presupuestario.
-
-### Fase 17: consistencia con un razonador completo
-
-1. Las intervenciones compartidas de las ontologías de prueba (`TT_InterventionTreat`, `TT_InterventionNone`) incumplen la cardinalidad «exactamente un objetivo» (fase 4): un razonador completo inferiría que las enfermedades son el mismo individuo. Proponer cómo corregirlo sin cambiar valores esperados (por ejemplo, intervenciones propias de cada modelo). Requiere aprobación.
-2. Un test que cargue `OSDi.ttl` y cada ontología de prueba, `BD.ttl` y `PBD.ttl` incluidas, con un razonador completo (HermiT u otro compatible con OWL API 5.5) y compruebe que son consistentes.
 
 ### Fase 18: ejemplos de validación
 
@@ -575,3 +570,25 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 - `DiseaseSubTreeGenerator.generateTargetSubTree` descarta las muertes del nodo objetivo con aviso. Test P67 (ManX crónica con muerte 0,1 como objetivo: comparador 74750; 65; 55,25; evaluado 81250) y su aviso en `TestDecisionTreeWarnings`. Antes falló con `Unexpected life years (comparator). Expected 65.0 but found 58.5` y una hoja `DEATH` de más.
 - Test P68 (ManA aguda con muerte 0,1 como objetivo, 300 por episodio y 50 de una vez de la intervención): muerte en el tiempo 0 con 0 años de vida y solo los pagos de una vez; comparador 58800; 58,5; 49,725; evaluado 58850. Pasó a la primera: añade cobertura.
 - Suite final: 354 tests, 0 fallos, 1 omitido.
+
+### Fase 17: consistencia con un razonador completo (2026-11-24)
+
+**Hecho:**
+- Test `TestOntologyConsistency` (commit `0547d5d`): carga con HermiT 1.4.5.519 (ya era dependencia; `ignoreUnsupportedDatatypes` por OWL-Time) `OSDi.ttl` y todas las ontologías de prueba, `BD.ttl` y `PBD.ttl` incluidas, tal como están escritas (sin el `OSDiWrapper`). Comprueba que son coherentes y que el razonador no deduce que dos enfermedades distintas sean el mismo individuo. `OSDi_test_tree_malformed.ttl` se comprueba caso a caso.
+- Primera ejecución: `OSDi.ttl` y ocho ontologías eran coherentes; `OSDi_test_tree_malformed.ttl`, `OSDi_test_tree_payoffs.ttl` y `BD.ttl`, no. owlexplanation 5.0.0 falló con un `NullPointerException` interno tras 5 a 12 minutos por ontología, así que las causas se localizaron comprobando cada modelo por separado y reduciendo sus asertos a un conjunto mínimo incoherente. Las intervenciones compartidas no eran la causa de ninguna incoherencia: sin sus objetivos, las tres seguían siendo incoherentes.
+- A (aprobado; commit `11ff4f7`): defecto de `OSDi.ttl` de la fase 13. `causesFailOf`, inversa de `failsIf`, seguía con dominio `Parameter` y rango `LineOfTherapy`, así que el rango efectivo de `failsIf` era `Parameter` y un `failsIf` hacia una condición de salud (P45, P61) o un efecto adverso (P48) hacía la ontología incoherente. Ahora su dominio es `HealthCondition` o `Parameter`, su rango `Strategy` y su comentario, en inglés y en español, remite a `failsIf`. Sin cambiar la versión.
+- B (aprobado): N15 (una intervención con dos objetivos disjuntos), N20 y N22 (una intervención de cribado con `hasSensitivity` o `detects`, cuyo dominio es `DetectionStrategy`, disjunta de `Intervention`) son incoherentes a propósito: el razonador detecta el error que JaDES rechaza. El test exige que sean exactamente esos tres.
+- C (aprobado; commit `a3b8490`): los modelos de `BD.ttl` declaraban `hasDisutilityCombinationMethod` y `PBD_ModelTree` también `hasYear`, cuyos dominios no incluyen `Model`. Se quitan; `hasYear` apareció al volver a comprobar tras quitar el primero.
+- Punto 1 (aprobado; commit `0702c6c`): `TT_InterventionTreat` y `TT_InterventionNone` se compartían en 114 casos de cinco ontologías de árbol; una intervención tiene exactamente un objetivo, así que HermiT deducía que todas las enfermedades de cada fichero eran el mismo individuo. Un script crea en cada caso `TT_<caso>_InterventionTreat` (con `TT_TreatAnnualCost`) y `TT_<caso>_InterventionNone`; las intervenciones que ya eran propias se conservan. Todas las enfermedades ya declaraban su objetivo con `hasIntervention`, así que no cambia ningún aviso. Ningún valor esperado cambia.
+- La comprobación de enfermedades iguales encontró el mismo error en `OSDi_test.ttl` (aprobado; commit `d458d7f`): sus cuatro modelos compartían `TEST_InterventionEffective` y `TEST_InterventionIneffective`. El modelo 1 conserva los nombres; los modelos 2 a 4 tienen `TEST_InterventionEffective<n>` y `TEST_InterventionIneffective<n>`, con el mismo coste y efecto. Solo cambian los nombres esperados de `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration`; los valores, incluida la regresión del Excel, no.
+- Antes de los cambios, la comprobación de enfermedades iguales falló en `OSDi_test.ttl` y en las cinco ontologías de árbol (p. ej., `OSDi_test_tree_scenarios.ttl: the reasoner infers that different diseases are the same individual: [TT_I01_Disease = TT_I02_Disease]`).
+- Documentación: CLAUDE.md (convenciones de los casos, test nuevo, notas técnicas) y `docs/known-limitations.md`.
+- Suite final: 366 tests, 0 fallos, 1 omitido.
+
+**Decidido:**
+- Cada modelo de prueba tiene sus propias intervenciones; los demás individuos (población, costes, efectos) se pueden compartir.
+- Los casos malformados incoherentes a propósito se mantienen, y el test los enumera.
+
+**Pendiente:**
+- El test no cubre las ontologías que se creen fuera de `src/test/resources` (p. ej., los ejemplos de la fase 18): convendrá añadirlas.
+- Algunas progresiones se comparten entre enfermedades de `OSDi_test.ttl` (p. ej., `TEST_CoexistentDevelopment1`); no producen incoherencia, pero si OSDi restringiera algún día `hasProgressionElement`, habría que separarlas.
