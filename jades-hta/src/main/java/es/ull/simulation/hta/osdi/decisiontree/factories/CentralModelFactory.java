@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 
 import es.ull.simulation.hta.MalformedSimulationModelException;
 import es.ull.simulation.hta.osdi.decisiontree.Model;
+import es.ull.simulation.hta.osdi.decisiontree.nbsdecisiontree.NBSModel;
 import es.ull.simulation.hta.osdi.exceptions.MalformedOSDiModelException;
 import es.ull.simulation.hta.osdi.exceptions.UnsupportedOSDiFeatureException;
 import es.ull.simulation.hta.osdi.ontology.ExperimentWrapper;
@@ -24,8 +25,24 @@ public class CentralModelFactory {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(CentralModelFactory.class);
     private static final List<AbstractModelFactory> factories = new ArrayList<>();
 
-    public static void register(AbstractModelFactory factory) {
-        factories.add(factory);
+    /**
+     * Registers a factory of decision tree models. A factory of a class that is already registered is ignored, so registering the default
+     * factories several times (e.g., from {@link #registerDefaultFactories()} and from the tests) has no effect.
+     * @param factory The factory
+     */
+    public static synchronized void register(AbstractModelFactory factory) {
+        if (factories.stream().noneMatch(f -> f.getClass().equals(factory.getClass()))) {
+            factories.add(factory);
+        }
+    }
+
+    /**
+     * Registers the factories of the decision tree models included in JaDES: newborn screening ({@link NBSModel}) and single disease and
+     * population ({@link SimpleModel}).
+     */
+    public static void registerDefaultFactories() {
+        register(NBSModel.getFactory());
+        register(SimpleModel.getFactory());
     }
 
     public static void checkSuitability(ExperimentWrapper experiment) throws MalformedSimulationModelException {

@@ -152,29 +152,32 @@ public class OntologyLoader {
 	}
 
     /**
-     * Creates an OWLOntologyDocumentSource from a string that can be either a file path or an IRI. It first tries to parse the string as a URI, and if that fails, 
-     * it treats it as a file path.
+     * Creates an OWLOntologyDocumentSource from a string that can be either a file path or an IRI. A path to an existing file (absolute or relative,
+     * with or without the file:/// prefix) is loaded as a file. Otherwise, the string must be an absolute IRI with a scheme of more than one letter
+     * (e.g., https://...): a one-letter scheme is a Windows drive (C:/...), and a relative path is not an IRI.
      * @param ontologyFileOrIRI The string representing either the file path or the IRI of the ontology
      * @return an OWLOntologyDocumentSource corresponding to the given string
-     * @throws OWLOntologyCreationException if the string is not a valid URI and does not correspond to an existing file path
+     * @throws OWLOntologyCreationException if the string is neither an existing file nor an absolute IRI
      */
 	public static OWLOntologyDocumentSource getOntologyDocumentSourceFromString(String ontologyFileOrIRI) throws OWLOntologyCreationException {
         Objects.requireNonNull(ontologyFileOrIRI, "Ontology file/IRI must not be null");
-        boolean isURI = true;
         try {
-            new java.net.URI(ontologyFileOrIRI);
-        } catch (Exception e) {
-            isURI = false;
+            final Path path = Paths.get(ontologyFileOrIRI);
+            if (Files.isRegularFile(path)) {
+                return new FileDocumentSource(Objects.requireNonNull(path.toFile()));
+            }
+        } catch (java.nio.file.InvalidPathException e) {
+            // Not a file path (e.g., an IRI with characters that are not valid in a path)
         }
-        if (isURI) {
+        java.net.URI uri = null;
+        try {
+            uri = new java.net.URI(ontologyFileOrIRI);
+        } catch (java.net.URISyntaxException e) {
+            // Not an IRI either
+        }
+        if (uri != null && uri.isAbsolute() && uri.getScheme().length() > 1) {
             return new IRIDocumentSource(Objects.requireNonNull(IRI.create(ontologyFileOrIRI)));
         }
-        else {
-            final Path path = Paths.get(ontologyFileOrIRI);
-            if (!Files.exists(path) || !Files.isRegularFile(path)) {
-                throw new OWLOntologyCreationException("The specified ontology file does not exist or is not a regular file: " + ontologyFileOrIRI);
-            }
-            return new FileDocumentSource(Objects.requireNonNull(path.toFile()));
-        }
+        throw new OWLOntologyCreationException("The specified ontology is neither an existing file nor an absolute IRI: " + ontologyFileOrIRI);
     }
 }

@@ -38,6 +38,7 @@ public class OSDiMain {
             OWLOntologyDocumentSource source = OntologyLoader.getOntologyDocumentSourceFromString(args.osdiPath);
             OSDiWrapper osdi = new OSDiWrapper.Builder().build(source);
             ExperimentWrapper experiment = osdi.buildExperiment(osdi.toIRI(args.osdiExperiment));
+            CentralModelFactory.registerDefaultFactories();
             Model tempModel = CentralModelFactory.create(experiment);
             if (!(tempModel instanceof SingleDiseaseAndPopulationModel)) {
                 log.error("The OSDi experiment " + args.osdiExperiment + " at " + args.osdiPath + " does not represent a single disease and population decision tree model. Currently, only this type of model is supported for Excel generation.");
