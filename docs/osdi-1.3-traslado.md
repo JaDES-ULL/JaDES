@@ -27,7 +27,7 @@ Cada entidad aparece en la decisión que la cambió; si la cambiaron varias, en 
 
 ### D3. Semántica de la magnitud de un efecto (fase 2)
 
-- **Individuos.** Nuevos `DI_HazardRatio` y `DI_OddsRatio` (`DataItemType`), sin `hasRefToSTATO` (véase el apartado 3).
+- **Individuos.** Nuevos `DI_HazardRatio` (`hasRefToSTATO`: STATO_0000677, *hazard ratio*) y `DI_OddsRatio` (STATO_0000182, *odds ratio*), de tipo `DataItemType`. Códigos comprobados en OLS (no obsoletos) el 2026-11-25.
 - **Comentarios.** `Effect` (cómo se aplica la magnitud según los tipos de dato) y `hasEffectMagnitude` (tabla de operaciones).
 
 ### D4. Resultados de las estrategias (fases 7a y 7b)
@@ -74,6 +74,7 @@ Ningún cambio en la ontología.
 ### Sin decisión numerada
 
 - **Horizonte temporal (fase 11).** Comentario de `hasTimeHorizon` (inglés y español).
+- **Comentarios en español (2026-11-25).** Los 37 términos nuevos o con el comentario cambiado que solo lo tenían en inglés tienen ahora también el español. `hasSensitivity` y `hasSpecificity` tenían el comentario sin etiqueta de idioma; ahora lleva `@en`. Los términos que no cambian respecto a la 1.2 conservan sus comentarios sin traducir.
 - **Evans et al. (fase 12).** Nuevo individuo `Currency_CanadianDollar`; comentario de `hasProportionWithinGroup` (proporción de una estrategia dentro de un grupo de alternativas; añade el español).
 
 ## 2. Ejemplos para el repositorio de OSDi
@@ -173,8 +174,6 @@ Los individuos del ejemplo son `…/OSDi#EVANS_…`. El fragmento no llega al se
 ## 3. Pendiente
 
 **En la ontología**
-- `DI_HazardRatio` y `DI_OddsRatio` no tienen `hasRefToSTATO`; los demás tipos de dato sí (p. ej., `DI_RelativeRisk`: STATO_0000245). Hay que confirmar los códigos de STATO antes de añadirlos.
-- 37 términos nuevos o con el comentario cambiado tienen comentario en inglés pero no en español: `AcuteManifestation`, `DI_HazardRatio`, `DI_OddsRatio`, `DetectionOutcome`, `DiagnosisIntervention`, `Effect`, `FailureOutcome`, `InconclusiveDetectionOutcome`, `Intervention`, `NegativeDetectionOutcome`, `PositiveDetectionOutcome`, `ScreeningIntervention`, `SuccessOutcome`, `TreatmentOutcome`, `affects`, `appliesOneTime`, `detects`, `failsIf`, `followedByStrategy`, `followedOnFailureBy`, `hasEffectMagnitude`, `hasEvaluationTime`, `hasOutcomeRisk`, `hasRiskCharacterization`, `hasRiskIfDiseased`, `hasRiskIfNotDiseased`, `hasSensitivity`, `hasSpecificity`, `hasStrategy`, `hasStrategyOutcome`, `isAffectedBy`, `isDetectedBy`, `isDisutility`, `isRiskCharacterizationOf`, `isStrategyOutcomeOf`, `resolvesHealthCondition` y `resolvesOnSuccess`. Algunos ya no tenían español en la 1.2.
 - La cabecera: `owl:versionIRI` y `owl:versionInfo` a 1.3, `owl:priorVersion <…/OSDi/1.2>` y, si se quiere, una nota de cambios en el comentario.
 
 **En el repositorio de OSDi**
@@ -203,7 +202,7 @@ Los individuos del ejemplo son `…/OSDi#EVANS_…`. El fragmento no llega al se
 >
 > - **Target of an intervention** (`hasIntervention` / `isInterventionOf`, now between `HealthCondition` and `Intervention`): every intervention has exactly one target, the disease or an element of its progression. Time 0 is the moment when the intervention is applied: every patient presents the target, and the intervention is active during the whole simulation. With an acute target, every patient starts with an episode. Compared interventions have the same target.
 > - **Strategies of an intervention** are declared as effects that replace the strategies of a health condition (`StrategyReplacementEffect`, `hasReplacementStrategy`). `Intervention` no longer declares `hasStrategy`.
-> - **Effect magnitudes**: the data item types of the magnitude and of the affected parameter define how an effect applies (relative risks and hazard ratios on the equivalent rate, odds ratios on the odds, differences, replacements). New `DI_HazardRatio` and `DI_OddsRatio`.
+> - **Effect magnitudes**: the data item types of the magnitude and of the affected parameter define how an effect applies (relative risks and hazard ratios on the equivalent rate, odds ratios on the odds, differences, replacements). New `DI_HazardRatio` and `DI_OddsRatio`, with their STATO references.
 > - **Strategy outcomes** (`StrategyOutcome`, with `TreatmentOutcome` — `SuccessOutcome`, `FailureOutcome` — and `DetectionOutcome` — positive, negative, inconclusive): mutually exclusive outcomes with their risk, evaluation time, next strategy, payoffs, effects and resolution of the health condition. `failsIf` (now also towards a health condition), `followedOnSuccessBy`, `followedOnFailureBy` and `resolvesOnSuccess` are short forms. Relapses after the response are the failure of a follow-up strategy.
 > - **Adverse events** (`AdverseEvent`, `hasAdverseEvent`, `isOccurrenceOf`): problems caused by a strategy, with a mandatory risk per application, one-time payoffs, and effects such as death or the failure of the strategy.
 > - **Detection**: `detects`, `hasSensitivity`, `hasSpecificity` and `hasTemporaryThreshold` belong to detection strategies, not to interventions. The disease detected by a detection intervention is its target.
@@ -256,7 +255,7 @@ Todo esto queda fuera de `docs/` y `examples/`, y se hará cuando lo apruebes:
 
 **En el repositorio de OSDi**
 
-1. Copiar a la raíz la `OSDi.ttl` de `jades-hta`, con la cabecera de la 1.3: `owl:versionIRI <…/OSDi/1.3>`, `owl:versionInfo "1.3"` y `owl:priorVersion <…/OSDi/1.2>`. Decidir si se publica antes de resolver los pendientes de la ontología del apartado 3 (códigos de STATO y comentarios en español).
+1. Copiar a la raíz la `OSDi.ttl` de `jades-hta`, con la cabecera de la 1.3: `owl:versionIRI <…/OSDi/1.3>`, `owl:versionInfo "1.3"` y `owl:priorVersion <…/OSDi/1.2>`.
 2. Sustituir `individuals/PBD.ttl` e `individuals/T1DM.ttl` por las copias de `jades-hta`, importando la 1.3. Corregir el IRI de `T1DM.ttl` (doble barra) e `individuals/catalog-v001.xml`.
 3. Añadir `examples/`, cambiando sus importaciones a la 1.3, y su paso en `generate_doc.yml` (apartado 2).
 4. Añadir las notas de la versión (apartado 4) al `README.md` o a un `CHANGELOG`.

@@ -122,7 +122,8 @@ osdi:affects rdf:type owl:ObjectProperty ;
                                         osdi:HealthCondition
                                       )
                         ] ;
-             rdfs:comment "Defines a relationship between an effect and an attribute, parameter or health condition, indicating that the effect affects it. A health condition can only be affected by a StrategyReplacementEffect; the rest of effects affect attributes or parameters."@en ;
+             rdfs:comment "Defines a relationship between an effect and an attribute, parameter or health condition, indicating that the effect affects it. A health condition can only be affected by a StrategyReplacementEffect; the rest of effects affect attributes or parameters."@en ,
+                          "Define una relación entre un efecto y un atributo, parámetro o condición de salud, indicando que el efecto lo afecta. Una condición de salud solo puede verse afectada por un StrategyReplacementEffect; el resto de efectos afectan a atributos o parámetros."@es ;
              rdfs:label "afecta"@es ,
                         "affects"@en .
 
@@ -171,7 +172,8 @@ osdi:detects rdf:type owl:ObjectProperty ;
              owl:inverseOf osdi:isDetectedBy ;
              rdfs:domain osdi:DetectionStrategy ;
              rdfs:range osdi:Disease ;
-             rdfs:comment "Indicates the disease or diseases detected by a detection strategy. The disease detected by a detection intervention is its target (isInterventionOf)."@en ;
+             rdfs:comment "Indicates the disease or diseases detected by a detection strategy. The disease detected by a detection intervention is its target (isInterventionOf)."@en ,
+                          "Indica la enfermedad o enfermedades que detecta una estrategia de detección. La enfermedad que detecta una intervención de detección es su objetivo (isInterventionOf)."@es ;
              rdfs:label "detecta"@es ,
                         "detects"@en .
 
@@ -184,7 +186,8 @@ osdi:failsIf rdf:type owl:ObjectProperty ;
                                          osdi:Parameter
                                        )
                          ] ;
-             rdfs:comment "Short form of two outcomes of a strategy: a FailureOutcome and a SuccessOutcome (see StrategyOutcome). The failure happens with the probability per episode or the time to event of the parameter (according to its data item type), or when the health condition appears (e.g., the progression of the disease, or an adverse event of the strategy, which models the abandonment of the treatment). The success is the default outcome (in a simulation, it arrives with the duration of the health condition, modified by the effects). The next strategies are given by followedOnFailureBy and followedOnSuccessBy, and resolvesOnSuccess says whether the success resolves the health condition. It cannot be combined with hasStrategyOutcome."@en ;
+             rdfs:comment "Short form of two outcomes of a strategy: a FailureOutcome and a SuccessOutcome (see StrategyOutcome). The failure happens with the probability per episode or the time to event of the parameter (according to its data item type), or when the health condition appears (e.g., the progression of the disease, or an adverse event of the strategy, which models the abandonment of the treatment). The success is the default outcome (in a simulation, it arrives with the duration of the health condition, modified by the effects). The next strategies are given by followedOnFailureBy and followedOnSuccessBy, and resolvesOnSuccess says whether the success resolves the health condition. It cannot be combined with hasStrategyOutcome."@en ,
+                          "Forma abreviada de dos resultados de una estrategia: un FailureOutcome y un SuccessOutcome (ver StrategyOutcome). El fracaso ocurre con la probabilidad por episodio o el tiempo hasta el evento del parámetro (según su tipo de dato), o cuando aparece la condición de salud (p. ej., la progresión de la enfermedad, o un efecto adverso de la estrategia, que modela el abandono del tratamiento). El éxito es el resultado por defecto (en una simulación, llega con la duración de la condición de salud, modificada por los efectos). Las estrategias siguientes las dan followedOnFailureBy y followedOnSuccessBy, y resolvesOnSuccess indica si el éxito resuelve la condición de salud. No puede combinarse con hasStrategyOutcome."@es ;
              rdfs:label "fails if"@en ,
                         "falla si"@es .
 
@@ -198,7 +201,8 @@ osdi:followedByStrategy rdf:type owl:ObjectProperty ;
                                                   )
                                     ] ;
                         rdfs:range osdi:Strategy ;
-                        rdfs:comment "For a strategy: the strategy scheduled after it ends, whatever its outcome, unless the outcome declares its own next strategy. For a detection strategy that only declares its sensitivity and specificity, the next strategy is applied to the positive results (e.g., a confirmatory diagnosis). For an outcome of a strategy (StrategyOutcome): the strategy that follows such outcome."@en ;
+                        rdfs:comment "For a strategy: the strategy scheduled after it ends, whatever its outcome, unless the outcome declares its own next strategy. For a detection strategy that only declares its sensitivity and specificity, the next strategy is applied to the positive results (e.g., a confirmatory diagnosis). For an outcome of a strategy (StrategyOutcome): the strategy that follows such outcome."@en ,
+                                     "Para una estrategia: la estrategia programada tras su final, sea cual sea su resultado, salvo que el resultado declare su propia estrategia siguiente. Para una estrategia de detección que solo declara su sensibilidad y especificidad, la estrategia siguiente se aplica a los resultados positivos (p. ej., un diagnóstico de confirmación). Para un resultado de una estrategia (StrategyOutcome): la estrategia que sigue a ese resultado."@es ;
                         rdfs:label "followed by strategy"@en ,
                                    "seguido por la estrategia"@es .
 
@@ -220,7 +224,8 @@ osdi:followsStrategy rdf:type owl:ObjectProperty ;
 osdi:followedOnFailureBy rdf:type owl:ObjectProperty ;
                          rdfs:domain osdi:Strategy ;
                          rdfs:range osdi:Strategy ;
-                         rdfs:comment "Short form (see failsIf): the strategy that follows the failure of a strategy."@en ;
+                         rdfs:comment "Short form (see failsIf): the strategy that follows the failure of a strategy."@en ,
+                                      "Forma abreviada (ver failsIf): la estrategia que sigue al fracaso de una estrategia."@es ;
                          rdfs:label "followed on failure by"@en ,
                                     "seguida en caso de fracaso por"@es .
 
@@ -240,7 +245,8 @@ osdi:hasEvaluationTime rdf:type owl:ObjectProperty ;
                        rdfs:subPropertyOf osdi:hasParameter ;
                        rdfs:domain osdi:StrategyOutcome ;
                        rdfs:range osdi:Parameter ;
-                       rdfs:comment "Time, in years since the start of the strategy, when the outcome is evaluated (e.g., a stopping rule that assesses the response at 12 weeks). The strategy and the health condition (if the outcome resolves it) stop at such time, and the next strategy starts. Without an evaluation time, a decision tree assumes that the outcome happens at the start of the strategy."@en ;
+                       rdfs:comment "Time, in years since the start of the strategy, when the outcome is evaluated (e.g., a stopping rule that assesses the response at 12 weeks). The strategy and the health condition (if the outcome resolves it) stop at such time, and the next strategy starts. Without an evaluation time, a decision tree assumes that the outcome happens at the start of the strategy."@en ,
+                                    "Tiempo, en años desde el inicio de la estrategia, en que se evalúa el resultado (p. ej., una regla de parada que evalúa la respuesta a las 12 semanas). La estrategia y la condición de salud (si el resultado la resuelve) se detienen en ese momento, y empieza la estrategia siguiente. Sin tiempo de evaluación, un árbol de decisión supone que el resultado ocurre al inicio de la estrategia."@es ;
                        rdfs:label "has evaluation time"@en ,
                                   "tiene el momento de evaluación"@es .
 
@@ -250,7 +256,8 @@ osdi:hasOutcomeRisk rdf:type owl:ObjectProperty ;
                     rdfs:subPropertyOf osdi:hasParameter ;
                     rdfs:domain osdi:StrategyOutcome ;
                     rdfs:range osdi:Parameter ;
-                    rdfs:comment "How likely an outcome of a strategy is. Its data item type expresses it: a probability per episode (used by decision trees) or a time to event (used by simulations); the application converts one into the other when it can, and warns when it cannot. The outcome without risk of a strategy (at most one) is the default outcome: it takes the remaining probability (1 minus the sum of the rest)."@en ;
+                    rdfs:comment "How likely an outcome of a strategy is. Its data item type expresses it: a probability per episode (used by decision trees) or a time to event (used by simulations); the application converts one into the other when it can, and warns when it cannot. The outcome without risk of a strategy (at most one) is the default outcome: it takes the remaining probability (1 minus the sum of the rest)."@en ,
+                                 "Lo probable que es un resultado de una estrategia. Lo expresa su tipo de dato: una probabilidad por episodio (la que usan los árboles de decisión) o un tiempo hasta el evento (el que usan las simulaciones); la aplicación convierte uno en otro cuando puede, y avisa cuando no puede. El resultado sin riesgo de una estrategia (como mucho uno) es el resultado por defecto: se lleva la probabilidad restante (1 menos la suma del resto)."@es ;
                     rdfs:label "has outcome risk"@en ,
                                "tiene el riesgo del resultado"@es .
 
@@ -260,7 +267,8 @@ osdi:hasRiskIfDiseased rdf:type owl:ObjectProperty ;
                        rdfs:subPropertyOf osdi:hasOutcomeRisk ;
                        rdfs:domain osdi:DetectionOutcome ;
                        rdfs:range osdi:Parameter ;
-                       rdfs:comment "How likely an outcome of a detection strategy is for an individual that has the detected disease (e.g., the sensitivity, for a positive result without inconclusive results). The outcome without this risk takes the remaining probability."@en ;
+                       rdfs:comment "How likely an outcome of a detection strategy is for an individual that has the detected disease (e.g., the sensitivity, for a positive result without inconclusive results). The outcome without this risk takes the remaining probability."@en ,
+                                    "Lo probable que es un resultado de una estrategia de detección para un individuo que tiene la enfermedad detectada (p. ej., la sensibilidad, para un resultado positivo sin resultados no concluyentes). El resultado sin este riesgo se lleva la probabilidad restante."@es ;
                        rdfs:label "has risk if diseased"@en ,
                                   "tiene el riesgo si está enfermo"@es .
 
@@ -270,7 +278,8 @@ osdi:hasRiskIfNotDiseased rdf:type owl:ObjectProperty ;
                           rdfs:subPropertyOf osdi:hasOutcomeRisk ;
                           rdfs:domain osdi:DetectionOutcome ;
                           rdfs:range osdi:Parameter ;
-                          rdfs:comment "How likely an outcome of a detection strategy is for an individual that does not have the detected disease (e.g., 1 minus the specificity, for a positive result without inconclusive results). The outcome without this risk takes the remaining probability."@en ;
+                          rdfs:comment "How likely an outcome of a detection strategy is for an individual that does not have the detected disease (e.g., 1 minus the specificity, for a positive result without inconclusive results). The outcome without this risk takes the remaining probability."@en ,
+                                       "Lo probable que es un resultado de una estrategia de detección para un individuo que no tiene la enfermedad detectada (p. ej., 1 menos la especificidad, para un resultado positivo sin resultados no concluyentes). El resultado sin este riesgo se lleva la probabilidad restante."@es ;
                           rdfs:label "has risk if not diseased"@en ,
                                      "tiene el riesgo si no está enfermo"@es .
 
@@ -280,7 +289,8 @@ osdi:hasStrategyOutcome rdf:type owl:ObjectProperty ;
                         owl:inverseOf osdi:isStrategyOutcomeOf ;
                         rdfs:domain osdi:Strategy ;
                         rdfs:range osdi:StrategyOutcome ;
-                        rdfs:comment "Defines the mutually exclusive outcomes of a strategy (see StrategyOutcome). It cannot be combined with the short forms failsIf (for any strategy) or hasSensitivity and hasSpecificity (for a detection strategy)."@en ;
+                        rdfs:comment "Defines the mutually exclusive outcomes of a strategy (see StrategyOutcome). It cannot be combined with the short forms failsIf (for any strategy) or hasSensitivity and hasSpecificity (for a detection strategy)."@en ,
+                                     "Define los resultados mutuamente excluyentes de una estrategia (ver StrategyOutcome). No puede combinarse con las formas abreviadas failsIf (para cualquier estrategia) o hasSensitivity y hasSpecificity (para una estrategia de detección)."@es ;
                         rdfs:label "has strategy outcome"@en ,
                                    "tiene el resultado de la estrategia"@es .
 
@@ -289,7 +299,8 @@ osdi:hasStrategyOutcome rdf:type owl:ObjectProperty ;
 osdi:isStrategyOutcomeOf rdf:type owl:ObjectProperty ;
                          rdfs:domain osdi:StrategyOutcome ;
                          rdfs:range osdi:Strategy ;
-                         rdfs:comment "Inverse of hasStrategyOutcome."@en ;
+                         rdfs:comment "Inverse of hasStrategyOutcome."@en ,
+                                      "Inversa de hasStrategyOutcome."@es ;
                          rdfs:label "is strategy outcome of"@en ,
                                     "es resultado de la estrategia"@es .
 
@@ -483,7 +494,8 @@ osdi:hasEffect rdf:type owl:ObjectProperty ;
 osdi:hasEffectMagnitude rdf:type owl:ObjectProperty ;
                         rdfs:domain osdi:Effect ;
                         rdfs:range osdi:Parameter ;
-                        rdfs:comment "Defines the parameter that defines the magnitude of the effect. The data item type of the magnitude defines how it is applied to each affected parameter or attribute (x) in a generic Effect: a factor (DI_Factor) or a ratio (DI_Ratio) multiplies (x * m); a relative risk (DI_RelativeRisk) or a hazard ratio (DI_HazardRatio) on a probability multiplies the equivalent constant rate, i.e., 1 - (1 - x)^m; a hazard ratio on a time to event without a distribution divides the mean time (x / m), assuming an exponential time; an odds ratio (DI_OddsRatio) on a probability multiplies the odds, i.e., x * m / (1 - x + x * m); a mean difference (DI_MeanDifference) is subtracted (x - m). Any other type is an absolute value that replaces the affected item; DI_Continuous_Variable always replaces, and a type that does not match the type of the affected item should produce a warning. A relative magnitude always modifies the affected item, even if both share the same type. Statistics of the uncertainty (standard deviation, confidence limits) are not valid magnitudes. Use DI_Factor instead of DI_RelativeRisk to multiply a probability linearly (e.g., when the relative risk and the probability come from the same source and period)."@en ;
+                        rdfs:comment "Defines the parameter that defines the magnitude of the effect. The data item type of the magnitude defines how it is applied to each affected parameter or attribute (x) in a generic Effect: a factor (DI_Factor) or a ratio (DI_Ratio) multiplies (x * m); a relative risk (DI_RelativeRisk) or a hazard ratio (DI_HazardRatio) on a probability multiplies the equivalent constant rate, i.e., 1 - (1 - x)^m; a hazard ratio on a time to event without a distribution divides the mean time (x / m), assuming an exponential time; an odds ratio (DI_OddsRatio) on a probability multiplies the odds, i.e., x * m / (1 - x + x * m); a mean difference (DI_MeanDifference) is subtracted (x - m). Any other type is an absolute value that replaces the affected item; DI_Continuous_Variable always replaces, and a type that does not match the type of the affected item should produce a warning. A relative magnitude always modifies the affected item, even if both share the same type. Statistics of the uncertainty (standard deviation, confidence limits) are not valid magnitudes. Use DI_Factor instead of DI_RelativeRisk to multiply a probability linearly (e.g., when the relative risk and the probability come from the same source and period)."@en ,
+                                     "Define el parámetro que define la magnitud del efecto. El tipo de dato de la magnitud define cómo se aplica a cada parámetro o atributo afectado (x) en un Effect genérico: un factor (DI_Factor) o una razón (DI_Ratio) multiplica (x * m); un riesgo relativo (DI_RelativeRisk) o un hazard ratio (DI_HazardRatio) sobre una probabilidad multiplica la tasa constante equivalente, es decir, 1 - (1 - x)^m; un hazard ratio sobre un tiempo hasta el evento sin distribución divide el tiempo medio (x / m), suponiendo un tiempo exponencial; una odds ratio (DI_OddsRatio) sobre una probabilidad multiplica la odds, es decir, x * m / (1 - x + x * m); una diferencia de medias (DI_MeanDifference) se resta (x - m). Cualquier otro tipo es un valor absoluto que sustituye al elemento afectado; DI_Continuous_Variable siempre sustituye, y un tipo que no coincida con el del elemento afectado debería producir un aviso. Una magnitud relativa siempre modifica el elemento afectado, aunque ambos compartan el mismo tipo. Los estadísticos de la incertidumbre (desviación estándar, límites de confianza) no son magnitudes válidas. Usa DI_Factor en lugar de DI_RelativeRisk para multiplicar una probabilidad de forma lineal (p. ej., cuando el riesgo relativo y la probabilidad proceden de la misma fuente y periodo)."@es ;
                         rdfs:label "has magnitude effect"@en ,
                                    "tiene magnitud del efecto"@es .
 
@@ -740,7 +752,8 @@ osdi:hasRiskCharacterization rdf:type owl:ObjectProperty ;
                                                         osdi:Pathway
                                                       )
                                         ] ;
-                             rdfs:comment "Defines the risk characterization of a clinical progression element, which can be expressed as a parameter (e.g., relative risk) or as a pathway (e.g., a pathway that defines the events that lead to the occurrence of a certain manifestation). A development or chronic manifestation without risk characterization that does not belong to a group of two or more alternative progressions (i.e., not affected by any combination rule, affected by a coexistent rule, or by an alternative rule with a single member) is always active in its context: it applies from the start, and a manifestation without risk that depends on a development (hasSubProgression) is active whenever such development is active. Within a group of two or more alternative progressions, the progression without risk (at most one, and only if the group has no null progression) takes the remaining probability (1 minus the sum of the rest). Both decision trees and discrete-event simulations should interpret progressions without risk in this way. For an adverse event, the risk is mandatory and is a probability per application of the strategy that causes it (or a time to event in a simulation)."@en ;
+                             rdfs:comment "Defines the risk characterization of a clinical progression element, which can be expressed as a parameter (e.g., relative risk) or as a pathway (e.g., a pathway that defines the events that lead to the occurrence of a certain manifestation). A development or chronic manifestation without risk characterization that does not belong to a group of two or more alternative progressions (i.e., not affected by any combination rule, affected by a coexistent rule, or by an alternative rule with a single member) is always active in its context: it applies from the start, and a manifestation without risk that depends on a development (hasSubProgression) is active whenever such development is active. Within a group of two or more alternative progressions, the progression without risk (at most one, and only if the group has no null progression) takes the remaining probability (1 minus the sum of the rest). Both decision trees and discrete-event simulations should interpret progressions without risk in this way. For an adverse event, the risk is mandatory and is a probability per application of the strategy that causes it (or a time to event in a simulation)."@en ,
+                                          "Define la caracterización del riesgo de un elemento de progresión clínica, que puede expresarse como un parámetro (p. ej., un riesgo relativo) o como una vía (p. ej., una vía que define los eventos que llevan a la aparición de cierta manifestación). Un desarrollo o una manifestación crónica sin caracterización del riesgo que no pertenece a un grupo de dos o más progresiones alternativas (es decir, no afectado por ninguna regla de combinación, afectado por una regla de coexistencia, o por una regla de alternativas con un solo miembro) está siempre activo en su contexto: se aplica desde el inicio, y una manifestación sin riesgo que depende de un desarrollo (hasSubProgression) está activa siempre que ese desarrollo lo esté. Dentro de un grupo de dos o más progresiones alternativas, la progresión sin riesgo (como mucho una, y solo si el grupo no tiene progresión nula) se lleva la probabilidad restante (1 menos la suma del resto). Tanto los árboles de decisión como las simulaciones de eventos discretos deberían interpretar así las progresiones sin riesgo. Para un efecto adverso, el riesgo es obligatorio y es una probabilidad por aplicación de la estrategia que lo provoca (o un tiempo hasta el evento en una simulación)."@es ;
                              rdfs:label "has risk characterization"@en ,
                                         "tiene la caracterización de riesgo"@es ;
                              osdi:TODO "Check if this is the best name for the property" .
@@ -751,7 +764,8 @@ osdi:hasSensitivity rdf:type owl:ObjectProperty ;
                     rdfs:subPropertyOf osdi:hasParameter ;
                     rdfs:domain osdi:DetectionStrategy ;
                     rdfs:range osdi:Parameter ;
-                    rdfs:comment "The Sensitivity in epidemiology is the Probability of correctly classifying a sick individual, that is, the Probability that a positive result will be obtained in a diagnostic test for a sick subject. The Sensitivity is, therefore, the ability of the complementary test to detect the disease. Sensitivity is the percentage of true positives or the Probability that the test is positive if the disease is present; False negatives are sick subjects diagnosed as healthy. In a detection strategy, hasSensitivity and hasSpecificity are the short form of two outcomes: a PositiveDetectionOutcome (followed by the followedByStrategy of the strategy, if any) and a NegativeDetectionOutcome. They cannot be combined with hasStrategyOutcome." ;
+                    rdfs:comment "The Sensitivity in epidemiology is the Probability of correctly classifying a sick individual, that is, the Probability that a positive result will be obtained in a diagnostic test for a sick subject. The Sensitivity is, therefore, the ability of the complementary test to detect the disease. Sensitivity is the percentage of true positives or the Probability that the test is positive if the disease is present; False negatives are sick subjects diagnosed as healthy. In a detection strategy, hasSensitivity and hasSpecificity are the short form of two outcomes: a PositiveDetectionOutcome (followed by the followedByStrategy of the strategy, if any) and a NegativeDetectionOutcome. They cannot be combined with hasStrategyOutcome."@en ,
+                                 "En epidemiología, la sensibilidad es la probabilidad de clasificar correctamente a un individuo enfermo, es decir, la probabilidad de obtener un resultado positivo en una prueba diagnóstica para un sujeto enfermo. La sensibilidad es, por tanto, la capacidad de la prueba complementaria para detectar la enfermedad. La sensibilidad es el porcentaje de verdaderos positivos o la probabilidad de que la prueba sea positiva si la enfermedad está presente; los falsos negativos son sujetos enfermos diagnosticados como sanos. En una estrategia de detección, hasSensitivity y hasSpecificity son la forma abreviada de dos resultados: un PositiveDetectionOutcome (seguido del followedByStrategy de la estrategia, si lo hay) y un NegativeDetectionOutcome. No pueden combinarse con hasStrategyOutcome."@es ;
                     rdfs:label "has sensitivity"@en ,
                                "tiene la sensibilidad"@es .
 
@@ -774,7 +788,8 @@ osdi:hasSpecificity rdf:type owl:ObjectProperty ;
                     rdfs:subPropertyOf osdi:hasParameter ;
                     rdfs:domain osdi:DetectionStrategy ;
                     rdfs:range osdi:Parameter ;
-                    rdfs:comment "The Specificity of a test is the Probability that a healthy subject will have a negative test result. Specificity is the percentage of true negatives or the Probability that the test will be negative if the disease is not present. False positives are healthy subjects diagnosed as sick. In a detection strategy, hasSensitivity and hasSpecificity are the short form of two outcomes (see hasSensitivity)." ;
+                    rdfs:comment "The Specificity of a test is the Probability that a healthy subject will have a negative test result. Specificity is the percentage of true negatives or the Probability that the test will be negative if the disease is not present. False positives are healthy subjects diagnosed as sick. In a detection strategy, hasSensitivity and hasSpecificity are the short form of two outcomes (see hasSensitivity)."@en ,
+                                 "La especificidad de una prueba es la probabilidad de que un sujeto sano tenga un resultado negativo. La especificidad es el porcentaje de verdaderos negativos o la probabilidad de que la prueba sea negativa si la enfermedad no está presente. Los falsos positivos son sujetos sanos diagnosticados como enfermos. En una estrategia de detección, hasSensitivity y hasSpecificity son la forma abreviada de dos resultados (ver hasSensitivity)."@es ;
                     rdfs:label "has specificity"@en ,
                                "tiene la especificidad"@es .
 
@@ -810,7 +825,8 @@ osdi:hasStrategy rdf:type owl:ObjectProperty ;
                                             ]
                                           )
                             ] ;
-                 rdfs:comment "Defines a relationship between a health condition or strategy and a strategy, which can be either a simple strategy or a group of strategies. This property allows us to define the strategies that are applied to a health condition or strategy, as well as the strategies that are part of a group of strategies. Interventions do not declare strategies directly: they replace the strategies of a health condition through a StrategyReplacementEffect."@en ;
+                 rdfs:comment "Defines a relationship between a health condition or strategy and a strategy, which can be either a simple strategy or a group of strategies. This property allows us to define the strategies that are applied to a health condition or strategy, as well as the strategies that are part of a group of strategies. Interventions do not declare strategies directly: they replace the strategies of a health condition through a StrategyReplacementEffect."@en ,
+                              "Define una relación entre una condición de salud o estrategia y una estrategia, que puede ser una estrategia simple o un grupo de estrategias. Esta propiedad permite definir las estrategias que se aplican a una condición de salud o estrategia, así como las estrategias que forman parte de un grupo de estrategias. Las intervenciones no declaran estrategias directamente: sustituyen las estrategias de una condición de salud mediante un StrategyReplacementEffect."@es ;
                  rdfs:label "has strategy"@en ,
                             "tiene la estrategia"@es .
 
@@ -946,7 +962,8 @@ osdi:isAffectedBy rdf:type owl:ObjectProperty ;
                                             )
                               ] ;
                   rdfs:range osdi:Effect ;
-                  rdfs:comment "Defines a relationship between an attribute, parameter or health condition and an effect, indicating that it is affected by that effect. A health condition can only be affected by a StrategyReplacementEffect."@en ;
+                  rdfs:comment "Defines a relationship between an attribute, parameter or health condition and an effect, indicating that it is affected by that effect. A health condition can only be affected by a StrategyReplacementEffect."@en ,
+                               "Define una relación entre un atributo, parámetro o condición de salud y un efecto, indicando que se ve afectado por ese efecto. Una condición de salud solo puede verse afectada por un StrategyReplacementEffect."@es ;
                   rdfs:label "es modificado por"@es ,
                              "is modified by"@en .
 
@@ -995,7 +1012,8 @@ osdi:isDataItemTypeOf rdf:type owl:ObjectProperty ;
 osdi:isDetectedBy rdf:type owl:ObjectProperty ;
                   rdfs:domain osdi:Disease ;
                   rdfs:range osdi:DetectionStrategy ;
-                  rdfs:comment "Defines a relationship between a disease and a detection strategy, indicating that such strategy is used to identify the disease."@en ;
+                  rdfs:comment "Defines a relationship between a disease and a detection strategy, indicating that such strategy is used to identify the disease."@en ,
+                               "Define una relación entre una enfermedad y una estrategia de detección, indicando que esa estrategia se usa para identificar la enfermedad."@es ;
                   rdfs:label "es detectado por"@es ,
                              "is detected by"@en .
 
@@ -1125,7 +1143,8 @@ osdi:isRiskCharacterizationOf rdf:type owl:ObjectProperty ;
                                                          osdi:ClinicalProgressionElement
                                                        )
                                          ] ;
-                              rdfs:comment "Defines a relationship between a risk characterization and a clinical progression element or an adverse event, indicating that the characterization applies to that element."@en ;
+                              rdfs:comment "Defines a relationship between a risk characterization and a clinical progression element or an adverse event, indicating that the characterization applies to that element."@en ,
+                                           "Define una relación entre una caracterización del riesgo y un elemento de progresión clínica o un efecto adverso, indicando que la caracterización se aplica a ese elemento."@es ;
                               rdfs:label "es caracterización de riesgo de"@es ,
                                          "is risk characterization of"@en .
 
@@ -1304,7 +1323,8 @@ osdi:appliesOneTime rdf:type owl:DatatypeProperty ,
                                               )
                                 ] ;
                     rdfs:range xsd:boolean ;
-                    rdfs:comment "Defines the temporal behavior of a parameter (generally a cost or utility): if true, applies upon onset of some model item (disease, disease progression...); otherwise, it is assumed to apply annually. Per-episode utilities are one-time QALY losses, which are added when a strategy or an outcome of a strategy (StrategyOutcome) is applied, or when a manifestation appears. The costs and utilities of an outcome of a strategy apply once."@en ;
+                    rdfs:comment "Defines the temporal behavior of a parameter (generally a cost or utility): if true, applies upon onset of some model item (disease, disease progression...); otherwise, it is assumed to apply annually. Per-episode utilities are one-time QALY losses, which are added when a strategy or an outcome of a strategy (StrategyOutcome) is applied, or when a manifestation appears. The costs and utilities of an outcome of a strategy apply once."@en ,
+                                 "Define el comportamiento temporal de un parámetro (en general, un coste o una utilidad): si es verdadero, se aplica al aparecer algún elemento del modelo (enfermedad, progresión de la enfermedad...); en otro caso, se supone que se aplica anualmente. Las utilidades por episodio son pérdidas de AVAC de una vez, que se suman cuando se aplica una estrategia o un resultado de una estrategia (StrategyOutcome), o cuando aparece una manifestación. Los costes y utilidades de un resultado de una estrategia se aplican una vez."@es ;
                     rdfs:label "applies one time"@en ,
                                "se aplica una única vez"@es .
 
@@ -1429,7 +1449,8 @@ osdi:resolvesHealthCondition rdf:type owl:DatatypeProperty ,
                                       owl:FunctionalProperty ;
                              rdfs:domain osdi:TreatmentOutcome ;
                              rdfs:range xsd:boolean ;
-                             rdfs:comment "Whether an outcome of a strategy resolves the health condition in whose context the strategy is applied (false if not defined). For an acute manifestation, it ends the episode. For a chronic health condition, it is a cure: its annual payoffs and effects stop when the outcome happens (see hasEvaluationTime)."@en ;
+                             rdfs:comment "Whether an outcome of a strategy resolves the health condition in whose context the strategy is applied (false if not defined). For an acute manifestation, it ends the episode. For a chronic health condition, it is a cure: its annual payoffs and effects stop when the outcome happens (see hasEvaluationTime)."@en ,
+                                          "Si un resultado de una estrategia resuelve la condición de salud en cuyo contexto se aplica la estrategia (falso si no se define). Para una manifestación aguda, termina el episodio. Para una condición de salud crónica, es una curación: sus pagos anuales y sus efectos se detienen cuando ocurre el resultado (ver hasEvaluationTime)."@es ;
                              rdfs:label "resolves health condition"@en ,
                                         "resuelve la condición de salud"@es .
 
@@ -1439,7 +1460,8 @@ osdi:resolvesOnSuccess rdf:type owl:DatatypeProperty ,
                                 owl:FunctionalProperty ;
                        rdfs:domain osdi:Strategy ;
                        rdfs:range xsd:boolean ;
-                       rdfs:comment "Short form (see failsIf): whether the success of a strategy resolves the health condition (see resolvesHealthCondition)."@en ;
+                       rdfs:comment "Short form (see failsIf): whether the success of a strategy resolves the health condition (see resolvesHealthCondition)."@en ,
+                                    "Forma abreviada (ver failsIf): si el éxito de una estrategia resuelve la condición de salud (ver resolvesHealthCondition)."@es ;
                        rdfs:label "resolves on success"@en ,
                                   "resuelve en caso de éxito"@es .
 
@@ -1811,7 +1833,8 @@ osdi:isDisutility rdf:type owl:DatatypeProperty ,
                            owl:FunctionalProperty ;
                   rdfs:domain osdi:Utility ;
                   rdfs:range xsd:boolean ;
-                  rdfs:comment "Indicates whether a utility parameter represents a disutility or a utility. A utility u (isDisutility = false) of a progression, the disease or an intervention is equivalent to a disutility of (base utility of the population - u), so the patient gets exactly u if it is the only one active. The converted value is combined with the rest of disutilities by using the disutility combination method of the experiment (hasDisutilityCombinationMethod). This applies both to annual and one-time utilities, and assumes that the utility was measured in a population with the same base utility as that of the model. A one-time disutility is a loss of QALYs per episode, added when a strategy or an outcome of a strategy is applied, or when a manifestation appears."@en ;
+                  rdfs:comment "Indicates whether a utility parameter represents a disutility or a utility. A utility u (isDisutility = false) of a progression, the disease or an intervention is equivalent to a disutility of (base utility of the population - u), so the patient gets exactly u if it is the only one active. The converted value is combined with the rest of disutilities by using the disutility combination method of the experiment (hasDisutilityCombinationMethod). This applies both to annual and one-time utilities, and assumes that the utility was measured in a population with the same base utility as that of the model. A one-time disutility is a loss of QALYs per episode, added when a strategy or an outcome of a strategy is applied, or when a manifestation appears."@en ,
+                               "Indica si un parámetro de utilidad representa una desutilidad o una utilidad. Una utilidad u (isDisutility = false) de una progresión, la enfermedad o una intervención equivale a una desutilidad de (utilidad basal de la población - u), de modo que el paciente obtiene exactamente u si es la única activa. El valor convertido se combina con el resto de desutilidades mediante el método de combinación de desutilidades del experimento (hasDisutilityCombinationMethod). Esto se aplica tanto a las utilidades anuales como a las de una vez, y supone que la utilidad se midió en una población con la misma utilidad basal que la del modelo. Una desutilidad de una vez es una pérdida de AVAC por episodio, que se suma cuando se aplica una estrategia o un resultado de una estrategia, o cuando aparece una manifestación."@es ;
                   rdfs:label "es una desutilidad"@es ,
                              "is disutility"@en .
 
@@ -1838,7 +1861,8 @@ osdi:AcuteManifestation rdf:type owl:Class ;
                                           owl:allValuesFrom osdi:Parameter
                                         ] ;
                         owl:disjointWith osdi:ClinicalProgressionWithInitialProportion ;
-                        rdfs:comment "Sudden or rapid appearance of clinical signs or symtoms, in general with a short and intense course. Its costs and utilities apply per episode, so they should be one-time (appliesOneTime = true); a one-time utility is a loss of QALYs. In a decision tree, an acute manifestation represents a single episode between the initial age of the population and death: its risk characterization is the probability that the episode happens, and, as for any other progression, an acute manifestation without risk always happens in its context. A decision tree ignores the frequency (hasFrequency) of an acute manifestation that defines a risk, and cannot represent one that only defines a frequency. Annual costs and utilities of an acute manifestation are ignored both in decision trees and in discrete-event simulations."@en ;
+                        rdfs:comment "Sudden or rapid appearance of clinical signs or symtoms, in general with a short and intense course. Its costs and utilities apply per episode, so they should be one-time (appliesOneTime = true); a one-time utility is a loss of QALYs. In a decision tree, an acute manifestation represents a single episode between the initial age of the population and death: its risk characterization is the probability that the episode happens, and, as for any other progression, an acute manifestation without risk always happens in its context. A decision tree ignores the frequency (hasFrequency) of an acute manifestation that defines a risk, and cannot represent one that only defines a frequency. Annual costs and utilities of an acute manifestation are ignored both in decision trees and in discrete-event simulations."@en ,
+                                     "Aparición súbita o rápida de signos o síntomas clínicos, en general con un curso corto e intenso. Sus costes y utilidades se aplican por episodio, así que deberían ser de una vez (appliesOneTime = true); una utilidad de una vez es una pérdida de AVAC. En un árbol de decisión, una manifestación aguda representa un único episodio entre la edad inicial de la población y la muerte: su caracterización del riesgo es la probabilidad de que ocurra el episodio y, como cualquier otra progresión, una manifestación aguda sin riesgo ocurre siempre en su contexto. Un árbol de decisión ignora la frecuencia (hasFrequency) de una manifestación aguda que define un riesgo, y no puede representar una que solo define una frecuencia. Los costes y utilidades anuales de una manifestación aguda se ignoran tanto en los árboles de decisión como en las simulaciones de eventos discretos."@es ;
                         rdfs:label "Acute manifestation"@en ,
                                    "Manifestación aguda"@es .
 
@@ -2312,7 +2336,8 @@ osdi:DiagnosisIntervention rdf:type owl:Class ;
                                                ] ;
                            rdfs:subClassOf osdi:DetectionIntervention ;
                            owl:disjointWith osdi:ScreeningIntervention ;
-                           rdfs:comment "An intervention intended to establish the presence/absence of certain disease or condition. The detection strategies of its arm are those of the disease, unless it replaces them through a StrategyReplacementEffect."@en ;
+                           rdfs:comment "An intervention intended to establish the presence/absence of certain disease or condition. The detection strategies of its arm are those of the disease, unless it replaces them through a StrategyReplacementEffect."@en ,
+                                        "Una intervención destinada a establecer la presencia o ausencia de cierta enfermedad o condición. Las estrategias de detección de su brazo son las de la enfermedad, salvo que las sustituya mediante un StrategyReplacementEffect."@es ;
                            rdfs:label "Diagnosis intervention"@en ,
                                       "Intervención diagnóstica"@es .
 
@@ -2424,7 +2449,8 @@ osdi:Effect rdf:type owl:Class ;
                               owl:onProperty osdi:hasUtility ;
                               owl:allValuesFrom osdi:Utility
                             ] ;
-            rdfs:comment "An effect of a treatment or intervention. It applies its magnitude (hasEffectMagnitude) to the parameters or attributes it affects (affects). The subclasses define how the magnitude is applied (an instant death effect sets a probability of death, a life expectancy reduction effect subtracts years of life and an increased mortality rate effect multiplies the mortality rate), and a strategy replacement effect replaces the strategies of a health condition (see StrategyReplacementEffect); for a generic effect, the data item type of the magnitude defines the operation (see hasEffectMagnitude). When several effects modify the same parameter, the order is decided by the application; the suggested order is: first replace, then multiply (linear factors, then ratios of rates, then odds ratios) and finally subtract. At most one effect should replace the same parameter."@en ;
+            rdfs:comment "An effect of a treatment or intervention. It applies its magnitude (hasEffectMagnitude) to the parameters or attributes it affects (affects). The subclasses define how the magnitude is applied (an instant death effect sets a probability of death, a life expectancy reduction effect subtracts years of life and an increased mortality rate effect multiplies the mortality rate), and a strategy replacement effect replaces the strategies of a health condition (see StrategyReplacementEffect); for a generic effect, the data item type of the magnitude defines the operation (see hasEffectMagnitude). When several effects modify the same parameter, the order is decided by the application; the suggested order is: first replace, then multiply (linear factors, then ratios of rates, then odds ratios) and finally subtract. At most one effect should replace the same parameter."@en ,
+                         "Un efecto de un tratamiento o intervención. Aplica su magnitud (hasEffectMagnitude) a los parámetros o atributos a los que afecta (affects). Las subclases definen cómo se aplica la magnitud (un efecto de muerte inmediata fija una probabilidad de muerte, un efecto de reducción de la esperanza de vida resta años de vida y un efecto de aumento de la tasa de mortalidad multiplica la tasa de mortalidad), y un efecto de sustitución de estrategias sustituye las estrategias de una condición de salud (ver StrategyReplacementEffect); en un efecto genérico, el tipo de dato de la magnitud define la operación (ver hasEffectMagnitude). Cuando varios efectos modifican el mismo parámetro, el orden lo decide la aplicación; el orden sugerido es: primero sustituir, después multiplicar (factores lineales, después razones de tasas y después odds ratios) y por último restar. Como mucho un efecto debería sustituir un mismo parámetro."@es ;
             rdfs:label "Efecto"@es ,
                        "Effect"@en .
 
@@ -2889,7 +2915,8 @@ osdi:Intervention rdf:type owl:Class ;
                                   ] ;
                   owl:disjointWith osdi:ModelItemDefiningDiseaseProgression ,
                                    osdi:ModelItemWithRiskCharacterization ;
-                  rdfs:comment "Some kind of treatment, drug, surgical procedure... used to modify the development of a Disease. In the context of this ontology, interventions are the comparing options in the decision-making process. Each intervention has exactly one target (isInterventionOf): the disease or an element of its progression."@en ;
+                  rdfs:comment "Some kind of treatment, drug, surgical procedure... used to modify the development of a Disease. In the context of this ontology, interventions are the comparing options in the decision-making process. Each intervention has exactly one target (isInterventionOf): the disease or an element of its progression."@en ,
+                               "Algún tipo de tratamiento, fármaco, procedimiento quirúrgico... usado para modificar el desarrollo de una enfermedad. En el contexto de esta ontología, las intervenciones son las opciones que se comparan en el proceso de toma de decisiones. Cada intervención tiene exactamente un objetivo (isInterventionOf): la enfermedad o un elemento de su progresión."@es ;
                   rdfs:label "Intervención"@es ,
                              "Intervention"@en .
 
@@ -3556,7 +3583,8 @@ osdi:ScreeningIntervention rdf:type owl:Class ;
                                                  rdf:type owl:Class
                                                ] ;
                            rdfs:subClassOf osdi:DetectionIntervention ;
-                           rdfs:comment "An intervention to identifiy the subset of population who may have certain disease or condition and require further testing to obtain a final diagnosis. A screening intervention declares its screening strategy through a StrategyReplacementEffect on the disease: its replacement (usually a group with the screening strategy and the confirmatory diagnosis strategy) replaces the detection strategies of the disease in its arm. The sensitivity, specificity and costs of the screening are those of the screening strategy."@en ;
+                           rdfs:comment "An intervention to identifiy the subset of population who may have certain disease or condition and require further testing to obtain a final diagnosis. A screening intervention declares its screening strategy through a StrategyReplacementEffect on the disease: its replacement (usually a group with the screening strategy and the confirmatory diagnosis strategy) replaces the detection strategies of the disease in its arm. The sensitivity, specificity and costs of the screening are those of the screening strategy."@en ,
+                                        "Una intervención para identificar el subconjunto de la población que puede tener cierta enfermedad o condición y requiere más pruebas para obtener un diagnóstico final. Una intervención de cribado declara su estrategia de cribado mediante un StrategyReplacementEffect sobre la enfermedad: su sustitución (normalmente un grupo con la estrategia de cribado y la estrategia de diagnóstico de confirmación) sustituye las estrategias de detección de la enfermedad en su brazo. La sensibilidad, la especificidad y los costes del cribado son los de la estrategia de cribado."@es ;
                            rdfs:label "Intervención de cribado"@es ,
                                       "Screening intervention"@en .
 
@@ -3742,7 +3770,8 @@ osdi:TreatmentOutcome rdf:type owl:Class ;
                                         owl:onClass osdi:Parameter
                                       ] ;
                       owl:disjointWith osdi:DetectionOutcome ;
-                      rdfs:comment "An outcome of a strategy that is not a detection strategy (e.g., a partial response, a discontinuation or a death caused by the treatment). Its risk (hasOutcomeRisk) is a probability per episode or a time to event; resolvesHealthCondition says whether it resolves the health condition. Categories without effect on the computations (e.g., complete or partial response) should be expressed with hasCategory."@en ;
+                      rdfs:comment "An outcome of a strategy that is not a detection strategy (e.g., a partial response, a discontinuation or a death caused by the treatment). Its risk (hasOutcomeRisk) is a probability per episode or a time to event; resolvesHealthCondition says whether it resolves the health condition. Categories without effect on the computations (e.g., complete or partial response) should be expressed with hasCategory."@en ,
+                                   "Un resultado de una estrategia que no es de detección (p. ej., una respuesta parcial, una interrupción o una muerte causada por el tratamiento). Su riesgo (hasOutcomeRisk) es una probabilidad por episodio o un tiempo hasta el evento; resolvesHealthCondition indica si resuelve la condición de salud. Las categorías sin efecto en los cálculos (p. ej., respuesta completa o parcial) deberían expresarse con hasCategory."@es ;
                       rdfs:label "Resultado de un tratamiento"@es ,
                                  "Treatment outcome"@en .
 
@@ -3751,7 +3780,8 @@ osdi:TreatmentOutcome rdf:type owl:Class ;
 osdi:SuccessOutcome rdf:type owl:Class ;
                     rdfs:subClassOf osdi:TreatmentOutcome ;
                     owl:disjointWith osdi:FailureOutcome ;
-                    rdfs:comment "The success of a strategy. In a simulation, if it does not define its own risk, it arrives with the duration of the health condition (hasDuration), modified by the effects. It is the outcome followed by followedOnSuccessBy in the short form (see failsIf)."@en ;
+                    rdfs:comment "The success of a strategy. In a simulation, if it does not define its own risk, it arrives with the duration of the health condition (hasDuration), modified by the effects. It is the outcome followed by followedOnSuccessBy in the short form (see failsIf)."@en ,
+                                 "El éxito de una estrategia. En una simulación, si no define su propio riesgo, llega con la duración de la condición de salud (hasDuration), modificada por los efectos. Es el resultado al que sigue followedOnSuccessBy en la forma abreviada (ver failsIf)."@es ;
                     rdfs:label "Éxito"@es ,
                                "Success outcome"@en .
 
@@ -3759,7 +3789,8 @@ osdi:SuccessOutcome rdf:type owl:Class ;
 ###  https://w3id.org/ontologies-ULL/OSDi#FailureOutcome
 osdi:FailureOutcome rdf:type owl:Class ;
                     rdfs:subClassOf osdi:TreatmentOutcome ;
-                    rdfs:comment "The failure of a strategy. It is the outcome generated by failsIf (with the risk of the parameter, or when the health condition appears) and followed by followedOnFailureBy in the short form."@en ;
+                    rdfs:comment "The failure of a strategy. It is the outcome generated by failsIf (with the risk of the parameter, or when the health condition appears) and followed by followedOnFailureBy in the short form."@en ,
+                                 "El fracaso de una estrategia. Es el resultado que genera failsIf (con el riesgo del parámetro, o cuando aparece la condición de salud) y al que sigue followedOnFailureBy en la forma abreviada."@es ;
                     rdfs:label "Fracaso"@es ,
                                "Failure outcome"@en .
 
@@ -3781,7 +3812,8 @@ osdi:DetectionOutcome rdf:type owl:Class ;
                                             osdi:NegativeDetectionOutcome
                                             osdi:PositiveDetectionOutcome
                                           ) ;
-                      rdfs:comment "An outcome of a detection strategy. Its probability depends on whether the individual has the detected disease, so it declares a risk for each case (hasRiskIfDiseased, hasRiskIfNotDiseased). In each case, the outcome without risk (at most one) takes the remaining probability."@en ;
+                      rdfs:comment "An outcome of a detection strategy. Its probability depends on whether the individual has the detected disease, so it declares a risk for each case (hasRiskIfDiseased, hasRiskIfNotDiseased). In each case, the outcome without risk (at most one) takes the remaining probability."@en ,
+                                   "Un resultado de una estrategia de detección. Su probabilidad depende de si el individuo tiene la enfermedad detectada, así que declara un riesgo para cada caso (hasRiskIfDiseased, hasRiskIfNotDiseased). En cada caso, el resultado sin riesgo (como mucho uno) se lleva la probabilidad restante."@es ;
                       rdfs:label "Detection outcome"@en ,
                                  "Resultado de una detección"@es .
 
@@ -3789,7 +3821,8 @@ osdi:DetectionOutcome rdf:type owl:Class ;
 ###  https://w3id.org/ontologies-ULL/OSDi#PositiveDetectionOutcome
 osdi:PositiveDetectionOutcome rdf:type owl:Class ;
                               rdfs:subClassOf osdi:DetectionOutcome ;
-                              rdfs:comment "A positive result of a detection strategy: the individual is detected (true positive if diseased, false positive otherwise). It is usually followed by a confirmatory diagnosis. When it is followed by a diagnosis strategy, the diagnosis confirms the result; when it is followed by another detection strategy (e.g., a second-tier test), the individual is tested again. Without its own followedByStrategy, it is followed by the followedByStrategy of its detection strategy, if any."@en ;
+                              rdfs:comment "A positive result of a detection strategy: the individual is detected (true positive if diseased, false positive otherwise). It is usually followed by a confirmatory diagnosis. When it is followed by a diagnosis strategy, the diagnosis confirms the result; when it is followed by another detection strategy (e.g., a second-tier test), the individual is tested again. Without its own followedByStrategy, it is followed by the followedByStrategy of its detection strategy, if any."@en ,
+                                           "Un resultado positivo de una estrategia de detección: el individuo es detectado (verdadero positivo si tiene la enfermedad, falso positivo en otro caso). Normalmente va seguido de un diagnóstico de confirmación. Si va seguido de una estrategia de diagnóstico, el diagnóstico confirma el resultado; si va seguido de otra estrategia de detección (p. ej., una prueba de segundo nivel), el individuo vuelve a someterse a una prueba. Sin su propio followedByStrategy, le sigue el followedByStrategy de su estrategia de detección, si lo hay."@es ;
                               rdfs:label "Positive detection outcome"@en ,
                                          "Resultado positivo de una detección"@es .
 
@@ -3797,7 +3830,8 @@ osdi:PositiveDetectionOutcome rdf:type owl:Class ;
 ###  https://w3id.org/ontologies-ULL/OSDi#NegativeDetectionOutcome
 osdi:NegativeDetectionOutcome rdf:type owl:Class ;
                               rdfs:subClassOf osdi:DetectionOutcome ;
-                              rdfs:comment "A negative result of a detection strategy: the individual is not detected (false negative if diseased, true negative otherwise)."@en ;
+                              rdfs:comment "A negative result of a detection strategy: the individual is not detected (false negative if diseased, true negative otherwise)."@en ,
+                                           "Un resultado negativo de una estrategia de detección: el individuo no es detectado (falso negativo si tiene la enfermedad, verdadero negativo en otro caso)."@es ;
                               rdfs:label "Negative detection outcome"@en ,
                                          "Resultado negativo de una detección"@es .
 
@@ -3809,7 +3843,8 @@ osdi:InconclusiveDetectionOutcome rdf:type owl:Class ;
                                                     owl:onProperty osdi:followedByStrategy ;
                                                     owl:someValuesFrom osdi:Strategy
                                                   ] ;
-                                  rdfs:comment "An inconclusive result of a detection strategy: the individual is not classified, so the outcome must be followed by another strategy (a repetition of the test, modeled as another strategy, or a different test)."@en ;
+                                  rdfs:comment "An inconclusive result of a detection strategy: the individual is not classified, so the outcome must be followed by another strategy (a repetition of the test, modeled as another strategy, or a different test)."@en ,
+                                               "Un resultado no concluyente de una estrategia de detección: el individuo no queda clasificado, así que el resultado debe ir seguido de otra estrategia (una repetición de la prueba, modelada como otra estrategia, o una prueba distinta)."@es ;
                                   rdfs:label "Inconclusive detection outcome"@en ,
                                              "Resultado no concluyente de una detección"@es .
 
@@ -4085,7 +4120,9 @@ osdi:DI_Generic_Utility rdf:type owl:NamedIndividual ,
 osdi:DI_HazardRatio rdf:type owl:NamedIndividual ,
                              osdi:DataItemType ;
                     osdi:hasDescription "The ratio of the hazard rates of an event in two groups" ;
-                    rdfs:comment "As the magnitude of an effect, it multiplies the rate equivalent to a probability (1 - (1 - p)^HR), or divides the mean of a time to event, which is assumed exponential if it has no distribution"@en ;
+                    osdi:hasRefToSTATO "http://purl.obolibrary.org/obo/STATO_0000677" ;
+                    rdfs:comment "As the magnitude of an effect, it multiplies the rate equivalent to a probability (1 - (1 - p)^HR), or divides the mean of a time to event, which is assumed exponential if it has no distribution"@en ,
+                                 "Como magnitud de un efecto, multiplica la tasa equivalente a una probabilidad (1 - (1 - p)^HR), o divide la media de un tiempo hasta el evento, que se supone exponencial si no tiene distribución"@es ;
                     rdfs:label "Hazard ratio"@en ,
                                "Razón de riesgos instantáneos"@es .
 
@@ -4120,7 +4157,9 @@ osdi:DI_MeanDifference rdf:type owl:NamedIndividual ,
 osdi:DI_OddsRatio rdf:type owl:NamedIndividual ,
                            osdi:DataItemType ;
                   osdi:hasDescription "The ratio of the odds of an event in two groups" ;
-                  rdfs:comment "As the magnitude of an effect, it multiplies the odds of a probability: p * OR / (1 - p + p * OR)"@en ;
+                  osdi:hasRefToSTATO "http://purl.obolibrary.org/obo/STATO_0000182" ;
+                  rdfs:comment "As the magnitude of an effect, it multiplies the odds of a probability: p * OR / (1 - p + p * OR)"@en ,
+                               "Como magnitud de un efecto, multiplica la odds de una probabilidad: p * OR / (1 - p + p * OR)"@es ;
                   rdfs:label "Odds ratio"@en ,
                              "Razón de odds"@es .
 

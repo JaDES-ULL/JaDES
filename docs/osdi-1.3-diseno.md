@@ -625,3 +625,8 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 **Pendiente:**
 - Publicar la 1.3 en el repositorio de OSDi y el PR de w3id (pasos 1 a 6 de `docs/osdi-1.3-traslado.md`).
 - Después, adoptar la 1.3 en JaDES (apartado 5): copia publicada, importaciones de las ontologías de prueba y de los ejemplos, test de la copia y CLAUDE.md. Necesita tu aprobación, porque queda fuera de `docs/` y `examples/`.
+
+**Pendientes de la ontología (2026-11-25):**
+- `OSDi.ttl` (aprobado; sin cambiar la versión): `hasRefToSTATO` de `DI_HazardRatio` (STATO_0000677, *hazard ratio*) y `DI_OddsRatio` (STATO_0000182, *odds ratio*), comprobados en OLS y no obsoletos. Resuelve el pendiente de la fase 2.
+- `OSDi.ttl`: comentario en español para los 37 términos nuevos o cambiados respecto a la 1.2 que solo lo tenían en inglés, con la terminología de los comentarios en español existentes (AVAC, forma abreviada, se lleva la probabilidad restante…). Los comentarios sin etiqueta de idioma de `hasSensitivity` y `hasSpecificity` pasan a `@en`. Comprobado con rdflib: ninguno de los 37 queda sin `@es`.
+- `docs/osdi-1.3-traslado.md`: los dos puntos salen de «Pendiente»; el apartado 1 y las notas de la versión los recogen.
