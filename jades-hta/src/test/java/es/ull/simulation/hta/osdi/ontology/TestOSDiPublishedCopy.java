@@ -58,7 +58,7 @@ public class TestOSDiPublishedCopy {
      * new version is published, its OSDi.ttl is copied unchanged into jades-hta/src/main/resources and its fingerprint is added here.
      */
     private static final Map<String, String> PUBLISHED_SHA256 = Map.of(
-        "1.3", "43d485e8bb4e3cc1a3fce0cb714fc3248678669a1e398a9aad9359647af0de7f");
+        "1.3", "dbae59c7ef1c2e08e38ae641bffec9f1e6be2572ccfe843509f852952dd8c765");
     /** The suffix of the versionInfo of a draft */
     private static final String DRAFT_SUFFIX = "-dev";
     /** The local copies of the ontologies imported by OSDi (see {@link OSDiWrapper}) */
@@ -68,6 +68,8 @@ public class TestOSDiPublishedCopy {
         "http://www.w3.org/2006/time#2016", "/time.owl");
     /** An import of some version of OSDi in a Turtle file */
     private static final Pattern OSDI_IMPORT = Pattern.compile("owl:imports\\s+<(" + Pattern.quote(OSDI_IRI) + "/[^>]*)>");
+    /** A mention of a version of OSDi in a comment, e.g., "Individuals for OSDi ontology, version 1.3" */
+    private static final Pattern OSDI_VERSION_MENTION = Pattern.compile("OSDi ontology, version (\\d+\\.\\d+(?:\\.\\d+)?)");
     /** The folders (relative to the module) with the ontologies that import OSDi */
     private static final List<String> IMPORTING_FOLDERS = List.of("src/test/resources", "examples");
 
@@ -140,9 +142,10 @@ public class TestOSDiPublishedCopy {
     }
 
     @Test
-    @DisplayName("Every test ontology and every example imports the version of the copy")
+    @DisplayName("Every test ontology and every example imports, and mentions, the version of the copy")
     void importsMatchTheCopy() throws IOException {
         final String versionIRI = getVersionIRI();
+        final String version = getBaseVersion();
         final List<String> wrong = new ArrayList<>();
         int count = 0;
         for (String folder : IMPORTING_FOLDERS) {
@@ -150,16 +153,22 @@ public class TestOSDiPublishedCopy {
             assertTrue(Files.isDirectory(dir), "Folder not found: " + dir.toAbsolutePath());
             try (Stream<Path> files = Files.walk(dir)) {
                 for (Path file : files.filter(p -> p.toString().endsWith(".ttl")).sorted().toList()) {
-                    final Matcher matcher = OSDI_IMPORT.matcher(Files.readString(file, StandardCharsets.UTF_8));
+                    final String content = Files.readString(file, StandardCharsets.UTF_8);
+                    final Matcher matcher = OSDI_IMPORT.matcher(content);
                     while (matcher.find()) {
                         count++;
                         if (!matcher.group(1).equals(versionIRI))
                             wrong.add(file + " imports " + matcher.group(1));
                     }
+                    final Matcher mention = OSDI_VERSION_MENTION.matcher(content);
+                    while (mention.find()) {
+                        if (!mention.group(1).equals(version))
+                            wrong.add(file + " mentions OSDi version " + mention.group(1));
+                    }
                 }
             }
         }
         assertTrue(count > 0, "No ontology imports OSDi");
-        assertTrue(wrong.isEmpty(), "Imports that do not match the version of the copy (" + versionIRI + "):\n" + String.join("\n", wrong));
+        assertTrue(wrong.isEmpty(), "Imports or mentions that do not match the version of the copy (" + versionIRI + "):\n" + String.join("\n", wrong));
     }
 }

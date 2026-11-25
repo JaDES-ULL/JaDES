@@ -8,7 +8,7 @@ Decidido el 2026-11-25: el repositorio de OSDi es la referencia y JaDES usa una 
 
 **Método.** Comparación semántica (rdflib) entre `OSDi.ttl` del repositorio de OSDi en el commit de la publicación de la 1.2 (`1d424a5`) y la copia actual de `jades-hta`. Se compara cada entidad con nombre con todas sus tripletas, expandiendo los nodos anónimos (restricciones, uniones, listas). La copia de `jades-hta` justo antes de la fase 2 (`646cba0~1`) es idéntica a la 1.2 publicada, así que las diferencias son exactamente las de las fases 2 a 18.
 
-**Resultado.** 65 entidades distintas: 27 nuevas y 38 cambiadas. No se ha eliminado ninguna entidad. La cabecera (`owl:Ontology`) declara desde el 2026-11-25 `owl:versionIRI <…/OSDi/1.3>`, `owl:versionInfo "1.3"` y `owl:priorVersion <…/OSDi/1.2>` (apartado 5).
+**Resultado.** 65 entidades distintas por las decisiones de las fases 2 a 18: 27 nuevas y 38 cambiadas. No se ha eliminado ninguna entidad. Con la traducción de los comentarios (apartado «Sin decisión numerada»), la comparación con la 1.2 da 27 entidades nuevas y 199 cambiadas; las 161 de más solo cambian sus comentarios, salvo las correcciones que se indican allí. La cabecera (`owl:Ontology`) declara desde el 2026-11-25 `owl:versionIRI <…/OSDi/1.3>`, `owl:versionInfo "1.3"` y `owl:priorVersion <…/OSDi/1.2>` (apartado 5).
 
 Cada entidad aparece en la decisión que la cambió; si la cambiaron varias, en la principal, con referencia a las demás.
 
@@ -74,7 +74,14 @@ Ningún cambio en la ontología.
 ### Sin decisión numerada
 
 - **Horizonte temporal (fase 11).** Comentario de `hasTimeHorizon` (inglés y español).
-- **Comentarios en español (2026-11-25).** Los 37 términos nuevos o con el comentario cambiado que solo lo tenían en inglés tienen ahora también el español. `hasSensitivity` y `hasSpecificity` tenían el comentario sin etiqueta de idioma; ahora lleva `@en`. Los términos que no cambian respecto a la 1.2 conservan sus comentarios sin traducir.
+- **Comentarios en español (2026-11-25).** Los 37 términos nuevos o con el comentario cambiado que solo lo tenían en inglés tienen ahora también el español. `hasSensitivity` y `hasSpecificity` tenían el comentario sin etiqueta de idioma; ahora lleva `@en`. Después, todas las clases y propiedades de OSDi tienen comentario en inglés y en español (2026-11-25):
+  - 165 comentarios traducidos.
+  - `DiagnosisStrategy`, `LineOfTherapy` y `Strategy` tenían el comentario en inglés etiquetado como `@es`; ahora llevan `@en`, más su traducción.
+  - `AlternativeCombinationRule`, `CoexistentCombinationRule`, `hasTemporaryThreshold` y `hasYear` tenían el comentario sin etiqueta de idioma; ahora llevan `@en`.
+  - Nuevos comentarios de `isAssessedInterventionOf` e `isComparatorInterventionOf` (inversas de `hasAssessedIntervention` y `hasComparatorIntervention`).
+  - Erratas del inglés: `AgentBasedModel`, `AcuteManifestation`, `ScreeningIntervention`, `GammaDistributionExpression`, `MeasuredDataItemType`, `ProbabilityDistributionExpression`, `RareDisease`, `UniformDistributionExpression`, `usesSameModelItemsAs` y «which value» → «whose value» en los parámetros.
+  - Errores de copia y pega: `GroupableModelItemWithProportion` tenía la etiqueta y el comentario de `GroupableModelItem` (ahora «Groupable model item with proportion» / «Elemento del modelo agrupable con proporción»); el comentario de `isGroupItemOf` hablaba de estrategias (ahora: pertenece a un grupo, inversa de `hasGroupItem`); el de `isStrategyOf`, inversa de `hasStrategy`, hablaba de una ruta (ahora remite a `hasStrategy`).
+  - Quedan sin comentario ni etiqueta las tres propiedades de anotación del espacio de nombres de OSDi (`osdi:TODO`, `osdi:creator`, `osdi:contributor`) y, entre los individuos, 51 sin comentario y 20 sin etiquetas.
 - **Evans et al. (fase 12).** Nuevo individuo `Currency_CanadianDollar`; comentario de `hasProportionWithinGroup` (proporción de una estrategia dentro de un grupo de alternativas; añade el español).
 
 ## 2. Ejemplos para el repositorio de OSDi
@@ -205,6 +212,7 @@ Los individuos del ejemplo son `…/OSDi#EVANS_…`. El fragmento no llega al se
 > - **Detection**: `detects`, `hasSensitivity`, `hasSpecificity` and `hasTemporaryThreshold` belong to detection strategies, not to interventions. The disease detected by a detection intervention is its target.
 > - **Payoffs per episode**: one-time utilities are QALY losses (a negative loss is a gain); the costs and utilities of an acute manifestation apply per episode.
 > - New currency `Currency_CanadianDollar`, and clarified comments of `hasTimeHorizon`, `hasFrequency`, `hasDuration`, `appliesOneTime`, `isDisutility` and `hasProportionWithinGroup`.
+> - Every class and property has its comment in English and Spanish, with some spelling fixes; `GroupableModelItemWithProportion` gets its own label and comment.
 >
 > ### Breaking changes
 >
@@ -246,7 +254,7 @@ En lugar de copiar a JaDES la versión ya publicada, se hace al revés: JaDES de
 2. Todas las ontologías de prueba (`jades-hta/src/test/resources/*.ttl`) y el ejemplo importan `<https://w3id.org/ontologies-ULL/OSDi/1.3>`.
 3. `TestOSDiPublishedCopy` comprueba:
    - la cabecera: la versión coincide con `owl:versionInfo` y hay un único `owl:priorVersion`;
-   - la huella SHA-256 de la copia, con finales de línea LF, contra la registrada para su versión (1.3: `43d485e8bb4e3cc1a3fce0cb714fc3248678669a1e398a9aad9359647af0de7f`); un borrador (`-dev`) omite esta comprobación;
+   - la huella SHA-256 de la copia, con finales de línea LF, contra la registrada para su versión (1.3: `dbae59c7ef1c2e08e38ae641bffec9f1e6be2572ccfe843509f852952dd8c765`); un borrador (`-dev`) omite esta comprobación;
    - que todas las ontologías de prueba y los ejemplos importan la versión de la copia.
 4. CLAUDE.md recoge la versión 1.3 y la regla de la opción A.
 

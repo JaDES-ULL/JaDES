@@ -640,3 +640,9 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
   - todas las importaciones de OSDi apuntan a la versión de la copia.
   Comprobado alterando un comentario de la copia y la importación de `BD.ttl`: fallan las dos comprobaciones, con mensajes que dicen qué hacer.
 - CLAUDE.md (versión 1.3 y la regla de la opción A), `docs/osdi-1.3-traslado.md` (apartado 5 y los pasos de publicación) y el `README.md` de Evans.
+
+**Antes del traslado (2026-11-25):**
+- Los comentarios de las ontologías de prueba decían «Individuals for OSDi ontology, version 1.2»: ahora dicen 1.3. `TestOSDiPublishedCopy` comprueba también que esas menciones coinciden con la versión de la copia.
+- `OSDi.ttl`: todas las clases y propiedades tienen comentario en inglés y en español. Se tradujeron 165 comentarios, se corrigieron etiquetas de idioma, erratas y tres errores evidentes (`GroupableModelItemWithProportion`, `isGroupItemOf`, `isStrategyOf`), y se añadieron los comentarios de `isAssessedInterventionOf` e `isComparatorInterventionOf`. Detalle en el apartado 1 de `docs/osdi-1.3-traslado.md`.
+- Señalado sin cambiar: `hasLambdaParameter` dice que lambda es la forma de la gamma, pero `GammaDistributionExpression` dice que es la escala.
+- Nueva huella de la 1.3 en `TestOSDiPublishedCopy`.
