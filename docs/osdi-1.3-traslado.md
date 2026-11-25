@@ -1,6 +1,6 @@
 # Traslado de OSDi 1.3 desde jades-hta
 
-Fase 19 de `docs/osdi-1.3-diseno.md` (2026-11-25). Prepara el paso de la copia de OSDi de `jades-hta` (`jades-hta/src/main/resources/OSDi.ttl`) al repositorio de OSDi como versión 1.3, con sus ejemplos de validación. Nada fuera de `docs/` y `jades-hta/examples/` ha cambiado.
+Fase 19 de `docs/osdi-1.3-diseno.md` (2026-11-25). Prepara el paso de la copia de OSDi de `jades-hta` (`jades-hta/src/main/resources/OSDi.ttl`) al repositorio de OSDi como versión 1.3, con sus ejemplos de validación. Durante la fase 19 solo cambiaron `docs/` y `jades-hta/examples/`; después, con tu aprobación, la ontología (comentarios en español y códigos de STATO) y la adopción de la 1.3 en JaDES (apartado 5).
 
 Decidido el 2026-11-25: el repositorio de OSDi es la referencia y JaDES usa una copia de una versión publicada (apartado 5); los ejemplos se publican con el flujo de OSDi y reglas nuevas de w3id (apartado 2).
 
@@ -8,7 +8,7 @@ Decidido el 2026-11-25: el repositorio de OSDi es la referencia y JaDES usa una 
 
 **Método.** Comparación semántica (rdflib) entre `OSDi.ttl` del repositorio de OSDi en el commit de la publicación de la 1.2 (`1d424a5`) y la copia actual de `jades-hta`. Se compara cada entidad con nombre con todas sus tripletas, expandiendo los nodos anónimos (restricciones, uniones, listas). La copia de `jades-hta` justo antes de la fase 2 (`646cba0~1`) es idéntica a la 1.2 publicada, así que las diferencias son exactamente las de las fases 2 a 18.
 
-**Resultado.** 65 entidades distintas: 27 nuevas y 38 cambiadas. No se ha eliminado ninguna entidad. La cabecera (`owl:Ontology`) no ha cambiado: sigue declarando `owl:versionIRI <…/OSDi/1.2>` y `owl:versionInfo "1.2"`.
+**Resultado.** 65 entidades distintas: 27 nuevas y 38 cambiadas. No se ha eliminado ninguna entidad. La cabecera (`owl:Ontology`) declara desde el 2026-11-25 `owl:versionIRI <…/OSDi/1.3>`, `owl:versionInfo "1.3"` y `owl:priorVersion <…/OSDi/1.2>` (apartado 5).
 
 Cada entidad aparece en la decisión que la cambió; si la cambiaron varias, en la principal, con referencia a las demás.
 
@@ -99,7 +99,7 @@ GitHub Pages sirve los `.md` sin convertirlos a HTML, y el repositorio de OSDi n
 - `evans1997-migraine/catalog-v001.xml` resuelve `https://w3id.org/ontologies-ULL/OSDi/1.3` con `../../OSDi.ttl` (la raíz del repositorio de OSDi).
 - La ontología del ejemplo tiene como IRI `https://w3id.org/ontologies-ULL/OSDi/examples/evans1997-migraine` (la última versión) y como `owl:versionIRI` `https://w3id.org/ontologies-ULL/OSDi/1.3/examples/evans1997-migraine`.
 - Convención, documentada en `examples/README.md`: el `.ttl` de cada ejemplo se llama como su carpeta (`<caso>/<caso>.ttl`). Las reglas de w3id dependen de ella.
-- **La importación sigue siendo la 1.2.** JaDES solo resuelve en local la versión de su copia de `OSDi.ttl`: con la importación de la 1.3, `TestOntologyConsistency` y la validación intentarían descargarla y fallarían mientras no esté publicada. Cambia a `owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.3>` cuando JaDES adopte la 1.3 publicada (apartado 5).
+- La ontología del ejemplo importa `<https://w3id.org/ontologies-ULL/OSDi/1.3>`, la versión de la copia de `jades-hta` (apartado 5).
 
 ### Publicación en el repositorio de OSDi (`.github/workflows/generate_doc.yml`)
 
@@ -173,9 +173,6 @@ Los individuos del ejemplo son `…/OSDi#EVANS_…`. El fragmento no llega al se
 
 ## 3. Pendiente
 
-**En la ontología**
-- La cabecera: `owl:versionIRI` y `owl:versionInfo` a 1.3, `owl:priorVersion <…/OSDi/1.2>` y, si se quiere, una nota de cambios en el comentario.
-
 **En el repositorio de OSDi**
 - `individuals/PBD.ttl` importa la 1.1 y `individuals/T1DM.ttl` la 1.0. La `PBD.ttl` publicada declara `detects`, `hasSensitivity` y `hasSpecificity` en las intervenciones, lo que es incoherente con la 1.3 (D11; el mismo caso que N20). Las copias de `jades-hta/src/test/resources` (`PBD.ttl`, `T1DM.ttl`) ya están migradas a D2 y D11 y son coherentes según HermiT (`TestOntologyConsistency`): conviene publicarlas en su lugar, importando la 1.3.
 - `individuals/catalog-v001.xml` resuelve la 1.0 con una ruta absoluta de un equipo (`file:/C:/Users/icasrod/git/JaDES-HTA/resources/OSDi.owl`), y el catálogo de la raíz apunta a `docs/latest/ontology.owl`.
@@ -241,23 +238,27 @@ Los individuos del ejemplo son `…/OSDi#EVANS_…`. El fragmento no llega al se
 - **Cambios futuros de la ontología.** Se proponen en el repositorio de OSDi: 1.3.x si son aditivos, 1.4 si cambian el significado de algo publicado (la regla que el plan ya prevé para las fases 20 a 23). Si una fase de JaDES necesita la ontología antes de publicarla, usa un borrador con su propia versión (`owl:versionIRI <…/OSDi/1.4>`, `owl:versionInfo "1.4-dev"`), nunca con la de una versión publicada, y el test anterior lo señala como borrador.
 - **Lo que se evita.** Durante las fases 2 a 18, la copia de JaDES dijo ser la 1.2 sin serlo. Con la opción A, cada IRI de versión significa una sola cosa, y quien use OSDi sin JaDES ve lo mismo que JaDES.
 
-### Adopción de la 1.3 en JaDES (después de publicarla)
+### Adopción de la 1.3 en JaDES (hecho el 2026-11-25)
 
-Todo esto queda fuera de `docs/` y `examples/`, y se hará cuando lo apruebes:
+En lugar de copiar a JaDES la versión ya publicada, se hace al revés: JaDES declara la 1.3 primero y su `OSDi.ttl` se copia sin cambios al repositorio de OSDi. Así las dos copias son idénticas desde el principio. No hay que esperar a publicar, porque `OSDiWrapper.Builder.build` resuelve en local la versión que declara su copia, sea cual sea.
 
-1. Sustituir `jades-hta/src/main/resources/OSDi.ttl` por el `OSDi.ttl` publicado de la 1.3.
-2. Cambiar a la vez los `owl:imports` de todas las ontologías de prueba (`jades-hta/src/test/resources/*.ttl`) y de los ejemplos a `<https://w3id.org/ontologies-ULL/OSDi/1.3>`, porque `OSDiWrapper.Builder.build` solo resuelve en local la versión de su copia.
-3. Añadir el test que comprueba que la copia es la publicada.
-4. Actualizar CLAUDE.md: versión 1.3 en la descripción del proyecto y en la nota de las importaciones, la regla de la opción A en «Evolución de OSDi 1.3» (o una sección nueva) y la fuente de las copias.
-5. Pasar la suite completa, la de validación y `TestOntologyConsistency`.
+1. Cabecera de `jades-hta/src/main/resources/OSDi.ttl`: `owl:versionIRI <…/OSDi/1.3>`, `owl:priorVersion <…/OSDi/1.2>` y `owl:versionInfo "1.3"`.
+2. Todas las ontologías de prueba (`jades-hta/src/test/resources/*.ttl`) y el ejemplo importan `<https://w3id.org/ontologies-ULL/OSDi/1.3>`.
+3. `TestOSDiPublishedCopy` comprueba:
+   - la cabecera: la versión coincide con `owl:versionInfo` y hay un único `owl:priorVersion`;
+   - la huella SHA-256 de la copia, con finales de línea LF, contra la registrada para su versión (1.3: `43d485e8bb4e3cc1a3fce0cb714fc3248678669a1e398a9aad9359647af0de7f`); un borrador (`-dev`) omite esta comprobación;
+   - que todas las ontologías de prueba y los ejemplos importan la versión de la copia.
+4. CLAUDE.md recoge la versión 1.3 y la regla de la opción A.
+
+**La huella es la del fichero que se publica.** Si la copia cambia antes de publicarla, hay que actualizar la huella del test, o publicar el fichero que tiene la huella registrada.
 
 ## Pasos para publicar la 1.3
 
 **En el repositorio de OSDi**
 
-1. Copiar a la raíz la `OSDi.ttl` de `jades-hta`, con la cabecera de la 1.3: `owl:versionIRI <…/OSDi/1.3>`, `owl:versionInfo "1.3"` y `owl:priorVersion <…/OSDi/1.2>`.
+1. Copiar a la raíz, sin cambios, la `OSDi.ttl` de `jades-hta`, que ya declara la 1.3. Su huella SHA-256 (con finales de línea LF) debe ser la que registra `TestOSDiPublishedCopy`.
 2. Sustituir `individuals/PBD.ttl` e `individuals/T1DM.ttl` por las copias de `jades-hta`, importando la 1.3. Corregir el IRI de `T1DM.ttl` (doble barra) e `individuals/catalog-v001.xml`.
-3. Añadir `examples/`, cambiando sus importaciones a la 1.3, y su paso en `generate_doc.yml` (apartado 2).
+3. Añadir `examples/` (ya importan la 1.3) y su paso en `generate_doc.yml` (apartado 2).
 4. Añadir las notas de la versión (apartado 4) al `README.md` o a un `CHANGELOG`.
 5. Publicar. `generate_doc.yml` genera `docs/1.3` a partir de la `owl:versionIRI`. Opcional: etiqueta `v1.3`.
 
@@ -267,4 +268,4 @@ Todo esto queda fuera de `docs/` y `examples/`, y se hará cuando lo apruebes:
 
 **En JaDES**
 
-7. Adoptar la 1.3 publicada (apartado 5).
+7. Nada: la 1.3 ya está adoptada (apartado 5). Si el fichero publicado acaba siendo distinto, actualizar la huella de `TestOSDiPublishedCopy` con la del fichero publicado.

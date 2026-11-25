@@ -630,3 +630,13 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 - `OSDi.ttl` (aprobado; sin cambiar la versión): `hasRefToSTATO` de `DI_HazardRatio` (STATO_0000677, *hazard ratio*) y `DI_OddsRatio` (STATO_0000182, *odds ratio*), comprobados en OLS y no obsoletos. Resuelve el pendiente de la fase 2.
 - `OSDi.ttl`: comentario en español para los 37 términos nuevos o cambiados respecto a la 1.2 que solo lo tenían en inglés, con la terminología de los comentarios en español existentes (AVAC, forma abreviada, se lleva la probabilidad restante…). Los comentarios sin etiqueta de idioma de `hasSensitivity` y `hasSpecificity` pasan a `@en`. Comprobado con rdflib: ninguno de los 37 queda sin `@es`.
 - `docs/osdi-1.3-traslado.md`: los dos puntos salen de «Pendiente»; el apartado 1 y las notas de la versión los recogen.
+
+**Adopción de la 1.3 en JaDES (2026-11-25):**
+- Aprobado: en orden inverso al previsto. JaDES declara la 1.3 primero y su `OSDi.ttl` se copia sin cambios al repositorio de OSDi, así que no hay que esperar a la publicación (`OSDiWrapper` resuelve en local la versión que declara su copia).
+- `OSDi.ttl`: `owl:versionIRI <…/OSDi/1.3>`, `owl:priorVersion <…/OSDi/1.2>` y `owl:versionInfo "1.3"`. Las 12 ontologías de prueba y el ejemplo de Evans importan la 1.3.
+- Test `TestOSDiPublishedCopy`:
+  - cabecera coherente;
+  - huella SHA-256 de la copia, con finales de línea LF, contra la registrada para la 1.3; un borrador `-dev` omite esta comprobación;
+  - todas las importaciones de OSDi apuntan a la versión de la copia.
+  Comprobado alterando un comentario de la copia y la importación de `BD.ttl`: fallan las dos comprobaciones, con mensajes que dicen qué hacer.
+- CLAUDE.md (versión 1.3 y la regla de la opción A), `docs/osdi-1.3-traslado.md` (apartado 5 y los pasos de publicación) y el `README.md` de Evans.

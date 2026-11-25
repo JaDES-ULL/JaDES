@@ -9,7 +9,7 @@
 
 <https://w3id.org/ontologies-ULL/OSDi/examples/evans1997-migraine> rdf:type owl:Ontology ;
     owl:versionIRI <https://w3id.org/ontologies-ULL/OSDi/1.3/examples/evans1997-migraine> ;
-    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.2> ;
+    owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.3> ;
     rdfs:comment "Validation example of OSDi: Evans KW, Boan JA, Evans JL, Shuaib A. Economic evaluation of oral sumatriptan compared with oral caffeine/ergotamine for migraine. PharmacoEconomics. 1997;12(5):565-577. Decision tree of a migraine attack treated with sumatriptan or caffeine/ergotamine, with rescue at home or in the emergency department and relapse after the relief. See README.md."@en ;
     rdfs:label "OSDi validation example: Evans et al. (1997), sumatriptan versus caffeine/ergotamine for migraine"@en .
 

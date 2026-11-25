@@ -50,4 +50,4 @@ The incremental cost-effectiveness ratio is CAD 29 363 per QALY gained, against 
 ## Pending
 
 - The table of the article where the ratio is reported has to be checked, and other published values (e.g., the expected costs per arm) may be added to `expected-results.json`.
-- The individuals use the namespace of OSDi (`EVANS_…`), because JaDES finds the experiment by its short name in that namespace. The ontology imports OSDi 1.2 until OSDi 1.3 is published and JaDES uses it: then the import becomes `https://w3id.org/ontologies-ULL/OSDi/1.3` (see `docs/osdi-1.3-traslado.md` in JaDES).
+- The individuals use the namespace of OSDi (`EVANS_…`), because JaDES finds the experiment by its short name in that namespace. The ontology imports OSDi 1.3 (`https://w3id.org/ontologies-ULL/OSDi/1.3`).

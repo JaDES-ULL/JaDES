@@ -1,6 +1,6 @@
 # JaDES — guía para Claude Code
  
-JaDES es una librería Java de simulación para evaluación económica de tecnologías sanitarias. El módulo `jades-hta` genera modelos a partir de la ontología **OSDi** (OWL, Turtle, versión 1.2, IRI `https://w3id.org/ontologies-ULL/OSDi`; copia local en `jades-hta/src/main/resources/OSDi.ttl`): árboles de decisión exportados a Excel y modelos de simulación de eventos discretos (DES). La misma ontología debe servir para ambos tipos de modelo.
+JaDES es una librería Java de simulación para evaluación económica de tecnologías sanitarias. El módulo `jades-hta` genera modelos a partir de la ontología **OSDi** (OWL, Turtle, versión 1.3, IRI `https://w3id.org/ontologies-ULL/OSDi`; copia local en `jades-hta/src/main/resources/OSDi.ttl`): árboles de decisión exportados a Excel y modelos de simulación de eventos discretos (DES). La misma ontología debe servir para ambos tipos de modelo.
  
 Responde en español pero toda la codificación y comentarios deben estar en inglés.
  
@@ -37,7 +37,9 @@ Los tests de árboles cargan cada ontología una sola vez (`DecisionTreeTestSupp
 8. No hagas push salvo que te lo pida.
 ## Evolución de OSDi 1.3
 
-La copia de OSDi de `jades-hta` y el código que la lee evolucionan por fases hacia OSDi 1.3. Las decisiones, los puntos pendientes y el registro de cada fase están en [docs/osdi-1.3-diseno.md](docs/osdi-1.3-diseno.md). Las fases se aplican una a una: al terminar cada una, anota en su «Registro» qué se hizo, qué se decidió y qué quedó pendiente. El número de versión de `OSDi.ttl` no cambia hasta trasladar los cambios a OSDi.
+La copia de OSDi de `jades-hta` y el código que la lee evolucionan por fases hacia OSDi 1.3. Las decisiones, los puntos pendientes y el registro de cada fase están en [docs/osdi-1.3-diseno.md](docs/osdi-1.3-diseno.md). Las fases se aplican una a una: al terminar cada una, anota en su «Registro» qué se hizo, qué se decidió y qué quedó pendiente. Desde la fase 19, `OSDi.ttl` declara la 1.3 (`owl:versionIRI <…/OSDi/1.3>`, `owl:priorVersion <…/OSDi/1.2>`).
+
+**Copia de referencia (opción A, `docs/osdi-1.3-traslado.md`, apartado 5).** El repositorio de OSDi es la referencia: `jades-hta/src/main/resources/OSDi.ttl` es una copia idéntica de una versión publicada, y su `OSDi.ttl` se copia allí sin cambios. `TestOSDiPublishedCopy` comprueba la cabecera, compara la huella SHA-256 de la copia (con finales de línea LF) con la registrada para su versión en `PUBLISHED_SHA256` y exige que todas las ontologías de prueba y los ejemplos importen esa versión. No edites `OSDi.ttl` sin más: un cambio de la ontología se publica en el repositorio de OSDi como 1.3.x (aditivo) o 1.4 (cambia el significado de algo publicado). Si una fase necesita la ontología antes de publicarla, la copia pasa a ser un borrador con su propia versión (`owl:versionInfo "1.4-dev"`, `owl:versionIRI <…/OSDi/1.4>`), cambiando a la vez las importaciones; el test lo marca como omitido. Al publicar, se registra la huella del fichero publicado.
 
 ## Ejemplos de validación
 
@@ -65,7 +67,7 @@ Ontologías de prueba en `jades-hta/src/test/resources/`:
 | `OSDi_test_tree_nbs.ttl` | B01–B06 (cribado neonatal con estrategias; B04–B06: resultados de detección; se comprueban en `TestHTAExcelGeneration`) |
 | `OSDi_test_tree_malformed.ttl` | N01–N05, N07–N12, N14–N36 (casos que deben lanzar excepción; N13 volvió a ser P26 y N06, P56) |
 
-Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.2>`):
+Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OSDi/1.3>`, la versión de la copia, que es la única que JaDES resuelve en local):
 
 | Fichero | Tests |
 |---|---|
@@ -73,7 +75,7 @@ Otras ontologías de prueba (todas importan `<https://w3id.org/ontologies-ULL/OS
 | `PBD.ttl` | `TestOntology`, `TestHTAExcelGeneration` (árbol de cribado neonatal), `TestSingleDiseaseAndPopulationDecisionTreeModelGeneration` |
 | `T1DM.ttl` | `TestOntology`, `TestLoadOntology` (DES; único modelo de prueba con `Pathway`, `requires` y `Group`) |
 | `OSDi_test_des.ttl` | `TestDESRisksAndEffects` (DES: D01, riesgos de manifestaciones y valores de los efectos de una intervención sobre ellos) `TestDESPopulationDefaults` (D02: población sin edad ni sexo, D10) `TestDESInterventionPayoffs` (D03: coste y utilidad de una vez de una intervención terapéutica) `TestDESInterventionTarget` (D04–D08: objetivo de las intervenciones en el DES, D1), `TestDESStrategies` (D09–D11, D14, D15: estrategias y sustituciones en el DES, D2) y `TestDESDetection` (D12–D13: estrategia de detección de cada brazo); `DESTestSupport` simula los dos brazos con listeners de costes y AVAC |
-| `BD.ttl` | Solo `TestOntologyConsistency` (no tiene experimentos; está a medias). Importa OSDi 1.2 desde la fase 13 |
+| `BD.ttl` | Solo `TestOntologyConsistency` (no tiene experimentos; está a medias). Importa OSDi desde la fase 13 |
 
 `TestOntologyConsistency` (fase 17) carga con HermiT `OSDi.ttl` y todas las ontologías de prueba anteriores, tal como están escritas: deben ser coherentes y el razonador no debe deducir que dos enfermedades distintas son el mismo individuo (pasaría, p. ej., con una intervención compartida por modelos de enfermedades distintas, porque tiene exactamente un objetivo). `OSDi_test_tree_malformed.ttl` se comprueba caso a caso: N15, N20 y N22 son incoherentes a propósito (el razonador detecta el mismo error que JaDES rechaza) y los demás deben ser coherentes. Tras cambiar `OSDi.ttl` o una ontología de prueba, este test es el que detecta los errores que el `StructuralReasoner` no ve.
 
