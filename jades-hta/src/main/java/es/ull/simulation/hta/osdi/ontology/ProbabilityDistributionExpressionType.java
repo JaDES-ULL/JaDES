@@ -17,7 +17,9 @@ public enum ProbabilityDistributionExpressionType implements WrapsOSDiClass {
 	NORMAL(OSDiClass.NORMAL_DISTRIBUTION_EXPRESSION, new OSDiDataProperty[] {OSDiDataProperty.HAS_AVERAGE_PARAMETER, OSDiDataProperty.HAS_STANDARD_DEVIATION_PARAMETER}),
 	UNIFORM(OSDiClass.UNIFORM_DISTRIBUTION_EXPRESSION, new OSDiDataProperty[] {OSDiDataProperty.HAS_LOWER_LIMIT_PARAMETER, OSDiDataProperty.HAS_UPPER_LIMIT_PARAMETER}),
 	BETA(OSDiClass.BETA_DISTRIBUTION_EXPRESSION, new OSDiDataProperty[] {OSDiDataProperty.HAS_ALFA_PARAMETER, OSDiDataProperty.HAS_BETA_PARAMETER}),
-	GAMMA(OSDiClass.GAMMA_DISTRIBUTION_EXPRESSION, new OSDiDataProperty[] {OSDiDataProperty.HAS_ALFA_PARAMETER, OSDiDataProperty.HAS_LAMBDA_PARAMETER}),
+	/** Shape (k) and scale (theta): mean = k * theta */
+	GAMMA(OSDiClass.GAMMA_DISTRIBUTION_EXPRESSION, new OSDiDataProperty[] {OSDiDataProperty.HAS_ALFA_PARAMETER, OSDiDataProperty.HAS_THETA_PARAMETER}),
+	/** Rate (lambda): mean = 1 / lambda */
 	EXPONENTIAL(OSDiClass.EXPONENTIAL_DISTRIBUTION_EXPRESSION, new OSDiDataProperty[] {OSDiDataProperty.HAS_LAMBDA_PARAMETER}),
 	POISSON(OSDiClass.POISSON_DISTRIBUTION_EXPRESSION, new OSDiDataProperty[] {OSDiDataProperty.HAS_LAMBDA_PARAMETER}),
 	BERNOULLI(OSDiClass.BERNOULLI_DISTRIBUTION_EXPRESSION, new OSDiDataProperty[] {OSDiDataProperty.HAS_PROBABILITY_PARAMETER});
@@ -56,6 +58,12 @@ public enum ProbabilityDistributionExpressionType implements WrapsOSDiClass {
 		for (int i = 0; i < parameters.length; i++) {
 			final OptionalDouble value = wrap.getDoubleValue(individualIRI, parameters[i]);
 			if (value.isEmpty()) {
+				// OSDi 1.2 called the scale of a gamma distribution hasLambdaParameter
+				if (OSDiDataProperty.HAS_THETA_PARAMETER.equals(parameters[i]) && wrap.getDoubleValue(individualIRI, OSDiDataProperty.HAS_LAMBDA_PARAMETER).isPresent()) {
+					throw new MalformedOSDiModelException("The individual " + individualIRI + " of distribution " + name() + " defines its scale with "
+						+ "hasLambdaParameter, as in OSDi 1.2. Since OSDi 1.3, the scale (theta, mean = alpha * theta) of a gamma distribution is "
+						+ "hasThetaParameter, and hasLambdaParameter only applies to exponential and Poisson distributions.");
+				}
 				throw new MalformedOSDiModelException("The individual " + individualIRI + " of distribution " + name() + " is missing value for parameter " + parameters[i]);
 			}
 			result[i] = value.getAsDouble();

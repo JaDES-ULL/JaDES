@@ -485,7 +485,7 @@ osdi:T1DM_Manif_ANGINA_Proportion_ParamUncertainty rdf:type owl:NamedIndividual 
                                                             osdi:GammaDistributionExpression ;
                                                    osdi:includedByModel osdi:T1DM_StdModelDES ;
                                                    osdi:hasAlfaParameter "1.0"^^xsd:double ;
-                                                   osdi:hasLambdaParameter "0.28"^^xsd:double .
+                                                   osdi:hasThetaParameter "0.28"^^xsd:double .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_ANGINA_TC
@@ -711,7 +711,7 @@ osdi:T1DM_Manif_HF_Proportion_ParamUncertainty rdf:type owl:NamedIndividual ,
                                                         osdi:GammaDistributionExpression ;
                                                osdi:includedByModel osdi:T1DM_StdModelDES ;
                                                osdi:hasAlfaParameter "1.0"^^xsd:double ;
-                                               osdi:hasLambdaParameter "0.12"^^xsd:double .
+                                               osdi:hasThetaParameter "0.12"^^xsd:double .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_HF_TC
@@ -989,7 +989,7 @@ osdi:T1DM_Manif_MI_Proportion_ParamUncertainty rdf:type owl:NamedIndividual ,
                                                         osdi:GammaDistributionExpression ;
                                                osdi:includedByModel osdi:T1DM_StdModelDES ;
                                                osdi:hasAlfaParameter "1.0"^^xsd:double ;
-                                               osdi:hasLambdaParameter "0.53"^^xsd:double .
+                                               osdi:hasThetaParameter "0.53"^^xsd:double .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_MI_TC
@@ -1496,7 +1496,7 @@ osdi:T1DM_Manif_STROKE_Proportion_ParamUncertainty rdf:type owl:NamedIndividual 
                                                             osdi:GammaDistributionExpression ;
                                                    osdi:includedByModel osdi:T1DM_StdModelDES ;
                                                    osdi:hasAlfaParameter "1.0"^^xsd:double ;
-                                                   osdi:hasLambdaParameter "0.07"^^xsd:double .
+                                                   osdi:hasThetaParameter "0.07"^^xsd:double .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#T1DM_Manif_STROKE_TC

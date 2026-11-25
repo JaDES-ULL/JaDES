@@ -46,6 +46,7 @@ public enum OSDiDataProperty implements IOSDiComponentWrapper {
 	HAS_SIZE("hasSize"),
 	HAS_SOURCE("hasSource"),
 	HAS_STANDARD_DEVIATION_PARAMETER("hasStandardDeviationParameter"),
+	HAS_THETA_PARAMETER("hasThetaParameter"),
 	HAS_TIME_HORIZON("hasTimeHorizon"),
 	HAS_UNIT("hasUnit"),
 	HAS_UPPER_LIMIT_PARAMETER("hasUpperLimitParameter"),

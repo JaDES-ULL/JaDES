@@ -58,7 +58,7 @@ public class TestOSDiPublishedCopy {
      * new version is published, its OSDi.ttl is copied unchanged into jades-hta/src/main/resources and its fingerprint is added here.
      */
     private static final Map<String, String> PUBLISHED_SHA256 = Map.of(
-        "1.3", "dbae59c7ef1c2e08e38ae641bffec9f1e6be2572ccfe843509f852952dd8c765");
+        "1.3", "bc1295056d702387c2f9bb7f02bde2c0d31c596b4e4e0942bd4e8a9faaf5e60b");
     /** The suffix of the versionInfo of a draft */
     private static final String DRAFT_SUFFIX = "-dev";
     /** The local copies of the ontologies imported by OSDi (see {@link OSDiWrapper}) */

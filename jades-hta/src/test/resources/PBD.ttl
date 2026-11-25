@@ -66,7 +66,7 @@ osdi:PBD_BasePopulationLifeExpectancyStochasticUncertainty rdf:type owl:NamedInd
                                                                     osdi:GammaDistributionExpression ;
                                                            osdi:includedByModel osdi:PBD_ModelTree ;
                                                            osdi:hasAlfaParameter "25.0"^^xsd:double ;
-                                                           osdi:hasLambdaParameter "3.29"^^xsd:double .
+                                                           osdi:hasThetaParameter "3.29"^^xsd:double .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_BasePopulationUtility
@@ -543,7 +543,7 @@ osdi:PBD_ManifestationMentalDelayLifeExpectancyReduction_ParamUncertainty rdf:ty
                                                                                    osdi:GammaDistributionExpression ;
                                                                           osdi:includedByModel osdi:PBD_ModelTree ;
                                                                           osdi:hasAlfaParameter "25.0"^^xsd:double ;
-                                                                          osdi:hasLambdaParameter "0.38"^^xsd:double .
+                                                                          osdi:hasThetaParameter "0.38"^^xsd:double .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#PBD_ManifestationMentalDelayProportion

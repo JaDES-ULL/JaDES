@@ -1580,13 +1580,12 @@ osdi:hasLambdaParameter rdf:type owl:DatatypeProperty ;
                         rdfs:subPropertyOf osdi:hasProbabilityDistributionParameter ;
                         rdfs:domain [ rdf:type owl:Class ;
                                       owl:unionOf ( osdi:ExponentialDistributionExpression
-                                                    osdi:GammaDistributionExpression
                                                     osdi:PoissonDistributionExpression
                                                   )
                                     ] ;
                         rdfs:range xsd:double ;
-                        rdfs:comment "Defines the lambda parameter of a probability distribution, which is the rate parameter in an exponential distribution, the shape parameter in a gamma distribution and the average number of events in a Poisson distribution"@en ,
-                                     "Define el parámetro lambda de una distribución de probabilidad, que es el parámetro de tasa en una distribución exponencial, el parámetro de forma en una distribución gamma y el número medio de eventos en una distribución de Poisson"@es ;
+                        rdfs:comment "Defines the lambda parameter of a probability distribution: the rate in an exponential distribution (mean = 1 / lambda) and the average number of events in a Poisson distribution. The scale of a gamma distribution is hasThetaParameter (in OSDi 1.2, it was called hasLambdaParameter)."@en ,
+                                     "Define el parámetro lambda de una distribución de probabilidad: la tasa en una distribución exponencial (media = 1 / lambda) y el número medio de eventos en una distribución de Poisson. La escala de una distribución gamma es hasThetaParameter (en OSDi 1.2 se llamaba hasLambdaParameter)."@es ;
                         rdfs:label "has lambda parameter"@en ,
                                    "tiene el parámetro lambda"@es .
 
@@ -1843,8 +1842,8 @@ osdi:hasScaleParameter rdf:type owl:DatatypeProperty ;
                        rdfs:subPropertyOf osdi:hasProbabilityDistributionParameter ;
                        rdfs:domain osdi:ProbabilityDistributionExpression ;
                        rdfs:range xsd:double ;
-                       rdfs:comment "Defines the scale parameter of a probability distribution"@en ,
-                                    "Define el parámetro de escala de una distribución de probabilidad"@es ;
+                       rdfs:comment "Defines a factor that multiplies the value of the random variable defined by the distribution (before adding the offset, see hasOffsetParameter). It is not the scale parameter of a gamma distribution, which is hasThetaParameter."@en ,
+                                    "Define un factor que multiplica el valor de la variable aleatoria definida por la distribución (antes de sumar el desplazamiento, ver hasOffsetParameter). No es el parámetro de escala de una distribución gamma, que es hasThetaParameter."@es ;
                        rdfs:label "has scale parameter"@en ,
                                   "tiene el parámetro de escala"@es .
 
@@ -1878,6 +1877,17 @@ osdi:hasStandardDeviationParameter rdf:type owl:DatatypeProperty ;
                                                 "Define el parámetro de la desviación estándar de una distribución de probabilidad"@es ;
                                    rdfs:label "has standard deviation parameter"@en ,
                                               "tiene el parámetro de desviación estándar"@es .
+
+
+###  https://w3id.org/ontologies-ULL/OSDi#hasThetaParameter
+osdi:hasThetaParameter rdf:type owl:DatatypeProperty ;
+                       rdfs:subPropertyOf osdi:hasProbabilityDistributionParameter ;
+                       rdfs:domain osdi:GammaDistributionExpression ;
+                       rdfs:range xsd:double ;
+                       rdfs:comment "Defines the scale parameter (theta) of a gamma distribution, whose mean is k * theta, with k its shape (hasAlfaParameter). For a gamma distribution expressed with a rate lambda, theta = 1 / lambda."@en ,
+                                    "Define el parámetro de escala (theta) de una distribución gamma, cuya media es k * theta, con k su forma (hasAlfaParameter). Para una distribución gamma expresada con una tasa lambda, theta = 1 / lambda."@es ;
+                       rdfs:label "has theta parameter"@en ,
+                                  "tiene el parámetro theta"@es .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#hasTimeHorizon
@@ -2701,7 +2711,7 @@ osdi:ExponentialDistributionExpression rdf:type owl:Class ;
                                        rdfs:comment "Continuous probability distribution that describes the time between events in a Poisson process, i.e. a process in which events occur continuously and independently at a constant average rate"@en ,
                                                     "Distribución de probabilidad continua que describe el tiempo entre eventos en un proceso de Poisson, es decir, un proceso en el que los eventos ocurren de forma continua e independiente a una tasa media constante"@es ;
                                        rdfs:label "Expresión para distribución de probabilidad Exponencial"@es ,
-                                                  "Expression for an Expnential probability distribution"@en .
+                                                  "Expression for an Exponential probability distribution"@en .
 
 
 ###  https://w3id.org/ontologies-ULL/OSDi#ExpressionLanguage
@@ -2784,12 +2794,12 @@ osdi:GammaDistributionExpression rdf:type owl:Class ;
                                                    owl:onDataRange xsd:double
                                                  ] ,
                                                  [ rdf:type owl:Restriction ;
-                                                   owl:onProperty osdi:hasLambdaParameter ;
+                                                   owl:onProperty osdi:hasThetaParameter ;
                                                    owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
                                                    owl:onDataRange xsd:double
                                                  ] ;
-                                 rdfs:comment "Continuous distribution of probability generally used to model costs, characterized by two parameters: alpha (shape) and lambda (scale)"@en ,
-                                              "Distribución de probabilidad continua que se usa en general para modelar costes, caracterizada por dos parámetros: alfa (forma) y lambda (escala)"@es ;
+                                 rdfs:comment "Continuous distribution of probability generally used to model costs, characterized by two parameters: the shape k (hasAlfaParameter) and the scale theta (hasThetaParameter), so that the mean is k * theta and the variance, k * theta^2. A gamma distribution expressed with a rate lambda (1 / theta) must be converted into its scale theta = 1 / lambda. In OSDi 1.2, the scale was called hasLambdaParameter."@en ,
+                                              "Distribución de probabilidad continua que se usa en general para modelar costes, caracterizada por dos parámetros: la forma k (hasAlfaParameter) y la escala theta (hasThetaParameter), de modo que la media es k * theta y la varianza, k * theta^2. Una distribución gamma expresada con una tasa lambda (1 / theta) debe convertirse a su escala theta = 1 / lambda. En OSDi 1.2, la escala se llamaba hasLambdaParameter."@es ;
                                  rdfs:label "Expresión para distribución de probabilidad Gamma"@es ,
                                             "Expression for a Gamma probability distribution"@en .
 

@@ -644,5 +644,13 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 **Antes del traslado (2026-11-25):**
 - Los comentarios de las ontologías de prueba decían «Individuals for OSDi ontology, version 1.2»: ahora dicen 1.3. `TestOSDiPublishedCopy` comprueba también que esas menciones coinciden con la versión de la copia.
 - `OSDi.ttl`: todas las clases y propiedades tienen comentario en inglés y en español. Se tradujeron 165 comentarios, se corrigieron etiquetas de idioma, erratas y tres errores evidentes (`GroupableModelItemWithProportion`, `isGroupItemOf`, `isStrategyOf`), y se añadieron los comentarios de `isAssessedInterventionOf` e `isComparatorInterventionOf`. Detalle en el apartado 1 de `docs/osdi-1.3-traslado.md`.
-- Señalado sin cambiar: `hasLambdaParameter` dice que lambda es la forma de la gamma, pero `GammaDistributionExpression` dice que es la escala.
+- Parámetros de las distribuciones (aprobado). La contradicción entre `hasLambdaParameter` (forma de la gamma) y `GammaDistributionExpression` (escala) era una errata de nombre: JaDES y todos los datos usan el valor como escala θ.
+  - Nueva `hasThetaParameter`; la gamma la usa en lugar de `hasLambdaParameter`, que queda para la exponencial (tasa) y la de Poisson.
+  - JaDES: `ProbabilityDistributionExpressionType.GAMMA` lee `hasThetaParameter` y rechaza una gamma con el `hasLambdaParameter` de la 1.2, con un mensaje que lo explica. El DES pasa 1/λ a `ExponentialVariate`, que espera la media.
+  - Datos: `PBD.ttl`, `T1DM.ttl` y `BD.ttl` usan `hasThetaParameter` (8 gammas; todos sus `hasLambdaParameter` eran de gammas).
+  - Test `TestProbabilityDistributionParameters`:
+    - la gamma de PBD se lee como k = 25 y θ = 3,29 y genera un `GammaVariate` con escala 3,29;
+    - una gamma con `hasLambdaParameter` se rechaza;
+    - una exponencial con λ = 4 genera un `ExponentialVariate` de media 0,25. Antes de corregir el DES fallaba con 4,0.
+  - Vistos y sin corregir: tres defectos del Excel con las distribuciones de un parámetro y la falta de un generador de Poisson en el DES (apartado 3 de `docs/osdi-1.3-traslado.md`).
 - Nueva huella de la 1.3 en `TestOSDiPublishedCopy`.

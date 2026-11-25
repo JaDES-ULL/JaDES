@@ -145,6 +145,10 @@ public interface ParameterFactory extends DESModelComponentFactory {
 				throw new IllegalArgumentException("Unsupported probability distribution: " + probExpr.getProbabilityDistribution());
 		}
 		double []numParams = probExpr.getParameterValues();
+		// OSDi defines an exponential distribution by its rate (lambda), whereas ExponentialVariate expects its mean (1 / lambda)
+		if (ProbabilityDistributionExpressionType.EXPONENTIAL.equals(probExpr.getProbabilityDistribution())) {
+			numParams = new double[] {1.0 / numParams[0]};
+		}
 		RandomVariate rnd = null;
 		if (numParams.length == 4)
 			rnd = RandomVariateFactory.getInstance(distributionName, numParams[0], numParams[1], numParams[2], numParams[3]);

@@ -8,7 +8,7 @@ Decidido el 2026-11-25: el repositorio de OSDi es la referencia y JaDES usa una 
 
 **Método.** Comparación semántica (rdflib) entre `OSDi.ttl` del repositorio de OSDi en el commit de la publicación de la 1.2 (`1d424a5`) y la copia actual de `jades-hta`. Se compara cada entidad con nombre con todas sus tripletas, expandiendo los nodos anónimos (restricciones, uniones, listas). La copia de `jades-hta` justo antes de la fase 2 (`646cba0~1`) es idéntica a la 1.2 publicada, así que las diferencias son exactamente las de las fases 2 a 18.
 
-**Resultado.** 65 entidades distintas por las decisiones de las fases 2 a 18: 27 nuevas y 38 cambiadas. No se ha eliminado ninguna entidad. Con la traducción de los comentarios (apartado «Sin decisión numerada»), la comparación con la 1.2 da 27 entidades nuevas y 199 cambiadas; las 161 de más solo cambian sus comentarios, salvo las correcciones que se indican allí. La cabecera (`owl:Ontology`) declara desde el 2026-11-25 `owl:versionIRI <…/OSDi/1.3>`, `owl:versionInfo "1.3"` y `owl:priorVersion <…/OSDi/1.2>` (apartado 5).
+**Resultado.** 65 entidades distintas por las decisiones de las fases 2 a 18: 27 nuevas y 38 cambiadas. No se ha eliminado ninguna entidad. Con la traducción de los comentarios y los parámetros de las distribuciones (apartado «Sin decisión numerada»), la comparación con la 1.2 da 28 entidades nuevas (se añade `hasThetaParameter`) y 199 cambiadas. Las 161 cambiadas de más solo cambian sus comentarios, salvo las correcciones que se indican allí. La cabecera (`owl:Ontology`) declara desde el 2026-11-25 `owl:versionIRI <…/OSDi/1.3>`, `owl:versionInfo "1.3"` y `owl:priorVersion <…/OSDi/1.2>` (apartado 5).
 
 Cada entidad aparece en la decisión que la cambió; si la cambiaron varias, en la principal, con referencia a las demás.
 
@@ -73,6 +73,15 @@ Ningún cambio en la ontología.
 
 ### Sin decisión numerada
 
+- **Parámetros de las distribuciones (2026-11-25).**
+  - **Escala de la gamma.** Se llamaba `hasLambdaParameter`, aunque lambda suele ser la tasa (1/θ). La 1.3 la renombra:
+    - Nueva propiedad `hasThetaParameter` (dominio `GammaDistributionExpression`), que es la escala θ: media = k·θ, con k la forma (`hasAlfaParameter`).
+    - `GammaDistributionExpression` la restringe en lugar de `hasLambdaParameter`.
+    - `hasLambdaParameter` sale del dominio de la gamma y queda para la exponencial (tasa, media = 1/λ) y la de Poisson (número medio de eventos).
+    - El significado del valor no cambia: JaDES y todos los datos ya lo usaban como escala (p. ej., PBD: k = 25, θ = 3,29, media 82,25 frente al valor esperado de 82,27). Solo cambia el nombre.
+  - **Comentarios.** Se corrigen los de `GammaDistributionExpression` y `hasLambdaParameter`, que se contradecían (forma frente a escala). `hasScaleParameter` explica que es un factor que multiplica la variable (antes del desplazamiento), no la escala de la gamma.
+  - **Errata.** La etiqueta en inglés de `ExponentialDistributionExpression` decía «Expnential».
+  - **Cambio incompatible.** Una gamma con `hasLambdaParameter` deja de ser válida, y HermiT no lo detecta, porque las distribuciones no son disjuntas. JaDES la rechaza con un mensaje que explica el cambio. Las copias de `PBD.ttl`, `T1DM.ttl` y `BD.ttl` de `jades-hta` ya usan `hasThetaParameter`; las publicadas en OSDi (1.0 y 1.1) usan `hasLambdaParameter` y se sustituyen al publicar (paso 2).
 - **Horizonte temporal (fase 11).** Comentario de `hasTimeHorizon` (inglés y español).
 - **Comentarios en español (2026-11-25).** Los 37 términos nuevos o con el comentario cambiado que solo lo tenían en inglés tienen ahora también el español. `hasSensitivity` y `hasSpecificity` tenían el comentario sin etiqueta de idioma; ahora lleva `@en`. Después, todas las clases y propiedades de OSDi tienen comentario en inglés y en español (2026-11-25):
   - 165 comentarios traducidos.
@@ -184,6 +193,13 @@ Los individuos del ejemplo son `…/OSDi#EVANS_…`. El fragmento no llega al se
 - `individuals/PBD.ttl` importa la 1.1 y `individuals/T1DM.ttl` la 1.0. La `PBD.ttl` publicada declara `detects`, `hasSensitivity` y `hasSpecificity` en las intervenciones, lo que es incoherente con la 1.3 (D11; el mismo caso que N20). Las copias de `jades-hta/src/test/resources` (`PBD.ttl`, `T1DM.ttl`) ya están migradas a D2 y D11 y son coherentes según HermiT (`TestOntologyConsistency`): conviene publicarlas en su lugar, importando la 1.3.
 - `individuals/catalog-v001.xml` resuelve la 1.0 con una ruta absoluta de un equipo (`file:/C:/Users/icasrod/git/JaDES-HTA/resources/OSDi.owl`), y el catálogo de la raíz apunta a `docs/latest/ontology.owl`.
 
+**En JaDES (distribuciones; vistos al renombrar la escala de la gamma)**
+- Excel: `ParamSheet` lee siempre dos parámetros de la distribución, así que falla con una distribución de un solo parámetro (exponencial, Poisson, Bernoulli).
+- Excel: la fórmula de la exponencial (`-LN(RAND() / λ)`) no es la inversa de la exponencial (`-LN(RAND()) / λ`).
+- Excel: `POISSON.INV` no existe en Excel.
+- DES: no hay generador de Poisson (`PoissonVariate`).
+- Ningún modelo de prueba usa estas distribuciones. La exponencial del DES ya se corrigió (pasa la media 1/λ).
+
 **En los ejemplos**
 - Evans: comprobar en el artículo la tabla de la RCEI publicada (29 366 CAD/AVAC) y, si se quiere, añadir otros valores publicados.
 - Los individuos de los ejemplos están en el espacio de nombres de OSDi (`EVANS_…`), porque JaDES busca el experimento por su nombre corto en ese espacio. Un espacio de nombres propio por ejemplo sería más limpio, pero exige que JaDES resuelva nombres en el espacio de la ontología cargada.
@@ -218,6 +234,7 @@ Los individuos del ejemplo son `…/OSDi#EVANS_…`. El fragmento no llega al se
 >
 > - `hasStrategy` on an intervention: use a `StrategyReplacementEffect`.
 > - `detects`, `hasSensitivity`, `hasSpecificity` and `hasTemporaryThreshold` on an intervention: move them to its detection strategy.
+> - The scale of a gamma distribution is now `hasThetaParameter` (mean = shape × scale); OSDi 1.2 called it `hasLambdaParameter`, although lambda usually denotes the rate. Rename the property in your gamma distributions; the value does not change. `hasLambdaParameter` remains the rate of an exponential distribution and the mean of a Poisson distribution.
 > - An intervention shared by the models of different diseases: since it has exactly one target, a reasoner infers that the diseases are the same individual. Give each model its own interventions.
 >
 > ### What the discrete event simulation of JaDES does not implement yet
@@ -254,7 +271,7 @@ En lugar de copiar a JaDES la versión ya publicada, se hace al revés: JaDES de
 2. Todas las ontologías de prueba (`jades-hta/src/test/resources/*.ttl`) y el ejemplo importan `<https://w3id.org/ontologies-ULL/OSDi/1.3>`.
 3. `TestOSDiPublishedCopy` comprueba:
    - la cabecera: la versión coincide con `owl:versionInfo` y hay un único `owl:priorVersion`;
-   - la huella SHA-256 de la copia, con finales de línea LF, contra la registrada para su versión (1.3: `dbae59c7ef1c2e08e38ae641bffec9f1e6be2572ccfe843509f852952dd8c765`); un borrador (`-dev`) omite esta comprobación;
+   - la huella SHA-256 de la copia, con finales de línea LF, contra la registrada para su versión (1.3: `bc1295056d702387c2f9bb7f02bde2c0d31c596b4e4e0942bd4e8a9faaf5e60b`); un borrador (`-dev`) omite esta comprobación;
    - que todas las ontologías de prueba y los ejemplos importan la versión de la copia.
 4. CLAUDE.md recoge la versión 1.3 y la regla de la opción A.
 
