@@ -2,7 +2,7 @@
 
 Fase 19 de `docs/osdi-1.3-diseno.md` (2026-11-25). Prepara el paso de la copia de OSDi de `jades-hta` (`jades-hta/src/main/resources/OSDi.ttl`) al repositorio de OSDi como versión 1.3, con sus ejemplos de validación. Nada fuera de `docs/` y `jades-hta/examples/` ha cambiado.
 
-Queda una decisión tuya antes de publicar: qué copia de la ontología será la de referencia después (apartado 5).
+Decidido el 2026-11-25: el repositorio de OSDi es la referencia y JaDES usa una copia de una versión publicada (apartado 5); los ejemplos se publican con el flujo de OSDi y reglas nuevas de w3id (apartado 2).
 
 ## 1. Cambios respecto a OSDi 1.2
 
@@ -78,18 +78,97 @@ Ningún cambio en la ontología.
 
 ## 2. Ejemplos para el repositorio de OSDi
 
-**Hecho.** `jades-hta/examples/evans1997-migraine/catalog-v001.xml` resuelve `https://w3id.org/ontologies-ULL/OSDi/1.3` con `../../OSDi.ttl`, es decir, con el `OSDi.ttl` de la raíz del repositorio de OSDi si el ejemplo queda en `examples/evans1997-migraine/`. Así, Protégé abre el ejemplo sin descargar nada.
+Propuesta aprobada el 2026-11-25. Además de copiar `examples/`, hay que publicar los ficheros con el flujo del repositorio de OSDi y añadir reglas en w3id. Los cambios en `generate_doc.yml` y en el `.htaccess` del fork de w3id.org los haces tú; aquí solo cambian `docs/` y `jades-hta/examples/`.
 
-**No hecho, a propósito: la importación de `evans1997-migraine.ttl` sigue siendo `<https://w3id.org/ontologies-ULL/OSDi/1.2>`.** JaDES solo resuelve en local la `owl:versionIRI` de su copia de `OSDi.ttl`, que sigue siendo la 1.2. Con la importación de la 1.3, `TestOntologyConsistency` y la suite de validación intentarían descargar la 1.3, que aún no está publicada, y fallarían. Para cambiar la versión de la copia habría que editar fuera de `docs/` y `examples/`. El cambio es una línea (`owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.3>`) y conviene hacerlo a la vez que el de la copia, según lo que decidas en el apartado 5.
+### Situación de partida (comprobada con `curl` el 2026-11-25)
 
-**Al mover `examples/` al repositorio de OSDi:**
+Las reglas de `ontologies-ULL/OSDi/.htaccess` del fork están activas en w3id.
 
-1. Copiar `jades-hta/examples/` a `examples/` en la raíz del repositorio de OSDi, con su `README.md` de índice.
-2. Cambiar la importación de cada ejemplo a la 1.3 (arriba).
-3. El IRI del ejemplo, `https://w3id.org/ontologies-ULL/OSDi/examples/evans1997-migraine`, no se resuelve hoy: w3id solo tiene reglas para `OSDi`, `OSDi/X.Y` y `OSDi/X.Y/individuals/…`, y el flujo `generate_doc.yml` solo copia `individuals/` a `docs/X.Y/`. Hay dos opciones:
-   - **Recomendada:** un paso en `generate_doc.yml` que copie `examples/` a `docs/latest/examples/` y `docs/X.Y/examples/`, y una regla en `w3id.org/ontologies-ULL/OSDi/.htaccess` para `X.Y/examples/(.*)`. El IRI pasaría a ser `…/OSDi/1.3/examples/evans1997-migraine`.
-   - Ponerlos en `individuals/examples/`, que ya se publica y resuelve, pero mezcla ejemplos de validación con individuos.
-4. El índice de `examples/README.md` explica cómo ejecutar la validación con JaDES (`mvn -pl jades-hta -am test -Pvalidation`). En el repositorio de OSDi habrá que decir de qué versión de JaDES se trata, o enlazar el informe.
+| Dirección | Respuesta |
+|---|---|
+| `…/OSDi` y `…/OSDi/1.2` | 303 al formato pedido (`ontology.ttl` con Turtle, `ontology.owl` con RDF/XML, que es lo que pide OWL API por defecto). Los ficheros existen. |
+| `…/OSDi/1.2/individuals/PBD.ttl` | 303 a `github.io/OSDi/1.2/individuals/PBD.ttl`, que existe. |
+| `…/OSDi/individuals/PBD` (el IRI que declara `PBD.ttl`) | 303 a `…/latest/individuals/PBD`, sin extensión: **404**. |
+| `…/OSDi/examples/evans1997-migraine` | Ninguna regla: **404**. |
+
+GitHub Pages sirve los `.md` sin convertirlos a HTML, y el repositorio de OSDi no tiene etiquetas por versión.
+
+### Hecho en `jades-hta/examples/`
+
+- `evans1997-migraine/catalog-v001.xml` resuelve `https://w3id.org/ontologies-ULL/OSDi/1.3` con `../../OSDi.ttl` (la raíz del repositorio de OSDi).
+- La ontología del ejemplo tiene como IRI `https://w3id.org/ontologies-ULL/OSDi/examples/evans1997-migraine` (la última versión) y como `owl:versionIRI` `https://w3id.org/ontologies-ULL/OSDi/1.3/examples/evans1997-migraine`.
+- Convención, documentada en `examples/README.md`: el `.ttl` de cada ejemplo se llama como su carpeta (`<caso>/<caso>.ttl`). Las reglas de w3id dependen de ella.
+- **La importación sigue siendo la 1.2.** JaDES solo resuelve en local la versión de su copia de `OSDi.ttl`: con la importación de la 1.3, `TestOntologyConsistency` y la validación intentarían descargarla y fallarían mientras no esté publicada. Cambia a `owl:imports <https://w3id.org/ontologies-ULL/OSDi/1.3>` cuando JaDES adopte la 1.3 publicada (apartado 5).
+
+### Publicación en el repositorio de OSDi (`.github/workflows/generate_doc.yml`)
+
+Un paso como el de `individuals/` (paso 7). El paso 8 ya copia `docs/latest/*` a `docs/$VERSION/`, así que los ejemplos llegan también a la carpeta de la versión:
+
+```yaml
+- name: Copy examples folder
+  if: ${{ hashFiles('examples/**') != '' }}
+  run: |
+    mkdir -p docs/latest/examples
+    cp -R examples/* docs/latest/examples/
+```
+
+### Reglas en w3id (`ontologies-ULL/OSDi/.htaccess` del fork)
+
+- Solo existe el `.ttl` de cada ejemplo, así que a cualquier cliente RDF se le sirve el Turtle. OWL API lo lee bien, porque Pages lo sirve como `text/turtle`.
+- Los navegadores (`text/html` en `Accept`, que OWL API no envía) van a la carpeta del ejemplo en GitHub, que muestra su `README.md`.
+
+```apache
+# ===============================================================
+# 4) EXAMPLES: /OSDi/X.Y/examples/<case> and /OSDi/examples/<case>
+# ===============================================================
+
+# Files of an example (e.g., expected-results.json, README.md)
+RewriteRule ^([0-9]+\.[0-9]+)/examples/([^/]+/.+)$ \
+  https://ontologies-ULL.github.io/OSDi/$1/examples/$2 [R=303,L]
+RewriteRule ^examples/([^/]+/.+)$ \
+  https://ontologies-ULL.github.io/OSDi/latest/examples/$1 [R=303,L]
+
+# Browsers: the folder of the example in GitHub, which renders its README
+RewriteCond %{HTTP_ACCEPT} text/html
+RewriteRule ^([0-9]+\.[0-9]+/)?examples/([^/]+)/?$ \
+  https://github.com/ontologies-ULL/OSDi/tree/main/examples/$2 [R=303,L]
+
+# RDF clients (any format): the Turtle file of the example
+RewriteRule ^([0-9]+\.[0-9]+)/examples/([^/]+)/?$ \
+  https://ontologies-ULL.github.io/OSDi/$1/examples/$2/$2.ttl [R=303,L]
+RewriteRule ^examples/([^/]+)/?$ \
+  https://ontologies-ULL.github.io/OSDi/latest/examples/$1/$1.ttl [R=303,L]
+```
+
+Los navegadores van siempre a `main`. Si se crean etiquetas por versión en el repositorio de OSDi (`v1.3`), la regla de HTML puede apuntar a `tree/v$1/examples/$2`.
+
+En el mismo PR conviene arreglar los individuos, cuyo IRI no lleva la extensión del fichero:
+
+```apache
+# Individuals without extension: their Turtle file
+RewriteRule ^([0-9]+\.[0-9]+)/individuals/([^/.]+)$ \
+  https://ontologies-ULL.github.io/OSDi/$1/individuals/$2.ttl [R=303,L]
+RewriteRule ^individuals/([^/.]+)$ \
+  https://ontologies-ULL.github.io/OSDi/latest/individuals/$1.ttl [R=303,L]
+```
+
+Estas dos reglas deben ir **antes** de las de la sección 3 del `.htaccess`, que copian la ruta tal cual. El IRI de `T1DM.ttl` tiene además una doble barra (`ontologies-ULL//individuals/T1DM`) que hay que corregir en el fichero. Conviene actualizar también la sección «Access» del `README.md` de `ontologies-ULL/OSDi` con las versiones, los individuos y los ejemplos.
+
+### Activación y comprobación
+
+- Las reglas funcionan cuando perma-id/w3id.org acepta el PR desde el fork. No importa que lleguen antes que los ficheros: devolverán 404 hasta que se publique la 1.3.
+- Comprobación:
+
+```bash
+curl -sI -H "Accept: text/turtle" https://w3id.org/ontologies-ULL/OSDi/1.3/examples/evans1997-migraine
+curl -sI -H "Accept: application/rdf+xml" https://w3id.org/ontologies-ULL/OSDi/examples/evans1997-migraine
+curl -sI -H "Accept: text/html" https://w3id.org/ontologies-ULL/OSDi/examples/evans1997-migraine
+curl -sI -H "Accept: text/turtle" https://w3id.org/ontologies-ULL/OSDi/individuals/PBD
+```
+
+### Espacio de nombres de los individuos (pendiente)
+
+Los individuos del ejemplo son `…/OSDi#EVANS_…`. El fragmento no llega al servidor, así que consultar `EVANS_Experiment` devuelve la ontología OSDi, que no lo define. Con un espacio de nombres propio (`…/OSDi/examples/evans1997-migraine#EVANS_…`), las reglas anteriores devolverían el ejemplo. Requiere que JaDES busque el experimento en el espacio de nombres de la ontología cargada: `OntologyResolution.toIRI` ya usa el prefijo por defecto, pero hay que comprobar el resto del wrapper. No bloquea la publicación.
 
 ## 3. Pendiente
 
@@ -155,30 +234,38 @@ Ningún cambio en la ontología.
 > - **Time horizon**: a tree uses it as declared; a simulation rounds it to whole years.
 > - `Pathway` is only supported in simulations.
 
-## 5. Copia de referencia después de la 1.3 (necesito tu decisión)
+## 5. Copia de referencia después de la 1.3
 
-Hoy hay dos copias: la del repositorio de OSDi (la 1.2 publicada) y la de `jades-hta`, que ha evolucionado durante las fases con la misma `owl:versionIRI` 1.2. Durante el desarrollo fue útil, pero tiene un coste: un fichero que dice ser la 1.2 sin serlo, y ontologías de prueba que importan la 1.2 y dependen de cambios de la 1.3.
+**Decidido (2026-11-25): opción A, OSDi fijada a una versión publicada.** El repositorio de OSDi es la referencia. `jades-hta` usa una copia idéntica a una versión publicada.
 
-**Opción A: OSDi fijada a una versión publicada (recomendada).** El repositorio de OSDi es la referencia; `jades-hta` usa una copia idéntica a una versión publicada.
-- **Sincronización:** al publicar una versión, se copia su `OSDi.ttl` a `jades-hta`. Un test compararía la copia con un hash, o con la versión que declara, para detectar cualquier edición local.
-- **Cambios futuros:** se proponen en el repositorio de OSDi como 1.3.x si son aditivos, o 1.4 si cambian el significado de algo publicado (es la regla que ya prevé el plan para las fases 20 a 23). Durante el desarrollo, JaDES puede usar una copia de borrador con su propia `owl:versionIRI` (p. ej., `…/OSDi/1.4`, `versionInfo "1.4-dev"`), nunca con la de una versión publicada.
-- **Ventajas:** un único significado para cada IRI de versión; los ejemplos y las ontologías de prueba importan una versión que existe; quien use OSDi sin JaDES ve lo mismo que JaDES.
-- **Coste:** cada cambio de ontología que necesite el DES pasa por una publicación, o por un borrador explícito.
+- **Sincronización.** Al publicar una versión, su `OSDi.ttl` se copia sin cambios a `jades-hta/src/main/resources/OSDi.ttl`. Un test de JaDES compara la copia con la versión que declara (p. ej., con la huella del fichero publicado), para detectar cualquier edición local.
+- **Cambios futuros de la ontología.** Se proponen en el repositorio de OSDi: 1.3.x si son aditivos, 1.4 si cambian el significado de algo publicado (la regla que el plan ya prevé para las fases 20 a 23). Si una fase de JaDES necesita la ontología antes de publicarla, usa un borrador con su propia versión (`owl:versionIRI <…/OSDi/1.4>`, `owl:versionInfo "1.4-dev"`), nunca con la de una versión publicada, y el test anterior lo señala como borrador.
+- **Lo que se evita.** Durante las fases 2 a 18, la copia de JaDES dijo ser la 1.2 sin serlo. Con la opción A, cada IRI de versión significa una sola cosa, y quien use OSDi sin JaDES ve lo mismo que JaDES.
 
-**Opción B: la copia de JaDES como desarrollo de la siguiente versión.** `jades-hta` sigue siendo donde se cambia la ontología, y el repositorio de OSDi recibe cada versión cuando se publica, como ahora.
-- **Sincronización:** al publicar, se traslada la copia (como en esta fase) y se sube la `owl:versionIRI` de la copia de JaDES a la siguiente versión.
-- **Ventajas:** cambiar la ontología y el código que la lee va en el mismo commit, como en las fases 2 a 18.
-- **Coste:** la copia de JaDES es siempre una versión no publicada. Las ontologías de prueba y los ejemplos importan una versión que no existe fuera de JaDES, y hay que acordarse de trasladar.
+### Adopción de la 1.3 en JaDES (después de publicarla)
 
-**En los dos casos, al publicar la 1.3** (fuera de `docs/` y `examples/`, así que necesita tu aprobación):
-- Cambiar la `owl:versionIRI` y la `owl:versionInfo` de la copia de `jades-hta` a 1.3.
-- Actualizar a la vez los `owl:imports` de todas las ontologías de prueba y de los ejemplos, porque `OSDiWrapper.Builder.build` solo resuelve en local la versión de su copia (CLAUDE.md, notas técnicas).
-- Pasar la suite completa y la de validación.
+Todo esto queda fuera de `docs/` y `examples/`, y se hará cuando lo apruebes:
 
-## Pasos en el repositorio de OSDi, una vez decidido
+1. Sustituir `jades-hta/src/main/resources/OSDi.ttl` por el `OSDi.ttl` publicado de la 1.3.
+2. Cambiar a la vez los `owl:imports` de todas las ontologías de prueba (`jades-hta/src/test/resources/*.ttl`) y de los ejemplos a `<https://w3id.org/ontologies-ULL/OSDi/1.3>`, porque `OSDiWrapper.Builder.build` solo resuelve en local la versión de su copia.
+3. Añadir el test que comprueba que la copia es la publicada.
+4. Actualizar CLAUDE.md: versión 1.3 en la descripción del proyecto y en la nota de las importaciones, la regla de la opción A en «Evolución de OSDi 1.3» (o una sección nueva) y la fuente de las copias.
+5. Pasar la suite completa, la de validación y `TestOntologyConsistency`.
 
-1. Copiar la `OSDi.ttl` de `jades-hta` a la raíz, con la cabecera de la 1.3 (apartado 3).
-2. Sustituir `individuals/PBD.ttl` y `individuals/T1DM.ttl` por las copias de `jades-hta`, importando la 1.3, y corregir `individuals/catalog-v001.xml`.
-3. Añadir `examples/` (apartado 2), con su paso de publicación y su regla de w3id.
+## Pasos para publicar la 1.3
+
+**En el repositorio de OSDi**
+
+1. Copiar a la raíz la `OSDi.ttl` de `jades-hta`, con la cabecera de la 1.3: `owl:versionIRI <…/OSDi/1.3>`, `owl:versionInfo "1.3"` y `owl:priorVersion <…/OSDi/1.2>`. Decidir si se publica antes de resolver los pendientes de la ontología del apartado 3 (códigos de STATO y comentarios en español).
+2. Sustituir `individuals/PBD.ttl` e `individuals/T1DM.ttl` por las copias de `jades-hta`, importando la 1.3. Corregir el IRI de `T1DM.ttl` (doble barra) e `individuals/catalog-v001.xml`.
+3. Añadir `examples/`, cambiando sus importaciones a la 1.3, y su paso en `generate_doc.yml` (apartado 2).
 4. Añadir las notas de la versión (apartado 4) al `README.md` o a un `CHANGELOG`.
-5. Publicar. `generate_doc.yml` genera `docs/1.3` a partir de la `owl:versionIRI`.
+5. Publicar. `generate_doc.yml` genera `docs/1.3` a partir de la `owl:versionIRI`. Opcional: etiqueta `v1.3`.
+
+**En el fork de w3id.org**
+
+6. Añadir las reglas de los ejemplos y de los individuos sin extensión (apartado 2), actualizar el `README.md` de `ontologies-ULL/OSDi` y abrir el PR contra perma-id/w3id.org. Comprobar con `curl` cuando lo acepten.
+
+**En JaDES**
+
+7. Adoptar la 1.3 publicada (apartado 5).

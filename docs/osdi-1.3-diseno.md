@@ -614,4 +614,14 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 - Suite: 369 tests en `jades-hta`, 0 fallos, 1 omitido.
 
 **Pendiente:**
-- Decidir qué copia de la ontología será la de referencia (apartado 5 de `docs/osdi-1.3-traslado.md`) y, con ello, cambiar la versión de la copia de `jades-hta` y las importaciones de las ontologías de prueba y de los ejemplos (fuera de `docs/` y `examples/`).
+- (Decidido: véase «Revisión».) Copia de referencia.
+
+**Revisión (2026-11-25):**
+- Decidido (apartado 5 de `docs/osdi-1.3-traslado.md`): opción A. El repositorio de OSDi es la referencia; `jades-hta` usa una copia idéntica a una versión publicada, comprobada por un test. Los cambios futuros se publican como 1.3.x (aditivos) o 1.4; un borrador lleva su propia versión (p. ej., 1.4-dev), nunca la de una versión publicada.
+- Revisadas las reglas de w3id del fork (`ontologies-ULL/OSDi/.htaccess`), activas en w3id: la ontología y sus versiones se resuelven; los individuos solo con la extensión del fichero (su IRI declarado, sin extensión, da 404); los ejemplos no tienen regla. Aprobado el plan del apartado 2: paso de copia de `examples/` en `generate_doc.yml`, reglas de w3id para `X.Y/examples/<caso>` y `examples/<caso>` (Turtle para clientes RDF, carpeta de GitHub para navegadores) y para los individuos sin extensión. Los aplicas tú en el repositorio de OSDi y en el fork.
+- En `jades-hta/examples/`: `owl:versionIRI` del ejemplo (`…/OSDi/1.3/examples/evans1997-migraine`) y la convención `<caso>/<caso>.ttl` en `examples/README.md`. La importación sigue en la 1.2 hasta adoptar la 1.3 publicada.
+- Suite: 369 tests en `jades-hta`, 0 fallos, 1 omitido; validación: 10 valores, 0 fallos.
+
+**Pendiente:**
+- Publicar la 1.3 en el repositorio de OSDi y el PR de w3id (pasos 1 a 6 de `docs/osdi-1.3-traslado.md`).
+- Después, adoptar la 1.3 en JaDES (apartado 5): copia publicada, importaciones de las ontologías de prueba y de los ejemplos, test de la copia y CLAUDE.md. Necesita tu aprobación, porque queda fuera de `docs/` y `examples/`.

@@ -4,7 +4,8 @@ Each example represents a published study in OSDi and checks that JaDES reproduc
 
 Each folder has:
 
-- the ontology of the example (`.ttl`), which imports OSDi;
+- the ontology of the example, named as its folder (`<case>/<case>.ttl`), which imports OSDi. Its IRI is `https://w3id.org/ontologies-ULL/OSDi/examples/<case>` (the latest version) and its version IRI, `https://w3id.org/ontologies-ULL/OSDi/<X.Y>/examples/<case>`. With a text/html request, these IRIs lead to the folder of the example in GitHub; otherwise, to its Turtle file;
+- `catalog-v001.xml`, which resolves the import of OSDi with the copy at the root of the repository (e.g., in Protégé);
 - a `README.md` with the citation, the decisions of representation, the assumptions of the article made explicit and the known differences with the published results;
 - `expected-results.json`, with the expected values. Each value states its source: `published` (with its tolerance and where it appears in the article) or `hand` (computed by hand from the model, with a relative tolerance of 1e-8).
 
