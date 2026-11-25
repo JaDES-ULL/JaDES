@@ -603,3 +603,15 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
 - Comprobar en el artículo la tabla de la RCEI publicada y, si se quiere, añadir otros valores publicados (costes y AVAC por brazo).
 - Los individuos de los ejemplos están en el espacio de nombres de OSDi porque JaDES busca el experimento por su nombre corto en él; para publicarlos en el repositorio de OSDi convendría un espacio de nombres propio (fase 19).
 - Si se añade otro caso (el candidato es la otitis de Coco, 2007, esbozada en P47), hace falta tu aprobación.
+
+### Fase 19: preparación del traslado a OSDi 1.3 (2026-11-25)
+
+**Hecho:**
+- `docs/osdi-1.3-traslado.md`: cambios de la copia de `OSDi.ttl` respecto a la 1.2 publicada, agrupados por decisión (comparación semántica con rdflib contra el commit `1d424a5` del repositorio de OSDi; la copia era idéntica a la 1.2 antes de la fase 2; 65 entidades: 27 nuevas y 38 cambiadas, ninguna eliminada); preparación de los ejemplos; pendientes; borrador de las notas de la versión; y propuesta sobre la copia de referencia.
+- `jades-hta/examples/evans1997-migraine/catalog-v001.xml`: resuelve la 1.3 con `../../OSDi.ttl` (la raíz del repositorio de OSDi).
+- La importación del ejemplo sigue siendo la 1.2: con la 1.3, JaDES intentaría descargarla (solo resuelve en local la versión de su copia) y fallarían la coherencia y la validación. Se cambiará a la vez que la versión de la copia.
+- Encontrado: la `individuals/PBD.ttl` publicada en OSDi declara `detects`, `hasSensitivity` y `hasSpecificity` en las intervenciones, incoherente con la 1.3 (D11); las copias de `jades-hta` ya están migradas.
+- Suite: 369 tests en `jades-hta`, 0 fallos, 1 omitido.
+
+**Pendiente:**
+- Decidir qué copia de la ontología será la de referencia (apartado 5 de `docs/osdi-1.3-traslado.md`) y, con ello, cambiar la versión de la copia de `jades-hta` y las importaciones de las ontologías de prueba y de los ejemplos (fuera de `docs/` y `examples/`).
