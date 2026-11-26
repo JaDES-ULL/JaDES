@@ -290,7 +290,8 @@ En lugar de copiar a JaDES la versión ya publicada, se hace al revés: JaDES de
 2. Sustituir `individuals/PBD.ttl` e `individuals/T1DM.ttl` por las copias de `jades-hta`, importando la 1.3. Corregir el IRI de `T1DM.ttl` (doble barra; corregido también en `jades-hta`).
 3. Añadir `examples/` (ya importan la 1.3) y su paso en `generate_doc.yml` (apartado 2).
 4. Añadir las notas de la versión (apartado 4) a `CHANGELOG.md`, enlazado desde el `README.md`.
-5. Publicar: fusionar `release-1.3` en `main` y hacer push. `generate_doc.yml` genera `docs/1.3` a partir de la `owl:versionIRI` (solo se dispara si cambia `OSDi.ttl`, como en este caso). Opcional: etiqueta `v1.3`.
+5. Publicar: fusionar `release-1.3` en `main` y hacer push. `generate_doc.yml` genera `docs/1.3` a partir de la `owl:versionIRI` (solo se dispara si cambia `OSDi.ttl`, como en este caso).
+   - Etiqueta `v1.3`, creada a mano el 2026-11-26 en `6540e67`. Las reglas de w3id del PR #7317 llevan a los navegadores a los ejemplos de la etiqueta de cada versión (`blob/vX.Y/...`). Desde entonces, `generate_doc.yml` crea la etiqueta `vX.Y` de cada versión nueva al publicarla, si no existe y si la versión es un número de versión (paso 10, commit `eb045fb` en OSDi). Los borradores no deben publicarse en el repositorio de OSDi: la etiqueta se toma de la `owl:versionIRI` (en un borrador, la de la versión siguiente, p. ej. 1.4).
    - Tutorial (`docs-src/`) actualizado a la 1.3 en la misma rama (commit `dc8c726`). Se construye con `mkdocs build --strict` y todos sus ejemplos Turtle se analizan sin errores. Las figuras (PNG) las cambias tú; la lista de cambios está en el registro de `docs/osdi-1.3-diseno.md`.
 
 **En el fork de w3id.org**
