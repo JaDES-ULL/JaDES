@@ -191,7 +191,7 @@ Los individuos del ejemplo son `…/OSDi#EVANS_…`. El fragmento no llega al se
 
 **En el repositorio de OSDi**
 - `individuals/PBD.ttl` importa la 1.1 y `individuals/T1DM.ttl` la 1.0. La `PBD.ttl` publicada declara `detects`, `hasSensitivity` y `hasSpecificity` en las intervenciones, lo que es incoherente con la 1.3 (D11; el mismo caso que N20). Las copias de `jades-hta/src/test/resources` (`PBD.ttl`, `T1DM.ttl`) ya están migradas a D2 y D11 y son coherentes según HermiT (`TestOntologyConsistency`): conviene publicarlas en su lugar, importando la 1.3.
-- `individuals/catalog-v001.xml` resuelve la 1.0 con una ruta absoluta de un equipo (`file:/C:/Users/icasrod/git/JaDES-HTA/resources/OSDi.owl`), y el catálogo de la raíz apunta a `docs/latest/ontology.owl`.
+- Corrección (2026-11-26): los catálogos no están publicados. El `.gitignore` de OSDi ignora `catalog-v*.xml`, así que el `individuals/catalog-v001.xml` con ruta absoluta era solo una copia local. En la rama `release-1.3` se añade a la fuerza solo el catálogo del ejemplo, que `examples/README.md` documenta.
 
 **En JaDES (distribuciones; vistos al renombrar la escala de la gamma)**
 - Excel: `ParamSheet` lee siempre dos parámetros de la distribución, así que falla con una distribución de un solo parámetro (exponencial, Poisson, Bernoulli).
@@ -281,11 +281,14 @@ En lugar de copiar a JaDES la versión ya publicada, se hace al revés: JaDES de
 
 **En el repositorio de OSDi**
 
+Los pasos 1 a 4 están hechos en la rama local `release-1.3` del repositorio de OSDi (commit `131e0f0`, sin push).
+
 1. Copiar a la raíz, sin cambios, la `OSDi.ttl` de `jades-hta`, que ya declara la 1.3. Su huella SHA-256 (con finales de línea LF) debe ser la que registra `TestOSDiPublishedCopy`.
-2. Sustituir `individuals/PBD.ttl` e `individuals/T1DM.ttl` por las copias de `jades-hta`, importando la 1.3. Corregir el IRI de `T1DM.ttl` (doble barra) e `individuals/catalog-v001.xml`.
+2. Sustituir `individuals/PBD.ttl` e `individuals/T1DM.ttl` por las copias de `jades-hta`, importando la 1.3. Corregir el IRI de `T1DM.ttl` (doble barra; corregido también en `jades-hta`).
 3. Añadir `examples/` (ya importan la 1.3) y su paso en `generate_doc.yml` (apartado 2).
-4. Añadir las notas de la versión (apartado 4) al `README.md` o a un `CHANGELOG`.
-5. Publicar. `generate_doc.yml` genera `docs/1.3` a partir de la `owl:versionIRI`. Opcional: etiqueta `v1.3`.
+4. Añadir las notas de la versión (apartado 4) a `CHANGELOG.md`, enlazado desde el `README.md`.
+5. Publicar: fusionar `release-1.3` en `main` y hacer push. `generate_doc.yml` genera `docs/1.3` a partir de la `owl:versionIRI` (solo se dispara si cambia `OSDi.ttl`, como en este caso). Opcional: etiqueta `v1.3`.
+   - Antes, o después, conviene actualizar el tutorial (`docs-src/`), que es de la 1.2: `intervention.md` pone `hasSensitivity` y `hasSpecificity` en una intervención de cribado (incompatible con la 1.3) y usa `isAssessedIntervention`.
 
 **En el fork de w3id.org**
 
