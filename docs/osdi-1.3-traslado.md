@@ -281,7 +281,10 @@ En lugar de copiar a JaDES la versión ya publicada, se hace al revés: JaDES de
 
 **En el repositorio de OSDi**
 
-Los pasos 1 a 4 están hechos en la rama local `release-1.3` del repositorio de OSDi (commit `131e0f0`, sin push).
+**Publicada el 2026-11-26.** La rama `release-1.3` se fusionó en `main` del repositorio de OSDi (`dc09f91`), y los flujos generaron `docs/1.3`, `docs/latest` (con los individuos y los ejemplos) y el tutorial.
+- `https://w3id.org/ontologies-ULL/OSDi/1.3` resuelve a `docs/1.3/ontology.ttl`.
+- La huella de `TestOSDiPublishedCopy` es la del `OSDi.ttl` de la raíz del repositorio (comprobada en `main`). El `ontology.ttl` que sirve w3id lo vuelve a serializar Widoco y tiene otra huella.
+- Queda el paso 6.
 
 1. Copiar a la raíz, sin cambios, la `OSDi.ttl` de `jades-hta`, que ya declara la 1.3. Su huella SHA-256 (con finales de línea LF) debe ser la que registra `TestOSDiPublishedCopy`.
 2. Sustituir `individuals/PBD.ttl` e `individuals/T1DM.ttl` por las copias de `jades-hta`, importando la 1.3. Corregir el IRI de `T1DM.ttl` (doble barra; corregido también en `jades-hta`).
