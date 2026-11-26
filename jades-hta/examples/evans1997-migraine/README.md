@@ -2,7 +2,7 @@
 
 Evans KW, Boan JA, Evans JL, Shuaib A. Economic evaluation of oral sumatriptan compared with oral caffeine/ergotamine for migraine. *PharmacoEconomics*. 1997;12(5):565-577.
 
-The study compares two oral treatments of a migraine attack in Canada with a decision tree over 24 hours. This example represents it in OSDi ([evans1997-migraine.ttl](evans1997-migraine.ttl)) and checks that JaDES reproduces its results ([expected-results.json](expected-results.json)).
+The study compares two oral treatments of a migraine attack in Canada with a decision tree over 24 hours. This example represents it in OSDi ([evans1997-migraine.ttl](evans1997-migraine.ttl)) and checks that [JaDES](https://github.com/JaDES-ULL/JaDES) reproduces its results ([expected-results.json](expected-results.json)).
 
 ## The model
 
@@ -14,13 +14,13 @@ The study compares two oral treatments of a migraine attack in Canada with a dec
 
 ## How it is represented in OSDi
 
-- The migraine is a `Disease` and the attack, an `AcuteManifestation`. The attack is the target of both interventions (`isInterventionOf`): every patient starts with an attack, and the tree evaluates it (decision D1). The migraine does not declare `hasIntervention`, which would give each intervention a second target.
-- Each intervention replaces the treatment of the attack by its drug (`StrategyReplacementEffect` with `hasReplacementStrategy`, D2).
-- The drug is a `LineOfTherapy` with a `SuccessOutcome` and a `FailureOutcome` (D4). The relief resolves the attack (`resolvesHealthCondition`).
+- The migraine is a `Disease` and the attack, an `AcuteManifestation`. The attack is the target of both interventions (`isInterventionOf`): every patient starts with an attack, and the tree evaluates it. The migraine does not declare `hasIntervention`, which would give each intervention a second target.
+- Each intervention replaces the treatment of the attack by its drug (`StrategyReplacementEffect` with `hasReplacementStrategy`).
+- The drug is a `LineOfTherapy` with a `SuccessOutcome` and a `FailureOutcome`. The relief resolves the attack (`resolvesHealthCondition`).
 - The failure of the drug is followed by a `Group` of alternative rescues, each one with its `hasProportionWithinGroup`: at home and in the emergency department.
 - The emergency department is a strategy with its own outcomes: relief (with a negative QALY loss) and failure, followed by the hospitalization.
-- The relapse follows the pattern of D9: the relief is followed by a `FollowUpStrategy` without cost, whose failure is the relapse, followed by the second dose.
-- QALY losses are one-time utilities (`appliesOneTime`, `isDisutility`), which apply once at the outcome (D7).
+- The relapse follows the pattern of a relapse after the response (see `FollowUpStrategy`): the relief is followed by a `FollowUpStrategy` without cost, whose failure is the relapse, followed by the second dose.
+- QALY losses are one-time utilities (`appliesOneTime`, `isDisutility`), which apply once at the outcome.
 - Costs use `Currency_CanadianDollar` with the year of the study, so they are not updated with the CPI.
 
 ## Assumptions of the article made explicit
