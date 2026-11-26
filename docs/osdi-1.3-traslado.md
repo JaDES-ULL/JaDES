@@ -288,7 +288,7 @@ Los pasos 1 a 4 están hechos en la rama local `release-1.3` del repositorio de 
 3. Añadir `examples/` (ya importan la 1.3) y su paso en `generate_doc.yml` (apartado 2).
 4. Añadir las notas de la versión (apartado 4) a `CHANGELOG.md`, enlazado desde el `README.md`.
 5. Publicar: fusionar `release-1.3` en `main` y hacer push. `generate_doc.yml` genera `docs/1.3` a partir de la `owl:versionIRI` (solo se dispara si cambia `OSDi.ttl`, como en este caso). Opcional: etiqueta `v1.3`.
-   - Antes, o después, conviene actualizar el tutorial (`docs-src/`), que es de la 1.2: `intervention.md` pone `hasSensitivity` y `hasSpecificity` en una intervención de cribado (incompatible con la 1.3) y usa `isAssessedIntervention`.
+   - Tutorial (`docs-src/`) actualizado a la 1.3 en la misma rama (commit `dc8c726`). Se construye con `mkdocs build --strict` y todos sus ejemplos Turtle se analizan sin errores. Las figuras (PNG) las cambias tú; la lista de cambios está en el registro de `docs/osdi-1.3-diseno.md`.
 
 **En el fork de w3id.org**
 

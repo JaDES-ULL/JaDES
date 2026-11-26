@@ -654,3 +654,31 @@ Bloqueada hasta decidir qué les ocurre a los falsos negativos (véase «Pendien
     - una exponencial con λ = 4 genera un `ExponentialVariate` de media 0,25. Antes de corregir el DES fallaba con 4,0.
   - Vistos y sin corregir: tres defectos del Excel con las distribuciones de un parámetro y la falta de un generador de Poisson en el DES (apartado 3 de `docs/osdi-1.3-traslado.md`).
 - Nueva huella de la 1.3 en `TestOSDiPublishedCopy`.
+
+**Publicación en el repositorio de OSDi (2026-11-26):**
+- Rama local `release-1.3` (sin push):
+  - `131e0f0`: la ontología, los individuos, los ejemplos, `generate_doc.yml` y `CHANGELOG.md`.
+  - `dc8c726`: el tutorial.
+- En JaDES: la IRI de `T1DM.ttl` (doble barra) y los README de los ejemplos, sin los códigos de decisión.
+- Tutorial (`docs-src/`), actualizado a la 1.3:
+  - objetivo de las intervenciones, estrategias y sustituciones, detección en las estrategias, resultados y efectos adversos;
+  - intervenciones evaluada y comparadoras del modelo;
+  - parámetros de cada distribución (escala de la gamma) y utilidades de una vez;
+  - corregidos seis nombres que no existen en OSDi y la sintaxis Turtle de los ejemplos.
+- Figuras del tutorial (PNG sin fuente editable en el repositorio), que hay que cambiar a mano:
+  - `osdi_intervention.png`:
+    - añadir `Intervention --isInterventionOf--> HealthCondition` (exactamente una);
+    - añadir `StrategyReplacementEffect` como subclase de `Effect`, con `hasReplacementStrategy --> Strategy`;
+    - `affects` también llega a `HealthCondition`;
+    - opcional: `HealthCondition --hasStrategy--> Strategy`, con sus subclases `DetectionStrategy` (`ScreeningStrategy`, `DiagnosisStrategy`), `LineOfTherapy` y `FollowUpStrategy`, y `Strategy --hasStrategyOutcome--> StrategyOutcome`.
+  - `osdi_model.png`:
+    - `DiseaseProgression` → `DiseaseProgressionElement`;
+    - añadir `Model --hasAssessedIntervention--> Intervention` y `Model --hasComparatorIntervention--> Intervention`.
+  - `osdi_disease_progression.png`: `CoexistenCombinationRule` → `CoexistentCombinationRule`.
+  - `osdi_pathway.png`: `DiseaseProgression` → `ClinicalProgressionElement`.
+  - `osdi_parameter.png`:
+    - `FirstOrderParameter` → `FirstOrderUncertaintyParameter` y `SecondOrderParameter` → `SecondOrderUncertaintyParameter`;
+    - las cuatro naturalezas (`DeterministicParameter`, `CalculatedParameter` y las dos de incertidumbre) son subclases de `ParameterNature`, no de `Parameter`: quitar sus flechas de subclase desde `Parameter`.
+  - `osdi_disease.png`: opcional, `Disease` como subclase de `HealthCondition`, junto a `AdverseEvent`.
+  - `osdi_population.png`: sin cambios.
+
